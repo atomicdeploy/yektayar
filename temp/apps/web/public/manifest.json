@@ -1,9 +1,0 @@
-{
-  "name": "YektaCare",
-  "short_name": "YektaCare",
-  "display": "standalone",
-  "start_url": "/",
-  "background_color": "#ffffff",
-  "theme_color": "#3B82F6",
-  "icons": []
-}

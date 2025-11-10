@@ -26,6 +26,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 
 #### Architecture & Design
 - **[Architecture Overview](ARCHITECTURE.md)** - Complete system architecture (prototype and production)
+- **[Alternative Architecture](ALTERNATIVE-ARCHITECTURE.md)** - Nuxt + Fastify approach (reference)
 - **[Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md)** - Understanding the difference between phases
 - **[Requirements Review](REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
 
@@ -62,6 +63,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 
 ### Architecture
 - [Architecture Overview](ARCHITECTURE.md) - Complete system design
+- [Alternative Architecture](ALTERNATIVE-ARCHITECTURE.md) - Nuxt + Fastify reference
 - [Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md) - Phase differences
 - [Requirements Review](REQUIREMENTS-REVIEW.md) - Requirements analysis
 

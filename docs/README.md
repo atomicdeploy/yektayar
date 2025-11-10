@@ -25,6 +25,12 @@ This directory contains comprehensive guides and documentation for the YektaYar 
   - Real-time architecture
   - Deployment architecture
 
+- **[Alternative Architecture](ALTERNATIVE-ARCHITECTURE.md)** - Nuxt + Fastify approach (reference)
+  - Alternative tech stack explored
+  - Comparison with current implementation
+  - Useful patterns extracted
+  - When to consider this approach
+
 - **[Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md)** - Understanding development phases
   - What the prototype is vs. what production will be
   - Scope and limitations of each phase

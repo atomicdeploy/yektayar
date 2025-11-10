@@ -193,7 +193,9 @@ npm run build
 #### Additional Resources
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
 - **[Prototype Tasks](docs/PROTOTYPE-TASKS.md)** - Detailed prototype task breakdown
+- **[Alternative Architecture](docs/ALTERNATIVE-ARCHITECTURE.md)** - Nuxt + Fastify reference approach
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
+- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 
 ---
 
