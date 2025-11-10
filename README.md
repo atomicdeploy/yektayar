@@ -161,9 +161,18 @@ npm run build
 
 ## 📚 Documentation
 
-- **README.md** (this file) - Project overview
-- **docs-archive/** - Archived Spark prototype documentation
-- Additional docs to be created as needed
+### Main Documentation
+- **[README.md](README.md)** - Project overview and quick start
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Detailed development guide
+- **[QUICK-START.md](QUICK-START.md)** - Quick reference guide
+
+### Guides
+- **[Bun vs NPM](docs/BUN-VS-NPM.md)** - Comparison and usage guide for bun and npm
+- **[Network Configuration](docs/NETWORK-CONFIGURATION.md)** - Interface binding and port configuration
+- **[Ubuntu 24.04 Deployment](docs/UBUNTU-24-DEPLOYMENT.md)** - Complete VPS deployment guide
+
+### Archive
+- **docs-archive/** - Archived Spark prototype documentation (reference only)
 
 ---
 
@@ -206,12 +215,16 @@ This mono repo addresses all requirements from the issue:
 
 ## 🚢 Deployment
 
-See individual package README files for deployment instructions.
+See **[Ubuntu 24.04 Deployment Guide](docs/UBUNTU-24-DEPLOYMENT.md)** for complete VPS deployment instructions.
 
-Basic setup:
-1. Backend: Deploy with PM2 on VPS
-2. Admin Panel: Build and serve with Apache
-3. Mobile App: Build for Android/iOS with Capacitor
+Quick overview:
+1. **Backend**: Deploy with PM2 on VPS (using Bun runtime)
+2. **Admin Panel**: Build and serve with Apache/Nginx
+3. **Mobile App**: Build for Android/iOS with Capacitor
+
+Additional deployment resources:
+- [Network Configuration Guide](docs/NETWORK-CONFIGURATION.md) - Configure ports and interfaces
+- [Bun vs NPM Guide](docs/BUN-VS-NPM.md) - Understanding the runtime and package manager
 
 ---
 
