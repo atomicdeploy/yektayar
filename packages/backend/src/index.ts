@@ -41,7 +41,10 @@ const app = new Elysia()
   .use(messageRoutes)
   .use(appointmentRoutes)
   .use(courseRoutes)
-  .listen(process.env.PORT || 3000)
+  .listen({
+    port: process.env.PORT || 3000,
+    hostname: process.env.HOST || 'localhost'
+  })
 
 console.log(
   `🚀 YektaYar Backend is running at ${app.server?.hostname}:${app.server?.port}`
