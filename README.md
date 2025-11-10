@@ -100,8 +100,15 @@ yektayar/
 │   ├── admin-panel/          # Vue.js admin interface
 │   ├── mobile-app/           # Ionic + Capacitor app
 │   └── shared/               # Shared code (types, utils, i18n)
-├── docs-archive/             # Archived Spark prototype docs
+├── docs/                     # Complete documentation
+│   ├── INDEX.md             # Documentation hub
+│   ├── GETTING-STARTED.md   # Developer onboarding
+│   ├── ARCHITECTURE.md      # System architecture
+│   ├── SETUP.md             # Setup guide
+│   └── ...                  # Additional guides
 ├── package.json              # Root workspace configuration
+├── ROADMAP.md                # Implementation roadmap
+├── DEVELOPMENT.md            # Development guide
 └── README.md                 # This file
 ```
 
@@ -161,18 +168,32 @@ npm run build
 
 ## 📚 Documentation
 
-### Main Documentation
-- **[README.md](README.md)** - Project overview and quick start
-- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Detailed development guide
-- **[QUICK-START.md](QUICK-START.md)** - Quick reference guide
+> **📖 Complete Documentation**: Visit **[docs/INDEX.md](docs/INDEX.md)** for the complete documentation hub with guided reading paths.
 
-### Guides
-- **[Bun vs NPM](docs/BUN-VS-NPM.md)** - Comparison and usage guide for bun and npm
-- **[Network Configuration](docs/NETWORK-CONFIGURATION.md)** - Interface binding and port configuration
-- **[Ubuntu 24.04 Deployment](docs/UBUNTU-24-DEPLOYMENT.md)** - Complete VPS deployment guide
+### Quick Links
 
-### Archive
-- **docs-archive/** - Archived Spark prototype documentation (reference only)
+#### Getting Started
+- **[Quick Start Guide](QUICK-START.md)** - Fast setup for the monorepo
+- **[Getting Started Guide](docs/GETTING-STARTED.md)** - Comprehensive developer onboarding
+- **[Development Guide](DEVELOPMENT.md)** - Detailed development practices
+- **[Quick Reference](docs/QUICK-REFERENCE.md)** - Code snippets and daily checklist
+
+#### Architecture & Planning
+- **[Architecture Overview](docs/ARCHITECTURE.md)** - Complete system architecture
+- **[Prototype vs Production](docs/PROTOTYPE-vs-PRODUCTION.md)** - Understanding development phases
+- **[Implementation Roadmap](ROADMAP.md)** - Production roadmap and progress
+- **[Prototype Roadmap](docs/PROTOTYPE-ROADMAP.md)** - Prototype sprint plan
+
+#### Setup & Deployment
+- **[Setup Guide](docs/SETUP.md)** - Complete setup for all phases
+- **[Ubuntu 24.04 Deployment](docs/UBUNTU-24-DEPLOYMENT.md)** - VPS deployment guide
+- **[Network Configuration](docs/NETWORK-CONFIGURATION.md)** - Port and interface configuration
+- **[Bun vs NPM](docs/BUN-VS-NPM.md)** - Runtime comparison guide
+
+#### Additional Resources
+- **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
+- **[Prototype Tasks](docs/PROTOTYPE-TASKS.md)** - Detailed prototype task breakdown
+- **[Security Policy](SECURITY.md)** - Security practices and reporting
 
 ---
 
