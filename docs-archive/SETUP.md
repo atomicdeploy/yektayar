@@ -1,8 +1,8 @@
-# YektaCare Setup Guide
+# YektaYar Setup Guide
 
 ## 🎯 Overview
 
-This guide covers setting up YektaCare for both the **prototype phase** (client-side only) and **future production** (full-stack).
+This guide covers setting up YektaYar for both the **prototype phase** (client-side only) and **future production** (full-stack).
 
 ---
 
@@ -105,9 +105,9 @@ sudo -i -u postgres
 psql
 
 # In PostgreSQL shell:
-CREATE DATABASE yektacare;
-CREATE USER yektacare_user WITH ENCRYPTED PASSWORD 'your_secure_password_here';
-GRANT ALL PRIVILEGES ON DATABASE yektacare TO yektacare_user;
+CREATE DATABASE yektayar;
+CREATE USER yektayar_user WITH ENCRYPTED PASSWORD 'your_secure_password_here';
+GRANT ALL PRIVILEGES ON DATABASE yektayar TO yektayar_user;
 
 # Exit PostgreSQL shell
 \q
@@ -120,12 +120,12 @@ exit
 
 ```bash
 # Create application directory
-sudo mkdir -p /var/www/yektacare
-sudo chown $USER:$USER /var/www/yektacare
+sudo mkdir -p /var/www/yektayar
+sudo chown $USER:$USER /var/www/yektayar
 
 # Clone repository
-cd /var/www/yektacare
-git clone https://github.com/your-org/yektacare.git .
+cd /var/www/yektayar
+git clone https://github.com/your-org/yektayar.git .
 
 # Install dependencies (in monorepo root)
 npm install
@@ -135,7 +135,7 @@ npm install
 
 ```bash
 # Backend environment variables
-cd /var/www/yektacare/packages/backend
+cd /var/www/yektayar/packages/backend
 cp .env.example .env
 
 # Edit .env file
@@ -147,10 +147,10 @@ nano .env
 # Application
 NODE_ENV=production
 PORT=3000
-APP_URL=https://yektacare.com
+APP_URL=https://yektayar.com
 
 # Database
-DATABASE_URL=postgresql://yektacare_user:your_secure_password_here@localhost:5432/yektacare
+DATABASE_URL=postgresql://yektayar_user:your_secure_password_here@localhost:5432/yektayar
 
 # Security
 SESSION_SECRET=generate_a_long_random_string_here
@@ -165,7 +165,7 @@ SMTP_HOST=
 SMTP_PORT=587
 SMTP_USER=
 SMTP_PASS=
-SMTP_FROM=noreply@yektacare.com
+SMTP_FROM=noreply@yektayar.com
 
 # SMS (configure later - Iranian gateway)
 SMS_GATEWAY_URL=
@@ -176,7 +176,7 @@ PAYMENT_GATEWAY_URL=
 PAYMENT_MERCHANT_ID=
 
 # File Storage
-UPLOAD_DIR=/var/www/yektacare/storage/uploads
+UPLOAD_DIR=/var/www/yektayar/storage/uploads
 MAX_FILE_SIZE=10485760  # 10MB
 
 # Rate Limiting
@@ -191,22 +191,22 @@ SESSION_LIFETIME=7  # days
 
 ```bash
 # Build backend
-cd /var/www/yektacare/packages/backend
+cd /var/www/yektayar/packages/backend
 npm run build
 
 # Build frontend
-cd /var/www/yektacare/packages/web-app
+cd /var/www/yektayar/packages/web-app
 npm run build
 
 # Build admin panel
-cd /var/www/yektacare/packages/admin-panel
+cd /var/www/yektayar/packages/admin-panel
 npm run build
 ```
 
 ### 6. Database Migration
 
 ```bash
-cd /var/www/yektacare/packages/backend
+cd /var/www/yektayar/packages/backend
 
 # Run migrations (when implemented)
 npm run migrate
@@ -218,10 +218,10 @@ npm run seed
 ### 7. Setup PM2
 
 ```bash
-cd /var/www/yektacare/packages/backend
+cd /var/www/yektayar/packages/backend
 
 # Start application with PM2
-pm2 start dist/server.js --name yektacare-api -i 2
+pm2 start dist/server.js --name yektayar-api -i 2
 
 # Save PM2 configuration
 pm2 save
@@ -235,14 +235,14 @@ pm2 startup
 
 ```bash
 # Create Apache configuration
-sudo nano /etc/apache2/sites-available/yektacare.conf
+sudo nano /etc/apache2/sites-available/yektayar.conf
 ```
 
 #### Apache Configuration:
 ```apache
 <VirtualHost *:80>
-    ServerName yektacare.com
-    ServerAlias www.yektacare.com
+    ServerName yektayar.com
+    ServerAlias www.yektayar.com
     
     # Redirect to HTTPS
     RewriteEngine On
@@ -251,13 +251,13 @@ sudo nano /etc/apache2/sites-available/yektacare.conf
 </VirtualHost>
 
 <VirtualHost *:443>
-    ServerName yektacare.com
-    ServerAlias www.yektacare.com
+    ServerName yektayar.com
+    ServerAlias www.yektayar.com
     
     # SSL Configuration
     SSLEngine on
-    SSLCertificateFile /etc/letsencrypt/live/yektacare.com/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/yektacare.com/privkey.pem
+    SSLCertificateFile /etc/letsencrypt/live/yektayar.com/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/yektayar.com/privkey.pem
     
     # Security headers
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
@@ -277,9 +277,9 @@ sudo nano /etc/apache2/sites-available/yektacare.conf
     RewriteRule ^/api/(.*)$ ws://localhost:3000/api/$1 [P,L]
     
     # Serve static files for web app
-    DocumentRoot /var/www/yektacare/packages/web-app/dist
+    DocumentRoot /var/www/yektayar/packages/web-app/dist
     
-    <Directory /var/www/yektacare/packages/web-app/dist>
+    <Directory /var/www/yektayar/packages/web-app/dist>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -294,9 +294,9 @@ sudo nano /etc/apache2/sites-available/yektacare.conf
     </Directory>
     
     # Serve admin panel at /admin
-    Alias /admin /var/www/yektacare/packages/admin-panel/dist
+    Alias /admin /var/www/yektayar/packages/admin-panel/dist
     
-    <Directory /var/www/yektacare/packages/admin-panel/dist>
+    <Directory /var/www/yektayar/packages/admin-panel/dist>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -310,14 +310,14 @@ sudo nano /etc/apache2/sites-available/yektacare.conf
     </Directory>
     
     # Error logs
-    ErrorLog ${APACHE_LOG_DIR}/yektacare_error.log
-    CustomLog ${APACHE_LOG_DIR}/yektacare_access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/yektayar_error.log
+    CustomLog ${APACHE_LOG_DIR}/yektayar_access.log combined
 </VirtualHost>
 ```
 
 ```bash
 # Enable site
-sudo a2ensite yektacare.conf
+sudo a2ensite yektayar.conf
 
 # Test configuration
 sudo apache2ctl configtest
@@ -333,7 +333,7 @@ sudo systemctl reload apache2
 sudo apt install -y certbot python3-certbot-apache
 
 # Obtain certificate
-sudo certbot --apache -d yektacare.com -d www.yektacare.com
+sudo certbot --apache -d yektayar.com -d www.yektayar.com
 
 # Test auto-renewal
 sudo certbot renew --dry-run
@@ -371,7 +371,7 @@ sudo apt install -y pgadmin4
 
 # Or use Docker
 docker run -p 5050:80 \
-  -e 'PGADMIN_DEFAULT_EMAIL=admin@yektacare.com' \
+  -e 'PGADMIN_DEFAULT_EMAIL=admin@yektayar.com' \
   -e 'PGADMIN_DEFAULT_PASSWORD=admin' \
   -d dpage/pgadmin4
 ```
@@ -385,7 +385,7 @@ docker run -p 5050:80 \
 
 ```bash
 # Connect to database
-psql -U yektacare_user -d yektacare
+psql -U yektayar_user -d yektayar
 
 # Common commands
 \dt              # List tables
@@ -413,9 +413,9 @@ brew install postgresql@15
 sudo apt install postgresql-15
 
 # Or use Docker
-docker run --name yektacare-postgres \
-  -e POSTGRES_DB=yektacare \
-  -e POSTGRES_USER=yektacare \
+docker run --name yektayar-postgres \
+  -e POSTGRES_DB=yektayar \
+  -e POSTGRES_USER=yektayar \
   -e POSTGRES_PASSWORD=password \
   -p 5432:5432 \
   -d postgres:15
@@ -425,8 +425,8 @@ docker run --name yektacare-postgres \
 
 ```bash
 # Clone repository
-git clone https://github.com/your-org/yektacare.git
-cd yektacare
+git clone https://github.com/your-org/yektayar.git
+cd yektayar
 
 # Install dependencies
 npm install
@@ -445,7 +445,7 @@ NODE_ENV=development
 PORT=3000
 APP_URL=http://localhost:3000
 
-DATABASE_URL=postgresql://yektacare:password@localhost:5432/yektacare
+DATABASE_URL=postgresql://yektayar:password@localhost:5432/yektayar
 
 SESSION_SECRET=dev_session_secret
 JWT_SECRET=dev_jwt_secret
@@ -562,10 +562,10 @@ npx cap open ios
 pm2 status
 
 # View logs
-pm2 logs yektacare-api
+pm2 logs yektayar-api
 
 # Restart application
-pm2 restart yektacare-api
+pm2 restart yektayar-api
 ```
 
 **Problem:** Database connection failed
@@ -574,7 +574,7 @@ pm2 restart yektacare-api
 sudo systemctl status postgresql
 
 # Test connection
-psql -U yektacare_user -d yektacare -h localhost
+psql -U yektayar_user -d yektayar -h localhost
 
 # Check DATABASE_URL in .env
 ```
@@ -585,7 +585,7 @@ psql -U yektacare_user -d yektacare -h localhost
 sudo systemctl status apache2
 
 # View error logs
-sudo tail -f /var/log/apache2/yektacare_error.log
+sudo tail -f /var/log/apache2/yektayar_error.log
 
 # Test proxy manually
 curl http://localhost:3000/api/health
@@ -600,7 +600,7 @@ sudo certbot certificates
 sudo certbot renew
 
 # Test SSL
-openssl s_client -connect yektacare.com:443
+openssl s_client -connect yektayar.com:443
 ```
 
 ---
@@ -643,10 +643,10 @@ pm2 install pm2-server-monit
 
 ```bash
 # Create logrotate configuration
-sudo nano /etc/logrotate.d/yektacare
+sudo nano /etc/logrotate.d/yektayar
 
 # Add:
-/var/www/yektacare/packages/backend/logs/*.log {
+/var/www/yektayar/packages/backend/logs/*.log {
   daily
   rotate 14
   compress
@@ -668,21 +668,21 @@ sudo nano /etc/logrotate.d/yektacare
 
 ```bash
 # Create backup script
-sudo nano /usr/local/bin/backup-yektacare.sh
+sudo nano /usr/local/bin/backup-yektayar.sh
 ```
 
 ```bash
 #!/bin/bash
-BACKUP_DIR="/var/backups/yektacare"
+BACKUP_DIR="/var/backups/yektayar"
 DATE=$(date +%Y%m%d_%H%M%S)
 
 mkdir -p $BACKUP_DIR
 
 # Backup database
-pg_dump -U yektacare_user yektacare | gzip > $BACKUP_DIR/db_$DATE.sql.gz
+pg_dump -U yektayar_user yektayar | gzip > $BACKUP_DIR/db_$DATE.sql.gz
 
 # Backup uploads
-tar -czf $BACKUP_DIR/uploads_$DATE.tar.gz /var/www/yektacare/storage/uploads
+tar -czf $BACKUP_DIR/uploads_$DATE.tar.gz /var/www/yektayar/storage/uploads
 
 # Keep only last 7 days
 find $BACKUP_DIR -name "*.gz" -mtime +7 -delete
@@ -692,23 +692,23 @@ echo "Backup completed: $DATE"
 
 ```bash
 # Make executable
-sudo chmod +x /usr/local/bin/backup-yektacare.sh
+sudo chmod +x /usr/local/bin/backup-yektayar.sh
 
 # Add to crontab (daily at 2 AM)
 sudo crontab -e
 
 # Add line:
-0 2 * * * /usr/local/bin/backup-yektacare.sh >> /var/log/yektacare-backup.log 2>&1
+0 2 * * * /usr/local/bin/backup-yektayar.sh >> /var/log/yektayar-backup.log 2>&1
 ```
 
 ### Restore from Backup
 
 ```bash
 # Restore database
-gunzip < /var/backups/yektacare/db_YYYYMMDD_HHMMSS.sql.gz | psql -U yektacare_user yektacare
+gunzip < /var/backups/yektayar/db_YYYYMMDD_HHMMSS.sql.gz | psql -U yektayar_user yektayar
 
 # Restore uploads
-tar -xzf /var/backups/yektacare/uploads_YYYYMMDD_HHMMSS.tar.gz -C /
+tar -xzf /var/backups/yektayar/uploads_YYYYMMDD_HHMMSS.tar.gz -C /
 ```
 
 ---
@@ -730,7 +730,7 @@ tar -xzf /var/backups/yektacare/uploads_YYYYMMDD_HHMMSS.tar.gz -C /
 
 ## 🆘 Getting Help
 
-- **Issues:** https://github.com/your-org/yektacare/issues
+- **Issues:** https://github.com/your-org/yektayar/issues
 - **Discussions:** GitHub Discussions
 - **Email:** (Future)
 

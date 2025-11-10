@@ -1,8 +1,8 @@
-# YektaCare - Developer Quick Start
+# YektaYar - Developer Quick Start
 
 ## 👋 Welcome Developer!
 
-This is your **command center** for building YektaCare. Everything you need to know is documented here.
+This is your **command center** for building YektaYar. Everything you need to know is documented here.
 
 ---
 
@@ -47,7 +47,7 @@ Read these in order:
 
 ## 🎯 Your Mission (5 Days)
 
-Build a **professional-looking, feature-demonstrating prototype** of YektaCare mental health platform that:
+Build a **professional-looking, feature-demonstrating prototype** of YektaYar mental health platform that:
 
 ✅ Shows all key user flows  
 ✅ Looks modern and trustworthy  

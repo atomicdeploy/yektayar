@@ -1,7 +1,7 @@
 {
-  "name": "@yektacare/shared",
+  "name": "@yektayar/shared",
   "version": "0.1.0",
-  "description": "YektaCare Shared Types and Utilities",
+  "description": "YektaYar Shared Types and Utilities",
   "private": true,
   "type": "module",
   "main": "dist/index.js",

@@ -50,7 +50,7 @@
   },
   "en": {
     "common": {
-      "app_name": "YektaCare",
+      "app_name": "YektaYar",
       "welcome": "Welcome",
       "login": "Login",
       "register": "Register",
@@ -70,8 +70,8 @@
       "phone": "Phone Number",
       "password": "Password",
       "name": "Name",
-      "login_title": "Login to YektaCare",
-      "register_title": "Register for YektaCare",
+      "login_title": "Login to YektaYar",
+      "register_title": "Register for YektaYar",
       "send_otp": "Send OTP",
       "verify_otp": "Verify OTP",
       "forgot_password": "Forgot Password"

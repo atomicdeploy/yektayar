@@ -1,4 +1,4 @@
-# YektaCare - Implementation Roadmap
+# YektaYar - Implementation Roadmap
 
 **Status**: Mono repo structure complete, ready for feature implementation
 

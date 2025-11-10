@@ -1,8 +1,8 @@
-# YektaCare Tasks & Sprint Plan
+# YektaYar Tasks & Sprint Plan
 
 ## 🎯 Current Sprint: Prototype MVP (Days 1-5)
 
-**Goal:** Create a functional, professional-looking prototype demonstrating all key user flows for YektaCare mental health platform.
+**Goal:** Create a functional, professional-looking prototype demonstrating all key user flows for YektaYar mental health platform.
 
 **Status:** 🟡 Planning Complete - Ready to Start Development
 

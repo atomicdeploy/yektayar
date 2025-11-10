@@ -1,6 +1,6 @@
-# 📚 YektaCare - Complete Documentation Index
+# 📚 YektaYar - Complete Documentation Index
 
-Welcome to YektaCare! All documentation is organized and ready for you.
+Welcome to YektaYar! All documentation is organized and ready for you.
 
 ---
 
@@ -151,7 +151,7 @@ Code snippets, troubleshooting, daily checklist.
 ## 📂 Complete File Structure
 
 ```
-yektacare/
+yektayar/
 ├── docs/                              # You are here!
 │   ├── START-HERE.md                  ⭐ Start here
 │   ├── PROTOTYPE-vs-PRODUCTION.md     ⚠️ Critical context
@@ -314,7 +314,7 @@ All documentation follows these principles:
 - **Feedback:** GitHub Discussions
 
 ### Contact
-- **Project:** YektaCare
+- **Project:** YektaYar
 - **Maintainer:** Solo Developer
 - **Status:** Prototype Phase
 

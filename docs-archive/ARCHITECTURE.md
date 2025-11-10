@@ -1,4 +1,4 @@
-# YektaCare Architecture Documentation
+# YektaYar Architecture Documentation
 
 ## 🏗️ System Architecture Overview
 
@@ -139,7 +139,7 @@
 ## 📁 Project Structure (Monorepo Concept for Future)
 
 ```
-yektacare/
+yektayar/
 ├── .github/
 │   ├── workflows/
 │   │   ├── ci.yml
@@ -788,7 +788,7 @@ html[dir="rtl"] {
 ### Apache Configuration
 ```apache
 <VirtualHost *:443>
-    ServerName yektacare.com
+    ServerName yektayar.com
     
     SSLEngine on
     SSLCertificateFile /path/to/cert.pem
@@ -804,7 +804,7 @@ html[dir="rtl"] {
     RewriteRule /(.*) ws://localhost:3000/$1 [P,L]
     
     # Static files
-    DocumentRoot /var/www/yektacare/public
+    DocumentRoot /var/www/yektayar/public
 </VirtualHost>
 ```
 
@@ -812,7 +812,7 @@ html[dir="rtl"] {
 ```json
 {
   "apps": [{
-    "name": "yektacare-api",
+    "name": "yektayar-api",
     "script": "./dist/server.js",
     "instances": 2,
     "exec_mode": "cluster",

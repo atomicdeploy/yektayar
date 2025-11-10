@@ -1,7 +1,7 @@
 {
-  "name": "@yektacare/mobile-app",
+  "name": "@yektayar/mobile-app",
   "version": "0.1.0",
-  "description": "YektaCare Mobile App (Ionic + Capacitor)",
+  "description": "YektaYar Mobile App (Ionic + Capacitor)",
   "private": true,
   "type": "module",
   "scripts": {

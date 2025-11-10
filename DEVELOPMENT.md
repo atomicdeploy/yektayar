@@ -1,6 +1,6 @@
-# YektaCare - Development Guide
+# YektaYar - Development Guide
 
-This document provides detailed information for developers working on the YektaCare platform.
+This document provides detailed information for developers working on the YektaYar platform.
 
 ---
 
@@ -27,8 +27,8 @@ This document provides detailed information for developers working on the YektaC
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/atomicdeploy/yektacare-spark.git
-   cd yektacare-spark
+   git clone https://github.com/atomicdeploy/yektayar.git
+   cd yektayar
    ```
 
 2. **Install dependencies**
@@ -47,7 +47,7 @@ This document provides detailed information for developers working on the YektaC
    ```bash
    # Install PostgreSQL if not already installed
    # Create database
-   createdb yektacare
+   createdb yektayar
    
    # TODO: Run migrations when available
    ```
@@ -379,7 +379,7 @@ The shared package contains code used by multiple packages:
 
 ```typescript
 // In backend, admin-panel, or mobile-app
-import { User, UserType, userSchema } from '@yektacare/shared'
+import { User, UserType, userSchema } from '@yektayar/shared'
 
 const user: User = {
   id: '123',
@@ -500,7 +500,7 @@ When backend is running: http://localhost:3000/swagger
 npm test
 
 # Run tests for specific package
-npm test -w @yektacare/backend
+npm test -w @yektayar/backend
 ```
 
 *Note: Tests not yet implemented in prototype phase.*

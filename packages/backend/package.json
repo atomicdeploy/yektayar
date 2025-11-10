@@ -1,7 +1,7 @@
 {
-  "name": "@yektacare/backend",
+  "name": "@yektayar/backend",
   "version": "0.1.0",
-  "description": "YektaCare Backend API Server",
+  "description": "YektaYar Backend API Server",
   "private": true,
   "type": "module",
   "main": "dist/index.js",

@@ -1,4 +1,4 @@
-# YektaCare Platform
+# YektaYar Platform
 
 **Mental Health Care Platform - Mono Repo**
 
@@ -24,7 +24,7 @@
 
 ## 🎯 Overview
 
-YektaCare is a comprehensive mental health care platform that connects users with:
+YektaYar is a comprehensive mental health care platform that connects users with:
 - **AI-powered support** for initial assessments
 - **Professional psychologists** for appointments
 - **Educational content** based on psychological assessments
@@ -59,8 +59,8 @@ YektaCare is a comprehensive mental health care platform that connects users wit
 
 ```bash
 # Clone the repository
-git clone https://github.com/atomicdeploy/yektacare-spark.git
-cd yektacare-spark
+git clone https://github.com/atomicdeploy/yektayar.git
+cd yektayar
 
 # Install all dependencies
 npm install
@@ -94,7 +94,7 @@ npm run dev:mobile     # Mobile App (port 8100)
 ## 📁 Project Structure
 
 ```
-yektacare-spark/
+yektayar/
 ├── packages/
 │   ├── backend/              # Elysia.js API server
 │   ├── admin-panel/          # Vue.js admin interface
@@ -230,7 +230,7 @@ This is a proprietary project in prototype phase. Team members only.
 ## 📞 Support
 
 - **Issues**: GitHub Issues
-- **Repository**: https://github.com/atomicdeploy/yektacare-spark
+- **Repository**: https://github.com/atomicdeploy/yektayar
 
 ---
 

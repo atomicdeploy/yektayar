@@ -1,4 +1,4 @@
-# YektaCare Platform - Quick Reference
+# YektaYar Platform - Quick Reference
 
 **Version**: 0.1.0  
 **Status**: ✅ Mono repo structure complete, ready for implementation  
@@ -9,7 +9,7 @@
 ## 📁 Repository Structure
 
 ```
-yektacare-spark/
+yektayar/
 ├── packages/
 │   ├── backend/           # Elysia.js API (Port 3000)
 │   ├── admin-panel/       # Vue.js Admin UI (Port 5173)
@@ -75,7 +75,7 @@ npm run clean
 
 ## 📦 Package Details
 
-### Backend (@yektacare/backend)
+### Backend (@yektayar/backend)
 - **Port**: 3000
 - **Framework**: Elysia.js
 - **Runtime**: Bun
@@ -86,7 +86,7 @@ npm run clean
 - `src/routes/` - API endpoints
 - `.env.example` - Config template
 
-### Admin Panel (@yektacare/admin-panel)
+### Admin Panel (@yektayar/admin-panel)
 - **Port**: 5173
 - **Framework**: Vue.js 3
 - **Build**: Vite
@@ -97,7 +97,7 @@ npm run clean
 - `src/router/` - Routes
 - `src/views/` - Pages
 
-### Mobile App (@yektacare/mobile-app)
+### Mobile App (@yektayar/mobile-app)
 - **Port**: 8100
 - **Framework**: Ionic 7 + Vue.js 3
 - **Native**: Capacitor
@@ -109,7 +109,7 @@ npm run clean
 - `src/views/` - Pages
 - `capacitor.config.json` - Native config
 
-### Shared (@yektacare/shared)
+### Shared (@yektayar/shared)
 - **Purpose**: Common code
 - **Exports**: Types, schemas, utilities, i18n
 
@@ -130,7 +130,7 @@ Create `packages/backend/.env` from `.env.example`:
 ```bash
 PORT=3000
 NODE_ENV=development
-DATABASE_URL=postgresql://user:password@localhost:5432/yektacare
+DATABASE_URL=postgresql://user:password@localhost:5432/yektayar
 SESSION_SECRET=your_session_secret
 JWT_SECRET=your_jwt_secret
 CORS_ORIGIN=http://localhost:5173,http://localhost:8100
@@ -140,7 +140,7 @@ CORS_ORIGIN=http://localhost:5173,http://localhost:8100
 
 ```bash
 # Create database
-createdb yektacare
+createdb yektayar
 
 # TODO: Run migrations when available
 ```
@@ -345,7 +345,7 @@ git push origin feature/my-feature
 - [Zod](https://zod.dev/)
 
 ### Repository
-- **GitHub**: https://github.com/atomicdeploy/yektacare-spark
+- **GitHub**: https://github.com/atomicdeploy/yektayar
 - **Issues**: Use GitHub Issues
 - **Discussions**: Use GitHub Discussions
 

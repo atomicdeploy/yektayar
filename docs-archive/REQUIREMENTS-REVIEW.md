@@ -1,4 +1,4 @@
-# YektaCare - Requirements Review & Answers
+# YektaYar - Requirements Review & Answers
 
 This document addresses your comprehensive requirements list and provides answers to your questions.
 
@@ -120,7 +120,7 @@ These can all be deferred to post-MVP, but good to think about.
    - Simple chat app with database
    - Authentication with sessions
    - WebSocket messaging
-   - This will make YektaCare backend 3x easier
+   - This will make YektaYar backend 3x easier
 
 **When Building:**
 1. Start with authentication (hardest part)

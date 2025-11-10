@@ -13,7 +13,7 @@ const app = new Elysia()
     swagger({
       documentation: {
         info: {
-          title: 'YektaCare API',
+          title: 'YektaYar API',
           version: '0.1.0',
           description: 'Mental Health Care Platform API'
         },
@@ -28,7 +28,7 @@ const app = new Elysia()
     })
   )
   .get('/', () => ({
-    message: 'YektaCare API Server',
+    message: 'YektaYar API Server',
     version: '0.1.0',
     status: 'running'
   }))
@@ -44,7 +44,7 @@ const app = new Elysia()
   .listen(process.env.PORT || 3000)
 
 console.log(
-  `🚀 YektaCare Backend is running at ${app.server?.hostname}:${app.server?.port}`
+  `🚀 YektaYar Backend is running at ${app.server?.hostname}:${app.server?.port}`
 )
 
 export default app

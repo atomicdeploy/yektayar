@@ -1,4 +1,4 @@
-# YektaCare - Quick Reference Card
+# YektaYar - Quick Reference Card
 
 **Keep this open while coding!**
 

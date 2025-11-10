@@ -1,4 +1,4 @@
-# YektaCare - Prototype vs Production
+# YektaYar - Prototype vs Production
 
 ## ⚠️ CRITICAL: Understanding This Prototype
 
@@ -288,7 +288,7 @@ You'll need to build an entirely separate system:
 
 ### Demo Script
 
-1. **Open with vision**: "YektaCare connects people with mental health support"
+1. **Open with vision**: "YektaYar connects people with mental health support"
 2. **Show the flow**: Walk through patient journey start to finish
 3. **Highlight design**: Point out RTL support, dark mode, animations
 4. **Explain prototype**: "This validates the concept before building production infrastructure"
@@ -373,13 +373,13 @@ Since you mentioned the tech stack is new to you:
 - AdonisJS: Official documentation (excellent)
 - Socket.IO: Official guides
 
-### Practice Projects (Before YektaCare Backend)
+### Practice Projects (Before YektaYar Backend)
 Build a tiny app first:
 - Simple chat app with Node + Socket.IO
 - Basic CRUD API with database
 - Authentication with sessions
 
-This will make the actual YektaCare backend much easier.
+This will make the actual YektaYar backend much easier.
 
 ---
 

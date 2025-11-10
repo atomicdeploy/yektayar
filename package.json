@@ -1,20 +1,20 @@
 {
-  "name": "yektacare",
+  "name": "yektayar",
   "version": "0.1.0",
-  "description": "YektaCare - Mental Health Care Platform",
+  "description": "YektaYar - Mental Health Care Platform",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
     "dev": "npm run dev --workspaces --if-present",
-    "dev:backend": "npm run dev -w @yektacare/backend",
-    "dev:admin": "npm run dev -w @yektacare/admin-panel",
-    "dev:mobile": "npm run dev -w @yektacare/mobile-app",
+    "dev:backend": "npm run dev -w @yektayar/backend",
+    "dev:admin": "npm run dev -w @yektayar/admin-panel",
+    "dev:mobile": "npm run dev -w @yektayar/mobile-app",
     "build": "npm run build --workspaces --if-present",
-    "build:backend": "npm run build -w @yektacare/backend",
-    "build:admin": "npm run build -w @yektacare/admin-panel",
-    "build:mobile": "npm run build -w @yektacare/mobile-app",
+    "build:backend": "npm run build -w @yektayar/backend",
+    "build:admin": "npm run build -w @yektayar/admin-panel",
+    "build:mobile": "npm run build -w @yektayar/mobile-app",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
@@ -28,7 +28,7 @@
     "ionic",
     "elysia"
   ],
-  "author": "YektaCare Team",
+  "author": "YektaYar Team",
   "license": "PROPRIETARY",
   "engines": {
     "node": ">=18.0.0",

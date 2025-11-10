@@ -35,8 +35,8 @@ const i18n = createI18n({
       app_title: 'یکتاکر'
     },
     en: {
-      welcome: 'Welcome to YektaCare',
-      app_title: 'YektaCare'
+      welcome: 'Welcome to YektaYar',
+      app_title: 'YektaYar'
     }
   }
 })

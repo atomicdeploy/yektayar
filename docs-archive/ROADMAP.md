@@ -1,4 +1,4 @@
-# YektaCare Development Roadmap
+# YektaYar Development Roadmap
 
 ## 🎯 Current Phase: Prototype (Days 1-5)
 

@@ -1,4 +1,4 @@
-# YektaCare - Project Status
+# YektaYar - Project Status
 
 **Last Updated:** Day 0 - Initial Planning  
 **Current Phase:** 📋 Prototype Sprint (Days 1-5)  

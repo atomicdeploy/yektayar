@@ -16,7 +16,7 @@ const i18n = createI18n({
       admin_panel: 'پنل مدیریت'
     },
     en: {
-      welcome: 'Welcome to YektaCare',
+      welcome: 'Welcome to YektaYar',
       admin_panel: 'Admin Panel'
     }
   }
