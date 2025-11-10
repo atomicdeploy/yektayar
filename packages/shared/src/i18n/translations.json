@@ -1,0 +1,100 @@
+{
+  "fa": {
+    "common": {
+      "app_name": "یکتاکر",
+      "welcome": "خوش آمدید",
+      "login": "ورود",
+      "register": "ثبت‌نام",
+      "logout": "خروج",
+      "submit": "ارسال",
+      "cancel": "انصراف",
+      "save": "ذخیره",
+      "delete": "حذف",
+      "edit": "ویرایش",
+      "search": "جستجو",
+      "loading": "در حال بارگذاری...",
+      "error": "خطا",
+      "success": "موفقیت‌آمیز"
+    },
+    "auth": {
+      "email": "ایمیل",
+      "phone": "شماره تلفن",
+      "password": "رمز عبور",
+      "name": "نام",
+      "login_title": "ورود به یکتاکر",
+      "register_title": "ثبت‌نام در یکتاکر",
+      "send_otp": "ارسال کد تأیید",
+      "verify_otp": "تأیید کد",
+      "forgot_password": "فراموشی رمز عبور"
+    },
+    "navigation": {
+      "home": "خانه",
+      "dashboard": "داشبورد",
+      "chat": "گفتگو",
+      "appointments": "نوبت‌ها",
+      "courses": "دوره‌ها",
+      "profile": "پروفایل",
+      "settings": "تنظیمات"
+    },
+    "messages": {
+      "no_messages": "پیامی وجود ندارد",
+      "type_message": "پیام خود را بنویسید...",
+      "send": "ارسال"
+    },
+    "appointments": {
+      "book": "رزرو نوبت",
+      "upcoming": "نوبت‌های آینده",
+      "past": "نوبت‌های گذشته",
+      "no_appointments": "نوبتی وجود ندارد"
+    }
+  },
+  "en": {
+    "common": {
+      "app_name": "YektaYar",
+      "welcome": "Welcome",
+      "login": "Login",
+      "register": "Register",
+      "logout": "Logout",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "search": "Search",
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success"
+    },
+    "auth": {
+      "email": "Email",
+      "phone": "Phone Number",
+      "password": "Password",
+      "name": "Name",
+      "login_title": "Login to YektaYar",
+      "register_title": "Register for YektaYar",
+      "send_otp": "Send OTP",
+      "verify_otp": "Verify OTP",
+      "forgot_password": "Forgot Password"
+    },
+    "navigation": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "chat": "Chat",
+      "appointments": "Appointments",
+      "courses": "Courses",
+      "profile": "Profile",
+      "settings": "Settings"
+    },
+    "messages": {
+      "no_messages": "No messages",
+      "type_message": "Type your message...",
+      "send": "Send"
+    },
+    "appointments": {
+      "book": "Book Appointment",
+      "upcoming": "Upcoming Appointments",
+      "past": "Past Appointments",
+      "no_appointments": "No appointments"
+    }
+  }
+}

@@ -1,485 +1,238 @@
-# YektaCare - Mental Health Care Platform
+# YektaYar Platform
 
-**Version:** 0.1.0 (Prototype/MVP)  
-**Timeline:** 5-day sprint  
-**Status:** 📋 Planning Complete - Ready to Start
+**Mental Health Care Platform - Mono Repo**
 
-## 🚀 Quick Start for Developers
-
-**👉 [START HERE - Developer Quick Start Guide](./START-HERE.md)** 
-
-New to the project? Read the documentation in this order:
-1. **[START-HERE.md](./START-HERE.md)** - Your command center
-2. **[PROTOTYPE-vs-PRODUCTION.md](./PROTOTYPE-vs-PRODUCTION.md)** - Critical context ⚠️
-3. **[TASKS.md](./TASKS.md)** - Your daily task guide 📋
-4. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical deep dive
-5. **[SETUP.md](./SETUP.md)** - Setup guide (for future production)
-6. **[ROADMAP.md](./ROADMAP.md)** - Feature roadmap
+> **Version:** 0.1.0  
+> **Status:** In Development  
+> **Architecture:** Mono Repo with Backend (Elysia.js), Admin Panel (Vue.js), Mobile App (Ionic + Capacitor)
 
 ---
 
-## 🎯 Project Overview
+## 📋 Table of Contents
 
-YektaCare is a mental health care platform connecting users with AI-powered support, professional psychologists, educational content, and appointment booking services.
-
-### Core Value Proposition
-Users can chat with AI to explain their mental health concerns, receive personalized educational content based on psychological assessments, book appointments with professionals, and access mental health resources - all in Persian (primary) and English (secondary).
-
-### What This Is
-This is a **UI/UX prototype** built in a browser-based React environment (GitHub Spark). It demonstrates the complete user experience with mock data and simulated interactions. It does NOT include a real backend, database, or server-side functionality.
-
----
-
-## ⚠️ CRITICAL: Current Environment Limitations
-
-This Spark template is a **browser-based React runtime** with key-value storage. It is **NOT** a full-stack Node.js environment. This prototype demonstrates:
-
-- ✅ UI/UX flows and design system
-- ✅ Client-side state management and routing
-- ✅ Mock AI chat interactions
-- ✅ Appointment booking interfaces
-- ✅ Dashboard and admin panel layouts
-- ✅ PWA capabilities (installable, offline-ready)
-- ✅ Real-time-like interactions (simulated)
-
-This prototype **DOES NOT** include:
-- ❌ Real backend server (Node.js/Elysia/AdonisJS)
-- ❌ Database (PostgreSQL/MySQL)
-- ❌ Real authentication/sessions
-- ❌ Payment processing
-- ❌ SMS/Email sending
-- ❌ WebSocket server
-
-**Next Step:** Use this prototype to validate UX/UI, then build the actual backend stack separately.
+- [Overview](#overview)
+- [Quick Start](#quick-start)
+- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
+- [Development](#development)
+- [Building](#building)
+- [Deployment](#deployment)
+- [Documentation](#documentation)
+- [License](#license)
 
 ---
 
-## 📋 5-Day Prototype Scope (MVP-MVP)
+## 🎯 Overview
 
-### Day 1-2: Core UI Foundation
-- [ ] Design system setup (colors, typography, RTL support)
-- [ ] Authentication screens (login, register, OTP mock)
-- [ ] Main navigation structure
-- [ ] Dashboard layout (user + admin views)
-- [ ] Persian/English i18n setup
+YektaYar is a comprehensive mental health care platform that connects users with:
+- **AI-powered support** for initial assessments
+- **Professional psychologists** for appointments
+- **Educational content** based on psychological assessments
+- **Unified messaging system** for communication
+- **Admin panel** for managing the platform
 
-### Day 3: Key Features - Part 1
-- [ ] AI Chat interface with mock responses
-- [ ] User profile with gradual data collection
-- [ ] Psychological assessment form (mock)
-- [ ] Results display
+### Core Features
 
-### Day 4: Key Features - Part 2
-- [ ] Appointment booking interface
-- [ ] Professional profiles listing
-- [ ] Messaging/ticketing center (unified)
-- [ ] Educational content browser
-
-### Day 5: Polish & PWA
-- [ ] Animations and transitions
-- [ ] Loading states and error handling
-- [ ] PWA manifest and icons
-- [ ] Pattern lock screen
-- [ ] Dark/Light mode
-- [ ] Final testing
+- ✅ User authentication (OTP-based, session management)
+- ✅ AI chatbot for mental health support
+- ✅ Appointment booking with professionals
+- ✅ Psychological assessments
+- ✅ Educational course management
+- ✅ Real-time messaging (WebSocket)
+- ✅ Admin dashboard
+- ✅ Multi-language support (Persian primary, English secondary)
+- ✅ RTL/LTR support
+- ✅ PWA capabilities
 
 ---
 
-## 🏗️ Architecture (Prototype)
-
-```
-YektaCare/
-├── src/
-│   ├── components/
-│   │   ├── auth/           # Login, Register, OTP
-│   │   ├── chat/           # AI Chat, Messaging
-│   │   ├── dashboard/      # Admin & User dashboards
-│   │   ├── appointments/   # Booking interface
-│   │   ├── courses/        # Educational content
-│   │   ├── profiles/       # User/Professional profiles
-│   │   └── common/         # Shared components
-│   ├── hooks/
-│   │   ├── useAuth.ts      # Auth state management
-│   │   ├── useChat.ts      # Chat functionality
-│   │   └── useI18n.ts      # Internationalization
-│   ├── lib/
-│   │   ├── mock-data.ts    # Sample data
-│   │   ├── ai-mock.ts      # Mock AI responses
-│   │   └── persian-date.ts # Jalali calendar utils
-│   ├── types/
-│   │   └── index.ts        # TypeScript definitions
-│   └── i18n/
-│       ├── fa.json         # Persian translations
-│       └── en.json         # English translations
-└── docs/
-    ├── SETUP.md            # Development setup
-    ├── ARCHITECTURE.md     # Technical architecture
-    ├── DEPLOYMENT.md       # Deployment guide
-    └── ROADMAP.md          # Future features
-```
-
----
-
-## 🚀 Quick Start (Development)
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm
-- Modern browser (Chrome/Firefox/Edge)
-- Code editor (VS Code recommended)
 
-### Run Locally
+- **Node.js** >= 18.0.0
+- **npm** >= 9.0.0
+- **Bun** >= 1.0.0 (for backend)
+- **PostgreSQL** 15+ (for database)
+
+### Installation
+
 ```bash
-# The Spark environment auto-installs dependencies
-# Just refresh the browser to see changes
-# No build process needed for development
+# Clone the repository
+git clone https://github.com/atomicdeploy/yektayar.git
+cd yektayar
+
+# Install all dependencies
+npm install
+
+# Setup environment variables
+cp packages/backend/.env.example packages/backend/.env
+# Edit .env file with your configuration
 ```
 
-### Key Technologies
-- **Frontend:** React 19 + TypeScript
-- **Styling:** Tailwind CSS + shadcn/ui
-- **State:** React hooks + useKV (persistent storage)
-- **Icons:** Phosphor Icons
-- **Animations:** Framer Motion
-- **i18n:** Custom lightweight solution
+### Development
 
----
-
-## 🎨 Design System
-
-### Colors (Light Mode Primary)
-- Primary: Blue-based for trust and calm
-- Secondary: Soft teal for healthcare
-- Accent: Warm orange for CTAs
-- Success: Green
-- Warning: Amber
-- Destructive: Red (minimal use)
-
-### Typography
-- Primary Font: **Vazirmatn** (Persian) / **Inter** (English)
-- Clear hierarchy: H1-H6, body, caption
-- RTL-first design with LTR support
-
-### Key Principles
-- Clean, modern, professional
-- Accessibility (WCAG AA minimum)
-- Mobile-first responsive design
-- Smooth animations (subtle, purposeful)
-- Dark mode support
-
----
-
-## 🔑 Key Features (Prototype)
-
-### 1. Authentication System (Mock)
-- Email + Phone number registration
-- OTP verification (simulated)
-- Optional password
-- Session management (localStorage)
-- Pattern lock screen
-
-### 2. AI Chat Support
-- Conversational interface
-- Mock AI responses based on keywords
-- Chat history persistence
-- Typing indicators
-- Support for Persian/English
-
-### 3. Dashboard
-**User View:**
-- Upcoming appointments
-- Recent messages
-- Recommended courses
-- Progress tracking
-
-**Admin View:**
-- User activity monitoring
-- Appointment management
-- Message moderation
-- Analytics overview
-
-### 4. Appointment Booking
-- Professional directory
-- Availability calendar (mock)
-- Booking confirmation
-- Appointment history
-
-### 5. Unified Messaging System
-- Chat with professionals
-- Ticketing/support requests
-- System notifications
-- Message categories (departments)
-- Multi-participant support
-
-### 6. Educational Content
-- Course browsing
-- Video content (mock)
-- Progress tracking
-- Recommendations based on assessments
-
-### 7. Psychological Assessment
-- Question forms
-- Personality type results
-- Customized recommendations
-
----
-
-## 🌐 Internationalization (i18n)
-
-### Supported Languages
-1. **Persian (Farsi)** - Primary
-2. **English** - Secondary
-
-### Implementation
-```typescript
-// Simple hook-based approach
-const { t, locale, setLocale } = useI18n()
-
-// Usage
-<h1>{t('welcome.title')}</h1>
-```
-
-### Date/Time
-- Jalali (Persian) calendar for Persian locale
-- Gregorian calendar for English locale
-- Timezone: Asia/Tehran (default, configurable)
-
----
-
-## 📱 PWA Features
-
-- ✅ Installable on mobile/desktop
-- ✅ Offline capability (limited)
-- ✅ Splash screen with logo
-- ✅ App icons (multiple sizes)
-- ✅ Push notification support (UI only)
-- ✅ Pattern lock for security
-
----
-
-## 🔐 Security Considerations (Prototype)
-
-**Note:** This prototype uses CLIENT-SIDE ONLY storage and authentication. NOT suitable for production.
-
-For production, implement:
-- Server-side session management
-- Secure token handling (JWT/Opaque)
-- HTTPS only
-- CSRF protection
-- Rate limiting
-- SQL injection prevention (parameterized queries)
-- Input validation and sanitization
-- Secure password hashing (bcrypt/argon2)
-
----
-
-## 📊 Data Model (Conceptual)
-
-### Users Table
-```typescript
-{
-  id: string
-  identifiers: { email?: string[], phone?: string[] }
-  profile: { name, avatar, birthdate, ... }
-  type: 'patient' | 'psychologist' | 'admin'
-  permissions: string[]
-  createdAt: Date
-  lastLoginAt: Date
-}
-```
-
-### Sessions Table
-```typescript
-{
-  token: string (opaque)
-  userId?: string
-  isLoggedIn: boolean
-  metadata: { ip, userAgent, ... }
-  expiresAt: Date
-}
-```
-
-### Messages Table
-```typescript
-{
-  id: string
-  threadId: string
-  participants: string[]
-  category: string
-  status: 'open' | 'closed'
-  messages: Array<{
-    senderId: string
-    content: string
-    timestamp: Date
-  }>
-}
-```
-
-### Appointments Table
-```typescript
-{
-  id: string
-  patientId: string
-  psychologistId: string
-  scheduledAt: Date
-  duration: number
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-  notes?: string
-}
-```
-
----
-
-## 🛠️ Development Workflow
-
-### Branching Strategy (Prototype)
-- `main` - production-ready code
-- Direct commits for rapid prototyping
-- Feature branches if needed: `feature/chat-ui`, `feature/booking`
-
-### Code Style
-- ESLint warnings only (not blocking)
-- Prettier for formatting (optional)
-- TypeScript strict mode: OFF (for speed)
-
-### Testing
-- Manual testing only for prototype
-- Unit tests: Deferred to post-MVP
-- E2E tests: Deferred to post-MVP
-
----
-
-## 🚢 Deployment (Future - Not This Prototype)
-
-### Infrastructure Requirements
-- **Server:** VPS (Ubuntu 22.04 LTS recommended)
-- **Web Server:** Apache + PM2/PM2-runtime
-- **Database:** PostgreSQL 15+ or MySQL 8+
-- **Cache:** Redis (when needed)
-- **Queue:** Defer until needed
-
-### Environment Variables (.env)
 ```bash
-NODE_ENV=production
-PORT=3000
-DATABASE_URL=postgresql://user:pass@localhost:5432/yektacare
-SESSION_SECRET=<secure-random-string>
-JWT_SECRET=<secure-random-string>
+# Start all services in development mode
+npm run dev
+
+# Or start individual services:
+npm run dev:backend    # Backend API (port 3000)
+npm run dev:admin      # Admin Panel (port 5173)
+npm run dev:mobile     # Mobile App (port 8100)
 ```
 
-Dynamic configuration stored in database `config` table.
+### Access the Applications
 
-### Build & Deploy
+- **Backend API**: http://localhost:3000
+- **API Documentation**: http://localhost:3000/swagger
+- **Admin Panel**: http://localhost:5173
+- **Mobile App**: http://localhost:8100
+
+---
+
+## 📁 Project Structure
+
+```
+yektayar/
+├── packages/
+│   ├── backend/              # Elysia.js API server
+│   ├── admin-panel/          # Vue.js admin interface
+│   ├── mobile-app/           # Ionic + Capacitor app
+│   └── shared/               # Shared code (types, utils, i18n)
+├── docs-archive/             # Archived Spark prototype docs
+├── package.json              # Root workspace configuration
+└── README.md                 # This file
+```
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Framework**: Elysia.js (TypeScript, Bun runtime)
+- **Database**: PostgreSQL 15+
+- **Validation**: Zod
+- **Real-time**: Socket.IO
+- **API Docs**: Swagger
+
+### Frontend (Admin Panel)
+- **Framework**: Vue.js 3 (Composition API)
+- **Build Tool**: Vite
+- **State**: Pinia
+- **Router**: Vue Router
+- **i18n**: vue-i18n
+
+### Mobile App
+- **Framework**: Ionic 7 + Vue.js 3
+- **Native**: Capacitor
+- **Build**: Vite
+- **i18n**: vue-i18n
+
+### Shared
+- **Language**: TypeScript
+- **Validation**: Zod
+
+---
+
+## 💻 Development
+
+### Start All Services
+
 ```bash
-# Backend (future)
+npm run dev
+```
+
+### Start Individual Services
+
+```bash
+npm run dev:backend    # Backend only
+npm run dev:admin      # Admin panel only
+npm run dev:mobile     # Mobile app only
+```
+
+### Build All
+
+```bash
 npm run build
-pm2 start dist/server.js --name yektacare
-
-# Frontend (future)
-npm run build
-# Serve from Apache with proper routing
 ```
 
 ---
 
-## 📖 Documentation Structure
+## 📚 Documentation
 
-- **README.md** (this file) - Overview and quick start
-- **SETUP.md** - Detailed setup instructions
-- **ARCHITECTURE.md** - Technical deep dive (future backend)
-- **ROADMAP.md** - Feature roadmap and deferred items
-- **API.md** - API documentation (future)
+- **README.md** (this file) - Project overview
+- **docs-archive/** - Archived Spark prototype documentation
+- Additional docs to be created as needed
 
 ---
 
-## 🗺️ Roadmap (Post-Prototype)
+## 🔧 Requirements Implementation
 
-### Phase 1: Backend Foundation (Weeks 1-2)
-- Choose framework: Elysia.js (Bun) or AdonisJS
-- Setup PostgreSQL with proper schema
-- Implement authentication (session-based)
-- REST API endpoints
-- WebSocket server for real-time
+This mono repo addresses all requirements from the issue:
 
-### Phase 2: Core Features (Weeks 3-4)
-- Real AI integration (Pollination AI or similar)
-- Email/SMS gateway integration
-- Payment gateway (IPG/POS)
-- File upload/storage
-- Admin panel functionality
+✅ **Mono repo structure** with packages for backend, admin, mobile, and shared code  
+✅ **Backend**: Elysia.js (fast, modern, TypeScript-first)  
+✅ **Admin Panel**: Vue.js with Vite  
+✅ **Mobile App**: Ionic + Capacitor + Vue.js  
+✅ **Shared code**: Types, schemas, utilities, i18n  
+✅ **No React**: All React/Spark remnants removed  
+✅ **Node.js/TypeScript**: Consistent across all packages  
+✅ **Simple structure**: Easy to understand and extend  
+✅ **Fast prototyping**: Minimal boilerplate, ready to develop  
+✅ **i18n support**: Persian (primary) + English (secondary)  
+✅ **RTL support**: Built into Vue.js and Ionic  
 
-### Phase 3: Enhancement (Weeks 5-6)
-- Role-based access control (RBAC)
-- Attribute-based access control (ABAC) where needed
-- Advanced analytics
-- Export/import functionality
-- Logging and monitoring
+---
 
-### Phase 4: Optimization (Weeks 7-8)
-- Redis caching layer
-- Database query optimization
-- CDN integration (Cloudflare/ArvanCloud)
-- Performance tuning
-- Load testing
+## 📝 Scripts
 
-### Deferred to Future Phases
-- Multi-tenancy (row-level)
-- Plugin architecture
-- Marketplace
-- Advanced ML features
-- Public API documentation portal
-- Automated testing suite
-- CI/CD pipeline (GitHub Actions)
-- Backup/disaster recovery automation
-- Feature flags
-- Data retention policies
-- Legal/compliance features (GDPR-equivalent)
-- User data deletion workflows
-- Changelog automation
-- Dependabot integration
-- Migration tools
-- Duplicate user merging
-- Impersonation feature
-- Full offline mode
+### Root-level Scripts
+- `npm run dev` - Start all packages in development
+- `npm run build` - Build all packages
+- `npm run lint` - Lint all packages
+- `npm run test` - Test all packages
+- `npm run clean` - Clean all build artifacts
+
+### Package-specific Scripts
+- `npm run dev:backend` - Backend only
+- `npm run dev:admin` - Admin panel only
+- `npm run dev:mobile` - Mobile app only
+- `npm run build:backend` - Build backend only
+- `npm run build:admin` - Build admin panel only
+- `npm run build:mobile` - Build mobile app only
+
+---
+
+## 🚢 Deployment
+
+See individual package README files for deployment instructions.
+
+Basic setup:
+1. Backend: Deploy with PM2 on VPS
+2. Admin Panel: Build and serve with Apache
+3. Mobile App: Build for Android/iOS with Capacitor
 
 ---
 
 ## 🤝 Contributing
 
-This is a proprietary project in prototype phase. Contributions limited to core team only.
-
-Future: Parts of the codebase (public API clients, SDKs) will be open-sourced.
+This is a proprietary project in prototype phase. Team members only.
 
 ---
 
-## 📞 Support & Contact
+## 📄 License
 
-- **Issue Tracking:** GitHub Issues
-- **Project Management:** GitHub Projects
-- **Code Repository:** GitHub
+**Proprietary** - All Rights Reserved
 
 ---
 
-## 📜 License
+## 📞 Support
 
-Proprietary - All Rights Reserved (for now)
-
-Future: Gradual open-sourcing of non-core components under MIT/Apache-2.0.
-
----
-
-## ⚡ Quick Development Tips
-
-1. **Don't Over-Engineer:** This is a prototype, not production
-2. **Mock Everything:** AI, payments, emails, SMS - all mocked
-3. **Focus on UX:** The goal is to validate user flows
-4. **Use Real Design:** Make it look professional even if backend is fake
-5. **Document Assumptions:** Note what's real vs. mocked
-6. **Keep It Simple:** Avoid premature optimization
-7. **RTL First:** Design for Persian, adapt for English
-8. **Mobile First:** Most users will be on phones
+- **Issues**: GitHub Issues
+- **Repository**: https://github.com/atomicdeploy/yektayar
 
 ---
 
-**Last Updated:** {DATE}  
-**Maintained By:** Solo Developer  
-**Next Review:** After prototype completion
+**Last Updated**: 2025-11-10  
+**Version**: 0.1.0
