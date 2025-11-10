@@ -23,10 +23,18 @@ export function validateIranianPhone(phone: string): boolean {
 }
 
 /**
- * Sanitize user input
+ * Sanitize user input by removing HTML tags
+ * Note: For production, use a proper HTML sanitization library like DOMPurify or validator.js
+ * This basic implementation is for prototype purposes only
  */
 export function sanitizeInput(input: string): string {
-  return input.trim().replace(/<[^>]*>/g, '')
+  // Simple and safe approach: remove all < and > characters
+  // This prevents HTML injection without complex regex patterns
+  return input
+    .trim()
+    .split('')
+    .filter(char => char !== '<' && char !== '>')
+    .join('')
 }
 
 /**
