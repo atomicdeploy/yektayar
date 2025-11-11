@@ -76,6 +76,11 @@ Desktop.ini
 *.sqlite
 *.sqlite3
 
+# Database credentials
+postgresql-credentials.txt
+pgadmin-credentials.txt
+adminer-credentials.txt
+
 # PM2
 .pm2
 

@@ -12,7 +12,93 @@ Systemd service unit files for running YektaYar services as system services:
 - `yektayar-admin-panel.service` - Admin Panel Web Server
 - `yektayar-mobile-app.service` - Mobile App Web Server
 
-### Scripts
+### Database Setup Scripts
+
+#### `setup-postgresql.sh`
+
+Installs and configures PostgreSQL database for YektaYar platform.
+
+**Usage:**
+```bash
+sudo ./scripts/setup-postgresql.sh
+```
+
+**What it does:**
+- Installs PostgreSQL 15+ (if not already installed)
+- Creates YektaYar database and user
+- Configures database permissions
+- Generates secure password
+- Updates `.env` file with database credentials
+- Saves credentials to `postgresql-credentials.txt`
+
+**Environment Variables:**
+- `DB_NAME` - Database name (default: `yektayar`)
+- `DB_USER` - Database user (default: `yektayar_user`)
+- `DB_PASSWORD` - Database password (auto-generated if not provided)
+- `PG_VERSION` - PostgreSQL version to install (default: `15`)
+- `ALLOW_REMOTE_ACCESS` - Enable remote connections (default: `false`)
+
+**Example with custom configuration:**
+```bash
+sudo DB_NAME=mydb DB_USER=myuser ALLOW_REMOTE_ACCESS=true ./scripts/setup-postgresql.sh
+```
+
+#### `setup-pgadmin.sh`
+
+Installs pgAdmin 4 for PostgreSQL database management (similar to phpMyAdmin for MySQL).
+
+**Usage:**
+```bash
+sudo ./scripts/setup-pgadmin.sh
+```
+
+**What it does:**
+- Installs pgAdmin 4 (web or desktop mode)
+- Configures web interface on Apache/Nginx
+- Creates admin user account
+- Saves access credentials to `pgadmin-credentials.txt`
+
+**Environment Variables:**
+- `PGADMIN_EMAIL` - Admin email (default: `admin@yektayar.local`)
+- `PGADMIN_PASSWORD` - Admin password (auto-generated if not provided)
+- `PGADMIN_PORT` - Web interface port (default: `5050`)
+- `INSTALL_MODE` - Installation mode: `web` or `desktop` (default: `web`)
+
+**Access:**
+- Web Interface: `http://localhost/pgadmin4`
+- Login with email and password from credentials file
+
+#### `setup-adminer.sh`
+
+Installs Adminer for lightweight database management (alternative to pgAdmin).
+
+**Usage:**
+```bash
+sudo ./scripts/setup-adminer.sh
+```
+
+**What it does:**
+- Downloads and installs Adminer (single-file PHP application)
+- Configures web server (Apache, Nginx, or standalone)
+- Sets up access on specified port
+- Saves access information to `adminer-credentials.txt`
+
+**Environment Variables:**
+- `ADMINER_DIR` - Installation directory (default: `/var/www/adminer`)
+- `ADMINER_PORT` - Web interface port (default: `8080`)
+- `WEB_SERVER` - Web server to use: `apache2`, `nginx`, or `standalone` (auto-detected)
+
+**Access:**
+- Web Interface: `http://localhost:8080`
+- Select PostgreSQL and login with database credentials
+
+**Features:**
+- Lightweight (single PHP file)
+- Supports multiple database systems
+- Similar interface to phpMyAdmin
+- Export/Import data, execute SQL queries
+
+### Application Scripts
 
 #### `install-services.sh`
 
@@ -123,7 +209,43 @@ tail -f /tmp/yektayar-mobile.log
 
 ## Deployment Guide
 
-### Initial Setup
+### Database Setup (Required First)
+
+Before deploying the application, set up PostgreSQL database:
+
+1. **Install and configure PostgreSQL:**
+   ```bash
+   sudo ./scripts/setup-postgresql.sh
+   ```
+   
+   This will:
+   - Install PostgreSQL 15+
+   - Create database and user
+   - Generate secure credentials
+   - Update `.env` file automatically
+
+2. **Install database management UI (optional but recommended):**
+   
+   Choose one or both:
+   
+   **pgAdmin 4** (Full-featured, similar to phpMyAdmin):
+   ```bash
+   sudo ./scripts/setup-pgadmin.sh
+   ```
+   Access at: `http://localhost/pgadmin4`
+   
+   **Adminer** (Lightweight, single-file):
+   ```bash
+   sudo ./scripts/setup-adminer.sh
+   ```
+   Access at: `http://localhost:8080`
+
+3. **Review database credentials:**
+   ```bash
+   cat postgresql-credentials.txt
+   ```
+
+### Application Setup
 
 1. **Clone the repository:**
    ```bash
