@@ -12,6 +12,7 @@ export default defineConfig({
   },
   server: {
     port: 8100,
+    allowedHosts: ['.yektayar.ir'],
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
