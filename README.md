@@ -199,6 +199,7 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Implementation Roadmap](ROADMAP.md)** - Production roadmap with prototype sprint reference
 
 #### Setup & Deployment
+- **[Environment Configuration Guide](ENV-GUIDE.md)** - Complete .env management and configuration guide
 - **[Setup Guide](docs/SETUP.md)** - Complete setup for all phases
 - **[Ubuntu 24.04 Deployment](docs/UBUNTU-24-DEPLOYMENT.md)** - VPS deployment guide
 - **[Network Configuration](docs/NETWORK-CONFIGURATION.md)** - Port and interface configuration
