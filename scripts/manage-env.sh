@@ -563,47 +563,45 @@ tui_frontend_config() {
 }
 
 show_usage() {
-    cat << EOF
-${BLUE}YektaYar .env Management Script${NC}
-
-${CYAN}Usage:${NC}
-    $0 [command]
-
-${CYAN}Commands:${NC}
-    ${GREEN}init${NC}              Create .env file from template
-    ${GREEN}show${NC}              Display current .env configuration (with masked secrets)
-    ${GREEN}validate${NC}          Validate that all required variables are set correctly
-    ${GREEN}test${NC}              Test configuration (validate + database connection)
-    ${GREEN}edit${NC}              Interactive TUI mode for editing .env values
-    ${GREEN}generate-secret${NC}   Generate a secure random secret for use in .env
-    ${GREEN}help${NC}              Show this help message
-
-${CYAN}Examples:${NC}
-    # Initial setup - create .env from template
-    $0 init
-
-    # Show current configuration
-    $0 show
-
-    # Validate configuration
-    $0 validate
-
-    # Test configuration (includes database connectivity test)
-    $0 test
-
-    # Interactive mode with TUI
-    $0 edit
-
-    # Generate a secure secret
-    $0 generate-secret
-
-${CYAN}Notes:${NC}
-    - The .env file is located at: ${PROJECT_ROOT}/.env
-    - All packages use this unified .env file
-    - Sensitive values are masked when displayed with 'show' command
-    - The 'test' command requires psql to be installed for database testing
-
-EOF
+    echo -e "${BLUE}YektaYar .env Management Script${NC}"
+    echo -e ""
+    echo -e "${CYAN}Usage:${NC}"
+    echo -e "    $0 [command]"
+    echo -e ""
+    echo -e "${CYAN}Commands:${NC}"
+    echo -e "    ${GREEN}init${NC}              Create .env file from template"
+    echo -e "    ${GREEN}show${NC}              Display current .env configuration (with masked secrets)"
+    echo -e "    ${GREEN}validate${NC}          Validate that all required variables are set correctly"
+    echo -e "    ${GREEN}test${NC}              Test configuration (validate + database connection)"
+    echo -e "    ${GREEN}edit${NC}              Interactive TUI mode for editing .env values"
+    echo -e "    ${GREEN}generate-secret${NC}   Generate a secure random secret for use in .env"
+    echo -e "    ${GREEN}help${NC}              Show this help message"
+    echo -e ""
+    echo -e "${CYAN}Examples:${NC}"
+    echo -e "    # Initial setup - create .env from template"
+    echo -e "    $0 init"
+    echo -e ""
+    echo -e "    # Show current configuration"
+    echo -e "    $0 show"
+    echo -e ""
+    echo -e "    # Validate configuration"
+    echo -e "    $0 validate"
+    echo -e ""
+    echo -e "    # Test configuration (includes database connectivity test)"
+    echo -e "    $0 test"
+    echo -e ""
+    echo -e "    # Interactive mode with TUI"
+    echo -e "    $0 edit"
+    echo -e ""
+    echo -e "    # Generate a secure secret"
+    echo -e "    $0 generate-secret"
+    echo -e ""
+    echo -e "${CYAN}Notes:${NC}"
+    echo -e "    - The .env file is located at: ${PROJECT_ROOT}/.env"
+    echo -e "    - All packages use this unified .env file"
+    echo -e "    - Sensitive values are masked when displayed with 'show' command"
+    echo -e "    - The 'test' command requires psql to be installed for database testing"
+    echo -e ""
 }
 
 # ==============================================================================
