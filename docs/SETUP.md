@@ -120,11 +120,11 @@ exit
 
 ```bash
 # Create application directory
-sudo mkdir -p /var/www/yektayar
-sudo chown $USER:$USER /var/www/yektayar
+sudo mkdir -p /home/deploy/Projects/YektaYar
+sudo chown $USER:$USER /home/deploy/Projects/YektaYar
 
 # Clone repository
-cd /var/www/yektayar
+cd /home/deploy/Projects/YektaYar
 git clone https://github.com/your-org/yektayar.git .
 
 # Install dependencies (in monorepo root)
@@ -135,7 +135,7 @@ npm install
 
 ```bash
 # Backend environment variables
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 cp .env.example .env
 
 # Edit .env file
@@ -176,7 +176,7 @@ PAYMENT_GATEWAY_URL=
 PAYMENT_MERCHANT_ID=
 
 # File Storage
-UPLOAD_DIR=/var/www/yektayar/storage/uploads
+UPLOAD_DIR=/home/deploy/Projects/YektaYar/storage/uploads
 MAX_FILE_SIZE=10485760  # 10MB
 
 # Rate Limiting
@@ -191,22 +191,22 @@ SESSION_LIFETIME=7  # days
 
 ```bash
 # Build backend
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 npm run build
 
 # Build frontend
-cd /var/www/yektayar/packages/web-app
+cd /home/deploy/Projects/YektaYar/packages/web-app
 npm run build
 
 # Build admin panel
-cd /var/www/yektayar/packages/admin-panel
+cd /home/deploy/Projects/YektaYar/packages/admin-panel
 npm run build
 ```
 
 ### 6. Database Migration
 
 ```bash
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 
 # Run migrations (when implemented)
 npm run migrate
@@ -218,7 +218,7 @@ npm run seed
 ### 7. Setup PM2
 
 ```bash
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 
 # Start application with PM2
 pm2 start dist/server.js --name yektayar-api -i 2
@@ -277,9 +277,9 @@ sudo nano /etc/apache2/sites-available/yektayar.conf
     RewriteRule ^/api/(.*)$ ws://localhost:3000/api/$1 [P,L]
     
     # Serve static files for web app
-    DocumentRoot /var/www/yektayar/packages/web-app/dist
+    DocumentRoot /home/deploy/Projects/YektaYar/packages/web-app/dist
     
-    <Directory /var/www/yektayar/packages/web-app/dist>
+    <Directory /home/deploy/Projects/YektaYar/packages/web-app/dist>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -294,9 +294,9 @@ sudo nano /etc/apache2/sites-available/yektayar.conf
     </Directory>
     
     # Serve admin panel at /admin
-    Alias /admin /var/www/yektayar/packages/admin-panel/dist
+    Alias /admin /home/deploy/Projects/YektaYar/packages/admin-panel/dist
     
-    <Directory /var/www/yektayar/packages/admin-panel/dist>
+    <Directory /home/deploy/Projects/YektaYar/packages/admin-panel/dist>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -371,7 +371,7 @@ sudo apt install -y pgadmin4
 
 # Or use Docker
 docker run -p 5050:80 \
-  -e 'PGADMIN_DEFAULT_EMAIL=admin@yektayar.ir' \
+  -e 'PGADMIN_DEFAULT_EMAIL=info@yektayar.ir' \
   -e 'PGADMIN_DEFAULT_PASSWORD=admin' \
   -d dpage/pgadmin4
 ```
@@ -646,7 +646,7 @@ pm2 install pm2-server-monit
 sudo nano /etc/logrotate.d/yektayar
 
 # Add:
-/var/www/yektayar/packages/backend/logs/*.log {
+/home/deploy/Projects/YektaYar/packages/backend/logs/*.log {
   daily
   rotate 14
   compress
@@ -682,7 +682,7 @@ mkdir -p $BACKUP_DIR
 pg_dump -U yektayar_user yektayar | gzip > $BACKUP_DIR/db_$DATE.sql.gz
 
 # Backup uploads
-tar -czf $BACKUP_DIR/uploads_$DATE.tar.gz /var/www/yektayar/storage/uploads
+tar -czf $BACKUP_DIR/uploads_$DATE.tar.gz /home/deploy/Projects/YektaYar/storage/uploads
 
 # Keep only last 7 days
 find $BACKUP_DIR -name "*.gz" -mtime +7 -delete

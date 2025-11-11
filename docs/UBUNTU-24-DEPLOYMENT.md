@@ -295,9 +295,9 @@ psql -U yektayar_user -d yektayar -h localhost
 
 ```bash
 # Create directory
-sudo mkdir -p /var/www/yektayar
-sudo chown $USER:$USER /var/www/yektayar
-cd /var/www/yektayar
+sudo mkdir -p /home/deploy/Projects/YektaYar
+sudo chown $USER:$USER /home/deploy/Projects/YektaYar
+cd /home/deploy/Projects/YektaYar
 ```
 
 ### 2. Clone Repository
@@ -323,7 +323,7 @@ npm install
 
 ```bash
 # Navigate to backend
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 
 # Copy example env file
 cp .env.example .env
@@ -375,22 +375,22 @@ openssl rand -hex 32  # Run this twice for SESSION_SECRET and JWT_SECRET
 
 ```bash
 # Build backend
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 npm run build
 
 # Build admin panel
-cd /var/www/yektayar/packages/admin-panel
+cd /home/deploy/Projects/YektaYar/packages/admin-panel
 npm run build
 
 # Build mobile app (if needed)
-cd /var/www/yektayar/packages/mobile-app
+cd /home/deploy/Projects/YektaYar/packages/mobile-app
 npm run build
 ```
 
 ### 6. Run Database Migrations (When Available)
 
 ```bash
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 
 # Run migrations (implement this as needed)
 # npm run migrate
@@ -453,9 +453,9 @@ sudo nano /etc/apache2/sites-available/yektayar.conf
     RewriteRule ^/api/(.*)$ ws://127.0.0.1:3000/api/$1 [P,L]
     
     # Serve Admin Panel (main site)
-    DocumentRoot /var/www/yektayar/packages/admin-panel/dist
+    DocumentRoot /home/deploy/Projects/YektaYar/packages/admin-panel/dist
     
-    <Directory /var/www/yektayar/packages/admin-panel/dist>
+    <Directory /home/deploy/Projects/YektaYar/packages/admin-panel/dist>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -470,9 +470,9 @@ sudo nano /etc/apache2/sites-available/yektayar.conf
     </Directory>
     
     # Serve Mobile App at /mobile (optional)
-    Alias /mobile /var/www/yektayar/packages/mobile-app/dist
+    Alias /mobile /home/deploy/Projects/YektaYar/packages/mobile-app/dist
     
-    <Directory /var/www/yektayar/packages/mobile-app/dist>
+    <Directory /home/deploy/Projects/YektaYar/packages/mobile-app/dist>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -546,7 +546,7 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     
     # Root directory
-    root /var/www/yektayar/packages/admin-panel/dist;
+    root /home/deploy/Projects/YektaYar/packages/admin-panel/dist;
     index index.html;
     
     # API Proxy
@@ -569,7 +569,7 @@ server {
     
     # Mobile App (optional)
     location /mobile {
-        alias /var/www/yektayar/packages/mobile-app/dist;
+        alias /home/deploy/Projects/YektaYar/packages/mobile-app/dist;
         try_files $uri $uri/ /mobile/index.html;
     }
     
@@ -645,7 +645,7 @@ sudo systemctl status certbot.timer
 
 ```bash
 # Navigate to backend
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 
 # Start with PM2 using Bun as interpreter
 pm2 start dist/index.js --name yektayar-api --interpreter bun -i max
@@ -740,7 +740,7 @@ sudo nano /etc/logrotate.d/yektayar
 Add this configuration:
 
 ```
-/var/www/yektayar/packages/backend/logs/*.log {
+/home/deploy/Projects/YektaYar/packages/backend/logs/*.log {
     daily
     rotate 14
     compress
@@ -825,13 +825,13 @@ pm2 list
 pm2 logs yektayar-api
 
 # Check application directory permissions
-ls -la /var/www/yektayar
+ls -la /home/deploy/Projects/YektaYar
 
 # Verify environment variables
-cat /var/www/yektayar/packages/backend/.env
+cat /home/deploy/Projects/YektaYar/packages/backend/.env
 
 # Try starting manually
-cd /var/www/yektayar/packages/backend
+cd /home/deploy/Projects/YektaYar/packages/backend
 bun run dist/index.js
 ```
 
@@ -943,7 +943,7 @@ Before going live:
 
 ```bash
 # Navigate to application directory
-cd /var/www/yektayar
+cd /home/deploy/Projects/YektaYar
 
 # Pull latest changes
 git pull origin main

@@ -804,7 +804,7 @@ html[dir="rtl"] {
     RewriteRule /(.*) ws://localhost:3000/$1 [P,L]
     
     # Static files
-    DocumentRoot /var/www/yektayar/public
+    DocumentRoot /home/deploy/Projects/YektaYar/public
 </VirtualHost>
 ```
 
