@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
 import { logger } from '@yektayar/shared'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3000'
 const STORAGE_KEY = 'yektayar_admin_session_token'
 
 export interface Session {
