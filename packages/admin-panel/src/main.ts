@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 import { useSessionStore } from './stores/session'
+import { messages } from './locales'
 import { logger } from '@yektayar/shared'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
@@ -21,16 +22,7 @@ const i18n = createI18n({
   legacy: false,
   locale: 'fa',
   fallbackLocale: 'en',
-  messages: {
-    fa: {
-      welcome: 'خوش آمدید به یکتایار',
-      admin_panel: 'پنل مدیریت'
-    },
-    en: {
-      welcome: 'Welcome to YektaYar',
-      admin_panel: 'Admin Panel'
-    }
-  }
+  messages,
 })
 
 const app = createApp(App)
