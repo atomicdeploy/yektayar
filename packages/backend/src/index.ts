@@ -8,6 +8,7 @@ import { userRoutes } from './routes/users'
 import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
+import { dashboardRoutes } from './routes/dashboard'
 import { setupSocketIO } from './websocket/socketServer'
 
 const app = new Elysia()
@@ -25,7 +26,8 @@ const app = new Elysia()
           { name: 'Users', description: 'User management endpoints' },
           { name: 'Messages', description: 'Messaging and chat endpoints' },
           { name: 'Appointments', description: 'Appointment booking endpoints' },
-          { name: 'Courses', description: 'Educational content endpoints' }
+          { name: 'Courses', description: 'Educational content endpoints' },
+          { name: 'Dashboard', description: 'Dashboard statistics endpoints' }
         ]
       }
     })
@@ -49,6 +51,7 @@ const app = new Elysia()
   .use(messageRoutes)
   .use(appointmentRoutes)
   .use(courseRoutes)
+  .use(dashboardRoutes)
 
 // For Bun, we need to create an HTTP server manually to add Socket.IO
 // Bun's fetch handler is used for the Elysia app
