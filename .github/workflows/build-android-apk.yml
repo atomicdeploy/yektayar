@@ -1,0 +1,108 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'packages/mobile-app/**'
+      - '.github/workflows/build-android-apk.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'packages/mobile-app/**'
+      - '.github/workflows/build-android-apk.yml'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type (debug or release)'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build mobile app web assets
+        run: |
+          cd packages/mobile-app
+          npm run build:production
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://api.yektayar.com' }}
+          VITE_ENVIRONMENT: production
+
+      - name: Sync Capacitor
+        run: |
+          cd packages/mobile-app
+          npm run cap:sync
+
+      - name: Make gradlew executable
+        run: chmod +x packages/mobile-app/android/gradlew
+
+      - name: Build Debug APK
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
+        run: |
+          cd packages/mobile-app
+          npm run android:build:debug
+
+      - name: Build Release APK
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        run: |
+          cd packages/mobile-app
+          npm run android:build:release
+
+      - name: Upload Debug APK
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: packages/mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: Upload Release APK
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: packages/mobile-app/android/app/build/outputs/apk/release/app-release-unsigned.apk
+          retention-days: 30
+
+      - name: Comment PR with APK
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Android APK built successfully! Download the artifact from the Actions tab.'
+            })

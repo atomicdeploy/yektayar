@@ -31,10 +31,13 @@ lerna-debug.log*
 .env
 .env.local
 .env.*.local
-.env.production
-.env.development
+# Keep .env.production and .env.example for documentation
+!.env.production
+!.env.example
 **/.env
 **/.env.local
+!**/.env.production
+!**/.env.example
 
 # Editor directories and files
 .vscode/*
@@ -92,3 +95,21 @@ pids
 temp/
 tmp/
 *.zip
+
+# Android/Capacitor
+**/android/.gradle
+**/android/build
+**/android/app/build
+**/android/local.properties
+**/android/.idea
+**/android/captures
+**/android/*.apk
+**/android/*.aab
+
+# iOS/Capacitor (for future)
+**/ios/App/Pods
+**/ios/App/Podfile.lock
+**/ios/App/build
+**/ios/App/*.xcworkspace
+!**/ios/App/*.xcworkspace/contents.xcworkspacedata
+
