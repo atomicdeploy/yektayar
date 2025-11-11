@@ -6,10 +6,10 @@
  */
 
 import config from '@/config';
-import { Plugins } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 import type { DeviceInfoPlugin } from '@/plugins/device-info';
 
-const { DeviceInfoPlugin: deviceInfo } = Plugins as { DeviceInfoPlugin: DeviceInfoPlugin };
+const deviceInfo = registerPlugin<DeviceInfoPlugin>('DeviceInfoPlugin');
 
 // ===== Environment Configuration =====
 
