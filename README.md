@@ -69,9 +69,10 @@ cd yektayar
 # Install all dependencies
 npm install
 
-# Setup environment variables
-cp packages/backend/.env.example packages/backend/.env
-# Edit .env file with your configuration
+# Setup environment variables (unified .env for all packages)
+./scripts/manage-env.sh init
+# Then edit .env with your configuration, or use interactive mode:
+./scripts/manage-env.sh edit
 ```
 
 ### Development
