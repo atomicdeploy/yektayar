@@ -164,6 +164,17 @@ npm run dev:mobile     # Mobile app only
 npm run build
 ```
 
+### Build Mobile App (Android APK)
+
+```bash
+cd packages/mobile-app
+npm run build:production    # Build web assets
+npm run cap:sync            # Sync with Android project
+npm run android:build:debug # Build debug APK
+```
+
+For detailed instructions on building Android APKs, see **[packages/mobile-app/BUILD_APK.md](packages/mobile-app/BUILD_APK.md)**.
+
 ---
 
 ## 📚 Documentation
@@ -235,6 +246,8 @@ This mono repo addresses all requirements from the issue:
 ## 🚢 Deployment
 
 See **[Ubuntu 24.04 Deployment Guide](docs/UBUNTU-24-DEPLOYMENT.md)** for complete VPS deployment instructions.
+
+See **[Mobile App Build Guide](packages/mobile-app/BUILD_APK.md)** for Android APK build instructions.
 
 Quick overview:
 1. **Backend**: Deploy with PM2 on VPS (using Bun runtime)
