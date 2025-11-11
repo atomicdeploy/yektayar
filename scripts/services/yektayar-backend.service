@@ -1,0 +1,33 @@
+[Unit]
+Description=YektaYar Backend API Server
+Documentation=https://github.com/atomicdeploy/yektayar
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/home/deploy/Projects/YektaYar/packages/backend
+Environment="NODE_ENV=production"
+Environment="PATH=/home/runner/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=/home/deploy/Projects/YektaYar/packages/backend/.env
+ExecStart=/home/runner/.bun/bin/bun run src/index.ts
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/yektayar/backend.log
+StandardError=append:/var/log/yektayar/backend-error.log
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/home/deploy/Projects/YektaYar/packages/backend
+ReadWritePaths=/var/log/yektayar
+
+# Resource limits
+LimitNOFILE=65536
+TasksMax=512
+
+[Install]
+WantedBy=multi-user.target

@@ -41,13 +41,12 @@ const app = new Elysia()
   .use(messageRoutes)
   .use(appointmentRoutes)
   .use(courseRoutes)
-  .listen({
-    port: process.env.PORT || 3000,
-    hostname: process.env.HOST || 'localhost'
-  })
 
-console.log(
-  `🚀 YektaYar Backend is running at ${app.server?.hostname}:${app.server?.port}`
-)
-
-export default app
+// Export the app configuration for Bun to serve automatically
+// When running with: bun run src/index.ts
+// Bun will automatically call Bun.serve() with this configuration
+export default {
+  port: process.env.PORT || 3000,
+  hostname: process.env.HOST || 'localhost',
+  fetch: app.fetch
+}

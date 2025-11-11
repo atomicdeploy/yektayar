@@ -119,8 +119,6 @@ npm run clean
 - `src/utils/` - Helper functions
 - `src/i18n/` - Translations
 
----
-
 ## 🔧 Configuration
 
 ### Backend Environment Variables
@@ -144,6 +142,70 @@ createdb yektayar
 
 # TODO: Run migrations when available
 ```
+
+---
+
+## 🚀 Deployment & Service Management
+
+### Development Mode
+
+Run services in development mode with hot-reload:
+
+```bash
+# Run individual service in foreground
+./scripts/dev-runner.sh backend
+./scripts/dev-runner.sh admin
+./scripts/dev-runner.sh mobile
+
+# Run all services in background (detached mode)
+./scripts/dev-runner.sh all --detached
+
+# Stop all detached services
+./scripts/dev-runner.sh stop
+
+# View logs
+tail -f /tmp/yektayar-backend.log
+```
+
+### Production Deployment
+
+Install and run services as system services using systemd:
+
+```bash
+# 1. Install systemd service files
+sudo ./scripts/install-services.sh
+
+# 2. Enable services to start on boot
+sudo ./scripts/manage-services.sh enable all
+
+# 3. Start all services
+sudo ./scripts/manage-services.sh start all
+
+# 4. Check service status
+sudo ./scripts/manage-services.sh status
+
+# 5. View logs
+sudo ./scripts/manage-services.sh logs backend
+```
+
+### Service Management Commands
+
+```bash
+# Start/stop services
+sudo ./scripts/manage-services.sh start [backend|admin|mobile|all]
+sudo ./scripts/manage-services.sh stop [backend|admin|mobile|all]
+sudo ./scripts/manage-services.sh restart [backend|admin|mobile|all]
+
+# Enable/disable auto-start on boot
+sudo ./scripts/manage-services.sh enable [backend|admin|mobile|all]
+sudo ./scripts/manage-services.sh disable [backend|admin|mobile|all]
+
+# View service status and logs
+sudo ./scripts/manage-services.sh status [backend|admin|mobile|all]
+sudo ./scripts/manage-services.sh logs [backend|admin|mobile|all]
+```
+
+For detailed deployment instructions, see [scripts/README.md](scripts/README.md).
 
 ---
 
@@ -273,6 +335,8 @@ sudo systemctl start postgresql
 
 ### Issue: Port already in use
 **Solution**: Change port in .env or kill the process
+
+**Note**: If you see "EADDRINUSE" error when running backend directly with `bun src/index.ts`, this is expected behavior when the server code calls `.listen()` explicitly. The backend is now configured to work with Bun's automatic serving. Use `npm run dev` or `PORT=xxxx bun src/index.ts` instead.
 
 ### Issue: Dependencies not installing
 **Solution**: 
