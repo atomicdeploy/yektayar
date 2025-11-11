@@ -577,6 +577,188 @@ Types:
 
 ---
 
+## 📋 Prototype Sprint Guide (5-Day MVP)
+
+If building a rapid prototype/MVP, use this detailed task breakdown:
+
+### Project Status Tracking
+
+**Current Phase:** Prototype Sprint (Days 1-5)  
+**Overall Progress:** Track against milestones
+
+**Key Milestones:**
+1. Theme and i18n working (End of Day 1)
+2. User can navigate through app (End of Day 2)
+3. Chat functionality complete (End of Day 3)
+4. Booking and assessment flows complete (End of Day 4)
+5. Prototype complete and polished (End of Day 5)
+
+### Day 1: Foundation & Design System (8 hours)
+
+**Morning Session (4 hours):**
+- Setup Base Theme (1.5 hours)
+  - Define color palette (blue/teal healthcare theme)
+  - Configure Tailwind theme
+  - Setup dark/light mode variables
+  - Test theme switching
+
+- Typography & Fonts (1 hour)
+  - Add Vazirmatn font (Persian)
+  - Add Inter font (English)
+  - Define typography scale
+  - Test RTL rendering
+
+- i18n System (1.5 hours)
+  - Create i18n utility
+  - Persian translations
+  - English translations
+  - Language switching hook
+
+**Afternoon Session (4 hours):**
+- Base Layout Components (2 hours)
+  - AppShell component
+  - Header with language/theme toggles
+  - BottomNav (mobile)
+  - Sidebar (desktop)
+  - Responsive breakpoints
+
+- PWA Setup (1.5 hours)
+  - PWA manifest
+  - App icons
+  - Splash screen
+  - Meta tags
+  - Test "Add to Home Screen"
+
+- Integration (0.5 hours)
+  - Theme provider
+  - i18n provider
+  - Basic routing
+  - Splash screen on first load
+
+**Deliverables:** Working theme switcher, language switcher, RTL/LTR switching, professional typography, installable PWA, base layout
+
+### Day 2: Authentication & Navigation (8 hours)
+
+**Morning Session:**
+- Auth data layer with mock user types
+- Login screen with email/phone input
+- Register screen with multi-step form
+- Form validation and error handling
+
+**Afternoon Session:**
+- OTP verification screen
+- Pattern lock (3x3 grid)
+- Main navigation (bottom nav + sidebar)
+- User profile screen
+- Admin panel layout
+- Role-based UI rendering
+
+**Deliverables:** Complete auth flow (mocked), navigation, pattern lock, different views per user type
+
+### Day 3: AI Chat & Messaging (8 hours)
+
+**Tasks:**
+- Chat interface component
+- Message bubbles (sent/received)
+- Typing indicator
+- Mock AI response generator
+- Chat history persistence
+- Unified messaging center
+- Message categories/departments
+- Thread management
+- Multi-participant UI
+
+**Deliverables:** Working AI chat with mock responses, messaging center, chat persistence
+
+### Day 4: Appointments & Assessments (8 hours)
+
+**Tasks:**
+- Professional directory
+- Professional profiles
+- Appointment booking interface
+- Calendar (Jalali + Gregorian)
+- Time slot selection
+- Booking confirmation
+- Psychological assessment form
+- Results display
+- Personality type visualization
+- Course recommendations
+
+**Deliverables:** End-to-end booking flow, assessment completion, results visualization, dual calendar system
+
+### Day 5: Dashboard, Courses & Polish (8-10 hours)
+
+**Tasks:**
+- User dashboard (appointments, messages, progress)
+- Admin dashboard (activity, stats, monitoring)
+- Course browser
+- Course detail pages
+- Progress tracking UI
+- Course enrollment
+- Admin user profile viewer
+- Admin secret notes feature
+- Loading states and skeletons
+- Error handling and empty states
+- Page transitions (Framer Motion)
+- Animation polish
+- Responsive design fixes
+- Final testing (mobile/desktop/tablet)
+- Performance optimization
+- Accessibility audit (basic)
+
+**Deliverables:** Complete user journey, complete admin journey, polished animations, professional look, working PWA
+
+### Feature Completion Checklist
+
+**Core Features:**
+- [ ] Authentication System (Mock)
+- [ ] AI Chat Interface
+- [ ] Messaging System
+- [ ] Appointment Booking
+- [ ] Psychological Assessment
+- [ ] Educational Courses
+- [ ] User Dashboard
+- [ ] Admin Dashboard
+
+**Technical Features:**
+- [ ] PWA Support
+- [ ] Dark/Light Mode
+- [ ] Persian/English i18n
+- [ ] RTL/LTR Support
+- [ ] Pattern Lock
+- [ ] Data Persistence
+
+**Polish Features:**
+- [ ] Animations
+- [ ] Loading States
+- [ ] Error Handling
+- [ ] Empty States
+- [ ] Responsive Design
+
+### Development Tips for Prototype
+
+**For Speed:**
+1. Use shadcn components - Don't build from scratch
+2. Copy and adapt - Similar components can share code
+3. Mock smartly - Create reusable mock data
+4. Don't overthink - This is a prototype
+5. Skip perfection - Good enough is good enough
+
+**For Quality:**
+1. Test on mobile - Use browser dev tools
+2. Test RTL - Switch to Persian frequently
+3. Test dark mode - Toggle often
+4. Check console - No errors
+5. User perspective - Think like a patient
+
+**Time Management:**
+- Set timer for each task
+- Take breaks every 2 hours
+- If stuck > 30 min, simplify or skip
+- End each day by updating progress
+
+---
+
 ## 📚 Additional Resources
 
 - [Elysia.js Documentation](https://elysiajs.com/)

@@ -16,26 +16,16 @@ This directory contains comprehensive guides and documentation for the YektaYar 
 
 ### Architecture & Design
 
-- **[Architecture Overview](ARCHITECTURE.md)** - Complete system architecture (prototype and production)
+- **[Architecture Overview](ARCHITECTURE.md)** - Complete system architecture
   - Current prototype architecture
   - Future production architecture
+  - Prototype vs production comparison
+  - Alternative architecture approaches (Nuxt + Fastify)
   - Database schema design
   - API design
   - Security architecture
   - Real-time architecture
   - Deployment architecture
-
-- **[Alternative Architecture](ALTERNATIVE-ARCHITECTURE.md)** - Nuxt + Fastify approach (reference)
-  - Alternative tech stack explored
-  - Comparison with current implementation
-  - Useful patterns extracted
-  - When to consider this approach
-
-- **[Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md)** - Understanding development phases
-  - What the prototype is vs. what production will be
-  - Scope and limitations of each phase
-  - Technology differences
-  - Data handling differences
 
 - **[Requirements Review](REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
   - Coverage assessment
@@ -45,22 +35,12 @@ This directory contains comprehensive guides and documentation for the YektaYar 
 
 ### Development Planning
 
-- **[Prototype Roadmap](PROTOTYPE-ROADMAP.md)** - 5-day prototype sprint plan
-  - Day-by-day breakdown
-  - Task lists per day
-  - Deliverables and milestones
-  - Feature roadmap
-
-- **[Prototype Tasks](PROTOTYPE-TASKS.md)** - Detailed task breakdown for prototype development
-  - Component checklist
-  - Priority ordering
-  - Time estimates
-
-- **[Prototype Status](PROTOTYPE-STATUS.md)** - Progress tracking for prototype phase
-  - Current sprint progress
-  - Feature completion status
-  - Known issues
-  - Daily standup log
+- **[Implementation Roadmap](../ROADMAP.md)** - Complete roadmap
+  - Current implementation status
+  - Core implementation phases
+  - 5-day prototype sprint plan (optional reference)
+  - Production backend implementation timeline
+  - Feature roadmap and milestones
 
 ### Setup and Configuration
 
@@ -114,9 +94,9 @@ This directory contains comprehensive guides and documentation for the YektaYar 
 
 ### For Prototype Development
 
-- Building the prototype? Follow [Prototype Tasks](PROTOTYPE-TASKS.md)
-- Track your progress: [Prototype Status](PROTOTYPE-STATUS.md)
-- Understand the scope: [Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md)
+- Building the prototype? Follow [Development Guide](../DEVELOPMENT.md) - Prototype Sprint section
+- Understand the scope: [Architecture Overview](ARCHITECTURE.md) - Prototype vs Production section
+- Reference roadmap: [../ROADMAP.md](../ROADMAP.md) - Prototype Sprint section
 - Daily reference: [Quick Reference](QUICK-REFERENCE.md)
 
 ### For Production Development

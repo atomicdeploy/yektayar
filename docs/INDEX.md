@@ -19,22 +19,17 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 ### For Developers
 
 #### Getting Started
-- **[Getting Started Guide](GETTING-STARTED.md)** - Complete developer onboarding (previously START-HERE.md)
-- **[Development Guide](../DEVELOPMENT.md)** - Detailed development practices and environment setup
+- **[Getting Started Guide](GETTING-STARTED.md)** - Complete developer onboarding
+- **[Development Guide](../DEVELOPMENT.md)** - Detailed development practices, environment setup, and prototype sprint guide
 - **[Quick Reference](QUICK-REFERENCE.md)** - Essential code snippets and daily checklist
 - **[Quick Start](../QUICK-START.md)** - Fast setup for the current monorepo
 
 #### Architecture & Design
-- **[Architecture Overview](ARCHITECTURE.md)** - Complete system architecture (prototype and production)
-- **[Alternative Architecture](ALTERNATIVE-ARCHITECTURE.md)** - Nuxt + Fastify approach (reference)
-- **[Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md)** - Understanding the difference between phases
+- **[Architecture Overview](ARCHITECTURE.md)** - Complete system architecture including prototype/production phases and alternative approaches
 - **[Requirements Review](REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
 
-#### Development Planning
-- **[Prototype Roadmap](PROTOTYPE-ROADMAP.md)** - 5-day prototype sprint plan
-- **[Implementation Roadmap](../ROADMAP.md)** - Production implementation roadmap (root level)
-- **[Prototype Tasks](PROTOTYPE-TASKS.md)** - Detailed task breakdown for prototype
-- **[Prototype Status](PROTOTYPE-STATUS.md)** - Prototype progress tracking
+#### Planning & Roadmap
+- **[Implementation Roadmap](../ROADMAP.md)** - Production implementation roadmap with prototype sprint reference
 
 ### For DevOps/Deployment
 
@@ -50,9 +45,8 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 
 #### Project Understanding
 - **[Project Overview](../README.md)** - Main project readme
-- **[Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md)** - Understanding development phases
+- **[Architecture Overview](ARCHITECTURE.md)** - System architecture with prototype vs production details
 - **[Implementation Roadmap](../ROADMAP.md)** - Production roadmap and progress
-- **[Prototype Roadmap](PROTOTYPE-ROADMAP.md)** - Prototype phase planning
 
 #### Security & Compliance
 - **[Security Policy](../SECURITY.md)** - Security practices and vulnerability reporting
@@ -62,16 +56,13 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 ## 📋 Documentation by Topic
 
 ### Architecture
-- [Architecture Overview](ARCHITECTURE.md) - Complete system design
-- [Alternative Architecture](ALTERNATIVE-ARCHITECTURE.md) - Nuxt + Fastify reference
-- [Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md) - Phase differences
+- [Architecture Overview](ARCHITECTURE.md) - Complete system design with prototype/production phases and alternative approaches
 - [Requirements Review](REQUIREMENTS-REVIEW.md) - Requirements analysis
 
 ### Development
-- [Development Guide](../DEVELOPMENT.md) - Development practices
+- [Development Guide](../DEVELOPMENT.md) - Development practices and prototype sprint guide
 - [Getting Started Guide](GETTING-STARTED.md) - Onboarding guide
 - [Quick Reference](QUICK-REFERENCE.md) - Code snippets & patterns
-- [Prototype Tasks](PROTOTYPE-TASKS.md) - Task breakdown
 
 ### Setup & Deployment
 - [Setup Guide](SETUP.md) - Complete setup instructions
@@ -80,9 +71,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - [Bun vs NPM](BUN-VS-NPM.md) - Runtime guide
 
 ### Project Management
-- [Implementation Roadmap](../ROADMAP.md) - Production roadmap
-- [Prototype Roadmap](PROTOTYPE-ROADMAP.md) - Prototype roadmap
-- [Prototype Status](PROTOTYPE-STATUS.md) - Progress tracking
+- [Implementation Roadmap](../ROADMAP.md) - Production roadmap with prototype sprint details
 - [Quick Start](../QUICK-START.md) - Quick setup
 
 ---
@@ -92,10 +81,11 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 ```
 yektayar/
 ├── README.md                      # Main project overview
-├── ROADMAP.md                     # Production implementation roadmap
-├── DEVELOPMENT.md                 # Development guide
+├── ROADMAP.md                     # Implementation roadmap (includes prototype sprint)
+├── DEVELOPMENT.md                 # Development guide (includes prototype sprint details)
 ├── QUICK-START.md                 # Quick start for monorepo
 ├── SECURITY.md                    # Security policy
+├── CONTRIBUTING.md                # Contributing guidelines
 │
 └── docs/                          # Documentation directory
     ├── INDEX.md                   # This file - documentation hub
@@ -104,13 +94,8 @@ yektayar/
     ├── GETTING-STARTED.md         # New developer onboarding
     ├── QUICK-REFERENCE.md         # Code snippets & daily checklist
     │
-    ├── ARCHITECTURE.md            # System architecture
-    ├── PROTOTYPE-vs-PRODUCTION.md # Phase differences
+    ├── ARCHITECTURE.md            # System architecture (all phases & alternatives)
     ├── REQUIREMENTS-REVIEW.md     # Requirements analysis
-    │
-    ├── PROTOTYPE-ROADMAP.md       # Prototype sprint plan
-    ├── PROTOTYPE-TASKS.md         # Prototype task breakdown
-    ├── PROTOTYPE-STATUS.md        # Prototype progress tracking
     │
     ├── SETUP.md                   # Setup guide (all phases)
     ├── UBUNTU-24-DEPLOYMENT.md    # Ubuntu VPS deployment
@@ -125,10 +110,9 @@ yektayar/
 ### Path 1: New Developer (Full Onboarding)
 1. [Project Overview](../README.md) - 10 min
 2. [Getting Started Guide](GETTING-STARTED.md) - 15 min
-3. [Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md) - 10 min
+3. [Architecture Overview](ARCHITECTURE.md) - Focus on prototype/production sections - 20 min
 4. [Development Guide](../DEVELOPMENT.md) - 20 min
 5. [Quick Reference](QUICK-REFERENCE.md) - 5 min (keep open)
-6. [Architecture Overview](ARCHITECTURE.md) - 20 min
 
 **Time:** ~1.5 hours
 
@@ -141,12 +125,12 @@ yektayar/
 
 ### Path 3: Prototype Development
 1. [Getting Started Guide](GETTING-STARTED.md) - 15 min
-2. [Prototype vs Production](PROTOTYPE-vs-PRODUCTION.md) - 10 min
-3. [Prototype Tasks](PROTOTYPE-TASKS.md) - 15 min
+2. [Architecture Overview](ARCHITECTURE.md) - Prototype sections - 15 min
+3. [Development Guide](../DEVELOPMENT.md) - Prototype Sprint Guide section - 15 min
 4. [Quick Reference](QUICK-REFERENCE.md) - 5 min (keep open)
-5. [Prototype Roadmap](PROTOTYPE-ROADMAP.md) - Reference as needed
+5. [Implementation Roadmap](../ROADMAP.md) - Prototype Sprint section - Reference as needed
 
-**Time:** ~45 minutes + ongoing reference
+**Time:** ~50 minutes + ongoing reference
 
 ### Path 4: Production Deployment
 1. [Architecture Overview](ARCHITECTURE.md) - 20 min
@@ -162,14 +146,15 @@ yektayar/
 
 ### By Keyword
 
-- **Authentication**: [Architecture](ARCHITECTURE.md), [Prototype Tasks](PROTOTYPE-TASKS.md), [Development Guide](../DEVELOPMENT.md)
+- **Authentication**: [Architecture](ARCHITECTURE.md), [Development Guide](../DEVELOPMENT.md)
 - **Database**: [Architecture](ARCHITECTURE.md), [Setup Guide](SETUP.md), [Ubuntu Deployment](UBUNTU-24-DEPLOYMENT.md)
 - **i18n/Internationalization**: [Getting Started](GETTING-STARTED.md), [Quick Reference](QUICK-REFERENCE.md), [Architecture](ARCHITECTURE.md)
 - **RTL/LTR**: [Getting Started](GETTING-STARTED.md), [Quick Reference](QUICK-REFERENCE.md)
-- **PWA**: [Getting Started](GETTING-STARTED.md), [Prototype Tasks](PROTOTYPE-TASKS.md)
+- **PWA**: [Getting Started](GETTING-STARTED.md), [Development Guide](../DEVELOPMENT.md)
 - **Deployment**: [Setup Guide](SETUP.md), [Ubuntu Deployment](UBUNTU-24-DEPLOYMENT.md)
 - **API**: [Architecture](ARCHITECTURE.md), [Development Guide](../DEVELOPMENT.md)
 - **WebSocket**: [Architecture](ARCHITECTURE.md), [Setup Guide](SETUP.md)
+- **Prototype Sprint**: [Development Guide](../DEVELOPMENT.md), [Roadmap](../ROADMAP.md)
 
 ---
 

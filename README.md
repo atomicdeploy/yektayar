@@ -179,10 +179,8 @@ npm run build
 - **[Quick Reference](docs/QUICK-REFERENCE.md)** - Code snippets and daily checklist
 
 #### Architecture & Planning
-- **[Architecture Overview](docs/ARCHITECTURE.md)** - Complete system architecture
-- **[Prototype vs Production](docs/PROTOTYPE-vs-PRODUCTION.md)** - Understanding development phases
-- **[Implementation Roadmap](ROADMAP.md)** - Production roadmap and progress
-- **[Prototype Roadmap](docs/PROTOTYPE-ROADMAP.md)** - Prototype sprint plan
+- **[Architecture Overview](docs/ARCHITECTURE.md)** - Complete system architecture with prototype/production phases
+- **[Implementation Roadmap](ROADMAP.md)** - Production roadmap with prototype sprint reference
 
 #### Setup & Deployment
 - **[Setup Guide](docs/SETUP.md)** - Complete setup for all phases
@@ -192,8 +190,6 @@ npm run build
 
 #### Additional Resources
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
-- **[Prototype Tasks](docs/PROTOTYPE-TASKS.md)** - Detailed prototype task breakdown
-- **[Alternative Architecture](docs/ALTERNATIVE-ARCHITECTURE.md)** - Nuxt + Fastify reference approach
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 
