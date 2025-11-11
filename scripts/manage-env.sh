@@ -294,6 +294,145 @@ generate_secret() {
     fi
 }
 
+create_backup() {
+    if [ -f "$ENV_FILE" ]; then
+        local backup_dir="${PROJECT_ROOT}/.env.backups"
+        mkdir -p "$backup_dir"
+        local timestamp=$(date +%Y%m%d_%H%M%S)
+        local backup_file="${backup_dir}/.env.backup.${timestamp}"
+        cp "$ENV_FILE" "$backup_file"
+        print_success "Backup created: $backup_file"
+    fi
+}
+
+set_env_value() {
+    local key=""
+    local value=""
+    local force=false
+    
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --key=*)
+                key="${1#*=}"
+                shift
+                ;;
+            --val=*)
+                value="${1#*=}"
+                shift
+                ;;
+            --force)
+                force=true
+                shift
+                ;;
+            *)
+                # Handle positional arguments: set KEY VALUE
+                if [ -z "$key" ]; then
+                    key="$1"
+                elif [ -z "$value" ]; then
+                    value="$1"
+                fi
+                shift
+                ;;
+        esac
+    done
+    
+    # Validate inputs
+    if [ -z "$key" ]; then
+        print_error "Key is required"
+        print_info "Usage: $0 set --key=KEY --val=VALUE [--force]"
+        print_info "   or: $0 set KEY VALUE [--force]"
+        exit 1
+    fi
+    
+    if [ -z "$value" ]; then
+        print_error "Value is required"
+        print_info "Usage: $0 set --key=KEY --val=VALUE [--force]"
+        print_info "   or: $0 set KEY VALUE [--force]"
+        exit 1
+    fi
+    
+    print_header "Setting Environment Variable"
+    
+    # Check if .env file exists
+    if ! check_env_exists; then
+        print_warning ".env file does not exist. Creating from template..."
+        create_env_from_template
+    fi
+    
+    # Check if key exists in .env
+    local old_value=""
+    if grep -q "^${key}=" "$ENV_FILE"; then
+        old_value=$(grep "^${key}=" "$ENV_FILE" | cut -d= -f2-)
+        
+        # Check if value is the same
+        if [ "$old_value" = "$value" ]; then
+            print_info "Value for $key is already set to: $value"
+            print_success "No changes needed"
+            return 0
+        fi
+        
+        # Ask for confirmation if not forced
+        if [ "$force" = false ]; then
+            echo -e "\n${YELLOW}Key '$key' already exists${NC}"
+            echo -e "Old value: ${RED}$old_value${NC}"
+            echo -e "New value: ${GREEN}$value${NC}\n"
+            read -p "Do you want to overwrite it? (y/N): " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Operation cancelled"
+                return 0
+            fi
+        fi
+        
+        # Create backup before modifying
+        create_backup
+        
+        # Update existing key
+        sed -i "s|^${key}=.*|${key}=${value}|" "$ENV_FILE"
+        print_success "Updated $key in .env"
+    else
+        # Key doesn't exist, check if it should be added
+        print_warning "Key '$key' does not exist in .env file"
+        
+        if [ "$force" = false ]; then
+            read -p "Do you want to add it? (y/N): " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Operation cancelled"
+                return 0
+            fi
+        fi
+        
+        # Create backup before modifying
+        create_backup
+        
+        # Add new key at the end
+        echo "" >> "$ENV_FILE"
+        echo "${key}=${value}" >> "$ENV_FILE"
+        print_success "Added $key to .env"
+    fi
+    
+    # Update DATABASE_URL if any DB credentials were changed
+    if [[ "$key" =~ ^DB_(HOST|PORT|NAME|USER|PASSWORD)$ ]]; then
+        print_info "Database credential changed, updating DATABASE_URL..."
+        
+        # Source the updated env file
+        set -a
+        source "$ENV_FILE" 2>/dev/null || true
+        set +a
+        
+        # Update DATABASE_URL if all components are present
+        if [ -n "$DB_USER" ] && [ -n "$DB_PASSWORD" ] && [ -n "$DB_HOST" ] && [ -n "$DB_PORT" ] && [ -n "$DB_NAME" ]; then
+            local db_url="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+            sed -i "s|^DATABASE_URL=.*|DATABASE_URL=${db_url}|" "$ENV_FILE"
+            print_success "Updated DATABASE_URL"
+        fi
+    fi
+    
+    print_success "Environment variable set successfully!"
+}
+
 interactive_setup() {
     print_header "Interactive .env Setup"
     
@@ -460,11 +599,11 @@ tui_interactive_setup() {
                 read -p "Press Enter to continue..."
                 ;;
             6)
-                ENV_FILE="$temp_env" validate_env
+                ENV_FILE="$temp_env" validate_env || true
                 read -p "Press Enter to continue..."
                 ;;
             7)
-                ENV_FILE="$temp_env" test_configuration
+                ENV_FILE="$temp_env" test_configuration || true
                 read -p "Press Enter to continue..."
                 ;;
             8)
@@ -574,8 +713,18 @@ show_usage() {
     echo -e "    ${GREEN}validate${NC}          Validate that all required variables are set correctly"
     echo -e "    ${GREEN}test${NC}              Test configuration (validate + database connection)"
     echo -e "    ${GREEN}edit${NC}              Interactive TUI mode for editing .env values"
+    echo -e "    ${GREEN}set${NC}               Set a specific environment variable"
     echo -e "    ${GREEN}generate-secret${NC}   Generate a secure random secret for use in .env"
     echo -e "    ${GREEN}help${NC}              Show this help message"
+    echo -e ""
+    echo -e "${CYAN}Set Command Usage:${NC}"
+    echo -e "    $0 set --key=KEY --val=VALUE [--force]"
+    echo -e "    $0 set KEY VALUE [--force]"
+    echo -e ""
+    echo -e "    ${CYAN}Options:${NC}"
+    echo -e "      --key=KEY       Environment variable key to set"
+    echo -e "      --val=VALUE     Value to set for the key"
+    echo -e "      --force         Overwrite without confirmation (optional)"
     echo -e ""
     echo -e "${CYAN}Examples:${NC}"
     echo -e "    # Initial setup - create .env from template"
@@ -593,6 +742,11 @@ show_usage() {
     echo -e "    # Interactive mode with TUI"
     echo -e "    $0 edit"
     echo -e ""
+    echo -e "    # Set a specific environment variable"
+    echo -e "    $0 set --key=DB_HOST --val=localhost"
+    echo -e "    $0 set DB_USER myuser"
+    echo -e "    $0 set --key=DB_PASSWORD --val=secret123 --force"
+    echo -e ""
     echo -e "    # Generate a secure secret"
     echo -e "    $0 generate-secret"
     echo -e ""
@@ -601,6 +755,7 @@ show_usage() {
     echo -e "    - All packages use this unified .env file"
     echo -e "    - Sensitive values are masked when displayed with 'show' command"
     echo -e "    - The 'test' command requires psql to be installed for database testing"
+    echo -e "    - A backup is automatically created when modifying .env with 'set' command"
     echo -e ""
 }
 
@@ -625,6 +780,10 @@ case "${1:-help}" in
         ;;
     edit)
         interactive_setup
+        ;;
+    set)
+        shift  # Remove 'set' from arguments
+        set_env_value "$@"
         ;;
     generate-secret)
         echo "Generated secret: $(generate_secret)"
