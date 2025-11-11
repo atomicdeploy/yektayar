@@ -14,6 +14,99 @@ Systemd service unit files for running YektaYar services as system services:
 
 ### Scripts
 
+#### `install-apache.sh`
+
+Installs Apache web server configurations for all YektaYar services with separate subdomains.
+
+**Usage:**
+```bash
+sudo ./scripts/install-apache.sh
+```
+
+**What it does:**
+- Installs Apache if not already installed
+- Enables required Apache modules (proxy, proxy_http, proxy_wstunnel, ssl, rewrite, headers)
+- Copies configuration files for all subdomains:
+  - `api.yektayar.ir` → Backend API (port 3000)
+  - `panel.yektayar.ir` → Admin Panel (port 5173)
+  - `app.yektayar.ir` → Mobile App (port 8100)
+  - `static.yektayar.ir` → Static files hosting
+- Creates static files directory at `/var/www/yektayar/static`
+- Enables all sites
+- Tests and restarts Apache
+
+**Next steps after installation:**
+1. Configure DNS records for your domains
+2. Obtain SSL certificates using Certbot:
+   ```bash
+   sudo certbot --apache -d api.yektayar.ir
+   sudo certbot --apache -d panel.yektayar.ir
+   sudo certbot --apache -d app.yektayar.ir
+   sudo certbot --apache -d static.yektayar.ir
+   ```
+
+#### `install-nginx.sh`
+
+Installs Nginx web server configurations for all YektaYar services with separate subdomains.
+
+**Usage:**
+```bash
+sudo ./scripts/install-nginx.sh
+```
+
+**What it does:**
+- Installs Nginx if not already installed
+- Copies configuration files for all subdomains:
+  - `api.yektayar.ir` → Backend API (port 3000)
+  - `panel.yektayar.ir` → Admin Panel (port 5173)
+  - `app.yektayar.ir` → Mobile App (port 8100)
+  - `static.yektayar.ir` → Static files hosting
+- Creates static files directory at `/var/www/yektayar/static`
+- Enables all sites (creates symlinks)
+- Tests and restarts Nginx
+
+**Next steps after installation:**
+1. Configure DNS records for your domains
+2. Obtain SSL certificates using Certbot:
+   ```bash
+   sudo certbot --nginx -d api.yektayar.ir
+   sudo certbot --nginx -d panel.yektayar.ir
+   sudo certbot --nginx -d app.yektayar.ir
+   sudo certbot --nginx -d static.yektayar.ir
+   ```
+
+#### `install-caddy.sh`
+
+Installs Caddy web server with automatic HTTPS for all YektaYar services.
+
+**Usage:**
+```bash
+sudo ./scripts/install-caddy.sh
+```
+
+**What it does:**
+- Installs Caddy if not already installed
+- Copies configuration files for all subdomains:
+  - `api.yektayar.ir` → Backend API (port 3000)
+  - `panel.yektayar.ir` → Admin Panel (port 5173)
+  - `app.yektayar.ir` → Mobile App (port 8100)
+  - `static.yektayar.ir` → Static files hosting
+- Creates static files directory at `/var/www/yektayar/static`
+- Creates log directory at `/var/log/caddy`
+- Prompts for Let's Encrypt notification email
+- Tests and starts Caddy
+
+**Features:**
+- ✨ **Automatic HTTPS** - No manual SSL certificate setup required!
+- 🔄 Automatic certificate renewal
+- 🚀 HTTP/2 and HTTP/3 support
+- 🔌 WebSocket support included
+
+**Next steps after installation:**
+1. Configure DNS records for your domains
+2. Wait for DNS propagation (5-30 minutes)
+3. Caddy will automatically obtain SSL certificates!
+
 #### `install-services.sh`
 
 Installs systemd service files and sets up logging infrastructure.
@@ -316,9 +409,50 @@ sudo journalctl -u yektayar-backend --since "today"
 - Read-only system directories
 - Limited file access via `ProtectSystem` and `ReadWritePaths`
 
-## Nginx Reverse Proxy (Optional)
+## Web Server Configuration (Recommended for Production)
 
-For production deployments, consider using Nginx as a reverse proxy:
+For production deployments, use a reverse proxy web server (Apache, Nginx, or Caddy) instead of exposing services directly.
+
+### Quick Installation
+
+Use the provided installation scripts:
+
+```bash
+# For Apache (with manual SSL setup)
+sudo ./scripts/install-apache.sh
+
+# For Nginx (with manual SSL setup)
+sudo ./scripts/install-nginx.sh
+
+# For Caddy (with automatic HTTPS)
+sudo ./scripts/install-caddy.sh
+```
+
+These scripts will configure:
+- `api.yektayar.ir` → Backend API (port 3000)
+- `panel.yektayar.ir` → Admin Panel (port 5173)
+- `app.yektayar.ir` → Mobile App (port 8100)
+- `static.yektayar.ir` → Static files hosting
+
+### Features
+
+All configurations include:
+- ✅ HTTPS/SSL support (automatic with Caddy, manual with Apache/Nginx)
+- ✅ HTTP to HTTPS redirection
+- ✅ WebSocket support for real-time features and HMR
+- ✅ Security headers (HSTS, X-Frame-Options, etc.)
+- ✅ Proper request forwarding and headers
+- ✅ Access and error logging
+
+### Detailed Documentation
+
+For detailed configuration options, troubleshooting, and manual setup instructions, see:
+- [**config/webserver/README.md**](../config/webserver/README.md) - Comprehensive web server configuration guide
+- [**docs/UBUNTU-24-DEPLOYMENT.md**](../docs/UBUNTU-24-DEPLOYMENT.md) - Full deployment guide
+
+### Manual Configuration (Legacy)
+
+If you prefer manual configuration, here's a basic Nginx example:
 
 ```nginx
 # /etc/nginx/sites-available/yektayar

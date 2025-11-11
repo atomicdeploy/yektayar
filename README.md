@@ -245,16 +245,41 @@ This mono repo addresses all requirements from the issue:
 
 ## 🚢 Deployment
 
-See **[Ubuntu 24.04 Deployment Guide](docs/UBUNTU-24-DEPLOYMENT.md)** for complete VPS deployment instructions.
+### Quick Start Deployment
 
-See **[Mobile App Build Guide](packages/mobile-app/BUILD_APK.md)** for Android APK build instructions.
+For a quick web server setup with reverse proxy configurations:
+- **[Web Server Setup Guide](WEBSERVER-SETUP.md)** - Quick start for Apache, Nginx, or Caddy setup
 
-Quick overview:
+### Complete Deployment Guides
+
+- **[Ubuntu 24.04 Deployment Guide](docs/UBUNTU-24-DEPLOYMENT.md)** - Complete VPS deployment instructions
+- **[Mobile App Build Guide](packages/mobile-app/BUILD_APK.md)** - Android APK build instructions
+- **[Web Server Configuration](config/webserver/README.md)** - Detailed web server configuration guide
+
+### Deployment Overview
+
 1. **Backend**: Deploy with PM2 on VPS (using Bun runtime)
-2. **Admin Panel**: Build and serve with Apache/Nginx
+2. **Admin Panel**: Build and serve via reverse proxy (Apache/Nginx/Caddy)
 3. **Mobile App**: Build for Android/iOS with Capacitor
+4. **Static Files**: Host .apk files and assets on static subdomain
 
-Additional deployment resources:
+### Subdomain Configuration
+
+The platform uses separate subdomains for different services:
+- **api.yektayar.ir** → Backend API (port 3000)
+- **panel.yektayar.ir** → Admin Panel (port 5173)
+- **app.yektayar.ir** → Mobile App (port 8100)
+- **static.yektayar.ir** → Static files hosting
+
+Use the installation scripts to set up quickly:
+```bash
+sudo ./scripts/install-apache.sh   # For Apache
+sudo ./scripts/install-nginx.sh    # For Nginx
+sudo ./scripts/install-caddy.sh    # For Caddy (automatic HTTPS)
+```
+
+### Additional Deployment Resources
+
 - [Network Configuration Guide](docs/NETWORK-CONFIGURATION.md) - Configure ports and interfaces
 - [Bun vs NPM Guide](docs/BUN-VS-NPM.md) - Understanding the runtime and package manager
 

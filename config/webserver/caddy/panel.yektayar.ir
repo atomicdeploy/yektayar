@@ -1,0 +1,31 @@
+# Caddy configuration for panel.yektayar.ir
+# Automatic HTTPS with Let's Encrypt
+
+panel.yektayar.ir {
+    # Reverse proxy to Admin Panel dev server
+    reverse_proxy localhost:5173 {
+        # WebSocket support (for Vite HMR)
+        header_up Upgrade {http.request.header.Upgrade}
+        header_up Connection {http.request.header.Connection}
+        
+        # Forward real client IP
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+    }
+    
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+    
+    # Logging
+    log {
+        output file /var/log/caddy/panel.yektayar.ir_access.log
+    }
+}
