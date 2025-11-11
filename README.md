@@ -274,16 +274,54 @@ The platform uses separate subdomains for different services:
 - **panel.yektayar.ir** → Admin Panel (port 5173)
 - **app.yektayar.ir** → Mobile App (port 8100)
 - **static.yektayar.ir** → Static files hosting
+- **mail.yektayar.ir** → Email server (SMTP/IMAP)
+- **webmail.yektayar.ir** → Webmail interface (RoundCube)
+- **postfixadmin.yektayar.ir** → Email administration panel
 
 Use the installation scripts to set up quickly:
 ```bash
 sudo ./scripts/install-apache.sh   # For Apache
 sudo ./scripts/install-nginx.sh    # For Nginx
 sudo ./scripts/install-caddy.sh    # For Caddy (automatic HTTPS)
+sudo ./scripts/setup-email-server.sh  # For Email server
 ```
+
+### Email Server Setup
+
+YektaYar includes a complete email server stack for sending and receiving emails:
+
+**Quick Setup:**
+```bash
+# 1. Install PostgreSQL (if not already installed)
+sudo ./scripts/setup-postgresql.sh
+
+# 2. Install email server (Postfix, Dovecot, RoundCube, PostfixAdmin)
+sudo ./scripts/setup-email-server.sh
+
+# 3. View and add required DNS records
+./scripts/setup-email-dns-records.sh
+
+# 4. Verify setup after DNS propagation
+sudo ./scripts/verify-email-setup.sh
+
+# 5. Test email sending from backend
+./scripts/test-email-service.sh
+```
+
+**Features:**
+- ✉️ Full SMTP server (Postfix) for sending/receiving emails
+- 📬 IMAP/POP3 server (Dovecot) for email retrieval
+- 🌐 Modern webmail interface (RoundCube)
+- ⚙️ Web-based administration (PostfixAdmin)
+- 🔐 DKIM, SPF, and DMARC support
+- 🔒 SSL/TLS encryption
+- 📧 Default mailbox: info@yektayar.ir (catch-all)
+
+**See:** [Email Server Setup Guide](docs/EMAIL-SERVER-SETUP.md) for complete documentation
 
 ### Additional Deployment Resources
 
+- [Email Server Setup Guide](docs/EMAIL-SERVER-SETUP.md) - Complete email server configuration
 - [Network Configuration Guide](docs/NETWORK-CONFIGURATION.md) - Configure ports and interfaces
 - [Bun vs NPM Guide](docs/BUN-VS-NPM.md) - Understanding the runtime and package manager
 
