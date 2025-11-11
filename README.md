@@ -1,5 +1,9 @@
 # YektaYar Platform
 
+<div align="center">
+  <img src="assets/logo/logo.svg" alt="YektaYar Logo" width="150" />
+</div>
+
 **Mental Health Care Platform - Mono Repo**
 
 > **Version:** 0.1.0  
