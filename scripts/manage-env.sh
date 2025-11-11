@@ -335,30 +335,30 @@ basic_interactive_setup() {
     
     echo -e "${CYAN}=== Backend Configuration ===${NC}\n"
     
-    read -p "Backend Port [${PORT}]: " input
+    read -r -p "Backend Port [${PORT}]: " input
     [ -n "$input" ] && sed -i "s|^PORT=.*|PORT=${input}|" "$temp_env"
     
-    read -p "Backend Host [${HOST}]: " input
+    read -r -p "Backend Host [${HOST}]: " input
     [ -n "$input" ] && sed -i "s|^HOST=.*|HOST=${input}|" "$temp_env"
     
-    read -p "Node Environment (development/production) [${NODE_ENV}]: " input
+    read -r -p "Node Environment (development/production) [${NODE_ENV}]: " input
     [ -n "$input" ] && sed -i "s|^NODE_ENV=.*|NODE_ENV=${input}|" "$temp_env"
     
     echo -e "\n${CYAN}=== Database Configuration ===${NC}\n"
     
-    read -p "Database Host [${DB_HOST}]: " input
+    read -r -p "Database Host [${DB_HOST}]: " input
     [ -n "$input" ] && sed -i "s|^DB_HOST=.*|DB_HOST=${input}|" "$temp_env"
     
-    read -p "Database Port [${DB_PORT}]: " input
+    read -r -p "Database Port [${DB_PORT}]: " input
     [ -n "$input" ] && sed -i "s|^DB_PORT=.*|DB_PORT=${input}|" "$temp_env"
     
-    read -p "Database Name [${DB_NAME}]: " input
+    read -r -p "Database Name [${DB_NAME}]: " input
     [ -n "$input" ] && sed -i "s|^DB_NAME=.*|DB_NAME=${input}|" "$temp_env"
     
-    read -p "Database User [${DB_USER}]: " input
+    read -r -p "Database User [${DB_USER}]: " input
     [ -n "$input" ] && sed -i "s|^DB_USER=.*|DB_USER=${input}|" "$temp_env"
     
-    read -sp "Database Password: " input
+    read -r -sp "Database Password: " input
     echo ""
     [ -n "$input" ] && sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=${input}|" "$temp_env"
     
@@ -387,10 +387,10 @@ basic_interactive_setup() {
     
     echo -e "\n${CYAN}=== Frontend Configuration ===${NC}\n"
     
-    read -p "Frontend API Base URL [${VITE_API_BASE_URL}]: " input
+    read -r -p "Frontend API Base URL [${VITE_API_BASE_URL}]: " input
     [ -n "$input" ] && sed -i "s|^VITE_API_BASE_URL=.*|VITE_API_BASE_URL=${input}|" "$temp_env"
     
-    read -p "Frontend Environment (development/production) [${VITE_ENVIRONMENT}]: " input
+    read -r -p "Frontend Environment (development/production) [${VITE_ENVIRONMENT}]: " input
     [ -n "$input" ] && sed -i "s|^VITE_ENVIRONMENT=.*|VITE_ENVIRONMENT=${input}|" "$temp_env"
     
     # Save changes
