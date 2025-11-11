@@ -309,11 +309,13 @@ print_success "Access information saved to: $CREDENTIALS_FILE"
 GITIGNORE="$PROJECT_ROOT/.gitignore"
 if [ -f "$GITIGNORE" ]; then
     if ! grep -q "postgresql-credentials.txt" "$GITIGNORE"; then
-        echo "" >> "$GITIGNORE"
-        echo "# Database credentials" >> "$GITIGNORE"
-        echo "postgresql-credentials.txt" >> "$GITIGNORE"
-        echo "pgadmin-credentials.txt" >> "$GITIGNORE"
-        echo "adminer-credentials.txt" >> "$GITIGNORE"
+        {
+            echo ""
+            echo "# Database credentials"
+            echo "postgresql-credentials.txt"
+            echo "pgadmin-credentials.txt"
+            echo "adminer-credentials.txt"
+        } >> "$GITIGNORE"
         print_success "Updated .gitignore with credentials files"
     fi
 fi

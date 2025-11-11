@@ -80,7 +80,7 @@ if [ "$SKIP_INSTALL" = false ]; then
     sudo apt update
     
     print_info "Installing PostgreSQL..."
-    sudo apt install -y postgresql-$PG_VERSION postgresql-contrib-$PG_VERSION
+    sudo apt install -y "postgresql-$PG_VERSION" "postgresql-contrib-$PG_VERSION"
     
     print_info "Starting PostgreSQL service..."
     sudo systemctl start postgresql
@@ -174,7 +174,7 @@ print_success "PostgreSQL service restarted"
 # Test database connection
 print_section "Testing Database Connection"
 
-if PGPASSWORD=$DB_PASSWORD psql -h localhost -U $DB_USER -d $DB_NAME -c "SELECT version();" > /dev/null 2>&1; then
+if PGPASSWORD=$DB_PASSWORD psql -h localhost -U "$DB_USER" -d "$DB_NAME" -c "SELECT version();" > /dev/null 2>&1; then
     print_success "Database connection test successful"
 else
     print_error "Database connection test failed"
