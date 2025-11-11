@@ -79,12 +79,11 @@ npm run clean
 - **Port**: 3000
 - **Framework**: Elysia.js
 - **Runtime**: Bun
-- **Config**: packages/backend/.env
+- **Config**: Unified .env at project root
 
 **Key Files**:
 - `src/index.ts` - Entry point
 - `src/routes/` - API endpoints
-- `.env.example` - Config template
 
 ### Admin Panel (@yektayar/admin-panel)
 - **Port**: 5173
@@ -121,9 +120,41 @@ npm run clean
 
 ## 🔧 Configuration
 
+### Environment Variables (Unified .env)
+
+YektaYar uses a **unified `.env` file** at the project root for all packages.
+
+**Quick Setup**:
+```bash
+# Create .env from template
+./scripts/manage-env.sh init
+
+# Edit in interactive TUI mode
+./scripts/manage-env.sh edit
+
+# Or edit manually
+nano .env
+
+# Validate configuration
+./scripts/manage-env.sh validate
+
+# Test configuration (includes database check)
+./scripts/manage-env.sh test
+```
+
+**Management Script Commands**:
+- `init` - Create .env from template
+- `show` - Display current configuration (with masked secrets)
+- `validate` - Check all required variables are set
+- `test` - Test configuration + database connectivity
+- `edit` - Interactive TUI mode
+- `generate-secret` - Generate secure random secrets
+
+For detailed information, see **[ENV-GUIDE.md](ENV-GUIDE.md)**.
+
 ### Backend Environment Variables
 
-Create `packages/backend/.env` from `.env.example`:
+The unified `.env` at project root contains:
 
 ```bash
 PORT=3000
@@ -132,6 +163,8 @@ DATABASE_URL=postgresql://user:password@localhost:5432/yektayar
 SESSION_SECRET=your_session_secret
 JWT_SECRET=your_jwt_secret
 CORS_ORIGIN=http://localhost:5173,http://localhost:8100
+VITE_API_BASE_URL=http://localhost:3000
+VITE_ENVIRONMENT=development
 ```
 
 ### Database Setup
