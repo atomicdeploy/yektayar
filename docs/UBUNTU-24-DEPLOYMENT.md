@@ -12,6 +12,7 @@ Complete guide for deploying YektaYar Platform on Ubuntu 24.04 LTS VPS.
 - [Install Required Software](#install-required-software)
 - [Database Setup](#database-setup)
 - [Application Deployment](#application-deployment)
+- [DNS Configuration](#dns-configuration)
 - [Web Server Configuration](#web-server-configuration)
 - [SSL Certificate Setup](#ssl-certificate-setup)
 - [Process Management](#process-management)
@@ -401,9 +402,98 @@ cd /var/www/yektayar/packages/backend
 
 ---
 
+## DNS Configuration
+
+Before configuring your web server, you need to set up DNS records to point your domain names to your server.
+
+### Required DNS Records
+
+If using the multi-subdomain setup (recommended), configure these A records:
+
+```
+A    api.yektayar.ir       →  YOUR_SERVER_IP
+A    panel.yektayar.ir     →  YOUR_SERVER_IP
+A    app.yektayar.ir       →  YOUR_SERVER_IP
+A    static.yektayar.ir    →  YOUR_SERVER_IP
+```
+
+**Alternative:** Use a wildcard record (covers all subdomains):
+```
+A    *.yektayar.ir         →  YOUR_SERVER_IP
+```
+
+### DNS Providers
+
+Common DNS providers and where to configure these records:
+- **Cloudflare**: DNS → Add Record
+- **Namecheap**: Advanced DNS → Add New Record
+- **GoDaddy**: DNS Management → Add Record
+- **AWS Route 53**: Hosted Zones → Create Record
+- **DigitalOcean**: Networking → Domains → Add Record
+
+### DNS Propagation
+
+After adding DNS records:
+1. Wait 5-30 minutes for DNS propagation
+2. Verify DNS resolution:
+   ```bash
+   nslookup api.yektayar.ir
+   nslookup panel.yektayar.ir
+   nslookup app.yektayar.ir
+   nslookup static.yektayar.ir
+   ```
+3. Once DNS is propagated, proceed with web server configuration
+
+**Note:** SSL certificate issuance (Let's Encrypt) will fail if DNS records are not properly configured and propagated.
+
+---
+
 ## Web Server Configuration
 
-### Option A: Apache Configuration
+The YektaYar platform includes pre-configured web server setups for Apache, Nginx, and Caddy. These configurations support multiple subdomains for different services:
+
+- **api.yektayar.ir** → Backend API (port 3000)
+- **panel.yektayar.ir** → Admin Panel (port 5173)
+- **app.yektayar.ir** → Mobile App (port 8100)
+- **static.yektayar.ir** → Static files hosting
+
+### Quick Installation (Recommended)
+
+Use the provided installation scripts to automatically set up your preferred web server:
+
+```bash
+# Navigate to the repository
+cd /var/www/yektayar
+
+# For Apache
+sudo ./scripts/install-apache.sh
+
+# For Nginx
+sudo ./scripts/install-nginx.sh
+
+# For Caddy (with automatic HTTPS)
+sudo ./scripts/install-caddy.sh
+```
+
+These scripts will:
+- Install the web server if not already installed
+- Enable required modules (Apache only)
+- Copy configuration files
+- Create static files directory
+- Enable sites
+- Test configuration
+- Restart the web server
+
+**📖 For detailed configuration options, troubleshooting, and manual setup instructions, see the comprehensive guide:**
+[**config/webserver/README.md**](../config/webserver/README.md)
+
+### Manual Configuration (Alternative)
+
+If you prefer manual configuration or need to customize the setup, refer to the detailed instructions in the webserver configuration guide.
+
+### Option A: Apache Configuration (Legacy Single Domain)
+
+> **Note:** The configurations below are for a single-domain setup. For the recommended multi-subdomain setup, use the installation scripts above or refer to `config/webserver/README.md`.
 
 #### 1. Create Apache Virtual Host
 
@@ -507,7 +597,9 @@ sudo apache2ctl configtest
 sudo systemctl restart apache2
 ```
 
-### Option B: Nginx Configuration
+### Option B: Nginx Configuration (Legacy Single Domain)
+
+> **Note:** For the recommended multi-subdomain setup, use the installation scripts above or refer to `config/webserver/README.md`.
 
 #### 1. Create Nginx Configuration
 
