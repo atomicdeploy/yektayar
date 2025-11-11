@@ -147,7 +147,7 @@ nano .env
 # Application
 NODE_ENV=production
 PORT=3000
-APP_URL=https://yektayar.com
+APP_URL=https://yektayar.ir
 
 # Database
 DATABASE_URL=postgresql://yektayar_user:your_secure_password_here@localhost:5432/yektayar
@@ -165,7 +165,7 @@ SMTP_HOST=
 SMTP_PORT=587
 SMTP_USER=
 SMTP_PASS=
-SMTP_FROM=noreply@yektayar.com
+SMTP_FROM=noreply@yektayar.ir
 
 # SMS (configure later - Iranian gateway)
 SMS_GATEWAY_URL=
@@ -241,8 +241,8 @@ sudo nano /etc/apache2/sites-available/yektayar.conf
 #### Apache Configuration:
 ```apache
 <VirtualHost *:80>
-    ServerName yektayar.com
-    ServerAlias www.yektayar.com
+    ServerName yektayar.ir
+    ServerAlias www.yektayar.ir
     
     # Redirect to HTTPS
     RewriteEngine On
@@ -251,13 +251,13 @@ sudo nano /etc/apache2/sites-available/yektayar.conf
 </VirtualHost>
 
 <VirtualHost *:443>
-    ServerName yektayar.com
-    ServerAlias www.yektayar.com
+    ServerName yektayar.ir
+    ServerAlias www.yektayar.ir
     
     # SSL Configuration
     SSLEngine on
-    SSLCertificateFile /etc/letsencrypt/live/yektayar.com/fullchain.pem
-    SSLCertificateKeyFile /etc/letsencrypt/live/yektayar.com/privkey.pem
+    SSLCertificateFile /etc/letsencrypt/live/yektayar.ir/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/yektayar.ir/privkey.pem
     
     # Security headers
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
@@ -333,7 +333,7 @@ sudo systemctl reload apache2
 sudo apt install -y certbot python3-certbot-apache
 
 # Obtain certificate
-sudo certbot --apache -d yektayar.com -d www.yektayar.com
+sudo certbot --apache -d yektayar.ir -d www.yektayar.ir
 
 # Test auto-renewal
 sudo certbot renew --dry-run
@@ -371,7 +371,7 @@ sudo apt install -y pgadmin4
 
 # Or use Docker
 docker run -p 5050:80 \
-  -e 'PGADMIN_DEFAULT_EMAIL=admin@yektayar.com' \
+  -e 'PGADMIN_DEFAULT_EMAIL=admin@yektayar.ir' \
   -e 'PGADMIN_DEFAULT_PASSWORD=admin' \
   -d dpage/pgadmin4
 ```
@@ -600,7 +600,7 @@ sudo certbot certificates
 sudo certbot renew
 
 # Test SSL
-openssl s_client -connect yektayar.com:443
+openssl s_client -connect yektayar.ir:443
 ```
 
 ---

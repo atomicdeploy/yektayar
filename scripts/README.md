@@ -326,7 +326,7 @@ For production deployments, consider using Nginx as a reverse proxy:
 # Backend API
 server {
     listen 80;
-    server_name api.yektayar.com;
+    server_name api.yektayar.ir;
     
     location / {
         proxy_pass http://localhost:3000;
@@ -344,7 +344,7 @@ server {
 # Admin Panel
 server {
     listen 80;
-    server_name admin.yektayar.com;
+    server_name admin.yektayar.ir;
     
     location / {
         proxy_pass http://localhost:5173;
@@ -359,7 +359,7 @@ server {
 # Mobile App
 server {
     listen 80;
-    server_name app.yektayar.com;
+    server_name app.yektayar.ir;
     
     location / {
         proxy_pass http://localhost:8100;

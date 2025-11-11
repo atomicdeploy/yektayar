@@ -788,7 +788,7 @@ html[dir="rtl"] {
 ### Apache Configuration
 ```apache
 <VirtualHost *:443>
-    ServerName yektayar.com
+    ServerName yektayar.ir
     
     SSLEngine on
     SSLCertificateFile /path/to/cert.pem

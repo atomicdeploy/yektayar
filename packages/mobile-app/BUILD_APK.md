@@ -18,7 +18,7 @@ The mobile app supports environment-based configuration for the backend API URL 
 Create a `.env` file in `packages/mobile-app/` (or use `.env.production` for production builds):
 
 ```bash
-VITE_API_BASE_URL=https://api.yektayar.com
+VITE_API_BASE_URL=https://api.yektayar.ir
 VITE_ENVIRONMENT=production
 ```
 
@@ -129,7 +129,7 @@ Set the `VITE_API_BASE_URL` secret in your GitHub repository:
 
 1. Go to **Settings** > **Secrets and variables** > **Actions**
 2. Add a new repository secret: `VITE_API_BASE_URL`
-3. Value: Your production API URL (e.g., `https://api.yektayar.com`)
+3. Value: Your production API URL (e.g., `https://api.yektayar.ir`)
 
 ## Native Android Code
 
