@@ -69,9 +69,10 @@ cd yektayar
 # Install all dependencies
 npm install
 
-# Setup environment variables
-cp packages/backend/.env.example packages/backend/.env
-# Edit .env file with your configuration
+# Setup environment variables (unified .env for all packages)
+./scripts/manage-env.sh init
+# Then edit .env with your configuration, or use interactive mode:
+./scripts/manage-env.sh edit
 ```
 
 ### Development
@@ -198,6 +199,7 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Implementation Roadmap](ROADMAP.md)** - Production roadmap with prototype sprint reference
 
 #### Setup & Deployment
+- **[Environment Configuration Guide](ENV-GUIDE.md)** - Complete .env management and configuration guide
 - **[Setup Guide](docs/SETUP.md)** - Complete setup for all phases
 - **[Ubuntu 24.04 Deployment](docs/UBUNTU-24-DEPLOYMENT.md)** - VPS deployment guide
 - **[Network Configuration](docs/NETWORK-CONFIGURATION.md)** - Port and interface configuration

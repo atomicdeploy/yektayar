@@ -4,6 +4,74 @@ This directory contains scripts and service configurations for deploying and man
 
 ## Contents
 
+### Environment Management
+
+#### `manage-env.sh`
+
+Unified environment configuration management script for the YektaYar platform.
+
+**Usage:**
+```bash
+./scripts/manage-env.sh [command]
+```
+
+**Commands:**
+- `init` - Create `.env` file from template (for initial setup)
+- `show` - Display current `.env` configuration with masked secrets
+- `validate` - Validate that all required variables are properly set
+- `test` - Test configuration including database connectivity
+- `edit` - Interactive TUI mode for editing environment values
+- `generate-secret` - Generate a secure random secret for SESSION_SECRET or JWT_SECRET
+- `help` - Show help message
+
+**What it does:**
+- Creates unified `.env` file at project root from `.env.example`
+- Validates all required environment variables are set
+- Detects placeholder/default values in secure variables
+- Tests database connectivity (requires `psql`)
+- Provides interactive TUI mode using `whiptail` or `dialog`
+- Generates secure random secrets for authentication
+- Masks sensitive values when displaying configuration
+
+**Features:**
+- ✅ Unified `.env` for all packages (backend, admin-panel, mobile-app)
+- ✅ Interactive TUI mode for easy configuration
+- ✅ Validation of required vs optional variables
+- ✅ Security checks for placeholder values
+- ✅ Database connectivity testing
+- ✅ Secure secret generation
+- ✅ Masked display of sensitive values
+
+**Examples:**
+```bash
+# Initial setup - creates .env from template
+./scripts/manage-env.sh init
+
+# Show current configuration
+./scripts/manage-env.sh show
+
+# Validate configuration
+./scripts/manage-env.sh validate
+
+# Test configuration with database check
+./scripts/manage-env.sh test
+
+# Interactive mode (requires whiptail or dialog)
+./scripts/manage-env.sh edit
+
+# Generate a secure secret
+./scripts/manage-env.sh generate-secret
+```
+
+**Environment Variables Managed:**
+- Backend: `PORT`, `HOST`, `NODE_ENV`
+- Database: `DATABASE_URL`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
+- Security: `SESSION_SECRET`, `JWT_SECRET`, `JWT_EXPIRY`
+- CORS: `CORS_ORIGIN`
+- WebSocket: `WEBSOCKET_PORT`
+- Rate Limiting: `RATE_LIMIT_WINDOW`, `RATE_LIMIT_MAX_REQUESTS`
+- Frontend: `VITE_API_BASE_URL`, `VITE_ENVIRONMENT`
+
 ### Service Files (`services/`)
 
 Systemd service unit files for running YektaYar services as system services:
