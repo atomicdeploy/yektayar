@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
+import config from '@/config'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const API_URL = config.apiBaseUrl
 const STORAGE_KEY = 'yektayar_session_token'
 
 export interface Session {

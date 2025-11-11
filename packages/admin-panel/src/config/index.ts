@@ -1,4 +1,4 @@
-// Environment configuration for YektaYar Mobile App
+// Environment configuration for YektaYar Admin Panel
 
 export interface AppConfig {
   apiBaseUrl: string;

@@ -4,6 +4,9 @@ import { IonicVue } from '@ionic/vue'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
+import config from './config'
+import { validateApi } from './config/validation'
+import ErrorScreen from './components/ErrorScreen.vue'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -44,13 +47,46 @@ const i18n = createI18n({
   }
 })
 
-const app = createApp(App)
+// Validate API configuration and reachability before mounting the app
+async function initializeApp() {
+  console.log('=== YektaYar Mobile App Initialization ===')
+  console.log(`Environment: ${config.environment}`)
+  
+  const validationResult = await validateApi(config.apiBaseUrl)
+  
+  if (!validationResult.isValid) {
+    console.error('❌ API Configuration Error:', validationResult.error)
+    
+    // Create and mount error screen
+    const errorApp = createApp(ErrorScreen, {
+      title: 'API Configuration Error',
+      message: 'Cannot start the application due to API configuration issues.',
+      details: validationResult.error
+    })
+    
+    errorApp.use(IonicVue)
+    errorApp.mount('#app')
+    return
+  }
 
-app.use(IonicVue)
-app.use(createPinia())
-app.use(router)
-app.use(i18n)
+  console.log(`✅ API Base URL: ${config.apiBaseUrl}`)
+  console.log('=== Initialization Complete ===')
 
-router.isReady().then(() => {
-  app.mount('#app')
+  // Create and mount the main app
+  const app = createApp(App)
+
+  app.use(IonicVue)
+  app.use(createPinia())
+  app.use(router)
+  app.use(i18n)
+
+  router.isReady().then(() => {
+    app.mount('#app')
+  })
+}
+
+// Start initialization
+initializeApp().catch((error) => {
+  console.error('Failed to initialize app:', error)
 })
+
