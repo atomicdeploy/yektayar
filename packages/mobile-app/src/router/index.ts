@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { RouteRecordRaw } from 'vue-router'
 import TabsPage from '../views/TabsPage.vue'
+import SplashScreen from '../views/SplashScreen.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/tabs/home'
+    redirect: '/splash'
+  },
+  {
+    path: '/splash',
+    name: 'Splash',
+    component: SplashScreen
   },
   {
     path: '/tabs/',

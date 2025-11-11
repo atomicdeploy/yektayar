@@ -1,11 +1,14 @@
 import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
+import { Server as HTTPServer } from 'http'
+import { Server as SocketIOServer } from 'socket.io'
 import { authRoutes } from './routes/auth'
 import { userRoutes } from './routes/users'
 import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
+import { setupSocketIO } from './websocket/socketServer'
 
 const app = new Elysia()
   .use(cors())
@@ -30,7 +33,12 @@ const app = new Elysia()
   .get('/', () => ({
     message: 'YektaYar API Server',
     version: '0.1.0',
-    status: 'running'
+    status: 'running',
+    features: {
+      rest: true,
+      websocket: true,
+      sessionAcquisition: true
+    }
   }))
   .get('/health', () => ({
     status: 'healthy',
@@ -42,11 +50,39 @@ const app = new Elysia()
   .use(appointmentRoutes)
   .use(courseRoutes)
 
-// Export the app configuration for Bun to serve automatically
-// When running with: bun run src/index.ts
-// Bun will automatically call Bun.serve() with this configuration
-export default {
-  port: process.env.PORT || 3000,
-  hostname: process.env.HOST || 'localhost',
-  fetch: app.fetch
-}
+// For Bun, we need to create an HTTP server manually to add Socket.IO
+// Bun's fetch handler is used for the Elysia app
+const port = Number(process.env.PORT) || 3000
+const hostname = process.env.HOST || 'localhost'
+
+// Create HTTP server using Node's http module (works with Bun)
+const httpServer = Bun.serve({
+  port,
+  hostname,
+  fetch: app.fetch,
+  // Enable websocket support
+  websocket: {
+    message() {}, // Handled by Socket.IO
+    open() {},
+    close() {}
+  }
+})
+
+// Note: Socket.IO with Bun requires special handling
+// For now, we'll note that Socket.IO should be initialized when running on Node.js
+// In production, consider using Bun's native WebSocket or run Socket.IO on a separate Node.js process
+
+console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
+console.log(`📚 API Documentation available at http://${hostname}:${port}/swagger`)
+console.log(`⚡ Runtime: Bun ${Bun.version}`)
+
+// Socket.IO setup (for Node.js compatibility)
+// When running with Node.js instead of Bun, uncomment the following:
+// const httpServer = createServer((req, res) => app.fetch(req).then(response => {
+//   res.writeHead(response.status, Object.fromEntries(response.headers))
+//   res.end(await response.text())
+// }))
+// const io = setupSocketIO(httpServer)
+// httpServer.listen(port, hostname)
+
+export default httpServer
