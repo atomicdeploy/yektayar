@@ -5,22 +5,14 @@ import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 import { useSessionStore } from './stores/session'
+import { messages } from './locales'
 
 // i18n configuration
 const i18n = createI18n({
   legacy: false,
   locale: 'fa',
   fallbackLocale: 'en',
-  messages: {
-    fa: {
-      welcome: 'خوش آمدید به یکتایار',
-      admin_panel: 'پنل مدیریت'
-    },
-    en: {
-      welcome: 'Welcome to YektaYar',
-      admin_panel: 'Admin Panel'
-    }
-  }
+  messages,
 })
 
 const app = createApp(App)
