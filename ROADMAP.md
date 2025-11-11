@@ -446,6 +446,172 @@
 
 ---
 
-**Last Updated**: 2025-11-10  
+## 📅 Prototype Sprint: 5-Day Plan (Optional Reference)
+
+For rapid prototyping and MVP validation, a 5-day sprint plan is available:
+
+### Day 1: Foundation & Design System
+**Goal:** Establish the visual language and core navigation
+
+**Tasks:**
+- Setup i18n system (Persian + English)
+- Define color palette and theme
+- Configure Vazirmatn font for Persian and Inter font for English
+- Setup RTL/LTR switching
+- Create base layout components
+- Implement dark/light mode toggle
+- Create splash screen and PWA manifest
+
+**Deliverables:** Working theme switcher, language switcher, main layout shell, installable PWA
+
+### Day 2: Authentication & Navigation
+**Goal:** User can navigate through the app with mock authentication
+
+**Tasks:**
+- Login, register, and OTP verification screens (mock)
+- Pattern lock screen
+- Setup mock session management (useAuth hook)
+- Main navigation (bottom nav for mobile, sidebar for desktop)
+- User profile screen (basic)
+- Admin panel layout
+- Role-based UI rendering
+
+**Deliverables:** Complete auth flow (mocked), navigation between screens, pattern lock working, different views per user type
+
+### Day 3: AI Chat & Messaging
+**Goal:** Users can interact with AI and view messaging interface
+
+**Tasks:**
+- Chat interface component
+- Message bubble components (sent/received)
+- Typing indicator
+- Mock AI response generator (keyword-based)
+- Chat history persistence
+- Unified messaging center (chats + tickets)
+- Message categories/departments
+- Thread status (open/closed)
+- Multi-participant chat UI
+
+**Deliverables:** Working AI chat with mock responses, messaging center with threads, chat persistence
+
+### Day 4: Appointments & Assessments
+**Goal:** Users can browse professionals, book appointments, take assessments
+
+**Tasks:**
+- Professional directory listing
+- Professional profile detail page
+- Appointment booking interface
+- Calendar component (Jalali + Gregorian)
+- Time slot selection
+- Booking confirmation
+- Psychological assessment form
+- Assessment questions (mock data)
+- Results display page
+- Personality type visualization
+- Course recommendations based on results
+
+**Deliverables:** End-to-end booking flow, assessment completion, results visualization, calendar with both date systems
+
+### Day 5: Dashboard, Courses & Polish
+**Goal:** Complete the experience with dashboards and educational content
+
+**Tasks:**
+- User dashboard (upcoming appointments, messages, progress)
+- Admin dashboard (user activity, stats, monitoring mock)
+- Course/educational content browser
+- Course detail page (video mock, description)
+- Progress tracking UI
+- Course enrollment
+- Admin: User profile viewer
+- Admin: Secret notes feature
+- Loading states and skeletons
+- Error handling and empty states
+- Smooth page transitions (Framer Motion)
+- Animation polish
+- Responsive design fixes
+- Final testing (mobile/desktop/tablet)
+- Performance optimization
+- Accessibility audit (basic)
+
+**Deliverables:** Complete user journey, complete admin journey, polished animations, professional look and feel, PWA fully working
+
+---
+
+## 🔮 Production Backend Implementation (Weeks 1-8)
+
+### Phase 1: Backend Foundation (Weeks 1-2)
+
+#### Technology Stack Decision
+**Options Evaluated:**
+- Elysia.js (Bun-based, very fast, modern)
+- AdonisJS (Laravel-like for Node.js, batteries included)
+- Fastify (Lightweight, plugin ecosystem)
+
+**Current Choice:** Elysia.js + Bun for performance and modern API design
+
+#### Database Setup
+- PostgreSQL database
+- pgAdmin or DBeaver for management
+- Complete schema design
+- Migrations (as needed)
+- Seed data scripts
+- Backup strategy
+
+#### Core Backend Features
+- Project initialization
+- Environment configuration
+- Database connection and ORM setup
+- Session management (stateful, token-based)
+- Authentication endpoints (register, login, OTP)
+- Authorization middleware (permissions/roles)
+- User CRUD operations
+- REST API structure
+- API documentation (Swagger/OpenAPI)
+- Rate limiting middleware
+- Request validation
+- Error handling
+- Logging setup
+
+#### Security Implementation
+- HTTPS enforcement
+- CORS configuration
+- CSRF protection
+- SQL injection prevention
+- XSS protection
+- Password hashing
+- Session security
+- Input sanitization
+- Security headers
+
+### Phase 2: Core Features (Weeks 3-4)
+
+#### Real-Time Messaging
+- WebSocket server setup (Socket.IO)
+- Room management
+- Message persistence
+- Typing indicators
+- Read receipts
+- Online/offline status
+- Thread management
+- Category/department system
+- Multi-participant support
+- File attachments
+
+---
+
+## 🚀 Future Enhancements (Post-Launch)
+
+### Phase 3: Advanced Features
+
+- Migration tool setup
+- Comprehensive test suite
+- API documentation portal
+- Changelog automation
+- Dependency updates
+- Performance benchmarks
+
+---
+
+**Last Updated**: 2025-11-11  
 **Current Phase**: Core Implementation Ready to Start  
-**Target Completion**: 5 weeks from start
+**Target Completion**: 5 weeks from start for production backend

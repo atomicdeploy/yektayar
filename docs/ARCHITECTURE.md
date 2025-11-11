@@ -870,5 +870,152 @@ logger.error('Payment failed', { error, userId: '123' })
 
 ---
 
-**Last Updated:** Initial version  
+## 🎯 Prototype vs Production: Understanding Development Phases
+
+### Current Prototype Phase
+
+The prototype is a **browser-based React runtime** (GitHub Spark environment) that focuses on:
+
+✅ **Capabilities:**
+- Rapid UI/UX prototyping
+- Validating user flows
+- Demonstrating concepts to stakeholders
+- Testing design systems
+- Creating interactive mockups
+
+❌ **Limitations:**
+- No real backend server
+- No database (PostgreSQL/MySQL)
+- No true authentication/sessions
+- No payment processing
+- No email/SMS sending
+- No file uploads to server
+- No WebSocket server
+- No server-side code
+
+### What's Actually Running (Prototype)
+```
+┌─────────────────────────────┐
+│     Your Browser            │
+│  ┌─────────────────────┐   │
+│  │   React App         │   │
+│  │   (Client-side)     │   │
+│  │                     │   │
+│  │   Spark KV Storage  │   │
+│  │   (localStorage)    │   │
+│  └─────────────────────┘   │
+└─────────────────────────────┘
+```
+
+### Prototype Focus Areas
+
+#### 1. Visual Design & Branding
+- Color palette that evokes trust and calm
+- Professional typography (Vazirmatn for Persian)
+- Consistent spacing and layout
+- Dark/light mode that looks great
+- Smooth, purposeful animations
+
+#### 2. User Experience Flows
+- **Patient Journey:** Download/install app (PWA) → Register → Chat with AI → Take assessment → Browse professionals → Book appointment → Enroll in courses → Message with psychologist
+- **Psychologist Journey:** Login → View dashboard → Manage availability → Respond to messages → Add session notes → View patient history
+- **Admin Journey:** Login to admin panel → View system dashboard → Browse users → View profiles → Add secret notes → Monitor activity → Moderate content
+
+#### 3. Interface Components
+Build all UI components users will interact with:
+- Login/register forms
+- Chat interface
+- Calendar for appointments
+- Course cards and browsing
+- Dashboard widgets
+- Settings screens
+- Profile pages
+
+#### 4. Mock Interactions
+Simulate how the real system will behave with realistic mock data and interactions.
+
+---
+
+## 🔄 Alternative Architecture Approaches
+
+### Explored Alternative: Nuxt 3 + Fastify
+
+An alternative architecture was explored using a different tech stack:
+
+| Aspect | Alternative (Nuxt + Fastify) | Current (Ionic + Elysia) |
+|--------|------------------------------|--------------------------|
+| **Backend Framework** | Fastify | Elysia.js |
+| **Runtime** | Node.js | Bun |
+| **Frontend Framework** | Nuxt 3 (SSR capable) | Vue 3 + Ionic 7 |
+| **Mobile** | Capacitor (deferred) | Ionic + Capacitor |
+| **Database ORM** | Knex.js | (TBD) |
+| **Package Manager** | Yarn workspaces | npm workspaces |
+| **State Management** | Pinia | Pinia |
+| **Validation** | Zod | Zod |
+
+#### Alternative Approach Highlights
+
+**Fastify Backend:**
+- Lightweight REST API
+- Socket.IO integration for real-time features
+- Knex.js for database queries
+- Opaque session tokens (no JWT refresh tokens)
+- Modular route structure
+
+**Nuxt 3 Frontend:**
+- Universal rendering (SSR/SPA/PWA)
+- App and Admin panel in one codebase
+- Tailwind CSS for styling
+- vue-i18n for internationalization
+- Service Worker for offline support
+
+#### Why Current Architecture Was Chosen
+
+1. ✅ **Mobile-First**: Ionic provides better mobile UX
+2. ✅ **Performance**: Bun is significantly faster than Node.js
+3. ✅ **Separation**: Clear boundaries between app, admin, and backend
+4. ✅ **TypeScript**: Consistent TypeScript throughout
+5. ✅ **Modern**: Elysia is newer, more ergonomic API design
+
+#### Useful Patterns from Alternative
+
+**Opaque Session Tokens:**
+```javascript
+// Simple, effective session management
+const sessionToken = crypto.randomBytes(32).toString('base64url');
+await db('sessions').insert({
+  token: sessionToken,
+  user_id: userId,
+  expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+});
+```
+
+**Modular Route Registration:**
+```javascript
+// Clean pattern for organizing routes
+exports.register = (app) => {
+  app.get('/endpoint', handler);
+  app.post('/endpoint', handler);
+};
+
+// In server.js
+authModule.register(app);
+chatModule.register(app);
+```
+
+**Shared Socket.IO Instance:**
+```javascript
+// Decorate server with Socket.IO for route access
+app.decorate('io', io);
+
+// In routes
+app.post('/message', async (req, reply) => {
+  const message = await saveMessage(req.body);
+  app.io.to(threadId).emit('message:new', message);
+});
+```
+
+---
+
+**Last Updated:** 2025-11-11  
 **Review Schedule:** After each major phase

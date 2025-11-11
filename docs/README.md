@@ -2,11 +2,55 @@
 
 This directory contains comprehensive guides and documentation for the YektaYar platform.
 
+> **📚 Looking for something specific?** Check the [**Documentation Index (INDEX.md)**](INDEX.md) for a complete overview and guided reading paths.
+
 ---
 
 ## Available Documentation
 
+### Getting Started
+
+- **[Documentation Index](INDEX.md)** - Complete documentation hub with guided reading paths
+- **[Getting Started Guide](GETTING-STARTED.md)** - Comprehensive onboarding for new developers
+- **[Quick Reference](QUICK-REFERENCE.md)** - Essential code snippets and daily development checklist
+
+### Architecture & Design
+
+- **[Architecture Overview](ARCHITECTURE.md)** - Complete system architecture
+  - Current prototype architecture
+  - Future production architecture
+  - Prototype vs production comparison
+  - Alternative architecture approaches (Nuxt + Fastify)
+  - Database schema design
+  - API design
+  - Security architecture
+  - Real-time architecture
+  - Deployment architecture
+
+- **[Requirements Review](REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
+  - Coverage assessment
+  - Planning and organization evaluation
+  - Recommendations for efficiency
+  - Technology stack validation
+
+### Development Planning
+
+- **[Implementation Roadmap](../ROADMAP.md)** - Complete roadmap
+  - Current implementation status
+  - Core implementation phases
+  - 5-day prototype sprint plan (optional reference)
+  - Production backend implementation timeline
+  - Feature roadmap and milestones
+
 ### Setup and Configuration
+
+- **[Setup Guide](SETUP.md)** - Complete setup for prototype and production
+  - Prototype setup (Spark environment)
+  - Production VPS setup
+  - Development environment setup
+  - Mobile app setup (Capacitor)
+  - Troubleshooting guide
+  - Backup strategy
 
 - **[Bun vs NPM](BUN-VS-NPM.md)** - Understanding bun and npm in YektaYar
   - Comparison of bun and npm
@@ -40,19 +84,34 @@ This directory contains comprehensive guides and documentation for the YektaYar 
 
 ## Quick Links
 
-### For Developers
+### For New Developers
 
-- New to the project? Start with [../README.md](../README.md)
+- **Start Here**: [Documentation Index](INDEX.md) - Choose your reading path
+- New to the project? Read [Getting Started Guide](GETTING-STARTED.md)
+- Need a quick reference? Keep [Quick Reference](QUICK-REFERENCE.md) open
 - Setting up development environment? Check [../DEVELOPMENT.md](../DEVELOPMENT.md)
-- Need a quick reference? See [../QUICK-START.md](../QUICK-START.md)
-- Want to understand bun? Read [BUN-VS-NPM.md](BUN-VS-NPM.md)
-- Need to change ports? See [NETWORK-CONFIGURATION.md](NETWORK-CONFIGURATION.md)
+- Understanding the architecture? Read [Architecture Overview](ARCHITECTURE.md)
+
+### For Prototype Development
+
+- Building the prototype? Follow [Development Guide](../DEVELOPMENT.md) - Prototype Sprint section
+- Understand the scope: [Architecture Overview](ARCHITECTURE.md) - Prototype vs Production section
+- Reference roadmap: [../ROADMAP.md](../ROADMAP.md) - Prototype Sprint section
+- Daily reference: [Quick Reference](QUICK-REFERENCE.md)
+
+### For Production Development
+
+- Implementation roadmap: [../ROADMAP.md](../ROADMAP.md)
+- Architecture deep dive: [Architecture Overview](ARCHITECTURE.md)
+- Setup production: [Setup Guide](SETUP.md)
+- Deployment guide: [Ubuntu 24.04 Deployment](UBUNTU-24-DEPLOYMENT.md)
 
 ### For DevOps
 
-- Deploying to VPS? Follow [UBUNTU-24-DEPLOYMENT.md](UBUNTU-24-DEPLOYMENT.md)
-- Configuring network? Check [NETWORK-CONFIGURATION.md](NETWORK-CONFIGURATION.md)
-- Understanding runtime? Read [BUN-VS-NPM.md](BUN-VS-NPM.md)
+- Deploying to VPS? Follow [Ubuntu 24.04 Deployment](UBUNTU-24-DEPLOYMENT.md)
+- Complete setup guide: [Setup Guide](SETUP.md)
+- Configuring network? Check [Network Configuration](NETWORK-CONFIGURATION.md)
+- Understanding runtime? Read [Bun vs NPM](BUN-VS-NPM.md)
 
 ---
 
@@ -60,15 +119,31 @@ This directory contains comprehensive guides and documentation for the YektaYar 
 
 ```
 yektayar/
-├── docs/                          # Detailed guides (this directory)
-│   ├── README.md                 # This file
-│   ├── BUN-VS-NPM.md            # Bun vs NPM guide
-│   ├── NETWORK-CONFIGURATION.md  # Interface and port configuration
-│   └── UBUNTU-24-DEPLOYMENT.md   # Ubuntu 24.04 VPS deployment
-├── README.md                      # Project overview
-├── DEVELOPMENT.md                 # Development guide
-├── QUICK-START.md                 # Quick reference
-└── docs-archive/                  # Archived documentation (reference only)
+├── docs/                              # Documentation directory (you are here)
+│   ├── INDEX.md                       # Documentation hub with reading paths
+│   ├── README.md                      # This file
+│   │
+│   ├── GETTING-STARTED.md             # New developer onboarding
+│   ├── QUICK-REFERENCE.md             # Code snippets & daily checklist
+│   │
+│   ├── ARCHITECTURE.md                # System architecture
+│   ├── PROTOTYPE-vs-PRODUCTION.md     # Phase differences
+│   ├── REQUIREMENTS-REVIEW.md         # Requirements analysis
+│   │
+│   ├── PROTOTYPE-ROADMAP.md           # Prototype sprint plan
+│   ├── PROTOTYPE-TASKS.md             # Prototype task breakdown
+│   ├── PROTOTYPE-STATUS.md            # Prototype progress tracking
+│   │
+│   ├── SETUP.md                       # Setup guide (all phases)
+│   ├── UBUNTU-24-DEPLOYMENT.md        # Ubuntu VPS deployment
+│   ├── NETWORK-CONFIGURATION.md       # Network configuration
+│   └── BUN-VS-NPM.md                  # Bun vs NPM guide
+│
+├── README.md                           # Main project overview
+├── ROADMAP.md                          # Production implementation roadmap
+├── DEVELOPMENT.md                      # Development guide
+├── QUICK-START.md                      # Quick start for monorepo
+└── SECURITY.md                         # Security policy
 ```
 
 ---

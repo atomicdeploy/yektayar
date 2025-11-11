@@ -87,3 +87,8 @@ pids
 *.pid
 *.seed
 *.pid.lock
+
+# Temp directories (extracted archives, etc.)
+temp/
+tmp/
+*.zip
