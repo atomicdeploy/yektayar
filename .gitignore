@@ -1,8 +1,9 @@
 # Dependencies
 node_modules
 **/node_modules
-package-lock.json
-**/package-lock.json
+# Keep package-lock.json for CI cache
+# package-lock.json
+# **/package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
