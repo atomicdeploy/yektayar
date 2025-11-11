@@ -80,7 +80,7 @@ echo ""
 
 # Update email in Caddyfile
 echo -e "${BLUE}Email Configuration:${NC}"
-read -p "Enter your email for Let's Encrypt notifications (or press Enter to skip): " email
+read -r -p "Enter your email for Let's Encrypt notifications (or press Enter to skip): " email
 if [ -n "$email" ]; then
     sed -i "s/admin@yektayar.ir/$email/" /etc/caddy/Caddyfile
     echo -e "${GREEN}✓ Email updated to: $email${NC}\n"
