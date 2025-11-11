@@ -180,12 +180,43 @@ The `manage-env.sh` script provides comprehensive environment management:
 # Interactive TUI mode
 ./scripts/manage-env.sh edit
 
+# Set a specific environment variable
+./scripts/manage-env.sh set --key=KEY --val=VALUE [--force]
+./scripts/manage-env.sh set KEY VALUE [--force]
+
 # Generate secure random secret
 ./scripts/manage-env.sh generate-secret
 
 # Show help
 ./scripts/manage-env.sh help
 ```
+
+### Set Command
+
+The `set` command allows you to update individual environment variables from the command line:
+
+```bash
+# Set database host (with confirmation)
+./scripts/manage-env.sh set --key=DB_HOST --val=localhost
+
+# Set database password (force overwrite without confirmation)
+./scripts/manage-env.sh set --key=DB_PASSWORD --val=mysecret --force
+
+# Positional argument syntax
+./scripts/manage-env.sh set DB_USER myuser --force
+
+# Set multiple values
+./scripts/manage-env.sh set DB_HOST localhost --force
+./scripts/manage-env.sh set DB_PORT 5432 --force
+./scripts/manage-env.sh set DB_NAME mydb --force
+```
+
+**Features:**
+- Automatically creates backup before modifying .env
+- Backups stored in `.env.backups/` with timestamp
+- Shows confirmation prompt (old vs new value) unless `--force` is used
+- Auto-updates `DATABASE_URL` when DB credentials change
+- Can add new variables that don't exist in .env
 
 ### Features
 
@@ -194,6 +225,9 @@ The `manage-env.sh` script provides comprehensive environment management:
 - ✅ Checks for placeholder values
 - ✅ Tests database connectivity
 - ✅ Interactive TUI (requires `whiptail` or `dialog`)
+- ✅ **Set individual environment variables from command line**
+- ✅ **Automatic backup creation before modifications**
+- ✅ **Auto-update DATABASE_URL when DB credentials change**
 - ✅ Secure secret generation
 - ✅ Masks sensitive values in output
 
@@ -221,7 +255,40 @@ The `manage-env.sh` script provides comprehensive environment management:
 2. **Rotate secrets** periodically
 3. **Use strong passwords** (minimum 32 characters)
 4. **Limit CORS origins** to trusted domains only
-5. **Keep backups** of production `.env` securely
+5. **Keep backups** of production `.env` securely (backups are auto-created in `.env.backups/`)
+
+## PostgreSQL Setup Integration
+
+When running `./scripts/setup-postgresql.sh`, the script will:
+
+1. Install and configure PostgreSQL
+2. Create the database and user
+3. Generate secure credentials
+4. Save credentials to `postgresql-credentials.txt`
+5. **Ask if you want to update the unified `.env` file**
+6. If yes, use `manage-env.sh set` to apply credentials automatically
+
+This integration ensures your unified `.env` file stays in sync with your PostgreSQL configuration.
+
+```bash
+# Run PostgreSQL setup
+./scripts/setup-postgresql.sh
+
+# The script will prompt:
+# "Do you want to update the unified .env with these database credentials? (Y/n):"
+# 
+# If you answer yes:
+# "Force update without confirmation for each value? (y/N):"
+# - Yes: Updates all values with --force flag
+# - No: Prompts for confirmation for each value
+
+# Manual update if you skipped the automatic update
+./scripts/manage-env.sh set --key=DB_HOST --val=localhost --force
+./scripts/manage-env.sh set --key=DB_PORT --val=5432 --force
+./scripts/manage-env.sh set --key=DB_NAME --val=yektayar --force
+./scripts/manage-env.sh set --key=DB_USER --val=yektayar_user --force
+./scripts/manage-env.sh set --key=DB_PASSWORD --val=your_password --force
+```
 
 ## Troubleshooting
 
