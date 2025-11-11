@@ -12,7 +12,7 @@ const i18n = createI18n({
   fallbackLocale: 'en',
   messages: {
     fa: {
-      welcome: 'خوش آمدید به یکتاکر',
+      welcome: 'خوش آمدید به یکتایار',
       admin_panel: 'پنل مدیریت'
     },
     en: {

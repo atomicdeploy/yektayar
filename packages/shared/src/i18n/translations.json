@@ -1,7 +1,7 @@
 {
   "fa": {
     "common": {
-      "app_name": "یکتاکر",
+      "app_name": "یکتایار",
       "welcome": "خوش آمدید",
       "login": "ورود",
       "register": "ثبت‌نام",
@@ -21,8 +21,8 @@
       "phone": "شماره تلفن",
       "password": "رمز عبور",
       "name": "نام",
-      "login_title": "ورود به یکتاکر",
-      "register_title": "ثبت‌نام در یکتاکر",
+      "login_title": "ورود به یکتایار",
+      "register_title": "ثبت‌نام در یکتایار",
       "send_otp": "ارسال کد تأیید",
       "verify_otp": "تأیید کد",
       "forgot_password": "فراموشی رمز عبور"

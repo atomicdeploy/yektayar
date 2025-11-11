@@ -31,8 +31,8 @@ const i18n = createI18n({
   fallbackLocale: 'en',
   messages: {
     fa: {
-      welcome: 'خوش آمدید به یکتاکر',
-      app_title: 'یکتاکر'
+      welcome: 'خوش آمدید به یکتایار',
+      app_title: 'یکتایار'
     },
     en: {
       welcome: 'Welcome to YektaYar',
