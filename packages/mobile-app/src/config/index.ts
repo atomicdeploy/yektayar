@@ -7,7 +7,7 @@ export interface AppConfig {
 
 // Load configuration from environment variables - no defaults allowed
 export const config: AppConfig = {
-  apiBaseUrl: import.meta.env.API_BASE_URL || '',
+  apiBaseUrl: import.meta.env.VITE_API_URL || '',
   environment: (import.meta.env.VITE_ENVIRONMENT as AppConfig['environment']) || 'development'
 };
 
