@@ -710,6 +710,115 @@ sudo systemctl reload nginx
 - [Elysia.js Documentation](https://elysiajs.com/)
 - [Vue.js Deployment Guide](https://vuejs.org/guide/best-practices/production-deployment.html)
 
+## GitHub Management Scripts
+
+### `manage-github-labels.js`
+
+Creates and syncs GitHub labels from the `.github/labels.yml` configuration file.
+
+**Usage:**
+```bash
+# List existing labels
+node scripts/manage-github-labels.js --list --token YOUR_GITHUB_TOKEN
+
+# Dry run (see what would change)
+node scripts/manage-github-labels.js --sync --dry-run --token YOUR_GITHUB_TOKEN
+
+# Create missing labels
+GITHUB_TOKEN=YOUR_TOKEN node scripts/manage-github-labels.js --create
+
+# Sync all labels (create new, update existing)
+GITHUB_TOKEN=YOUR_TOKEN node scripts/manage-github-labels.js --sync
+```
+
+**Options:**
+- `--list` - List all existing labels in the repository
+- `--sync` - Sync all labels (create new, update existing)
+- `--create` - Only create missing labels (don't update existing)
+- `--dry-run` - Show what would be done without making changes
+- `--token` - GitHub personal access token (or set `GITHUB_TOKEN` env var)
+- `--repo` - Repository in format owner/repo (default: from git remote)
+
+**Requirements:**
+- GitHub personal access token with `repo` scope
+- To create a token: https://github.com/settings/tokens/new
+
+**Features:**
+- ✅ Creates 70+ professionally organized labels
+- ✅ Updates existing labels with new colors/descriptions
+- ✅ Validates configuration before applying
+- ✅ Dry-run mode to preview changes
+- ✅ Automatic repository detection from git remote
+
+**Label Categories:**
+- Type: 🐛 bug, ✨ feature, 📝 docs, 🔧 enhancement, etc.
+- Scope: 🖥️ backend, 🎨 frontend, 📱 mobile-app, etc.
+- Priority: 🔴 critical, 🟠 high, 🟡 medium, 🟢 low
+- Status: 🔍 needs-triage, ✅ ready, 🚧 in-progress, etc.
+- Size: 📏 XS, S, M, L, XL
+- Special: 👍 good first issue, 🆘 help wanted, etc.
+
+### `auto-label-issues.js`
+
+Automatically suggests and applies labels to existing issues and pull requests based on content analysis.
+
+**Usage:**
+```bash
+# Analyze issues (dry run)
+node scripts/auto-label-issues.js --token YOUR_GITHUB_TOKEN
+
+# Apply labels to issues
+node scripts/auto-label-issues.js --apply --token YOUR_GITHUB_TOKEN
+
+# Process pull requests
+GITHUB_TOKEN=YOUR_TOKEN node scripts/auto-label-issues.js --prs --apply
+
+# Process both issues and PRs with limit
+GITHUB_TOKEN=YOUR_TOKEN node scripts/auto-label-issues.js --all --apply --limit 100
+```
+
+**Options:**
+- `--apply` - Actually apply labels (default is dry-run)
+- `--issues` - Process issues (default)
+- `--prs` - Process pull requests
+- `--all` - Process both issues and PRs
+- `--limit` - Limit number of items to process (default: 50)
+- `--token` - GitHub personal access token (or set `GITHUB_TOKEN` env var)
+- `--repo` - Repository in format owner/repo (default: from git remote)
+
+**How It Works:**
+
+The script analyzes issue/PR titles and bodies for keywords:
+
+**Type Detection:**
+- `bug`: bug, error, crash, issue, broken, fix, not working
+- `feature`: feature, enhancement, add, new, implement
+- `documentation`: docs, documentation, readme, guide
+- `question`: question, how to, help, what is, why
+- `security`: security, vulnerability, exploit
+- `performance`: performance, slow, speed, optimize
+
+**Component Detection:**
+- `backend`: backend, api, server, endpoint, database
+- `frontend`: frontend, ui, ux, interface, design
+- `mobile`: mobile, app, android, ios, capacitor
+- `admin`: admin, panel, dashboard
+
+**Priority Detection** (from title):
+- `critical`: critical, urgent, emergency, blocker
+- `high`: high priority, important, severe
+
+**Features:**
+- ✅ Keyword-based content analysis
+- ✅ Respects existing labels (doesn't add duplicates)
+- ✅ Dry-run mode to preview suggestions
+- ✅ Batch processing with configurable limits
+- ✅ Works with both issues and pull requests
+
+**Documentation:**
+- [GitHub Management Guide](../docs/GITHUB-MANAGEMENT-GUIDE.md) - Complete usage guide
+- [Discord Integration Guide](../docs/GITHUB-DISCORD-INTEGRATION.md) - Team collaboration setup
+
 ## Dependency Testing
 
 ### `test-dependencies.js`
