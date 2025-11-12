@@ -11,8 +11,17 @@ import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
 import { setupSocketIO } from './websocket/socketServer'
 
+// Configure CORS based on environment
+// When behind a reverse proxy (like Apache), disable application-level CORS
+// to avoid duplicate headers
+const corsEnabled = process.env.DISABLE_CORS !== 'true'
+const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:8100']
+
 const app = new Elysia()
-  .use(cors())
+  .use(corsEnabled ? cors({
+    origin: corsOrigins,
+    credentials: true
+  }) : (app) => app)
   .use(
     swagger({
       documentation: {
