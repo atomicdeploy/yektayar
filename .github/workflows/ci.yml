@@ -13,6 +13,8 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     strategy:
       matrix:
@@ -53,6 +55,8 @@ jobs:
 
   type-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout code
@@ -85,6 +89,8 @@ jobs:
 
   status-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [lint-and-test, type-check]
     if: always()
     
