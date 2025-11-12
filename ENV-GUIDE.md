@@ -2,21 +2,31 @@
 
 This document explains how environment variables are managed in the YektaYar platform.
 
-## Unified .env File
+## Unified + Per-Package .env Files
 
-YektaYar uses a **unified `.env` file** at the project root instead of separate `.env` files for each package. This simplifies configuration management and ensures consistency across all services.
+YektaYar uses a **unified `.env` file** at the project root for shared configuration, with optional **per-package `.env` files** that can override specific values.
 
-### Location
+### Location & Priority
 
 ```
 yektayar/
-├── .env                    # Main environment file (created from .env.example)
-├── .env.example            # Template with all required variables
+├── .env                         # Main environment file (loaded first)
+├── .env.example                 # Template with all required variables
 └── packages/
-    ├── backend/            # Uses root .env automatically
-    ├── admin-panel/        # Uses root .env automatically
-    └── mobile-app/         # Uses root .env automatically
+    ├── backend/                 # Uses root .env
+    ├── admin-panel/
+    │   ├── .env                 # Optional: Overrides root .env for admin-panel
+    │   └── .env.example         # Template for package-specific vars
+    └── mobile-app/
+        ├── .env                 # Optional: Overrides root .env for mobile-app
+        └── .env.example         # Template for package-specific vars
 ```
+
+**Loading Order**:
+1. Root `.env` is loaded first (shared configuration)
+2. Package-specific `.env` is loaded second (overrides root values)
+
+This allows different values for `VITE_PROXY_DOMAIN` in mobile-app vs admin-panel.
 
 ## Quick Start
 
@@ -149,6 +159,7 @@ Priority order: `.env.local` > `.env.production` > `.env`
 |----------|----------|---------|-------------|
 | `VITE_API_BASE_URL` | Yes | `http://localhost:3000` | Backend API base URL |
 | `VITE_ENVIRONMENT` | Yes | `development` | Environment name |
+| `VITE_PROXY_DOMAIN` | No | - | (Optional) Override for HMR proxy domain. Leave empty to auto-detect from browser Host header (recommended). Set per-package in `packages/{app}/.env` if needed. |
 
 ### Optional API Keys
 

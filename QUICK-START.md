@@ -167,6 +167,15 @@ VITE_API_BASE_URL=http://localhost:3000
 VITE_ENVIRONMENT=development
 ```
 
+**Per-Package Configuration**: Frontend apps (mobile-app, admin-panel) can have their own `.env` files in `packages/{app}/.env` to override root values. This is useful for app-specific settings like `VITE_PROXY_DOMAIN`.
+
+**HMR Auto-Detection**: HMR (Hot Module Replacement) WebSocket now auto-detects the domain from the browser's Host header. This means:
+- Accessing via `localhost:8100` → uses `ws://localhost:8100`
+- Accessing via `app.yektayar.ir` → uses `wss://app.yektayar.ir:443`
+- No manual configuration needed for reverse proxy setups!
+
+Only set `VITE_PROXY_DOMAIN` in `packages/{app}/.env` if you need to override auto-detection.
+
 ### Database Setup
 
 ```bash

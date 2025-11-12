@@ -116,8 +116,86 @@ create_env_from_template() {
     
     cp "$ENV_EXAMPLE" "$ENV_FILE"
     print_success ".env file created from template"
-    print_info "Please edit .env and set appropriate values"
-    print_info "Run '$0 validate' to check if all required values are set"
+    
+    # Scan .env.example and check for missing values in .env
+    print_info "Scanning for variables that need values..."
+    echo ""
+    
+    # Source the new .env file
+    set -a
+    source "$ENV_FILE" 2>/dev/null || true
+    set +a
+    
+    local needs_input=0
+    
+    # Extract all variable names from .env.example (excluding comments and empty lines)
+    while IFS='=' read -r key value; do
+        # Skip comments and empty lines
+        if [[ "$key" =~ ^#.*$ ]] || [ -z "$key" ]; then
+            continue
+        fi
+        
+        # Get current value from environment
+        current_value="${!key}"
+        
+        # Check if value is empty or is a placeholder
+        if [ -z "$current_value" ] || \
+           [[ "$current_value" == "your_"* ]] || \
+           [[ "$current_value" == "change_this_"* ]] || \
+           [[ "$current_value" == "******"* ]]; then
+            
+            # Check if this is a required variable
+            local is_required=0
+            for req_var in "${REQUIRED_VARS[@]}"; do
+                if [ "$key" = "$req_var" ]; then
+                    is_required=1
+                    break
+                fi
+            done
+            
+            if [ $is_required -eq 1 ]; then
+                needs_input=1
+                echo -e "${YELLOW}Variable ${CYAN}${key}${YELLOW} needs a value${NC}"
+                
+                # Provide help for specific variables
+                case "$key" in
+                    SESSION_SECRET|JWT_SECRET)
+                        echo -e "${CYAN}  Hint: Generate with: ./scripts/manage-env.sh generate-secret${NC}"
+                        ;;
+                    DB_PASSWORD)
+                        echo -e "${CYAN}  Hint: Set a secure password for your database${NC}"
+                        ;;
+                esac
+                
+                echo -e -n "${GREEN}  Enter value for ${key}: ${NC}"
+                read -r new_value
+                
+                if [ -n "$new_value" ]; then
+                    # Update the .env file
+                    if [[ "$OSTYPE" == "darwin"* ]]; then
+                        sed -i '' "s|^${key}=.*|${key}=${new_value}|" "$ENV_FILE"
+                    else
+                        sed -i "s|^${key}=.*|${key}=${new_value}|" "$ENV_FILE"
+                    fi
+                    print_success "Set ${key}"
+                else
+                    print_warning "Skipped ${key} (you can set it later)"
+                fi
+                echo ""
+            fi
+        fi
+    done < <(grep -E '^[A-Z_]+=' "$ENV_EXAMPLE")
+    
+    echo ""
+    print_success ".env file is ready!"
+    
+    if [ $needs_input -eq 1 ]; then
+        print_info "Some required variables still need values"
+        print_info "Run '$0 validate' to check if all required values are set"
+        print_info "Run '$0 edit' for interactive editing"
+    else
+        print_info "Run '$0 validate' to verify your configuration"
+    fi
 }
 
 show_env() {
