@@ -10,6 +10,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  define: {
+    'import.meta.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL || '')
+  },
   server: {
     port: 8100,
     allowedHosts: ['.yektayar.ir'],

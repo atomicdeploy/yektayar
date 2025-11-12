@@ -48,11 +48,39 @@ const i18n = createI18n({
   messages: {
     fa: {
       welcome: 'خوش آمدید به یکتایار',
-      app_title: 'یکتایار'
+      app_title: 'یکتایار',
+      error_screen: {
+        title: 'خطای پیکربندی',
+        api_config_error: 'خطای پیکربندی API',
+        cannot_start: 'امکان راه‌اندازی برنامه به دلیل مشکل در پیکربندی API وجود ندارد.',
+        api_url_missing: 'متغیر محیطی API_BASE_URL تنظیم نشده است. لطفاً آدرس پایه API را پیکربندی کنید.',
+        details: 'جزئیات',
+        solution: 'راه‌حل',
+        show_solution: 'نمایش راه‌حل',
+        hide_solution: 'پنهان کردن راه‌حل',
+        fix_instruction: 'برای رفع این مشکل، می‌توانید دستور زیر را در ترمینال اجرا کنید:',
+        or: 'یا',
+        manual_setup: 'به صورت دستی یک فایل .env در ریشه پروژه با محتوای زیر ایجاد کنید:',
+        restart_note: 'پس از تنظیم متغیر محیطی، سرور توسعه را مجدداً راه‌اندازی کنید.',
+      }
     },
     en: {
       welcome: 'Welcome to YektaYar',
-      app_title: 'YektaYar'
+      app_title: 'YektaYar',
+      error_screen: {
+        title: 'Configuration Error',
+        api_config_error: 'API Configuration Error',
+        cannot_start: 'Cannot start the application due to API configuration issues.',
+        api_url_missing: 'API_BASE_URL environment variable is not set. Please configure the API base URL.',
+        details: 'Details',
+        solution: 'Solution',
+        show_solution: 'Show Solution',
+        hide_solution: 'Hide Solution',
+        fix_instruction: 'To fix this issue, you can run the following command in your terminal:',
+        or: 'Or',
+        manual_setup: 'Manually create a .env file in the project root with:',
+        restart_note: 'After setting the environment variable, restart the development server.',
+      }
     }
   }
 })
@@ -75,6 +103,7 @@ async function initializeApp() {
     })
     
     errorApp.use(IonicVue)
+    errorApp.use(i18n)
     errorApp.mount('#app')
     return
   }

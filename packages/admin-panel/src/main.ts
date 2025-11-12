@@ -44,6 +44,7 @@ async function initializeApp() {
       details: validationResult.error
     })
     
+    errorApp.use(i18n)
     errorApp.mount('#app')
     return
   }

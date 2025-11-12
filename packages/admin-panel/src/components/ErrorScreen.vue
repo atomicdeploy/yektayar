@@ -1,25 +1,100 @@
 <template>
-  <div class="error-screen">
+  <div class="error-screen" :class="{ 'dark-mode': isDarkMode }" :dir="direction">
     <div class="error-container">
       <div class="error-icon">❌</div>
-      <h1 class="error-title">{{ title }}</h1>
-      <p class="error-message">{{ message }}</p>
-      <div class="error-details" v-if="details">
-        <p>{{ details }}</p>
+      <h1 class="error-title">{{ t('error_screen.api_config_error') }}</h1>
+      <p class="error-message">{{ t('error_screen.cannot_start') }}</p>
+      
+      <div v-if="isDevelopment && details" class="error-section">
+        <h3 class="section-title">{{ t('error_screen.details') }}</h3>
+        <div class="error-details">
+          <p>{{ translatedDetails }}</p>
+        </div>
+      </div>
+
+      <div v-if="isDevelopment && showSolution" class="error-section">
+        <button @click="toggleSolution" class="solution-toggle">
+          {{ solutionExpanded ? t('error_screen.hide_solution') : t('error_screen.show_solution') }}
+          <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
+        </button>
+        
+        <div v-if="solutionExpanded" class="solution-content">
+          <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
+          
+          <p class="solution-text">{{ t('error_screen.fix_instruction') }}</p>
+          <div class="code-block">
+            <code>./scripts/manage-env.sh</code>
+          </div>
+          
+          <p class="solution-text">{{ t('error_screen.or') }}</p>
+          
+          <p class="solution-text">{{ t('error_screen.manual_setup') }}</p>
+          <div class="code-block">
+            <code>API_BASE_URL=http://localhost:3000</code>
+          </div>
+          
+          <p class="solution-note">{{ t('error_screen.restart_note') }}</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
 interface Props {
   title?: string
   message: string
   details?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   title: 'Configuration Error'
+})
+
+const { t, locale } = useI18n()
+
+const solutionExpanded = ref(false)
+const isDarkMode = ref(false)
+
+const isDevelopment = computed(() => {
+  return import.meta.env.MODE === 'development' || import.meta.env.DEV
+})
+
+const direction = computed(() => {
+  return locale.value === 'fa' ? 'rtl' : 'ltr'
+})
+
+const translatedDetails = computed(() => {
+  if (!props.details) return ''
+  // Translate the error message if it contains VITE_API_BASE_URL or API_BASE_URL
+  if (props.details.includes('API_BASE_URL') || props.details.includes('VITE_API_BASE_URL')) {
+    return t('error_screen.api_url_missing')
+  }
+  return props.details
+})
+
+const showSolution = computed(() => {
+  // Show solution only if the error is about missing API_BASE_URL
+  return props.details?.includes('API_BASE_URL') || props.details?.includes('VITE_API_BASE_URL')
+})
+
+const toggleSolution = () => {
+  solutionExpanded.value = !solutionExpanded.value
+}
+
+// Detect dark mode from system preferences
+onMounted(() => {
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    isDarkMode.value = true
+  }
+  
+  // Listen for changes to dark mode preference
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    isDarkMode.value = e.matches
+  })
 })
 </script>
 
@@ -35,6 +110,11 @@ withDefaults(defineProps<Props>(), {
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  transition: background 0.3s ease;
+}
+
+.error-screen.dark-mode {
+  background: #1a1a1a;
 }
 
 .error-container {
@@ -43,7 +123,8 @@ withDefaults(defineProps<Props>(), {
   align-items: center;
   text-align: center;
   padding: 2rem;
-  max-width: 600px;
+  max-width: 700px;
+  width: 100%;
 }
 
 .error-icon {
@@ -58,11 +139,36 @@ withDefaults(defineProps<Props>(), {
   margin-bottom: 1rem;
 }
 
+.dark-mode .error-title {
+  color: #ff6b6b;
+}
+
 .error-message {
   font-size: 1.125rem;
   color: #495057;
   margin-bottom: 1.5rem;
   line-height: 1.6;
+}
+
+.dark-mode .error-message {
+  color: #d0d0d0;
+}
+
+.error-section {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 0.75rem;
+  text-align: start;
+}
+
+.dark-mode .section-title {
+  color: #e0e0e0;
 }
 
 .error-details {
@@ -71,6 +177,12 @@ withDefaults(defineProps<Props>(), {
   border-radius: 0.5rem;
   padding: 1rem;
   width: 100%;
+  text-align: start;
+}
+
+.dark-mode .error-details {
+  background: #2a2a2a;
+  border-color: #404040;
 }
 
 .error-details p {
@@ -79,5 +191,93 @@ withDefaults(defineProps<Props>(), {
   margin: 0;
   font-family: monospace;
   word-break: break-word;
+}
+
+.dark-mode .error-details p {
+  color: #b0b0b0;
+}
+
+.solution-toggle {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.solution-toggle:hover {
+  background: #0056b3;
+}
+
+.dark-mode .solution-toggle {
+  background: #0d6efd;
+}
+
+.dark-mode .solution-toggle:hover {
+  background: #0a58ca;
+}
+
+.toggle-icon {
+  font-size: 0.875rem;
+}
+
+.solution-content {
+  text-align: start;
+}
+
+.solution-text {
+  font-size: 0.95rem;
+  color: #495057;
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.dark-mode .solution-text {
+  color: #c0c0c0;
+}
+
+.code-block {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+
+.dark-mode .code-block {
+  background: #2a2a2a;
+  border-color: #404040;
+}
+
+.code-block code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875rem;
+  color: #e83e8c;
+  white-space: pre;
+}
+
+.dark-mode .code-block code {
+  color: #ff79c6;
+}
+
+.solution-note {
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+.dark-mode .solution-note {
+  color: #a0a0a0;
 }
 </style>
