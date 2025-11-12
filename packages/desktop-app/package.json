@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "npm run build:web && electron .",
     "build": "npm run build:web && npm run build:electron",
-    "build:web": "cd ../admin-panel && npm run build",
-    "build:electron": "electron-builder --win",
-    "build:electron:dir": "electron-builder --win --dir"
+    "build:web": "echo 'Building admin panel...' && cd ../admin-panel && npm run build",
+    "build:electron": "echo 'Packaging with electron-builder...' && electron-builder --win",
+    "build:electron:dir": "echo 'Building unpacked directory...' && electron-builder --win --dir"
   },
   "dependencies": {
     "dotenv": "^16.4.5"

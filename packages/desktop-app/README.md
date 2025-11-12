@@ -6,6 +6,8 @@ Desktop application wrapper for YektaYar Admin Panel, built with Electron.
 
 This package provides a Windows desktop application (`.exe`) that wraps the YektaYar Admin Panel web interface. It's similar to the now-unmaintained Nativefier project but built specifically for YektaYar with configuration management.
 
+> **📘 For detailed build instructions, see [BUILD.md](BUILD.md)**
+
 ## Features
 
 - ✅ Windows `.exe` installer (NSIS)
