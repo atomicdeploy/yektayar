@@ -149,6 +149,7 @@ Priority order: `.env.local` > `.env.production` > `.env`
 |----------|----------|---------|-------------|
 | `VITE_API_BASE_URL` | Yes | `http://localhost:3000` | Backend API base URL |
 | `VITE_ENVIRONMENT` | Yes | `development` | Environment name |
+| `VITE_PROXY_DOMAIN` | No | - | Proxy domain for mobile-app HMR (e.g., `app.yektayar.ir`) - set when behind reverse proxy |
 
 ### Optional API Keys
 
