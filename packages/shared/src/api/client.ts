@@ -12,17 +12,19 @@
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { ApiClientConfig, ApiResponse, ApiError, RequestOptions } from './types'
+import { ApiClientConfig, ApiResponse, ApiError, RequestOptions, TokenDeliveryMethod } from './types'
 import { TokenStorage } from './storage'
 
 export class ApiClient {
   private axiosInstance: AxiosInstance
   private tokenStorage: TokenStorage
   private debug: boolean
+  private tokenDeliveryMethod: TokenDeliveryMethod
 
   constructor(config: ApiClientConfig) {
     this.debug = config.debug || false
     this.tokenStorage = new TokenStorage(config.storageKey)
+    this.tokenDeliveryMethod = config.tokenDeliveryMethod || 'header'
 
     // Create axios instance with base configuration
     this.axiosInstance = axios.create({
@@ -41,7 +43,7 @@ export class ApiClient {
    * Setup request and response interceptors
    */
   private setupInterceptors(): void {
-    // Request interceptor - add authorization header
+    // Request interceptor - add authorization based on delivery method
     this.axiosInstance.interceptors.request.use(
       async (config) => {
         // Skip auth for certain endpoints or if explicitly requested
@@ -50,10 +52,44 @@ export class ApiClient {
           return config
         }
 
-        // Get token from storage and add to headers
+        // Get token from storage
         const token = await this.tokenStorage.getToken()
         if (token) {
-          config.headers.Authorization = `Bearer ${token}`
+          // Determine which delivery method to use
+          const deliveryMethod = (config as any).tokenDeliveryMethod || this.tokenDeliveryMethod
+
+          switch (deliveryMethod) {
+            case 'header':
+              config.headers.Authorization = `Bearer ${token}`
+              break
+            
+            case 'cookie':
+              // Set cookie header - note: in browser, cookies are automatically sent
+              // This is for Node.js environments
+              if (config.headers.Cookie) {
+                config.headers.Cookie += `; token=${token}`
+              } else {
+                config.headers.Cookie = `token=${token}`
+              }
+              // For browser environments with credentials
+              config.withCredentials = true
+              break
+            
+            case 'query':
+              // Add token to query parameters
+              if (!config.params) {
+                config.params = {}
+              }
+              config.params.token = token
+              break
+            
+            case 'body':
+              // Add token to request body (only for POST/PUT/PATCH)
+              if (config.data && typeof config.data === 'object') {
+                config.data = { ...config.data, token }
+              }
+              break
+          }
         }
 
         if (this.debug) {
@@ -61,6 +97,7 @@ export class ApiClient {
             method: config.method,
             url: config.url,
             headers: config.headers,
+            deliveryMethod: (config as any).tokenDeliveryMethod || this.tokenDeliveryMethod,
           })
         }
 
@@ -120,11 +157,12 @@ export class ApiClient {
    * GET request
    */
   async get<T = any>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
-    const config: AxiosRequestConfig & { skipAuth?: boolean } = {
+    const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
       params: options?.params,
       headers: options?.headers,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
+      tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
     const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.get(url, config)
@@ -135,11 +173,12 @@ export class ApiClient {
    * POST request
    */
   async post<T = any>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    const config: AxiosRequestConfig & { skipAuth?: boolean } = {
+    const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
       headers: options?.headers,
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
+      tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
     const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.post(url, data, config)
@@ -150,11 +189,12 @@ export class ApiClient {
    * PUT request
    */
   async put<T = any>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    const config: AxiosRequestConfig & { skipAuth?: boolean } = {
+    const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
       headers: options?.headers,
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
+      tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
     const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.put(url, data, config)
@@ -165,11 +205,12 @@ export class ApiClient {
    * PATCH request
    */
   async patch<T = any>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
-    const config: AxiosRequestConfig & { skipAuth?: boolean } = {
+    const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
       headers: options?.headers,
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
+      tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
     const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.patch(url, data, config)
@@ -180,11 +221,12 @@ export class ApiClient {
    * DELETE request
    */
   async delete<T = any>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
-    const config: AxiosRequestConfig & { skipAuth?: boolean } = {
+    const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
       headers: options?.headers,
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
+      tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
     const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.delete(url, config)

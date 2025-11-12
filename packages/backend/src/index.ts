@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
+import { cookie } from '@elysiajs/cookie'
 import { Server as HTTPServer } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
 import { authRoutes } from './routes/auth'
@@ -19,6 +20,7 @@ const corsEnabled = process.env.DISABLE_CORS !== 'true'
 const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:8100']
 
 const app = new Elysia()
+  .use(cookie())
   .use(corsEnabled ? cors({
     origin: corsOrigins,
     credentials: true,
