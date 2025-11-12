@@ -67,19 +67,25 @@ async function initializeApp() {
   if (!validationResult.isValid) {
     logger.error('❌ API Configuration Error:', validationResult.error)
     
-    // Create and mount error screen
-    const errorApp = createApp(ErrorScreen, {
-      title: 'API Configuration Error',
-      message: 'Cannot start the application due to API configuration issues.',
-      details: validationResult.error
-    })
-    
-    errorApp.use(IonicVue)
-    errorApp.mount('#app')
-    return
+    // In development mode, allow continuing without API to facilitate UI development
+    if (config.environment === 'development') {
+      logger.info('⚠️ Continuing anyway in development mode')
+    } else {
+      // In production, show error screen if API is not available
+      const errorApp = createApp(ErrorScreen, {
+        title: 'API Configuration Error',
+        message: 'Cannot start the application due to API configuration issues.',
+        details: validationResult.error
+      })
+      
+      errorApp.use(IonicVue)
+      errorApp.mount('#app')
+      return
+    }
+  } else {
+    logger.info(`✅ API Base URL: ${config.apiBaseUrl}`)
   }
-
-  logger.info(`✅ API Base URL: ${config.apiBaseUrl}`)
+  
   logger.info('=== Initialization Complete ===')
 
   // Create and mount the main app
