@@ -93,10 +93,26 @@ export default {
     loading: 'در حال بارگذاری...',
   },
   
-  // Placeholder for unimplemented pages
+  // Placeholder
   placeholder: {
     page_title: 'صفحه',
     coming_soon_message: 'این بخش در حال حاضر در دست توسعه است و به زودی در دسترس خواهد بود.',
     back_to_dashboard: 'بازگشت به داشبورد',
+  },
+  
+  // Error Screen
+  error_screen: {
+    title: 'خطای پیکربندی',
+    api_config_error: 'خطای پیکربندی API',
+    cannot_start: 'امکان راه‌اندازی پنل مدیریت به دلیل مشکل در پیکربندی API وجود ندارد.',
+    api_url_missing: 'متغیر محیطی API_BASE_URL تنظیم نشده است. لطفاً آدرس پایه API را پیکربندی کنید.',
+    details: 'جزئیات',
+    solution: 'راه‌حل',
+    show_solution: 'نمایش راه‌حل',
+    hide_solution: 'پنهان کردن راه‌حل',
+    fix_instruction: 'برای رفع این مشکل، می‌توانید دستور زیر را در ترمینال اجرا کنید:',
+    or: 'یا',
+    manual_setup: 'به صورت دستی یک فایل .env در ریشه پروژه با محتوای زیر ایجاد کنید:',
+    restart_note: 'پس از تنظیم متغیر محیطی، سرور توسعه را مجدداً راه‌اندازی کنید.',
   },
 }

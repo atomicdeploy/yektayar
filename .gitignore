@@ -57,7 +57,7 @@ lerna-debug.log*
 
 # OS
 Thumbs.db
-Desktop.ini
+# Desktop.ini - Now tracked for folder customization
 
 # IDE
 .project
