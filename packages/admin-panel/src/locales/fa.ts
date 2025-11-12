@@ -93,6 +93,13 @@ export default {
     loading: 'در حال بارگذاری...',
   },
   
+  // Placeholder
+  placeholder: {
+    page_title: 'صفحه',
+    coming_soon_message: 'این بخش در حال حاضر در دست توسعه است و به زودی در دسترس خواهد بود.',
+    back_to_dashboard: 'بازگشت به داشبورد',
+  },
+  
   // Error Screen
   error_screen: {
     title: 'خطای پیکربندی',

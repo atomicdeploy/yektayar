@@ -39,6 +39,14 @@ export default {
     appointment_stats: 'Appointment Statistics',
     recent_activities: 'Recent Activities',
     system_status: 'System Status',
+    no_activities: 'No activities found',
+  },
+  
+  // Placeholder for unimplemented pages
+  placeholder: {
+    page_title: 'Page',
+    coming_soon_message: 'This section is currently under development and will be available soon.',
+    back_to_dashboard: 'Back to Dashboard',
   },
   
   // Users
