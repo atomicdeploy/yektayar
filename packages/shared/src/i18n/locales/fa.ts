@@ -1,33 +1,53 @@
 export default {
-  // Common
-  welcome: 'خوش آمدید به یکتایار',
-  admin_panel: 'پنل مدیریت',
-  dashboard: 'داشبورد',
-  users: 'کاربران',
-  settings: 'تنظیمات',
-  logout: 'خروج',
-  search: 'جستجو',
-  filter: 'فیلتر',
-  save: 'ذخیره',
-  cancel: 'انصراف',
-  edit: 'ویرایش',
-  delete: 'حذف',
-  add: 'افزودن',
-  close: 'بستن',
-  loading: 'در حال بارگذاری...',
-  
-  // Navigation
+  // Common - مشترک در همه برنامه‌ها
+  common: {
+    app_name: 'یکتایار',
+    welcome: 'خوش آمدید',
+    login: 'ورود',
+    register: 'ثبت‌نام',
+    logout: 'خروج',
+    submit: 'ارسال',
+    cancel: 'انصراف',
+    save: 'ذخیره',
+    delete: 'حذف',
+    edit: 'ویرایش',
+    search: 'جستجو',
+    filter: 'فیلتر',
+    add: 'افزودن',
+    close: 'بستن',
+    loading: 'در حال بارگذاری...',
+    error: 'خطا',
+    success: 'موفقیت‌آمیز',
+  },
+
+  // Auth - احراز هویت
+  auth: {
+    email: 'ایمیل',
+    phone: 'شماره تلفن',
+    password: 'رمز عبور',
+    name: 'نام',
+    login_title: 'ورود به یکتایار',
+    register_title: 'ثبت‌نام در یکتایار',
+    send_otp: 'ارسال کد تأیید',
+    verify_otp: 'تأیید کد',
+    forgot_password: 'فراموشی رمز عبور',
+  },
+
+  // Navigation - منوی ناوبری مشترک
   nav: {
+    home: 'خانه',
     dashboard: 'داشبورد',
     users: 'کاربران',
+    chat: 'گفتگو',
     appointments: 'نوبت‌ها',
     messages: 'پیام‌ها',
     courses: 'دوره‌ها',
     reports: 'گزارش‌ها',
+    profile: 'پروفایل',
     settings: 'تنظیمات',
   },
-  
-  // Dashboard
+
+  // Dashboard - مخصوص پنل مدیریت
   dashboard_page: {
     title: 'داشبورد مدیریت',
     welcome_message: 'به پنل مدیریت یکتایار خوش آمدید',
@@ -41,15 +61,15 @@ export default {
     system_status: 'وضعیت سیستم',
     no_activities: 'فعالیتی وجود ندارد',
   },
-  
-  // Placeholder for unimplemented pages
+
+  // Placeholder برای صفحات در حال توسعه
   placeholder: {
     page_title: 'صفحه',
     coming_soon_message: 'این بخش در حال حاضر در دست توسعه است و به زودی در دسترس خواهد بود.',
     back_to_dashboard: 'بازگشت به داشبورد',
   },
-  
-  // Users
+
+  // Users - مدیریت کاربران
   users_page: {
     title: 'مدیریت کاربران',
     list_title: 'لیست کاربران',
@@ -67,44 +87,56 @@ export default {
     search_placeholder: 'جستجوی کاربران...',
     no_users: 'کاربری یافت نشد',
   },
-  
-  // Roles
+
+  // Roles - نقش‌ها
   roles: {
     admin: 'مدیر',
     psychologist: 'روانشناس',
     user: 'کاربر',
     moderator: 'ناظر',
   },
-  
-  // Status
+
+  // Status - وضعیت‌ها
   status: {
     active: 'فعال',
     inactive: 'غیرفعال',
     pending: 'در انتظار',
     blocked: 'مسدود',
   },
-  
-  // Theme
+
+  // Theme - تم
   theme: {
     light: 'روشن',
     dark: 'تیره',
     system: 'سیستم',
   },
-  
-  // Messages
+
+  // Messages - پیام‌ها
   messages: {
     success: 'عملیات با موفقیت انجام شد',
     error: 'خطایی رخ داده است',
     confirm_delete: 'آیا از حذف این مورد اطمینان دارید؟',
     saved: 'ذخیره شد',
     loading: 'در حال بارگذاری...',
+    no_messages: 'پیامی وجود ندارد',
+    type_message: 'پیام خود را بنویسید...',
+    send: 'ارسال',
   },
-  
-  // Error Screen
+
+  // Appointments - نوبت‌دهی
+  appointments: {
+    book: 'رزرو نوبت',
+    upcoming: 'نوبت‌های آینده',
+    past: 'نوبت‌های گذشته',
+    no_appointments: 'نوبتی وجود ندارد',
+  },
+
+  // Error Screen - صفحه خطا مشترک
   error_screen: {
     title: 'خطای پیکربندی',
     api_config_error: 'خطای پیکربندی API',
-    cannot_start: 'امکان راه‌اندازی پنل مدیریت به دلیل مشکل در پیکربندی API وجود ندارد.',
+    cannot_start: 'امکان راه‌اندازی برنامه به دلیل مشکل در پیکربندی API وجود ندارد.',
+    cannot_start_admin: 'امکان راه‌اندازی پنل مدیریت به دلیل مشکل در پیکربندی API وجود ندارد.',
     api_url_missing: 'متغیر محیطی API_BASE_URL تنظیم نشده است. لطفاً آدرس پایه API را پیکربندی کنید.',
     details: 'جزئیات',
     solution: 'راه‌حل',
@@ -115,4 +147,10 @@ export default {
     manual_setup: 'به صورت دستی یک فایل .env در ریشه پروژه با محتوای زیر ایجاد کنید:',
     restart_note: 'پس از تنظیم متغیر محیطی، سرور توسعه را مجدداً راه‌اندازی کنید.',
   },
+
+  // App specific - پنل مدیریت
+  admin_panel: 'پنل مدیریت',
+
+  // App specific - موبایل
+  app_title: 'یکتایار',
 }

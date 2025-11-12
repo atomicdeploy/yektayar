@@ -5,12 +5,11 @@ import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 import config from './config'
-import { validateApi } from './config/validation'
+import { validateApi } from '@yektayar/shared'
 import ErrorScreen from './components/ErrorScreen.vue'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
-import { messages } from './locales'
-import { logger } from '@yektayar/shared'
+import { messages, logger } from '@yektayar/shared'
 
 // Log startup information
 logger.startup('YektaYar Admin Panel', {
