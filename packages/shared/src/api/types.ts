@@ -13,6 +13,11 @@ export interface ApiResponse<T = any> {
 }
 
 /**
+ * Token delivery methods
+ */
+export type TokenDeliveryMethod = 'header' | 'cookie' | 'query' | 'body'
+
+/**
  * API Client configuration options
  */
 export interface ApiClientConfig {
@@ -42,6 +47,19 @@ export interface ApiClientConfig {
    * Enable debug logging
    */
   debug?: boolean
+
+  /**
+   * Token delivery method
+   * Specifies how the token should be sent to the backend
+   * - 'header': Authorization header (default)
+   * - 'cookie': Cookie named 'token'
+   * - 'query': Query parameter named 'token'
+   * - 'body': Body parameter named 'token' (POST/PUT/PATCH only)
+   * 
+   * Note: Multiple methods can be combined by calling setToken with different methods
+   * Default: 'header'
+   */
+  tokenDeliveryMethod?: TokenDeliveryMethod
 }
 
 /**
@@ -67,6 +85,11 @@ export interface RequestOptions {
    * Skip automatic Authorization header
    */
   skipAuth?: boolean
+
+  /**
+   * Override token delivery method for this request
+   */
+  tokenDeliveryMethod?: TokenDeliveryMethod
 }
 
 /**

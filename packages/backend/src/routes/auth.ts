@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
 import { createAnonymousSession, validateSessionToken, invalidateSession } from '../services/sessionService'
+import { extractToken } from '../middleware/tokenExtractor'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request }) => {
@@ -35,19 +36,19 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       }
     }
   })
-  .get('/session', async ({ headers }) => {
+  .get('/session', async ({ headers, query, cookie }) => {
     try {
-      // Extract token from Authorization header
-      const authHeader = headers['authorization']
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      // Extract token from multiple sources (cookie, header, query param)
+      const token = extractToken({ headers, query, cookie })
+      
+      if (!token) {
         return {
           success: false,
           error: 'No token provided',
-          message: 'Authorization header missing or invalid'
+          message: 'Token must be provided via Authorization header, cookie, or query parameter'
         }
       }
 
-      const token = authHeader.substring(7) // Remove 'Bearer ' prefix
       const session = await validateSessionToken(token)
 
       if (!session) {
@@ -104,17 +105,18 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       message: 'OTP verify endpoint - to be implemented'
     }
   })
-  .post('/logout', async ({ headers }) => {
+  .post('/logout', async ({ headers, body, cookie }) => {
     try {
-      const authHeader = headers['authorization']
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      // Extract token from multiple sources (cookie, header, body param)
+      const token = extractToken({ headers, body, cookie })
+      
+      if (!token) {
         return {
           success: false,
           error: 'No token provided'
         }
       }
 
-      const token = authHeader.substring(7)
       await invalidateSession(token)
 
       return {
