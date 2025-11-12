@@ -710,6 +710,105 @@ sudo systemctl reload nginx
 - [Elysia.js Documentation](https://elysiajs.com/)
 - [Vue.js Deployment Guide](https://vuejs.org/guide/best-practices/production-deployment.html)
 
+## Android APK Analysis
+
+### `analyze-apk.sh`
+
+A comprehensive script to analyze Android APK files and extract detailed information about the application.
+
+**Usage:**
+```bash
+./scripts/analyze-apk.sh <path-to-apk>
+```
+
+**Example:**
+```bash
+# Analyze the debug APK
+./scripts/analyze-apk.sh packages/mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
+
+# Using the npm script
+npm run android:analyze packages/mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+**What it analyzes:**
+
+1. **File Information:**
+   - File path and size
+   - MD5 and SHA256 checksums for integrity verification
+
+2. **Package Information:**
+   - Package name (e.g., `com.yektayar.app`)
+   - App name and version
+   - Minimum and target SDK versions
+
+3. **Application Details:**
+   - App version name (user-visible)
+   - App version code (internal)
+   - Package identifier
+
+4. **Permissions:**
+   - List of all requested permissions
+   - Helps identify potential privacy or security concerns
+
+5. **Activities:**
+   - List of all activities in the app
+   - Useful for understanding app structure
+
+6. **Native Libraries:**
+   - Lists CPU architectures supported
+   - Shows included native code (.so files)
+
+7. **APK Structure:**
+   - Total file count
+   - Number of DEX files (compiled code)
+   - Assets and resources count
+
+8. **Signing Information:**
+   - Certificate details (if available)
+   - Signature validation status
+
+**Requirements:**
+- `aapt` (Android Asset Packaging Tool) - available in Android SDK build-tools
+- `unzip` - for basic APK inspection
+- `jarsigner` (optional) - for signature verification
+
+**Example output:**
+```
+========================================
+Android APK Analysis
+========================================
+
+📄 File Information:
+  Path: app-debug.apk
+  Size: 6.5M
+  MD5: a1b2c3d4e5f6...
+  SHA256: 1a2b3c4d5e6f...
+
+📦 Package Information:
+  package: name='com.yektayar.app' versionCode='1' versionName='0.1.0'
+  sdkVersion:'24'
+  targetSdkVersion:'34'
+
+🏷️  Application Details:
+  App Name: YektaYar
+  Package Name: com.yektayar.app
+  Version Name: 0.1.0
+  Version Code: 1
+
+🔐 Permissions:
+  - android.permission.INTERNET
+  - android.permission.ACCESS_NETWORK_STATE
+  ...
+
+🎯 Activities:
+  - com.yektayar.app.MainActivity
+  - com.getcapacitor.BridgeActivity
+  ...
+```
+
+**Integration with CI/CD:**
+The script is automatically used in the GitHub Actions workflow to analyze built APKs and post the analysis as a comment on pull requests.
+
 ## Dependency Testing
 
 ### `test-dependencies.js`
