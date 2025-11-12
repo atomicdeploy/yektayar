@@ -212,7 +212,7 @@ The `set` command allows you to update individual environment variables from the
 ```
 
 **Features:**
-- Automatically creates backup before modifying .env
+- Automatically creates backup before modifying .env (applies to all modification commands)
 - Backups stored in `.env.backups/` with timestamp
 - Shows confirmation prompt (old vs new value) unless `--force` is used
 - Auto-updates `DATABASE_URL` when DB credentials change

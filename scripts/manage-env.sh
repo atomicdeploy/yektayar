@@ -537,6 +537,8 @@ basic_interactive_setup() {
     read -p "Save changes? (y/N): " -n 1 -r
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # Create backup before saving
+        create_backup
         cp "$temp_env" "$ENV_FILE"
         print_success ".env file updated successfully!"
         rm "$temp_env"
@@ -607,6 +609,8 @@ tui_interactive_setup() {
                 read -p "Press Enter to continue..."
                 ;;
             8)
+                # Create backup before saving
+                create_backup
                 cp "$temp_env" "$ENV_FILE"
                 print_success ".env file saved successfully!"
                 rm "$temp_env"
@@ -755,7 +759,7 @@ show_usage() {
     echo -e "    - All packages use this unified .env file"
     echo -e "    - Sensitive values are masked when displayed with 'show' command"
     echo -e "    - The 'test' command requires psql to be installed for database testing"
-    echo -e "    - A backup is automatically created when modifying .env with 'set' command"
+    echo -e "    - A backup is automatically created before any modification to .env"
     echo -e ""
 }
 
