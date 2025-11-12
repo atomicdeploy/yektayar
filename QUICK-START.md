@@ -165,7 +165,12 @@ JWT_SECRET=your_jwt_secret
 CORS_ORIGIN=http://localhost:5173,http://localhost:8100
 VITE_API_BASE_URL=http://localhost:3000
 VITE_ENVIRONMENT=development
+
+# Optional: Set when mobile-app dev server is behind a reverse proxy
+# VITE_PROXY_DOMAIN=app.yektayar.ir
 ```
+
+**Note**: When running the mobile-app dev server behind a reverse proxy (e.g., nginx proxying `app.yektayar.ir` to `localhost:8100`), set `VITE_PROXY_DOMAIN` to enable proper HMR (Hot Module Replacement) WebSocket connections. For local development without a reverse proxy, leave it unset.
 
 ### Database Setup
 
