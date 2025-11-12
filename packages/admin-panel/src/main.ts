@@ -63,7 +63,7 @@ async function initializeApp() {
   // Acquire session on app startup
   const sessionStore = useSessionStore()
   sessionStore.acquireSession().catch((error) => {
-    console.error('Failed to acquire session on startup:', error)
+    logger.error('Failed to acquire session on startup:', error)
     // Continue anyway - session will be acquired on next attempt
   })
 
