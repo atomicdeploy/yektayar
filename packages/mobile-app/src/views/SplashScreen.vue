@@ -28,6 +28,7 @@ import { useRouter } from 'vue-router'
 import { IonPage, IonContent, IonSpinner, IonIcon } from '@ionic/vue'
 import { heart } from 'ionicons/icons'
 import { useSessionStore } from '../stores/session'
+import { logger } from '@yektayar/shared'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
@@ -43,7 +44,7 @@ onMounted(async () => {
       router.replace('/tabs/home')
     }, 1500)
   } catch (error: any) {
-    console.error('Failed to acquire session:', error)
+    logger.error('Failed to acquire session:', error)
     errorMessage.value = 'خطا در برقراری ارتباط. لطفاً مجدداً تلاش کنید.'
     
     // Retry after 3 seconds
