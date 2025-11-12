@@ -162,6 +162,7 @@ async function initializeApp() {
         solution = findSolutionForError(solutionsData, validationResult.error || '', validationResult.errorType)
       }
       
+    // Create and mount error screen
       const errorApp = createApp(ErrorScreenMobile, {
         title: 'API Configuration Error',
         message: 'Cannot start the application due to API configuration issues.',

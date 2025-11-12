@@ -309,6 +309,39 @@ echo "Test file" | sudo tee /var/www/yektayar/static/test.txt
 curl https://static.yektayar.ir/test.txt
 ```
 
+### 5. Compare Installed Configs with Repository
+
+Use the configuration comparison script to check if your installed webserver configurations match the repository:
+
+```bash
+./scripts/compare-webserver-configs.sh
+```
+
+**What it does:**
+- Detects installed webservers (Apache, Nginx, Caddy)
+- Compares installed configurations with repository versions
+- Shows differences between configs
+- Provides step-by-step update instructions
+- Warns about outdated configurations
+
+**When to use:**
+- After pulling updates from the repository
+- Before and after webserver updates
+- When troubleshooting configuration issues
+- When migrating to a new server
+
+**Example output:**
+```
+✅ Detected webservers: nginx 
+========================================
+Checking nginx configurations
+========================================
+✅ api.yektayar.ir.conf - Up to date
+❌ panel.yektayar.ir.conf - Differs from repository
+```
+
+The script will interactively ask if you want to see differences and update instructions.
+
 ---
 
 ## 📊 Monitoring and Logs

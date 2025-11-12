@@ -18,6 +18,10 @@ cleanup() {
     echo "Cleaning up test files..."
     pkill -f "sleep 999" 2>/dev/null || true
     rm -f /tmp/yektayar-test-*.pid /tmp/yektayar-test-*.log
+    rm -f /tmp/yektayar-backend.pid /tmp/yektayar-backend.log
+    rm -f /tmp/yektayar-admin.pid /tmp/yektayar-admin.log
+    rm -f /tmp/yektayar-mobile.pid /tmp/yektayar-mobile.log
+    rm -f /tmp/test-logs-output.txt
 }
 
 # Setup trap to cleanup on exit
@@ -71,8 +75,8 @@ fi
 echo ""
 echo "Test 4: Testing stop command with running service..."
 
-# Start a fake service
-nohup sleep 999 > /tmp/yektayar-backend.log 2>&1 &
+# Start a fake service (use setsid to create new process group)
+setsid sleep 999 > /tmp/yektayar-backend.log 2>&1 &
 TEST_PID=$!
 echo $TEST_PID > /tmp/yektayar-backend.pid
 sleep 0.5
@@ -163,6 +167,107 @@ if grep -q "Available log files" /tmp/test-logs-output.txt && \
 else
     echo -e "${RED}✗ FAILED: Logs command output unexpected${NC}"
     cat /tmp/test-logs-output.txt
+    exit 1
+fi
+
+rm -f /tmp/test-logs-output.txt
+
+# Test 8: Restart command with no running services
+echo ""
+echo "Test 8: Testing restart command with no running services..."
+RESTART_OUTPUT=$("${DEV_RUNNER_SCRIPT}" restart 2>&1)
+
+if echo "${RESTART_OUTPUT}" | grep -q "No services are currently running"; then
+    echo -e "${GREEN}✓ PASSED: Restart command handles no running services${NC}"
+else
+    echo -e "${RED}✗ FAILED: Restart command output unexpected${NC}"
+    exit 1
+fi
+
+# Test 9: Restart command with running services
+echo ""
+echo "Test 9: Testing restart command detects running services..."
+
+# Start fake services (use setsid to create new process group)
+setsid sleep 999 > /tmp/yektayar-backend.log 2>&1 &
+BACKEND_PID=$!
+echo $BACKEND_PID > /tmp/yektayar-backend.pid
+sleep 0.2
+
+setsid sleep 999 > /tmp/yektayar-admin.log 2>&1 &
+ADMIN_PID=$!
+echo $ADMIN_PID > /tmp/yektayar-admin.pid
+sleep 0.2
+
+# Verify they're running
+if ! kill -0 $BACKEND_PID 2>/dev/null || ! kill -0 $ADMIN_PID 2>/dev/null; then
+    echo -e "${RED}✗ FAILED: Test services didn't start${NC}"
+    exit 1
+fi
+
+# Run restart command with timeout (will timeout trying to start real services, but that's ok)
+# We just want to verify it detects the running services and tries to stop them
+RESTART_OUTPUT=$(timeout 5 "${DEV_RUNNER_SCRIPT}" restart 2>&1 || true)
+
+# Verify the output mentions detecting the services
+if echo "${RESTART_OUTPUT}" | grep -q "backend" && \
+   echo "${RESTART_OUTPUT}" | grep -q "admin" && \
+   echo "${RESTART_OUTPUT}" | grep -q "Currently running services"; then
+    echo -e "${GREEN}✓ PASSED: Restart command detects running services${NC}"
+else
+    echo -e "${RED}✗ FAILED: Restart command didn't detect services${NC}"
+    echo "${RESTART_OUTPUT}"
+    exit 1
+fi
+
+# Verify services were stopped
+sleep 0.5
+if ! kill -0 $BACKEND_PID 2>/dev/null && ! kill -0 $ADMIN_PID 2>/dev/null; then
+    echo -e "${GREEN}✓ PASSED: Services were stopped by restart command${NC}"
+else
+    echo -e "${YELLOW}⚠ WARNING: Services may still be running, cleaning up...${NC}"
+    kill -9 $BACKEND_PID $ADMIN_PID 2>/dev/null || true
+fi
+
+# Clean up any remaining files
+rm -f /tmp/yektayar-backend.pid /tmp/yektayar-admin.pid /tmp/yektayar-backend.log /tmp/yektayar-admin.log
+
+# Test 10: Prevent duplicate start - start backend twice
+echo ""
+echo "Test 10: Testing duplicate start prevention..."
+
+# Start a fake backend service (use setsid to create new process group)
+setsid sleep 999 > /tmp/yektayar-backend.log 2>&1 &
+TEST_PID=$!
+echo $TEST_PID > /tmp/yektayar-backend.pid
+sleep 0.2
+
+# Verify it's running
+if ! kill -0 $TEST_PID 2>/dev/null; then
+    echo -e "${RED}✗ FAILED: Test service didn't start${NC}"
+    exit 1
+fi
+
+# Try to start backend again (should be prevented)
+START_OUTPUT=$("${DEV_RUNNER_SCRIPT}" backend --detached 2>&1 || true)
+
+if echo "${START_OUTPUT}" | grep -q "already running"; then
+    echo -e "${GREEN}✓ PASSED: Duplicate start was prevented${NC}"
+else
+    echo -e "${RED}✗ FAILED: Duplicate start was not prevented${NC}"
+    echo "${START_OUTPUT}"
+    kill -9 $TEST_PID 2>/dev/null || true
+    rm -f /tmp/yektayar-backend.pid
+    exit 1
+fi
+
+# Verify original process is still running
+if kill -0 $TEST_PID 2>/dev/null; then
+    echo -e "${GREEN}✓ PASSED: Original process still running${NC}"
+    kill -9 $TEST_PID 2>/dev/null || true
+    rm -f /tmp/yektayar-backend.pid
+else
+    echo -e "${RED}✗ FAILED: Original process was killed${NC}"
     exit 1
 fi
 

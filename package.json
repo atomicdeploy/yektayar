@@ -22,6 +22,7 @@
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
+    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs",
     "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android"
   },
   "keywords": [
