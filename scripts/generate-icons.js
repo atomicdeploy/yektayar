@@ -12,6 +12,7 @@ const ROOT_DIR = path.join(__dirname, '..');
 const ASSETS_DIR = path.join(ROOT_DIR, 'assets', 'logo');
 const ADMIN_PUBLIC_DIR = path.join(ROOT_DIR, 'packages', 'admin-panel', 'public');
 const MOBILE_PUBLIC_DIR = path.join(ROOT_DIR, 'packages', 'mobile-app', 'public');
+const DESKTOP_BUILD_DIR = path.join(ROOT_DIR, 'packages', 'desktop-app', 'build');
 
 // Icon sizes for various purposes
 const ICON_SIZES = [
@@ -38,6 +39,9 @@ async function generateIcons() {
   }
   if (!fs.existsSync(MOBILE_PUBLIC_DIR)) {
     fs.mkdirSync(MOBILE_PUBLIC_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(DESKTOP_BUILD_DIR)) {
+    fs.mkdirSync(DESKTOP_BUILD_DIR, { recursive: true });
   }
 
   // Generate PNG icons for admin panel
@@ -101,14 +105,25 @@ async function generateIcons() {
   fs.copyFileSync(iconSvgPath, iconOutputPathMobile);
   console.log('  ✓ Copied icon.svg to mobile app');
 
+  // Generate desktop app icons (256x256 PNG for Electron)
+  console.log('\n📦 Generating desktop app icon...');
+  const desktopIconPath = path.join(DESKTOP_BUILD_DIR, 'icon.png');
+  await sharp(iconSvg)
+    .resize(256, 256)
+    .png()
+    .toFile(desktopIconPath);
+  console.log('  ✓ Generated icon.png for desktop app (256x256)');
+
   console.log('\n✅ Icon generation complete!\n');
-  console.log('Generated files for both admin panel and mobile app:');
-  console.log(`  - ${ICON_SIZES.length} PNG icons in various sizes (per app)`);
+  console.log('Generated files for admin panel, mobile app, and desktop app:');
+  console.log(`  - ${ICON_SIZES.length} PNG icons in various sizes (web/mobile)`);
   console.log(`  - favicon.png for modern browsers`);
+  console.log(`  - 256x256 PNG icon for desktop app`);
   console.log(`  - logo.svg and icon.svg for reference`);
   console.log(`\nOutput directories:`);
   console.log(`  - Admin Panel: ${ADMIN_PUBLIC_DIR}`);
   console.log(`  - Mobile App: ${MOBILE_PUBLIC_DIR}`);
+  console.log(`  - Desktop App: ${DESKTOP_BUILD_DIR}`);
 }
 
 // Run the script

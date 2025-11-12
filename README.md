@@ -44,6 +44,7 @@ YektaYar is a comprehensive mental health care platform that connects users with
 - ✅ Educational course management
 - ✅ Real-time messaging (WebSocket)
 - ✅ Admin dashboard
+- ✅ Desktop app (Windows .exe with config support)
 - ✅ Multi-language support (Persian primary, English secondary)
 - ✅ RTL/LTR support
 - ✅ PWA capabilities
@@ -104,6 +105,7 @@ yektayar/
 │   ├── backend/              # Elysia.js API server
 │   ├── admin-panel/          # Vue.js admin interface
 │   ├── mobile-app/           # Ionic + Capacitor app
+│   ├── desktop-app/          # Electron desktop app (Windows .exe)
 │   └── shared/               # Shared code (types, utils, i18n)
 ├── docs/                     # Complete documentation
 │   ├── INDEX.md             # Documentation hub
@@ -141,6 +143,12 @@ yektayar/
 - **Build**: Vite
 - **i18n**: vue-i18n
 
+### Desktop App
+- **Framework**: Electron
+- **Platform**: Windows (.exe)
+- **Config**: .env and config.json support
+- **Builder**: electron-builder
+
 ### Shared
 - **Language**: TypeScript
 - **Validation**: Zod
@@ -161,6 +169,7 @@ npm run dev
 npm run dev:backend    # Backend only
 npm run dev:admin      # Admin panel only
 npm run dev:mobile     # Mobile app only
+npm run dev:desktop    # Desktop app only (requires built admin panel)
 ```
 
 ### Build All
@@ -168,6 +177,20 @@ npm run dev:mobile     # Mobile app only
 ```bash
 npm run build
 ```
+
+### Build Desktop App (Windows .exe)
+
+```bash
+# From root directory
+npm run build:desktop    # Builds admin panel and packages as .exe
+
+# Or manually from desktop-app directory
+cd packages/desktop-app
+npm run build:web        # Build admin panel
+npm run build:electron   # Create Windows installer
+```
+
+The Windows installer will be created in `packages/desktop-app/dist/`. For detailed instructions, see **[packages/desktop-app/README.md](packages/desktop-app/README.md)**.
 
 ### Build Mobile App (Android APK)
 
@@ -216,10 +239,11 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 
 This mono repo addresses all requirements from the issue:
 
-✅ **Mono repo structure** with packages for backend, admin, mobile, and shared code  
+✅ **Mono repo structure** with packages for backend, admin, mobile, desktop, and shared code  
 ✅ **Backend**: Elysia.js (fast, modern, TypeScript-first)  
 ✅ **Admin Panel**: Vue.js with Vite  
 ✅ **Mobile App**: Ionic + Capacitor + Vue.js  
+✅ **Desktop App**: Electron-based Windows .exe with .env and config.json support  
 ✅ **Shared code**: Types, schemas, utilities, i18n  
 ✅ **No React**: All React/Spark remnants removed  
 ✅ **Node.js/TypeScript**: Consistent across all packages  
@@ -243,9 +267,11 @@ This mono repo addresses all requirements from the issue:
 - `npm run dev:backend` - Backend only
 - `npm run dev:admin` - Admin panel only
 - `npm run dev:mobile` - Mobile app only
+- `npm run dev:desktop` - Desktop app only
 - `npm run build:backend` - Build backend only
 - `npm run build:admin` - Build admin panel only
 - `npm run build:mobile` - Build mobile app only
+- `npm run build:desktop` - Build desktop app (Windows .exe)
 
 ---
 
@@ -260,6 +286,7 @@ For a quick web server setup with reverse proxy configurations:
 
 - **[Ubuntu 24.04 Deployment Guide](docs/UBUNTU-24-DEPLOYMENT.md)** - Complete VPS deployment instructions
 - **[Mobile App Build Guide](packages/mobile-app/BUILD_APK.md)** - Android APK build instructions
+- **[Desktop App Guide](packages/desktop-app/README.md)** - Windows .exe build instructions
 - **[Web Server Configuration](config/webserver/README.md)** - Detailed web server configuration guide
 
 ### Deployment Overview
@@ -267,7 +294,8 @@ For a quick web server setup with reverse proxy configurations:
 1. **Backend**: Deploy with PM2 on VPS (using Bun runtime)
 2. **Admin Panel**: Build and serve via reverse proxy (Apache/Nginx/Caddy)
 3. **Mobile App**: Build for Android/iOS with Capacitor
-4. **Static Files**: Host .apk files and assets on static subdomain
+4. **Desktop App**: Build Windows .exe installer with electron-builder
+5. **Static Files**: Host .apk and .exe files on static subdomain
 
 ### Subdomain Configuration
 
