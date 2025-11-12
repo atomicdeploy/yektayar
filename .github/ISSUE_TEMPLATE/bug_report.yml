@@ -1,0 +1,123 @@
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["🐛 bug", "🔍 status: needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this bug! Please fill out the information below to help us understand and fix the issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: What actually happened?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component Affected
+      description: Which part of the application is affected?
+      multiple: true
+      options:
+        - Backend/API
+        - Admin Panel
+        - Mobile App
+        - Shared Package
+        - Database
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (App is unusable)
+        - High (Major functionality affected)
+        - Medium (Feature partially broken)
+        - Low (Minor issue or cosmetic)
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        Please provide relevant environment details
+      placeholder: |
+        - OS: [e.g., Ubuntu 22.04, Windows 11, macOS 13]
+        - Browser: [e.g., Chrome 120, Safari 17, Firefox 121]
+        - Node.js Version: [e.g., 20.10.0]
+        - Package Version: [e.g., 1.0.0]
+      value: |
+        - OS: 
+        - Browser: 
+        - Node.js Version: 
+        - Package Version: 
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots/Logs
+      description: If applicable, add screenshots or error logs to help explain the problem
+      placeholder: Paste screenshots or logs here
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: Any additional information that might be helpful
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      description: Before submitting, please confirm the following
+      options:
+        - label: I have searched existing issues to make sure this bug hasn't been reported before
+          required: true
+        - label: I have provided all the information requested above
+          required: true
+        - label: I am willing to help test fixes for this bug
+          required: false

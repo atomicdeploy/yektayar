@@ -1,0 +1,233 @@
+# GitHub Labels Configuration for YektaYar
+# This file defines all labels used for issue and PR management
+# Format: name, color (hex without #), description
+
+# ============================================
+# TYPE LABELS - What kind of work is this?
+# ============================================
+- name: "🐛 bug"
+  color: "d73a4a"
+  description: "Something isn't working correctly"
+
+- name: "✨ feature"
+  color: "a2eeef"
+  description: "New feature or request"
+
+- name: "🔧 enhancement"
+  color: "84b6eb"
+  description: "Improvement to existing feature"
+
+- name: "📝 documentation"
+  color: "0075ca"
+  description: "Documentation improvements or additions"
+
+- name: "🎨 design"
+  color: "e99695"
+  description: "UI/UX design work"
+
+- name: "♻️ refactor"
+  color: "fbca04"
+  description: "Code refactoring without changing functionality"
+
+- name: "⚡ performance"
+  color: "ff9800"
+  description: "Performance improvements"
+
+- name: "🧪 test"
+  color: "5319e7"
+  description: "Adding or updating tests"
+
+- name: "🔒 security"
+  color: "ee0701"
+  description: "Security-related changes or vulnerabilities"
+
+- name: "🚀 deployment"
+  color: "0e8a16"
+  description: "Deployment and CI/CD related"
+
+- name: "🔨 build"
+  color: "fbca04"
+  description: "Build system or dependencies"
+
+- name: "🧹 chore"
+  color: "fef2c0"
+  description: "Routine tasks and maintenance"
+
+# ============================================
+# SCOPE/AREA LABELS - Which part of the codebase?
+# ============================================
+- name: "🖥️ backend"
+  color: "1d76db"
+  description: "Backend/API related (Node.js, Express)"
+
+- name: "🎨 frontend"
+  color: "d4c5f9"
+  description: "General frontend work"
+
+- name: "📱 mobile-app"
+  color: "e99695"
+  description: "Mobile app (Ionic/Capacitor)"
+
+- name: "👨‍💼 admin-panel"
+  color: "5319e7"
+  description: "Admin panel (Vue.js)"
+
+- name: "📦 shared"
+  color: "0366d6"
+  description: "Shared package (@yektayar/shared)"
+
+- name: "🗄️ database"
+  color: "006b75"
+  description: "Database schema or queries (PostgreSQL)"
+
+- name: "🔌 api"
+  color: "1d76db"
+  description: "API endpoints and integration"
+
+- name: "🎭 ui"
+  color: "e99695"
+  description: "User interface components"
+
+- name: "🌐 i18n"
+  color: "0075ca"
+  description: "Internationalization and localization"
+
+- name: "🔐 auth"
+  color: "ee0701"
+  description: "Authentication and authorization"
+
+- name: "📧 notifications"
+  color: "0e8a16"
+  description: "Email, SMS, push notifications"
+
+- name: "📊 analytics"
+  color: "bfd4f2"
+  description: "Analytics and reporting"
+
+# ============================================
+# PRIORITY LABELS - How important/urgent is this?
+# ============================================
+- name: "🔴 priority: critical"
+  color: "b60205"
+  description: "Critical priority - needs immediate attention"
+
+- name: "🟠 priority: high"
+  color: "d93f0b"
+  description: "High priority - important to address soon"
+
+- name: "🟡 priority: medium"
+  color: "fbca04"
+  description: "Medium priority - normal timeline"
+
+- name: "🟢 priority: low"
+  color: "0e8a16"
+  description: "Low priority - nice to have"
+
+# ============================================
+# STATUS LABELS - What state is this in?
+# ============================================
+- name: "🔍 status: needs-triage"
+  color: "d4c5f9"
+  description: "Needs review and categorization"
+
+- name: "✅ status: ready"
+  color: "0e8a16"
+  description: "Ready to be worked on"
+
+- name: "🚧 status: in-progress"
+  color: "fbca04"
+  description: "Currently being worked on"
+
+- name: "⏸️ status: on-hold"
+  color: "fef2c0"
+  description: "Temporarily paused"
+
+- name: "⛔ status: blocked"
+  color: "d73a4a"
+  description: "Blocked by dependencies or other issues"
+
+- name: "👀 status: review-needed"
+  color: "0075ca"
+  description: "Needs code review"
+
+- name: "🔄 status: needs-rebase"
+  color: "fbca04"
+  description: "Needs to be rebased"
+
+- name: "🔧 status: needs-work"
+  color: "d93f0b"
+  description: "Needs additional work or changes"
+
+# ============================================
+# SIZE/EFFORT LABELS - How much work is this?
+# ============================================
+- name: "📏 size: XS"
+  color: "c5def5"
+  description: "Extra small effort (< 1 hour)"
+
+- name: "📏 size: S"
+  color: "bfe5bf"
+  description: "Small effort (1-4 hours)"
+
+- name: "📏 size: M"
+  color: "fbca04"
+  description: "Medium effort (4-8 hours)"
+
+- name: "📏 size: L"
+  color: "ff9800"
+  description: "Large effort (1-2 days)"
+
+- name: "📏 size: XL"
+  color: "d93f0b"
+  description: "Extra large effort (>2 days)"
+
+# ============================================
+# SPECIAL LABELS - Special states or types
+# ============================================
+- name: "👍 good first issue"
+  color: "7057ff"
+  description: "Good for newcomers"
+
+- name: "🆘 help wanted"
+  color: "008672"
+  description: "Extra attention is needed"
+
+- name: "❓ question"
+  color: "d876e3"
+  description: "Further information is requested"
+
+- name: "🚫 wontfix"
+  color: "ffffff"
+  description: "This will not be worked on"
+
+- name: "📋 duplicate"
+  color: "cfd3d7"
+  description: "This issue or pull request already exists"
+
+- name: "❌ invalid"
+  color: "e4e669"
+  description: "This doesn't seem right"
+
+- name: "🎯 breaking-change"
+  color: "b60205"
+  description: "Contains breaking changes"
+
+- name: "📚 needs-documentation"
+  color: "0075ca"
+  description: "Needs documentation update"
+
+- name: "🤖 dependencies"
+  color: "0366d6"
+  description: "Pull requests that update a dependency file"
+
+- name: "🐞 bug-confirmed"
+  color: "b60205"
+  description: "Bug has been confirmed and reproduced"
+
+- name: "💬 discussion"
+  color: "d876e3"
+  description: "Discussion or RFC needed"
+
+- name: "🎉 hacktoberfest"
+  color: "ff6f00"
+  description: "Hacktoberfest eligible"
