@@ -46,7 +46,7 @@ show_usage() {
     echo -e "${BLUE}YektaYar Development Mode Runner${NC}"
     echo -e ""
     echo -e "${CYAN}Usage:${NC}"
-    echo -e "    $0 {backend|admin|mobile|all|stop|logs|status|interact} [options]"
+    echo -e "    $0 {backend|admin|mobile|all|stop|restart|logs|status|interact} [options]"
     echo -e ""
     echo -e "${CYAN}Services:${NC}"
     echo -e "    ${GREEN}backend${NC}      - Backend API server (port $BACKEND_PORT)"
@@ -56,6 +56,7 @@ show_usage() {
     echo -e ""
     echo -e "${CYAN}Commands:${NC}"
     echo -e "    ${GREEN}stop${NC}         - Stop all detached services"
+    echo -e "    ${GREEN}restart${NC}      - Restart all currently running services"
     echo -e "    ${GREEN}logs${NC}         - Display logs from detached services (interactive)"
     echo -e "    ${GREEN}interact${NC}     - Send interactive input to a detached service"
     echo -e "    ${GREEN}status${NC}       - Show status of services"
@@ -78,6 +79,7 @@ show_usage() {
     echo -e "    $0 status            # Show service status"
     echo -e "    $0 stop              # Stop all detached services gracefully"
     echo -e "    $0 stop --force      # Force kill all services immediately"
+    echo -e "    $0 restart           # Restart all currently running services"
 }
 
 # Function to check if a command exists
@@ -193,10 +195,65 @@ kill_process_tree() {
     fi
 }
 
+# Function to check if a specific service is running
+is_service_running() {
+    local service=$1
+    local use_pm2=${2:-false}
+    
+    if [ "$use_pm2" = "true" ]; then
+        if ! command_exists pm2; then
+            return 1
+        fi
+        pm2 show "yektayar-${service}" >/dev/null 2>&1
+        return $?
+    else
+        local pid_file="/tmp/yektayar-${service}.pid"
+        if [ ! -f "$pid_file" ]; then
+            return 1
+        fi
+        
+        local pid=$(cat "$pid_file")
+        kill -0 "$pid" 2>/dev/null
+        return $?
+    fi
+}
+
+# Function to get list of currently running services
+get_running_services() {
+    local use_pm2=${1:-false}
+    local running_services=()
+    
+    if [ "$use_pm2" = "true" ]; then
+        if command_exists pm2; then
+            pm2 list 2>/dev/null | grep -q "yektayar-backend" && running_services+=("backend")
+            pm2 list 2>/dev/null | grep -q "yektayar-admin" && running_services+=("admin")
+            pm2 list 2>/dev/null | grep -q "yektayar-mobile" && running_services+=("mobile")
+        fi
+    else
+        is_service_running "backend" false && running_services+=("backend")
+        is_service_running "admin" false && running_services+=("admin")
+        is_service_running "mobile" false && running_services+=("mobile")
+    fi
+    
+    echo "${running_services[@]}"
+}
+
 # Function to run backend
 run_backend() {
     local mode=$1
     local use_pm2=${2:-false}
+    local force_start=${3:-false}
+    
+    # Check if already running (unless force start)
+    if [ "$force_start" = "false" ] && is_service_running "backend" "$use_pm2"; then
+        echo -e "${YELLOW}⚠ Backend is already running${NC}"
+        if [ "$use_pm2" = "true" ]; then
+            echo -e "${YELLOW}  Use 'pm2 restart yektayar-backend' to restart it${NC}"
+        else
+            echo -e "${YELLOW}  Use '$0 restart' to restart it or '$0 stop' to stop it first${NC}"
+        fi
+        return 0
+    fi
     
     echo -e "${GREEN}Starting Backend API Server...${NC}"
     cd "$PROJECT_ROOT/packages/backend"
@@ -243,6 +300,18 @@ run_backend() {
 run_admin() {
     local mode=$1
     local use_pm2=${2:-false}
+    local force_start=${3:-false}
+    
+    # Check if already running (unless force start)
+    if [ "$force_start" = "false" ] && is_service_running "admin" "$use_pm2"; then
+        echo -e "${YELLOW}⚠ Admin Panel is already running${NC}"
+        if [ "$use_pm2" = "true" ]; then
+            echo -e "${YELLOW}  Use 'pm2 restart yektayar-admin' to restart it${NC}"
+        else
+            echo -e "${YELLOW}  Use '$0 restart' to restart it or '$0 stop' to stop it first${NC}"
+        fi
+        return 0
+    fi
     
     echo -e "${GREEN}Starting Admin Panel Dev Server...${NC}"
     cd "$PROJECT_ROOT/packages/admin-panel"
@@ -289,6 +358,18 @@ run_admin() {
 run_mobile() {
     local mode=$1
     local use_pm2=${2:-false}
+    local force_start=${3:-false}
+    
+    # Check if already running (unless force start)
+    if [ "$force_start" = "false" ] && is_service_running "mobile" "$use_pm2"; then
+        echo -e "${YELLOW}⚠ Mobile App is already running${NC}"
+        if [ "$use_pm2" = "true" ]; then
+            echo -e "${YELLOW}  Use 'pm2 restart yektayar-mobile' to restart it${NC}"
+        else
+            echo -e "${YELLOW}  Use '$0 restart' to restart it or '$0 stop' to stop it first${NC}"
+        fi
+        return 0
+    fi
     
     echo -e "${GREEN}Starting Mobile App Dev Server...${NC}"
     cd "$PROJECT_ROOT/packages/mobile-app"
@@ -465,6 +546,72 @@ cleanup_port() {
                 fi
             fi
         done
+    fi
+}
+
+# Function to restart services
+restart_services() {
+    local use_pm2=${1:-false}
+    
+    echo -e "${BLUE}=== Restarting Services ===${NC}"
+    echo ""
+    
+    # Get list of currently running services
+    local running_services=($(get_running_services "$use_pm2"))
+    
+    if [ ${#running_services[@]} -eq 0 ]; then
+        echo -e "${YELLOW}⚠ No services are currently running${NC}"
+        echo -e "${YELLOW}  Use '$0 all --detached' to start all services${NC}"
+        return 0
+    fi
+    
+    echo -e "${CYAN}Currently running services:${NC}"
+    for service in "${running_services[@]}"; do
+        echo "  - $service"
+    done
+    echo ""
+    
+    # Stop all running services
+    echo -e "${CYAN}Stopping services...${NC}"
+    stop_services false "$use_pm2"
+    
+    echo ""
+    echo -e "${CYAN}Waiting 2 seconds before restarting...${NC}"
+    sleep 2
+    echo ""
+    
+    # Restart each service that was running
+    echo -e "${CYAN}Restarting services...${NC}"
+    for service in "${running_services[@]}"; do
+        case "$service" in
+            backend)
+                run_backend "detached" "$use_pm2" true
+                sleep 1
+                ;;
+            admin)
+                run_admin "detached" "$use_pm2" true
+                sleep 1
+                ;;
+            mobile)
+                run_mobile "detached" "$use_pm2" true
+                sleep 1
+                ;;
+        esac
+    done
+    
+    echo ""
+    echo -e "${GREEN}✓ All services restarted successfully${NC}"
+    echo ""
+    
+    if [ "$use_pm2" = "true" ]; then
+        echo -e "${CYAN}To view logs:${NC}"
+        echo "  pm2 logs"
+    else
+        echo -e "${CYAN}To view logs:${NC}"
+        echo "  $0 logs all"
+        echo ""
+        echo -e "${CYAN}To check status:${NC}"
+        echo "  $0 status"
     fi
 }
 
@@ -950,6 +1097,9 @@ case "$SERVICE" in
         ;;
     stop)
         stop_services "$FORCE_KILL" "$USE_PM2"
+        ;;
+    restart)
+        restart_services "$USE_PM2"
         ;;
     status)
         show_status "$USE_PM2"
