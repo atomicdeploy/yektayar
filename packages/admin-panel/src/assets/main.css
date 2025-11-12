@@ -1,9 +1,7 @@
 /* Import Sahel Font */
 @import './fonts.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Basic CSS reset and styles */
 body {
