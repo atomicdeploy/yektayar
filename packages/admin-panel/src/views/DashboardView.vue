@@ -68,33 +68,14 @@
             <ChartWidget
               v-if="element.id === 'user-growth'"
               type="line"
-              :data="{
-                labels: dashboardStore.userGrowthData.labels,
-                datasets: [{
-                  label: t('dashboard_page.user_growth'),
-                  data: dashboardStore.userGrowthData.data,
-                  borderColor: 'rgb(212, 164, 62)',
-                  backgroundColor: 'rgba(212, 164, 62, 0.1)',
-                  fill: true,
-                  tension: 0.4,
-                }]
-              }"
+              :data="userGrowthChartData"
             />
 
             <!-- Appointment Stats Chart -->
             <ChartWidget
               v-if="element.id === 'appointment-stats'"
               type="bar"
-              :data="{
-                labels: dashboardStore.appointmentStatsData.labels,
-                datasets: [{
-                  label: t('dashboard_page.appointment_stats'),
-                  data: dashboardStore.appointmentStatsData.data,
-                  backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                  borderColor: 'rgb(59, 130, 246)',
-                  borderWidth: 1,
-                }]
-              }"
+              :data="appointmentStatsChartData"
             />
 
             <!-- Recent Activities -->
@@ -156,7 +137,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import draggable from 'vuedraggable'
 import {
@@ -177,6 +158,30 @@ import { useSessionStore } from '@/stores/session'
 const { t } = useI18n()
 const dashboardStore = useDashboardStore()
 const sessionStore = useSessionStore()
+
+// Create non-reactive chart data to prevent Chart.js reactivity issues
+const userGrowthChartData = computed(() => ({
+  labels: [...dashboardStore.userGrowthData.labels],
+  datasets: [{
+    label: t('dashboard_page.user_growth'),
+    data: [...dashboardStore.userGrowthData.data],
+    borderColor: 'rgb(212, 164, 62)',
+    backgroundColor: 'rgba(212, 164, 62, 0.1)',
+    fill: true,
+    tension: 0.4,
+  }]
+}))
+
+const appointmentStatsChartData = computed(() => ({
+  labels: [...dashboardStore.appointmentStatsData.labels],
+  datasets: [{
+    label: t('dashboard_page.appointment_stats'),
+    data: [...dashboardStore.appointmentStatsData.data],
+    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+    borderColor: 'rgb(59, 130, 246)',
+    borderWidth: 1,
+  }]
+}))
 
 interface Widget {
   id: string
