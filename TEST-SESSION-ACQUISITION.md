@@ -5,7 +5,7 @@ This document provides a quick verification that the session acquisition API is 
 ## Prerequisites
 
 1. Backend server running on http://localhost:3000
-2. `.env` files configured in both mobile-app and admin-panel with `VITE_API_URL=http://localhost:3000`
+2. `.env` files configured in both mobile-app and admin-panel with `API_BASE_URL=http://localhost:3000`
 
 ## Backend Verification
 
@@ -128,17 +128,18 @@ Both should return CORS headers allowing the origins.
 **Solution**:
 1. Verify backend is running: `curl http://localhost:3000/health`
 2. Check `.env` file exists in mobile-app/admin-panel
-3. Verify `.env` contains `VITE_API_URL=http://localhost:3000`
+3. Verify `.env` contains `API_BASE_URL=http://localhost:3000`
 4. Restart the dev server after changing `.env`
 
 ### Issue: Empty/undefined API URL in frontend
 
-**Cause**: Environment variable doesn't have `VITE_` prefix.
+**Cause**: `.env` file is missing or `API_BASE_URL` is not set.
 
 **Solution**:
-- Vite only exposes environment variables prefixed with `VITE_`
-- Use `VITE_API_URL` not `API_BASE_URL` or `API_URL`
-- Variable must be defined before Vite dev server starts
+- Create `.env` files from `.env.example` templates
+- Verify `API_BASE_URL` is set in `.env` files
+- The Vite config already exposes `API_BASE_URL` via the `define` option
+- Restart the dev server after creating/modifying `.env` files
 
 ### Issue: CORS errors
 
@@ -159,19 +160,20 @@ CORS_ORIGIN=http://localhost:5173,http://localhost:8100
 
 ### Mobile App (.env)
 ```env
-VITE_API_URL=http://localhost:3000
+API_BASE_URL=http://localhost:3000
 VITE_ENVIRONMENT=development
 ```
 
 ### Admin Panel (.env)
 ```env
-VITE_API_URL=http://localhost:3000
+API_BASE_URL=http://localhost:3000
 VITE_ENVIRONMENT=development
 ```
 
 ## Notes
 
-- The `VITE_` prefix is **required** for Vite to expose environment variables to client-side code
+- The Vite configuration uses the `define` option to expose `API_BASE_URL` to client-side code (no `VITE_` prefix needed)
+- `.env` files must be created from `.env.example` templates
 - Session tokens are cryptographically secure (32 random bytes encoded as base64url)
 - Sessions expire after 30 days
 - Anonymous sessions can be linked to users after authentication

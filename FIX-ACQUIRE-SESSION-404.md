@@ -6,61 +6,57 @@ The mobile app and admin panel were experiencing 404 NOT FOUND errors when attem
 
 ## Root Cause Analysis
 
-The issue was **not** with the backend implementation - the API endpoint was correctly implemented and working. The problem was an **environment variable naming inconsistency** in the frontend applications:
+The issue was **not** with the backend implementation - the API endpoint was correctly implemented and working. The problem was that the frontend applications were not properly configured:
 
 ### The Issue
 
-1. **Vite Requirement**: Vite (the build tool used by both mobile-app and admin-panel) only exposes environment variables to client-side code if they are prefixed with `VITE_`
+1. **Vite Configuration**: While Vite typically requires environment variables to be prefixed with `VITE_` to be exposed to client-side code, the Vite configuration files for both mobile-app and admin-panel already have a `define` section that explicitly exposes `API_BASE_URL`:
 
-2. **Naming Inconsistency**: 
-   - Documentation specified `VITE_API_URL` ✅
-   - `.env.example` files used `API_BASE_URL` ❌
-   - Config files read `import.meta.env.API_BASE_URL` ❌
+   ```typescript
+   define: {
+     'import.meta.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL || '')
+   }
+   ```
 
-3. **Result**: Since `API_BASE_URL` lacked the `VITE_` prefix, Vite did not expose it to the client code. This caused `import.meta.env.API_BASE_URL` to be `undefined`, making `config.apiBaseUrl` an empty string.
+2. **Missing Configuration**: The actual issue was that `.env` files were not created from the `.env.example` templates, or the `API_BASE_URL` variable was not properly set.
+
+3. **Result**: Without proper `.env` files, `process.env.API_BASE_URL` was undefined, making `config.apiBaseUrl` an empty string.
 
 4. **Impact**: The frontend applications were sending requests to an incorrect/empty URL instead of `http://localhost:3000/api/auth/acquire-session`, resulting in 404 errors.
 
 ## Solution
 
-Updated all environment variable references to use the correct `VITE_API_URL` naming convention:
+The solution is straightforward: ensure that `.env` files are created from the `.env.example` templates and properly configured.
 
-### Files Modified
+### Setup Steps
 
-1. **Environment Variable Templates**:
-   - `packages/mobile-app/.env.example`
-   - `packages/mobile-app/.env.production`
-   - `packages/admin-panel/.env.example`
-   
-   Changed from:
+1. **Create `.env` files** from the examples:
+   ```bash
+   cp packages/mobile-app/.env.example packages/mobile-app/.env
+   cp packages/admin-panel/.env.example packages/admin-panel/.env
+   ```
+
+2. **Verify configuration** - Both `.env` files should contain:
    ```env
    API_BASE_URL=http://localhost:3000
-   ```
-   
-   To:
-   ```env
-   VITE_API_URL=http://localhost:3000
+   VITE_ENVIRONMENT=development
    ```
 
-2. **Configuration Files**:
-   - `packages/mobile-app/src/config/index.ts`
-   - `packages/admin-panel/src/config/index.ts`
-   
-   Changed from:
+3. **How it works**: The Vite configuration files already expose `API_BASE_URL` to client-side code via the `define` option:
    ```typescript
-   apiBaseUrl: import.meta.env.API_BASE_URL || '',
-   ```
-   
-   To:
-   ```typescript
-   apiBaseUrl: import.meta.env.VITE_API_URL || '',
+   // vite.config.ts
+   define: {
+     'import.meta.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL || '')
+   }
    ```
 
-3. **Validation Files**:
-   - `packages/mobile-app/src/config/validation.ts`
-   - `packages/admin-panel/src/config/validation.ts`
-   
-   Updated error messages to reference `VITE_API_URL` instead of `API_BASE_URL`
+   This means `API_BASE_URL` (without the `VITE_` prefix) is accessible in the client code as `import.meta.env.API_BASE_URL`.
+
+### Key Configuration Files
+
+- **Environment Templates**: `.env.example` files use `API_BASE_URL`
+- **Vite Config**: Both apps have `define` section that exposes `API_BASE_URL`
+- **App Config**: Both apps read `import.meta.env.API_BASE_URL`
 
 ## Verification
 
@@ -123,9 +119,9 @@ This fix ensures that:
 
 1. ✅ **Mobile app can acquire sessions**: The app can now successfully call `/api/auth/acquire-session` and receive a valid session token
 2. ✅ **Admin panel can acquire sessions**: The admin panel can now successfully call `/api/auth/acquire-session` and receive a valid session token
-3. ✅ **Environment variables are properly exposed**: Vite correctly exposes `VITE_API_URL` to client-side code
+3. ✅ **Environment variables are properly exposed**: Vite correctly exposes `API_BASE_URL` to client-side code
 4. ✅ **Configuration is consistent**: All files now use the same environment variable name that matches the documentation
-5. ✅ **Error messages are accurate**: Validation error messages correctly reference `VITE_API_URL`
+5. ✅ **Error messages are accurate**: Validation error messages correctly reference `API_BASE_URL`
 
 ## What Users Need to Do
 
@@ -139,7 +135,7 @@ This fix ensures that:
 
 2. Verify the files contain:
    ```env
-   VITE_API_URL=http://localhost:3000
+   API_BASE_URL=http://localhost:3000
    VITE_ENVIRONMENT=development
    ```
 
@@ -169,27 +165,44 @@ This fix ensures that:
 
 Update `.env` or `.env.production` files to use:
 ```env
-VITE_API_URL=https://api.yektayar.ir
+API_BASE_URL=https://api.yektayar.ir
 VITE_ENVIRONMENT=production
 ```
 
 ## Technical Details
 
-### Why `VITE_` Prefix is Required
+### How `API_BASE_URL` is Exposed Without `VITE_` Prefix
+
+While Vite's default behavior requires the `VITE_` prefix for environment variables, our Vite configuration uses the `define` option to explicitly expose `API_BASE_URL`:
+
+```typescript
+// vite.config.ts
+export default defineConfig({
+  // ...
+  define: {
+    'import.meta.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL || '')
+  },
+  // ...
+})
+```
 
 From Vite documentation:
 
 > To prevent accidentally leaking env variables to the client, only variables prefixed with `VITE_` are exposed to your Vite-processed code.
 
-This is a security feature that ensures sensitive environment variables (like database credentials, API keys, etc.) are not accidentally included in the client-side bundle.
+However, the `define` option allows us to explicitly expose specific variables without requiring the `VITE_` prefix. This approach:
+- ✅ Allows using `API_BASE_URL` without the `VITE_` prefix
+- ✅ Explicitly controls which variables are exposed
+- ✅ Maintains security by only exposing specifically defined variables
 
 ### Environment Variable Hierarchy
 
 1. **Not exposed** (backend only):
    - `PORT`, `DATABASE_URL`, `JWT_SECRET`, etc.
 
-2. **Exposed to client** (requires `VITE_` prefix):
-   - `VITE_API_URL`, `VITE_ENVIRONMENT`, etc.
+2. **Exposed to client** (via Vite `define`):
+   - `API_BASE_URL` (explicitly defined in vite.config.ts)
+   - `VITE_ENVIRONMENT` (standard Vite prefix)
 
 ## Related Documentation
 
@@ -214,7 +227,7 @@ This is a security feature that ensures sensitive environment variables (like da
 ## Future Improvements
 
 Consider adding:
-1. **Startup validation** that checks if `VITE_API_URL` is defined and reachable
+1. **Startup validation** that checks if `API_BASE_URL` is defined and reachable
 2. **Build-time checks** that fail if required environment variables are missing
 3. **Better error messages** in the app when API URL is misconfigured
 4. **Environment variable documentation** in developer onboarding guides
@@ -224,5 +237,5 @@ Consider adding:
 **Status**: ✅ Fixed and Verified  
 **Date**: 2025-11-12  
 **Issue**: Mobile app 404 on `/api/auth/acquire-session`  
-**Root Cause**: Missing `VITE_` prefix on environment variable  
-**Solution**: Renamed `API_BASE_URL` to `VITE_API_URL` across all frontend files
+**Root Cause**: Missing or improperly configured `.env` files with `API_BASE_URL`  
+**Solution**: Ensure `.env` files are created from `.env.example` templates. Vite config already exposes `API_BASE_URL` via the `define` option.

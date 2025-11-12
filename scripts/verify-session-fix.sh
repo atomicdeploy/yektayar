@@ -70,34 +70,34 @@ echo ""
 echo -e "${COLOR_YELLOW}[5/6] Checking frontend environment configuration...${COLOR_RESET}"
 
 # Check mobile-app .env.example
-if grep -q "VITE_API_URL" packages/mobile-app/.env.example; then
-    echo -e "${COLOR_GREEN}✓ mobile-app .env.example has VITE_API_URL${COLOR_RESET}"
+if grep -q "API_BASE_URL" packages/mobile-app/.env.example; then
+    echo -e "${COLOR_GREEN}✓ mobile-app .env.example has API_BASE_URL${COLOR_RESET}"
 else
-    echo -e "${COLOR_RED}✗ mobile-app .env.example missing VITE_API_URL${COLOR_RESET}"
+    echo -e "${COLOR_RED}✗ mobile-app .env.example missing API_BASE_URL${COLOR_RESET}"
     exit 1
 fi
 
 # Check admin-panel .env.example
-if grep -q "VITE_API_URL" packages/admin-panel/.env.example; then
-    echo -e "${COLOR_GREEN}✓ admin-panel .env.example has VITE_API_URL${COLOR_RESET}"
+if grep -q "API_BASE_URL" packages/admin-panel/.env.example; then
+    echo -e "${COLOR_GREEN}✓ admin-panel .env.example has API_BASE_URL${COLOR_RESET}"
 else
-    echo -e "${COLOR_RED}✗ admin-panel .env.example missing VITE_API_URL${COLOR_RESET}"
+    echo -e "${COLOR_RED}✗ admin-panel .env.example missing API_BASE_URL${COLOR_RESET}"
     exit 1
 fi
 
 # Check mobile-app config file
-if grep -q "VITE_API_URL" packages/mobile-app/src/config/index.ts; then
-    echo -e "${COLOR_GREEN}✓ mobile-app config reads VITE_API_URL${COLOR_RESET}"
+if grep -q "API_BASE_URL" packages/mobile-app/src/config/index.ts; then
+    echo -e "${COLOR_GREEN}✓ mobile-app config reads API_BASE_URL${COLOR_RESET}"
 else
-    echo -e "${COLOR_RED}✗ mobile-app config not reading VITE_API_URL${COLOR_RESET}"
+    echo -e "${COLOR_RED}✗ mobile-app config not reading API_BASE_URL${COLOR_RESET}"
     exit 1
 fi
 
 # Check admin-panel config file
-if grep -q "VITE_API_URL" packages/admin-panel/src/config/index.ts; then
-    echo -e "${COLOR_GREEN}✓ admin-panel config reads VITE_API_URL${COLOR_RESET}"
+if grep -q "API_BASE_URL" packages/admin-panel/src/config/index.ts; then
+    echo -e "${COLOR_GREEN}✓ admin-panel config reads API_BASE_URL${COLOR_RESET}"
 else
-    echo -e "${COLOR_RED}✗ admin-panel config not reading VITE_API_URL${COLOR_RESET}"
+    echo -e "${COLOR_RED}✗ admin-panel config not reading API_BASE_URL${COLOR_RESET}"
     exit 1
 fi
 echo ""
