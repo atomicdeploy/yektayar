@@ -12,7 +12,7 @@ export function validateApiBaseUrlConfig(apiBaseUrl: string): ValidationResult {
   if (!apiBaseUrl || apiBaseUrl.trim() === '') {
     return {
       isValid: false,
-      error: 'VITE_API_BASE_URL environment variable is not set. Please configure the API base URL.'
+      error: 'API_BASE_URL environment variable is not set. Please configure the API base URL.'
     };
   }
 
@@ -22,13 +22,13 @@ export function validateApiBaseUrlConfig(apiBaseUrl: string): ValidationResult {
     if (!url.protocol.startsWith('http')) {
       return {
         isValid: false,
-        error: 'VITE_API_BASE_URL must be a valid HTTP or HTTPS URL.'
+        error: 'API_BASE_URL must be a valid HTTP or HTTPS URL.'
       };
     }
   } catch {
     return {
       isValid: false,
-      error: 'VITE_API_BASE_URL is not a valid URL format.'
+      error: 'API_BASE_URL is not a valid URL format.'
     };
   }
 

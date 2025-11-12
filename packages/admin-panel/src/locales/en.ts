@@ -91,4 +91,20 @@ export default {
     saved: 'Saved',
     loading: 'Loading...',
   },
+  
+  // Error Screen
+  error_screen: {
+    title: 'Configuration Error',
+    api_config_error: 'API Configuration Error',
+    cannot_start: 'Cannot start the admin panel due to API configuration issues.',
+    api_url_missing: 'API_BASE_URL environment variable is not set. Please configure the API base URL.',
+    details: 'Details',
+    solution: 'Solution',
+    show_solution: 'Show Solution',
+    hide_solution: 'Hide Solution',
+    fix_instruction: 'To fix this issue, you can run the following command in your terminal:',
+    or: 'Or',
+    manual_setup: 'Manually create a .env file in the project root with:',
+    restart_note: 'After setting the environment variable, restart the development server.',
+  },
 }
