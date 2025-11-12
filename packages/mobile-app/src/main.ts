@@ -147,11 +147,15 @@ async function initializeApp() {
   if (!validationResult.isValid) {
     logger.error('❌ API Configuration Error:', validationResult.error)
     
-    // In development mode, allow continuing without API to facilitate UI development
-    if (config.environment === 'development') {
-      logger.info('⚠️ Continuing anyway in development mode')
+    // Allow bypassing API validation only if explicitly enabled via environment variable
+    // Set VITE_SKIP_API_VALIDATION=true in .env to enable this for UI testing
+    const skipApiValidation = import.meta.env.VITE_SKIP_API_VALIDATION === 'true'
+    
+    if (skipApiValidation) {
+      logger.warn('⚠️ VITE_SKIP_API_VALIDATION is enabled - bypassing API validation')
+      logger.warn('⚠️ This should only be used for UI development/testing')
     } else {
-      // In production, show error screen with solution parsing
+      // Show error screen with solution parsing
       let solution = null
       if (import.meta.env.DEV && import.meta.env.SOLUTIONS_MD) {
         const solutionsData = parseSolutionsMarkdown(import.meta.env.SOLUTIONS_MD)
