@@ -50,7 +50,7 @@ npm run clean
 ## 🔗 Local URLs
 
 - **Backend API**: http://localhost:3000
-- **API Docs (Swagger)**: http://localhost:3000/swagger
+- **API Documentation**: http://localhost:3000/api-docs (requires Basic Auth - see `.env`)
 - **Admin Panel**: http://localhost:5173
 - **Mobile App**: http://localhost:8100
 
@@ -393,7 +393,7 @@ npm install
 - Mobile: Chrome DevTools for web, native debuggers for mobile
 
 ### Testing API
-- Use Swagger UI at http://localhost:3000/swagger
+- Use API Documentation at http://localhost:3000/api-docs (requires Basic Auth credentials from `.env`)
 - Or use Postman/Insomnia
 
 ### Code Style

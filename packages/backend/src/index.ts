@@ -10,6 +10,7 @@ import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
 import { setupSocketIO } from './websocket/socketServer'
+import { swaggerAuth } from './middleware/swaggerAuth'
 
 // Configure CORS based on environment
 // When behind a reverse proxy (like Apache), disable application-level CORS
@@ -22,8 +23,10 @@ const app = new Elysia()
     origin: corsOrigins,
     credentials: true
   }) : (app) => app)
+  .use(swaggerAuth)
   .use(
     swagger({
+      path: '/api-docs',
       documentation: {
         info: {
           title: 'YektaYar API',
@@ -85,7 +88,8 @@ const httpServer = Bun.serve({
 // In production, consider using Bun's native WebSocket or run Socket.IO on a separate Node.js process
 
 console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
-console.log(`📚 API Documentation available at http://${hostname}:${port}/swagger`)
+console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
+console.log(`🔒 Documentation protected with Basic Auth`)
 console.log(`⚡ Runtime: Bun ${Bun.version}`)
 
 // Socket.IO setup (for Node.js compatibility)

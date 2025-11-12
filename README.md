@@ -90,7 +90,7 @@ npm run dev:mobile     # Mobile App (port 8100)
 ### Access the Applications
 
 - **Backend API**: http://localhost:3000
-- **API Documentation**: http://localhost:3000/swagger
+- **API Documentation**: http://localhost:3000/api-docs (protected with Basic Auth - see `.env` for credentials)
 - **Admin Panel**: http://localhost:5173
 - **Mobile App**: http://localhost:8100
 
