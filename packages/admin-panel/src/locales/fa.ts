@@ -42,6 +42,13 @@ export default {
     no_activities: 'فعالیتی وجود ندارد',
   },
   
+  // Placeholder for unimplemented pages
+  placeholder: {
+    page_title: 'صفحه',
+    coming_soon_message: 'این بخش در حال حاضر در دست توسعه است و به زودی در دسترس خواهد بود.',
+    back_to_dashboard: 'بازگشت به داشبورد',
+  },
+  
   // Users
   users_page: {
     title: 'مدیریت کاربران',
@@ -91,13 +98,6 @@ export default {
     confirm_delete: 'آیا از حذف این مورد اطمینان دارید؟',
     saved: 'ذخیره شد',
     loading: 'در حال بارگذاری...',
-  },
-  
-  // Placeholder
-  placeholder: {
-    page_title: 'صفحه',
-    coming_soon_message: 'این بخش در حال حاضر در دست توسعه است و به زودی در دسترس خواهد بود.',
-    back_to_dashboard: 'بازگشت به داشبورد',
   },
   
   // Error Screen
