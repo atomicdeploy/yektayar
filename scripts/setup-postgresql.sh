@@ -247,6 +247,76 @@ EOF
 chmod 600 "$CREDENTIALS_FILE"
 print_success "Credentials saved to: $CREDENTIALS_FILE"
 
+# Ask user if they want to update the unified .env file
+print_section "Update Unified .env Configuration"
+
+UNIFIED_ENV="$PROJECT_ROOT/.env"
+
+if [ -f "$UNIFIED_ENV" ]; then
+    print_info "Found unified .env file at: $UNIFIED_ENV"
+    echo ""
+    read -p "Do you want to update the unified .env with these database credentials? (Y/n): " -n 1 -r
+    echo ""
+    
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        print_info "Updating unified .env file..."
+        
+        # Ask if they want to force update or be prompted for each value
+        read -p "Force update without confirmation for each value? (y/N): " -n 1 -r
+        echo ""
+        
+        FORCE_FLAG=""
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            FORCE_FLAG="--force"
+        fi
+        
+        # Use the manage-env.sh script to set each database value
+        MANAGE_ENV_SCRIPT="$SCRIPT_DIR/manage-env.sh"
+        
+        if [ -f "$MANAGE_ENV_SCRIPT" ]; then
+            print_info "Setting DB_HOST..."
+            "$MANAGE_ENV_SCRIPT" set --key=DB_HOST --val=localhost $FORCE_FLAG
+            
+            print_info "Setting DB_PORT..."
+            "$MANAGE_ENV_SCRIPT" set --key=DB_PORT --val=5432 $FORCE_FLAG
+            
+            print_info "Setting DB_NAME..."
+            "$MANAGE_ENV_SCRIPT" set --key=DB_NAME --val="$DB_NAME" $FORCE_FLAG
+            
+            print_info "Setting DB_USER..."
+            "$MANAGE_ENV_SCRIPT" set --key=DB_USER --val="$DB_USER" $FORCE_FLAG
+            
+            print_info "Setting DB_PASSWORD..."
+            "$MANAGE_ENV_SCRIPT" set --key=DB_PASSWORD --val="$DB_PASSWORD" $FORCE_FLAG
+            
+            print_info "Setting DATABASE_URL..."
+            "$MANAGE_ENV_SCRIPT" set --key=DATABASE_URL --val="postgresql://$DB_USER:$DB_PASSWORD@localhost:5432/$DB_NAME" $FORCE_FLAG
+            
+            print_success "Unified .env file updated successfully!"
+        else
+            print_warning "manage-env.sh script not found at: $MANAGE_ENV_SCRIPT"
+            print_info "You can manually update the unified .env file later using:"
+            echo "  $MANAGE_ENV_SCRIPT set --key=DB_HOST --val=localhost"
+            echo "  $MANAGE_ENV_SCRIPT set --key=DB_PORT --val=5432"
+            echo "  $MANAGE_ENV_SCRIPT set --key=DB_NAME --val=$DB_NAME"
+            echo "  $MANAGE_ENV_SCRIPT set --key=DB_USER --val=$DB_USER"
+            echo "  $MANAGE_ENV_SCRIPT set --key=DB_PASSWORD --val=$DB_PASSWORD"
+        fi
+    else
+        print_info "Skipping unified .env update"
+        print_info "You can update it later using: $SCRIPT_DIR/manage-env.sh set --key=KEY --val=VALUE"
+    fi
+else
+    print_warning "Unified .env file not found at: $UNIFIED_ENV"
+    print_info "Create it first using: $SCRIPT_DIR/manage-env.sh init"
+    print_info "Then you can set database credentials using:"
+    echo "  $SCRIPT_DIR/manage-env.sh set --key=DB_HOST --val=localhost"
+    echo "  $SCRIPT_DIR/manage-env.sh set --key=DB_PORT --val=5432"
+    echo "  $SCRIPT_DIR/manage-env.sh set --key=DB_NAME --val=$DB_NAME"
+    echo "  $SCRIPT_DIR/manage-env.sh set --key=DB_USER --val=$DB_USER"
+    echo "  $SCRIPT_DIR/manage-env.sh set --key=DB_PASSWORD --val=$DB_PASSWORD"
+fi
+
 # Print final summary
 echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║                    Setup Complete!                         ║${NC}"

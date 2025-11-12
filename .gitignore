@@ -82,6 +82,9 @@ postgresql-credentials.txt
 pgadmin-credentials.txt
 adminer-credentials.txt
 
+# .env backups
+.env.backups/
+
 # PM2
 .pm2
 
