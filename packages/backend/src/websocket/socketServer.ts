@@ -1,6 +1,7 @@
 import { Server as SocketIOServer } from 'socket.io'
 import type { Server as HTTPServer } from 'http'
 import { validateSessionToken } from '../services/sessionService'
+import { logger } from '@yektayar/shared'
 
 export interface AuthenticatedSocket {
   sessionToken: string
@@ -46,7 +47,7 @@ export function setupSocketIO(httpServer: HTTPServer) {
 
       next()
     } catch (error) {
-      console.error('Socket authentication error:', error)
+      logger.error('Socket authentication error:', error)
       next(new Error('Authentication failed'))
     }
   })
@@ -54,7 +55,7 @@ export function setupSocketIO(httpServer: HTTPServer) {
   // Handle connections
   io.on('connection', (socket) => {
     const socketData = socket as any
-    console.log(`Socket connected: ${socket.id}`, {
+    logger.info(`Socket connected: ${socket.id}`, {
       sessionToken: socketData.sessionToken,
       userId: socketData.userId,
       isLoggedIn: socketData.isLoggedIn
@@ -82,19 +83,19 @@ export function setupSocketIO(httpServer: HTTPServer) {
 
     // Handle disconnect
     socket.on('disconnect', (reason) => {
-      console.log(`Socket disconnected: ${socket.id}`, { reason })
+      logger.info(`Socket disconnected: ${socket.id}`, { reason })
     })
 
     // Handle errors
     socket.on('error', (error) => {
-      console.error(`Socket error for ${socket.id}:`, error)
+      logger.error(`Socket error for ${socket.id}:`, error)
     })
   })
 
   // Periodic cleanup (optional - for monitoring)
   setInterval(() => {
     const socketCount = io.sockets.sockets.size
-    console.log(`Active socket connections: ${socketCount}`)
+    logger.debug(`Active socket connections: ${socketCount}`)
   }, 60000) // Every minute
 
   return io

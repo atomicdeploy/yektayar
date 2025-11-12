@@ -145,9 +145,37 @@ yektayar/
 - **Language**: TypeScript
 - **Validation**: Zod
 
+### Code Quality & CI/CD
+- **Linting**: ESLint 9 with TypeScript & Vue support
+- **Testing**: Vitest with coverage reporting
+- **CI/CD**: GitHub Actions (lint, test, type-check)
+- **Standards**: Enforced logger usage, no direct console.*
+
 ---
 
 ## 💻 Development
+
+### Code Quality & Testing
+
+This project enforces strict code quality standards:
+
+```bash
+# Run linting
+npm run lint              # Check for issues
+npm run lint:fix          # Auto-fix issues
+
+# Run tests
+npm run test              # Run all tests
+npm run test:watch        # Watch mode
+npm run test:ui           # Interactive UI
+npm run test:coverage     # Generate coverage report
+```
+
+**Important:** 
+- ⚠️ Always use `logger` utility instead of `console.*`
+- ✅ All tests must pass before committing
+- ✅ ESLint checks must pass
+- 📖 See [.github/copilot-instructions.md](.github/copilot-instructions.md) for coding standards
 
 ### Start All Services
 

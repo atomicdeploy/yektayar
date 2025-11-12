@@ -10,6 +10,7 @@ import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
 import { setupSocketIO } from './websocket/socketServer'
+import { logger } from '@yektayar/shared'
 
 const app = new Elysia()
   .use(cors())
@@ -75,9 +76,9 @@ const httpServer = Bun.serve({
 // For now, we'll note that Socket.IO should be initialized when running on Node.js
 // In production, consider using Bun's native WebSocket or run Socket.IO on a separate Node.js process
 
-console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
-console.log(`📚 API Documentation available at http://${hostname}:${port}/swagger`)
-console.log(`⚡ Runtime: Bun ${Bun.version}`)
+logger.custom('🚀', `YektaYar API Server running at http://${hostname}:${port}`, 'cyan')
+logger.custom('📚', `API Documentation available at http://${hostname}:${port}/swagger`, 'cyan')
+logger.custom('⚡', `Runtime: Bun ${Bun.version}`, 'cyan')
 
 // Socket.IO setup (for Node.js compatibility)
 // When running with Node.js instead of Bun, uncomment the following:
