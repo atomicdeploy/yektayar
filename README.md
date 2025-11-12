@@ -47,6 +47,7 @@ YektaYar is a comprehensive mental health care platform that connects users with
 - ✅ Multi-language support (Persian primary, English secondary)
 - ✅ RTL/LTR support
 - ✅ PWA capabilities
+- ✅ Telegram bot integration (admin notifications & user communication)
 
 ---
 

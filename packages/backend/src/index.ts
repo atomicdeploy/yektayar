@@ -9,7 +9,9 @@ import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
+import { telegramRoutes } from './routes/telegram'
 import { setupSocketIO } from './websocket/socketServer'
+import { initializeTelegramBot } from './services/telegramService'
 
 const app = new Elysia()
   .use(cors())
@@ -27,7 +29,8 @@ const app = new Elysia()
           { name: 'Messages', description: 'Messaging and chat endpoints' },
           { name: 'Appointments', description: 'Appointment booking endpoints' },
           { name: 'Courses', description: 'Educational content endpoints' },
-          { name: 'Dashboard', description: 'Dashboard statistics endpoints' }
+          { name: 'Dashboard', description: 'Dashboard statistics endpoints' },
+          { name: 'Telegram', description: 'Telegram bot integration endpoints' }
         ]
       }
     })
@@ -39,7 +42,8 @@ const app = new Elysia()
     features: {
       rest: true,
       websocket: true,
-      sessionAcquisition: true
+      sessionAcquisition: true,
+      telegram: true
     }
   }))
   .get('/health', () => ({
@@ -52,6 +56,7 @@ const app = new Elysia()
   .use(appointmentRoutes)
   .use(courseRoutes)
   .use(dashboardRoutes)
+  .use(telegramRoutes)
 
 // For Bun, we need to create an HTTP server manually to add Socket.IO
 // Bun's fetch handler is used for the Elysia app
@@ -78,6 +83,17 @@ const httpServer = Bun.serve({
 console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
 console.log(`📚 API Documentation available at http://${hostname}:${port}/swagger`)
 console.log(`⚡ Runtime: Bun ${Bun.version}`)
+
+// Initialize Telegram bot
+const telegramToken = process.env.TELEGRAM_BOT_TOKEN
+const telegramWebhookUrl = process.env.TELEGRAM_WEBHOOK_URL
+
+if (telegramToken && telegramToken !== 'your_telegram_bot_token_here') {
+  const useWebhook = Boolean(telegramWebhookUrl)
+  initializeTelegramBot(telegramToken, useWebhook, telegramWebhookUrl)
+} else {
+  console.log('ℹ️  Telegram bot not configured. Set TELEGRAM_BOT_TOKEN to enable.')
+}
 
 // Socket.IO setup (for Node.js compatibility)
 // When running with Node.js instead of Bun, uncomment the following:
