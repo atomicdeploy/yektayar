@@ -4,6 +4,9 @@ import { io, Socket } from 'socket.io-client'
 import config from '@/config'
 
 const API_URL = config.apiBaseUrl
+import { logger } from '@yektayar/shared'
+
+const API_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3000'
 const STORAGE_KEY = 'yektayar_admin_session_token'
 
 export interface Session {
@@ -32,7 +35,7 @@ export const useSessionStore = defineStore('session', () => {
    */
   async function acquireSession(): Promise<void> {
     if (isAcquiring.value) {
-      console.log('Session acquisition already in progress')
+      logger.info('Session acquisition already in progress')
       return
     }
 
@@ -43,21 +46,21 @@ export const useSessionStore = defineStore('session', () => {
       const storedToken = localStorage.getItem(STORAGE_KEY)
       
       if (storedToken) {
-        console.log('Found stored session token, validating...')
+        logger.info('Found stored session token, validating...')
         const isValid = await validateStoredSession(storedToken)
         
         if (isValid) {
-          console.log('Stored session is valid')
+          logger.success('Stored session is valid')
           await connectSocket()
           return
         } else {
-          console.log('Stored session is invalid, acquiring new one')
+          logger.warn('Stored session is invalid, acquiring new one')
           localStorage.removeItem(STORAGE_KEY)
         }
       }
 
       // Acquire a new session
-      console.log('Acquiring new session...')
+      logger.custom(logger.emoji('rocket'), 'Acquiring new session...', 'cyan')
       const response = await fetch(`${API_URL}/api/auth/acquire-session`, {
         method: 'POST',
         headers: {
@@ -86,12 +89,12 @@ export const useSessionStore = defineStore('session', () => {
       // Persist to localStorage
       localStorage.setItem(STORAGE_KEY, data.data.token)
 
-      console.log('Session acquired successfully')
+      logger.success('Session acquired successfully')
 
       // Connect Socket.IO
       await connectSocket()
     } catch (error) {
-      console.error('Error acquiring session:', error)
+      logger.error('Error acquiring session:', error)
       throw error
     } finally {
       isAcquiring.value = false
@@ -129,7 +132,7 @@ export const useSessionStore = defineStore('session', () => {
 
       return true
     } catch (error) {
-      console.error('Error validating stored session:', error)
+      logger.error('Error validating stored session:', error)
       return false
     }
   }
@@ -139,17 +142,17 @@ export const useSessionStore = defineStore('session', () => {
    */
   async function connectSocket(): Promise<void> {
     if (!session.value?.token) {
-      console.error('Cannot connect socket: no session token')
+      logger.error('Cannot connect socket: no session token')
       return
     }
 
     if (socket.value?.connected) {
-      console.log('Socket already connected')
+      logger.info('Socket already connected')
       return
     }
 
     try {
-      console.log('Connecting to Socket.IO...')
+      logger.custom(logger.emoji('link'), 'Connecting to Socket.IO...', 'cyan')
       
       socket.value = io(API_URL, {
         auth: {
@@ -163,25 +166,25 @@ export const useSessionStore = defineStore('session', () => {
 
       // Socket event handlers
       socket.value.on('connect', () => {
-        console.log('Socket.IO connected:', socket.value?.id)
+        logger.success(`Socket.IO connected: ${socket.value?.id}`)
         isSocketConnected.value = true
       })
 
       socket.value.on('connected', (data) => {
-        console.log('Server confirmed connection:', data)
+        logger.info('Server confirmed connection:', data)
       })
 
       socket.value.on('disconnect', (reason) => {
-        console.log('Socket.IO disconnected:', reason)
+        logger.warn(`Socket.IO disconnected: ${reason}`)
         isSocketConnected.value = false
       })
 
       socket.value.on('error', (error) => {
-        console.error('Socket.IO error:', error)
+        logger.error('Socket.IO error:', error)
       })
 
       socket.value.on('connect_error', (error) => {
-        console.error('Socket.IO connection error:', error)
+        logger.error('Socket.IO connection error:', error)
       })
 
       // Ping/pong for connection health
@@ -192,11 +195,11 @@ export const useSessionStore = defineStore('session', () => {
       }, 30000) // Every 30 seconds
 
       socket.value.on('pong', (data) => {
-        console.log('Received pong:', data)
+        logger.debug('Received pong:', data)
       })
 
     } catch (error) {
-      console.error('Error connecting socket:', error)
+      logger.error('Error connecting socket:', error)
       throw error
     }
   }
@@ -206,7 +209,7 @@ export const useSessionStore = defineStore('session', () => {
    */
   function disconnectSocket(): void {
     if (socket.value) {
-      console.log('Disconnecting socket...')
+      logger.info('Disconnecting socket...')
       socket.value.disconnect()
       socket.value = null
       isSocketConnected.value = false
@@ -227,7 +230,7 @@ export const useSessionStore = defineStore('session', () => {
         })
       }
     } catch (error) {
-      console.error('Error during logout:', error)
+      logger.error('Error during logout:', error)
     } finally {
       // Clear local state regardless of API call result
       session.value = null
