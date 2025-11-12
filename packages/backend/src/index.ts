@@ -80,7 +80,7 @@ const httpServer = Bun.serve({
 
 console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
 console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
-console.log(`🔒 Documentation protected with Basic Auth (username: ${process.env.SWAGGER_USERNAME || 'admin'})`)
+console.log(`🔒 Documentation protected with Basic Auth`)
 console.log(`⚡ Runtime: Bun ${Bun.version}`)
 
 // Socket.IO setup (for Node.js compatibility)
