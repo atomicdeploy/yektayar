@@ -28,6 +28,7 @@ import {
   Filler,
   type ChartConfiguration,
 } from 'chart.js'
+import { logger } from '@yektayar/shared'
 
 // Register Chart.js components
 Chart.register(
@@ -140,7 +141,7 @@ function createChart() {
 
     chartInstance.value = new Chart(chartCanvas.value, config)
   } catch (error) {
-    console.error('Error creating chart:', error)
+    logger.error('Error creating chart:', error)
   } finally {
     isInitializing.value = false
   }
@@ -154,7 +155,7 @@ function updateChart() {
     destroyChart()
     createChart()
   } catch (error) {
-    console.error('Error updating chart:', error)
+    logger.error('Error updating chart:', error)
   }
 }
 

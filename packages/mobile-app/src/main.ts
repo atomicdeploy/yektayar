@@ -59,13 +59,13 @@ const i18n = createI18n({
 
 // Validate API configuration and reachability before mounting the app
 async function initializeApp() {
-  console.log('=== YektaYar Mobile App Initialization ===')
-  console.log(`Environment: ${config.environment}`)
+  logger.info('=== YektaYar Mobile App Initialization ===')
+  logger.info(`Environment: ${config.environment}`)
   
   const validationResult = await validateApi(config.apiBaseUrl)
   
   if (!validationResult.isValid) {
-    console.error('❌ API Configuration Error:', validationResult.error)
+    logger.error('❌ API Configuration Error:', validationResult.error)
     
     // Create and mount error screen
     const errorApp = createApp(ErrorScreen, {
@@ -79,8 +79,8 @@ async function initializeApp() {
     return
   }
 
-  console.log(`✅ API Base URL: ${config.apiBaseUrl}`)
-  console.log('=== Initialization Complete ===')
+  logger.info(`✅ API Base URL: ${config.apiBaseUrl}`)
+  logger.info('=== Initialization Complete ===')
 
   // Create and mount the main app
   const app = createApp(App)
@@ -104,5 +104,5 @@ async function initializeApp() {
 
 // Start initialization
 initializeApp().catch((error) => {
-  console.error('Failed to initialize app:', error)
+  logger.error('Failed to initialize app:', error)
 })

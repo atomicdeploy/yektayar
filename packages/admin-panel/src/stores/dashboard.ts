@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useSessionStore } from './session'
 import config from '@/config'
+import { logger } from '@yektayar/shared'
 
 export interface DashboardStats {
   totalUsers: number
@@ -64,7 +65,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         stats.value = data.data
       }
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error)
+      logger.error('Error fetching dashboard stats:', error)
       // Set mock data for development
       stats.value = {
         totalUsers: 1234,
@@ -94,7 +95,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         userGrowthData.value = data.data
       }
     } catch (error) {
-      console.error('Error fetching user growth data:', error)
+      logger.error('Error fetching user growth data:', error)
       // Set mock data for development
       userGrowthData.value = {
         labels: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور'],
@@ -120,7 +121,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         appointmentStatsData.value = data.data
       }
     } catch (error) {
-      console.error('Error fetching appointment stats:', error)
+      logger.error('Error fetching appointment stats:', error)
       // Set mock data for development
       appointmentStatsData.value = {
         labels: ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'],
@@ -149,7 +150,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }))
       }
     } catch (error) {
-      console.error('Error fetching recent activities:', error)
+      logger.error('Error fetching recent activities:', error)
       // Set mock data for development
       recentActivities.value = [
         {

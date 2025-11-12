@@ -205,6 +205,7 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline'
 import { usePermissionsStore } from '@/stores/permissions'
+import { logger } from '@yektayar/shared'
 
 const { t } = useI18n()
 const permissionsStore = usePermissionsStore()
@@ -365,12 +366,12 @@ function formatDate(date: Date): string {
 }
 
 function editUser(id: string) {
-  console.log('Edit user:', id)
+  logger.info('Edit user:', id)
   // TODO: Implement edit user modal
 }
 
 function deleteUser(id: string) {
-  console.log('Delete user:', id)
+  logger.info('Delete user:', id)
   // TODO: Implement delete confirmation
 }
 
@@ -382,7 +383,7 @@ async function fetchUsers() {
     await new Promise((resolve) => setTimeout(resolve, 1000))
     users.value = mockUsers
   } catch (error) {
-    console.error('Error fetching users:', error)
+    logger.error('Error fetching users:', error)
   } finally {
     isLoading.value = false
   }
