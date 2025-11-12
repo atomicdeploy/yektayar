@@ -8,6 +8,7 @@ import config from './config'
 import { validateApi } from './config/validation'
 import ErrorScreen from './components/ErrorScreen.vue'
 import { useSessionStore } from './stores/session'
+import { useErrorStore } from './stores/error'
 import { logger } from '@yektayar/shared'
 
 /* Core CSS required for Ionic components to work properly */
@@ -84,11 +85,43 @@ async function initializeApp() {
 
   // Create and mount the main app
   const app = createApp(App)
+  const pinia = createPinia()
 
   app.use(IonicVue)
-  app.use(createPinia())
+  app.use(pinia)
   app.use(router)
   app.use(i18n)
+
+  // Setup global error handlers
+  const errorStore = useErrorStore(pinia)
+
+  // Vue error handler
+  app.config.errorHandler = (err, instance, info) => {
+    const error = err as Error
+    const message = error.message || 'An unknown error occurred'
+    const details = `Component: ${instance?.$options?.name || 'Unknown'}, Info: ${info}`
+    
+    errorStore.addError('Application Error', message, details)
+  }
+
+  // Global unhandled promise rejection handler
+  window.addEventListener('unhandledrejection', (event) => {
+    const error = event.reason
+    const message = error?.message || String(error) || 'Unhandled promise rejection'
+    
+    errorStore.addError('Promise Rejection', message, error?.stack)
+    event.preventDefault()
+  })
+
+  // Global error event handler
+  window.addEventListener('error', (event) => {
+    if (event.error) {
+      errorStore.addError('JavaScript Error', event.error.message, event.error.stack)
+    } else {
+      errorStore.addError('Error', event.message || 'Unknown error')
+    }
+    event.preventDefault()
+  })
 
   router.isReady().then(() => {
     app.mount('#app')
@@ -97,6 +130,11 @@ async function initializeApp() {
     const sessionStore = useSessionStore()
     sessionStore.acquireSession().catch((error) => {
       logger.error('Failed to acquire session on startup:', error)
+      errorStore.addError(
+        'Session Error',
+        'Failed to connect to the server. Some features may not work correctly.',
+        'Please check if the backend server is running.'
+      )
       // Continue anyway - session will be acquired on next attempt
     })
   })
@@ -105,4 +143,14 @@ async function initializeApp() {
 // Start initialization
 initializeApp().catch((error) => {
   logger.error('Failed to initialize app:', error)
+  
+  // Show error screen if app failed to initialize
+  const errorApp = createApp(ErrorScreen, {
+    title: 'Initialization Error',
+    message: 'Failed to start the application.',
+    details: error?.message || String(error)
+  })
+  
+  errorApp.use(IonicVue)
+  errorApp.mount('#app')
 })
