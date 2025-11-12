@@ -165,12 +165,16 @@ JWT_SECRET=your_jwt_secret
 CORS_ORIGIN=http://localhost:5173,http://localhost:8100
 VITE_API_BASE_URL=http://localhost:3000
 VITE_ENVIRONMENT=development
-
-# Optional: Set when mobile-app dev server is behind a reverse proxy
-# VITE_PROXY_DOMAIN=app.yektayar.ir
 ```
 
-**Note**: When running the mobile-app dev server behind a reverse proxy (e.g., nginx proxying `app.yektayar.ir` to `localhost:8100`), set `VITE_PROXY_DOMAIN` to enable proper HMR (Hot Module Replacement) WebSocket connections. For local development without a reverse proxy, leave it unset.
+**Per-Package Configuration**: Frontend apps (mobile-app, admin-panel) can have their own `.env` files in `packages/{app}/.env` to override root values. This is useful for app-specific settings like `VITE_PROXY_DOMAIN`.
+
+**HMR Auto-Detection**: HMR (Hot Module Replacement) WebSocket now auto-detects the domain from the browser's Host header. This means:
+- Accessing via `localhost:8100` → uses `ws://localhost:8100`
+- Accessing via `app.yektayar.ir` → uses `wss://app.yektayar.ir:443`
+- No manual configuration needed for reverse proxy setups!
+
+Only set `VITE_PROXY_DOMAIN` in `packages/{app}/.env` if you need to override auto-detection.
 
 ### Database Setup
 
