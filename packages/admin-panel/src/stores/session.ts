@@ -152,10 +152,12 @@ export const useSessionStore = defineStore('session', () => {
     try {
       logger.custom(logger.emoji('link'), 'Connecting to Socket.IO...', 'cyan')
       
+      // Create socket with autoConnect disabled to ensure we have full control
       socket.value = io(API_URL, {
         auth: {
           token: session.value.token
         },
+        autoConnect: false, // Prevent automatic connection until we're ready
         transports: ['websocket', 'polling'],
         reconnection: true,
         reconnectionDelay: 1000,
@@ -183,6 +185,21 @@ export const useSessionStore = defineStore('session', () => {
 
       socket.value.on('connect_error', (error) => {
         logger.error('Socket.IO connection error:', error)
+        // If authentication fails, prevent further reconnection attempts
+        if (error.message?.includes('Authentication') || error.message?.includes('token')) {
+          logger.warn('Authentication error - stopping reconnection attempts')
+          socket.value?.disconnect()
+        }
+      })
+
+      // Before each reconnection attempt, verify we still have a valid token
+      socket.value.io.on('reconnect_attempt', () => {
+        if (!session.value?.token) {
+          logger.warn('Reconnection attempted without valid token - aborting')
+          socket.value?.disconnect()
+        } else {
+          logger.info('Reconnection attempt with valid token')
+        }
       })
 
       // Ping/pong for connection health
@@ -195,6 +212,10 @@ export const useSessionStore = defineStore('session', () => {
       socket.value.on('pong', (data) => {
         logger.debug('Received pong:', data)
       })
+
+      // Now manually connect after all handlers are set up and token is confirmed
+      socket.value.connect()
+      logger.info('Socket connection initiated with valid token')
 
     } catch (error) {
       logger.error('Error connecting socket:', error)
