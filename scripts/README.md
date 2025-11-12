@@ -709,3 +709,36 @@ sudo systemctl reload nginx
 - [Bun Documentation](https://bun.sh/docs)
 - [Elysia.js Documentation](https://elysiajs.com/)
 - [Vue.js Deployment Guide](https://vuejs.org/guide/best-practices/production-deployment.html)
+
+## Dependency Testing
+
+### `test-dependencies.js`
+
+A test script that verifies dependency compatibility across all workspaces to prevent version conflicts.
+
+**Usage:**
+```bash
+npm run test:deps
+```
+
+**What it checks:**
+
+1. **Version consistency**: Warns if the same dependency has different versions across workspaces
+2. **Critical compatibility**: Ensures critical dependencies like `vite` and `@vitejs/plugin-vue` are compatible with each other
+
+**Example output:**
+```
+⚠️  Version mismatch for "vue-tsc":
+  packages/admin-panel: ^2.0.0
+  packages/mobile-app: ^3.1.3
+✅ All dependency compatibility checks passed!
+```
+
+**When to run:**
+- Before committing changes to `package.json` files
+- After resolving merge conflicts in dependencies
+- As part of CI/CD pipeline to catch dependency issues early
+
+**Exit codes:**
+- `0`: All checks passed (warnings are non-blocking)
+- `1`: Critical compatibility issues found (blocking)
