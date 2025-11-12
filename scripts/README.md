@@ -67,6 +67,7 @@ Unified environment configuration management script for the YektaYar platform.
 - Backend: `PORT`, `HOST`, `NODE_ENV`
 - Database: `DATABASE_URL`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`
 - Security: `SESSION_SECRET`, `JWT_SECRET`, `JWT_EXPIRY`
+- SMS Provider: `FARAZSMS_API_KEY`, `FARAZSMS_PATTERN_CODE`, `FARAZSMS_LINE_NUMBER`
 - CORS: `CORS_ORIGIN`
 - WebSocket: `WEBSOCKET_PORT`
 - Rate Limiting: `RATE_LIMIT_WINDOW`, `RATE_LIMIT_MAX_REQUESTS`
@@ -165,6 +166,41 @@ sudo ./scripts/setup-adminer.sh
 - Supports multiple database systems
 - Similar interface to phpMyAdmin
 - Export/Import data, execute SQL queries
+
+### Testing Scripts
+
+#### `test-sms.ts`
+
+Test FarazSMS integration for sending OTP messages.
+
+**Usage:**
+```bash
+bun scripts/test-sms.ts <phone_number> [otp_code]
+```
+
+**Examples:**
+```bash
+# Send test OTP (default: 123456) to a phone number
+bun scripts/test-sms.ts 09121234567
+
+# Send custom OTP code
+bun scripts/test-sms.ts 09121234567 654321
+```
+
+**What it does:**
+- Validates FarazSMS configuration from environment variables
+- Tests phone number format validation
+- Sends actual SMS using FarazSMS pattern API
+- Reports success or failure with detailed error messages
+
+**Requirements:**
+- `FARAZSMS_API_KEY` must be set in `.env`
+- `FARAZSMS_PATTERN_CODE` must be set in `.env`
+- `FARAZSMS_LINE_NUMBER` must be set in `.env`
+
+**See also:**
+- [SMS OTP Integration Guide](../docs/SMS-OTP-INTEGRATION.md)
+- [Environment Configuration Guide](../ENV-GUIDE.md)
 
 ### Application Scripts
 
