@@ -5,7 +5,8 @@
 The YektaYar API Client is a unified HTTP client for communicating with the backend API. It's designed to work across all client applications (admin-panel, mobile-app, and console) and provides:
 
 - **Automatic Token Management**: Handles session tokens automatically
-- **Request/Response Interceptors**: Adds authorization headers and handles errors
+- **Multiple Token Delivery Methods**: Send tokens via headers, cookies, query params, or body
+- **Request/Response Interceptors**: Adds authorization and handles errors
 - **Cross-Platform Support**: Works in browser, Node.js, and React Native
 - **Proxy Support**: Built on axios with full proxy configuration support
 - **Type Safety**: Full TypeScript support with typed responses
@@ -31,6 +32,7 @@ const apiClient = createApiClient({
   storageKey: 'my_session_token', // Optional, defaults to 'yektayar_session_token'
   timeout: 30000, // Optional, defaults to 30000ms
   debug: true, // Optional, enables debug logging
+  tokenDeliveryMethod: 'header', // Optional, defaults to 'header'. Options: 'header', 'cookie', 'query', 'body'
   headers: { // Optional custom headers
     'X-Custom-Header': 'value'
   }
@@ -113,6 +115,70 @@ const hasToken = await apiClient.hasToken()
 // Clear token (called during logout)
 await apiClient.clearToken()
 ```
+
+### Token Delivery Methods
+
+The API client supports multiple methods for sending authentication tokens to the backend. You can configure the default method when creating the client, or override it per-request.
+
+#### Available Methods
+
+- **`header`** (default): Sends token as `Authorization: Bearer <token>` header
+- **`cookie`**: Sends token as a cookie named `token`
+- **`query`**: Sends token as a URL query parameter `?token=<token>`
+- **`body`**: Sends token in the request body (POST/PUT/PATCH only)
+
+#### Configuration
+
+```typescript
+// Use header method (default)
+const apiClient = createApiClient({
+  baseURL: 'http://localhost:3000',
+  tokenDeliveryMethod: 'header' // or omit for default
+})
+
+// Use cookie method
+const apiClient = createApiClient({
+  baseURL: 'http://localhost:3000',
+  tokenDeliveryMethod: 'cookie'
+})
+
+// Use query parameter method
+const apiClient = createApiClient({
+  baseURL: 'http://localhost:3000',
+  tokenDeliveryMethod: 'query'
+})
+
+// Use body parameter method
+const apiClient = createApiClient({
+  baseURL: 'http://localhost:3000',
+  tokenDeliveryMethod: 'body'
+})
+```
+
+#### Per-Request Override
+
+You can override the token delivery method for individual requests:
+
+```typescript
+// Default uses 'header', but this request uses 'query'
+const response = await apiClient.get('/api/auth/session', {
+  tokenDeliveryMethod: 'query'
+})
+
+// POST with token in body instead of header
+const response = await apiClient.post('/api/data', { some: 'data' }, {
+  tokenDeliveryMethod: 'body'
+})
+```
+
+#### Use Cases
+
+- **`header`**: Best for most web applications (standard, secure)
+- **`cookie`**: Useful for browser-based apps with automatic cookie management
+- **`query`**: Useful for file downloads or when headers can't be set (use with caution - less secure)
+- **`body`**: Useful for form submissions where setting headers is difficult
+
+**Security Note**: Always use HTTPS in production. Query parameters expose tokens in URLs and should only be used when necessary. For complete documentation on token delivery methods, see [TOKEN-EXTRACTION-GUIDE.md](../../TOKEN-EXTRACTION-GUIDE.md).
 
 ### Error Handling
 
