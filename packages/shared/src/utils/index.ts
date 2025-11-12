@@ -1,4 +1,5 @@
 export * from './logger'
+export * from './solutions'
 
 /**
  * Format date for Persian (Jalali) calendar

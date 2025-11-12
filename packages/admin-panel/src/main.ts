@@ -6,7 +6,8 @@ import router from './router'
 import './assets/main.css'
 import config from './config'
 import { validateApi } from './config/validation'
-import ErrorScreen from './components/ErrorScreen.vue'
+import { ErrorScreen } from '@yektayar/shared'
+import { parseSolutionsMarkdown, findSolutionForError } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
 import { messages } from './locales'
@@ -37,11 +38,19 @@ async function initializeApp() {
   if (!validationResult.isValid) {
     logger.error('❌ API Configuration Error:', validationResult.error)
     
+    // Parse solutions if available in development mode
+    let solution = null
+    if (import.meta.env.DEV && import.meta.env.SOLUTIONS_MD) {
+      const solutionsData = parseSolutionsMarkdown(import.meta.env.SOLUTIONS_MD)
+      solution = findSolutionForError(solutionsData, validationResult.error || '')
+    }
+    
     // Create and mount error screen
     const errorApp = createApp(ErrorScreen, {
       title: 'API Configuration Error',
       message: 'Cannot start the admin panel due to API configuration issues.',
-      details: validationResult.error
+      details: validationResult.error,
+      solution: solution
     })
     
     errorApp.use(i18n)

@@ -6,7 +6,8 @@ import App from './App.vue'
 import router from './router'
 import config from './config'
 import { validateApi } from './config/validation'
-import ErrorScreen from './components/ErrorScreen.vue'
+import { ErrorScreenMobile } from '@yektayar/shared'
+import { parseSolutionsMarkdown, findSolutionForError } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { logger } from '@yektayar/shared'
 
@@ -95,11 +96,19 @@ async function initializeApp() {
   if (!validationResult.isValid) {
     logger.error('❌ API Configuration Error:', validationResult.error)
     
+    // Parse solutions if available in development mode
+    let solution = null
+    if (import.meta.env.DEV && import.meta.env.SOLUTIONS_MD) {
+      const solutionsData = parseSolutionsMarkdown(import.meta.env.SOLUTIONS_MD)
+      solution = findSolutionForError(solutionsData, validationResult.error || '')
+    }
+    
     // Create and mount error screen
-    const errorApp = createApp(ErrorScreen, {
+    const errorApp = createApp(ErrorScreenMobile, {
       title: 'API Configuration Error',
       message: 'Cannot start the application due to API configuration issues.',
-      details: validationResult.error
+      details: validationResult.error,
+      solution: solution
     })
     
     errorApp.use(IonicVue)
