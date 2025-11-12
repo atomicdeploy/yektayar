@@ -161,7 +161,6 @@ async function initializeApp() {
       details: validationResult.error,
       solution: solution,
       errorType: validationResult.errorType
-      errorType: validationResult.errorType
     })
     
     errorApp.use(IonicVue)
