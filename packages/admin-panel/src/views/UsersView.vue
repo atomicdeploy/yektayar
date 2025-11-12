@@ -228,54 +228,8 @@ const filterStatus = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-// Mock data for development
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'علی محمدی',
-    email: 'ali@example.com',
-    phone: '09121234567',
-    role: 'admin',
-    status: 'active',
-    createdAt: new Date('2024-01-15'),
-  },
-  {
-    id: '2',
-    name: 'سارا احمدی',
-    email: 'sara@example.com',
-    phone: '09129876543',
-    role: 'psychologist',
-    status: 'active',
-    createdAt: new Date('2024-02-20'),
-  },
-  {
-    id: '3',
-    name: 'محمد رضایی',
-    email: 'mohammad@example.com',
-    phone: '09135551234',
-    role: 'user',
-    status: 'active',
-    createdAt: new Date('2024-03-10'),
-  },
-  {
-    id: '4',
-    name: 'فاطمه کریمی',
-    email: 'fatemeh@example.com',
-    phone: '09141112233',
-    role: 'moderator',
-    status: 'active',
-    createdAt: new Date('2024-03-25'),
-  },
-  {
-    id: '5',
-    name: 'رضا حسینی',
-    email: 'reza@example.com',
-    phone: '09151234567',
-    role: 'user',
-    status: 'inactive',
-    createdAt: new Date('2024-04-05'),
-  },
-]
+// API base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const filteredUsers = computed(() => {
   let result = users.value
@@ -378,12 +332,23 @@ function deleteUser(id: string) {
 async function fetchUsers() {
   isLoading.value = true
   try {
-    // TODO: Fetch from API
-    // For now, use mock data
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    users.value = mockUsers
+    // Fetch users from API
+    const response = await fetch(`${API_BASE_URL}/api/users`)
+    const result = await response.json()
+    
+    if (result.success && result.data) {
+      // Convert createdAt strings to Date objects
+      users.value = result.data.map((user: any) => ({
+        ...user,
+        createdAt: new Date(user.createdAt)
+      }))
+    } else {
+      logger.error('Failed to fetch users:', result.error || result.message)
+      users.value = []
+    }
   } catch (error) {
     logger.error('Error fetching users:', error)
+    users.value = []
   } finally {
     isLoading.value = false
   }
