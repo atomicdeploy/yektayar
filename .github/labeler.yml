@@ -1,0 +1,83 @@
+# Automatic PR Labeler Configuration
+# This file defines rules for automatically labeling PRs based on changed files
+
+# Backend labels
+'🖥️ backend':
+  - packages/backend/**/*
+  - packages/backend/**
+
+# Admin Panel labels
+'👨‍💼 admin-panel':
+  - packages/admin-panel/**/*
+  - packages/admin-panel/**
+
+# Mobile App labels
+'📱 mobile-app':
+  - packages/mobile-app/**/*
+  - packages/mobile-app/**
+
+# Shared Package labels
+'📦 shared':
+  - packages/shared/**/*
+  - packages/shared/**
+
+# Documentation labels
+'📝 documentation':
+  - '**/*.md'
+  - docs/**/*
+  - '*.md'
+  - README.md
+  - CONTRIBUTING.md
+  - DEVELOPMENT.md
+
+# Build/CI labels
+'🔨 build':
+  - package.json
+  - package-lock.json
+  - bun.lock
+  - '**/package.json'
+  - '**/package-lock.json'
+  - .github/workflows/**
+  - .github/dependabot.yml
+
+# Configuration labels
+'🔧 enhancement':
+  - config/**/*
+  - .env.example
+  - '**/.env.example'
+  - '**/tsconfig.json'
+  - '**/vite.config.ts'
+
+# Testing labels
+'🧪 test':
+  - '**/*.test.ts'
+  - '**/*.test.js'
+  - '**/*.spec.ts'
+  - '**/*.spec.js'
+  - '**/tests/**'
+  - '**/test/**'
+
+# Database labels
+'🗄️ database':
+  - '**/migrations/**'
+  - '**/seeds/**'
+  - '**/schema.sql'
+  - '**/database.ts'
+
+# Script labels
+'🔨 build':
+  - scripts/**/*
+
+# UI/Design labels
+'🎭 ui':
+  - '**/*.vue'
+  - '**/*.css'
+  - '**/*.scss'
+  - '**/assets/**'
+  - '**/styles/**'
+
+# Dependencies
+'🤖 dependencies':
+  - package-lock.json
+  - bun.lock
+  - '**/package-lock.json'

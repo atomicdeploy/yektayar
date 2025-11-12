@@ -1,0 +1,55 @@
+name: Greetings
+
+on: [pull_request_target, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Greet First Time Contributors
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            👋 Thanks for opening your first issue in YektaYar! 
+            
+            We appreciate your contribution to the project. A maintainer will review your issue and respond as soon as possible.
+            
+            Please make sure you've:
+            - ✅ Filled out the issue template completely
+            - ✅ Searched for existing similar issues
+            - ✅ Provided all necessary information
+            
+            While you wait, feel free to:
+            - 📚 Check out our [documentation](../docs/)
+            - 💬 Join our [Discord community](../docs/GITHUB-DISCORD-INTEGRATION.md) (once set up)
+            - 👀 Browse other [open issues](../issues) you might be interested in
+            
+            Happy contributing! 🚀
+          pr-message: |
+            🎉 Thanks for opening your first pull request in YektaYar!
+            
+            We're excited to review your contribution. Here's what happens next:
+            
+            1. ✅ Automated checks will run on your PR
+            2. 👀 A maintainer will review your changes
+            3. 💬 We may request changes or ask questions
+            4. ✅ Once approved, your PR will be merged!
+            
+            **Before your PR is reviewed**, please ensure:
+            - ✅ All checks are passing
+            - ✅ You've filled out the PR template completely
+            - ✅ Your code follows our style guidelines
+            - ✅ You've added/updated tests if needed
+            - ✅ Documentation is updated if needed
+            
+            **Tips for a successful PR:**
+            - 📝 Keep PRs focused and small
+            - 🔄 Respond to feedback promptly
+            - 🧪 Make sure tests pass
+            - 📚 Update documentation as needed
+            
+            Thanks for contributing to YektaYar! 🎊

@@ -205,6 +205,10 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Network Configuration](docs/NETWORK-CONFIGURATION.md)** - Port and interface configuration
 - **[Bun vs NPM](docs/BUN-VS-NPM.md)** - Runtime comparison guide
 
+#### Project Management
+- **[GitHub Management Guide](docs/GITHUB-MANAGEMENT-GUIDE.md)** - Issue/PR labels, templates, and workflows
+- **[Discord Integration Guide](docs/GITHUB-DISCORD-INTEGRATION.md)** - Team collaboration and GitHub webhooks
+
 #### Additional Resources
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
 - **[CORS Fix Documentation](CORS-FIX.md)** - CORS OPTIONS verb support implementation

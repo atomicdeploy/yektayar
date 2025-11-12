@@ -1,0 +1,78 @@
+name: "Close Stale Issues and PRs"
+
+on:
+  schedule:
+    # Run daily at midnight UTC
+    - cron: "0 0 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark/Close Stale Issues and PRs
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Issue configuration
+          days-before-issue-stale: 90
+          days-before-issue-close: 14
+          stale-issue-message: |
+            👋 This issue has been automatically marked as stale because it has not had recent activity in the last 90 days.
+            
+            **This issue will be closed in 14 days** if no further activity occurs.
+            
+            If this issue is still relevant:
+            - ✅ Add a comment explaining why it should remain open
+            - 🔄 Provide any updates or additional information
+            - 🏷️ Remove the "stale" label
+            
+            Thank you for your contributions to YektaYar! 🙏
+          close-issue-message: |
+            🔒 This issue has been automatically closed due to inactivity.
+            
+            If you believe this issue should be reopened:
+            - 📝 Comment on this issue with updated information
+            - 🔄 Open a new issue if the problem still exists
+            
+            Thank you for your understanding!
+          stale-issue-label: "⏸️ status: stale"
+          exempt-issue-labels: "🔴 priority: critical,🟠 priority: high,🚧 status: in-progress,⛔ status: blocked,📌 pinned"
+          
+          # PR configuration
+          days-before-pr-stale: 60
+          days-before-pr-close: 14
+          stale-pr-message: |
+            👋 This pull request has been automatically marked as stale because it has not had recent activity in the last 60 days.
+            
+            **This PR will be closed in 14 days** if no further activity occurs.
+            
+            If this PR is still relevant:
+            - ✅ Add a comment explaining why it should remain open
+            - 🔄 Rebase on the latest main branch
+            - 🧪 Ensure all checks are passing
+            - 🏷️ Remove the "stale" label
+            
+            Thank you for your contributions to YektaYar! 🙏
+          close-pr-message: |
+            🔒 This pull request has been automatically closed due to inactivity.
+            
+            If you'd like to continue working on this:
+            - 🔄 Rebase your branch on the latest main
+            - 📝 Open a new PR with updated changes
+            
+            Thank you for your understanding!
+          stale-pr-label: "⏸️ status: stale"
+          exempt-pr-labels: "🚧 status: in-progress,👀 status: review-needed,🎯 breaking-change,📌 pinned"
+          
+          # General configuration
+          operations-per-run: 100
+          remove-stale-when-updated: true
+          exempt-all-assignees: false
+          exempt-all-milestones: false
+          ascending: false

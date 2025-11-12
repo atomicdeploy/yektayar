@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/atomicdeploy/yektayar/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📚 Documentation
+    url: https://github.com/atomicdeploy/yektayar
+    about: Check out our documentation for guides and references
+  - name: 🔒 Security Issue
+    url: https://github.com/atomicdeploy/yektayar/security/advisories/new
+    about: Report a security vulnerability privately
