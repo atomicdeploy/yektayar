@@ -161,17 +161,35 @@ kill_process_tree() {
     local pid=$1
     local signal=${2:-TERM}
     
-    # Get all child PIDs recursively
-    local children=$(pgrep -P "$pid" 2>/dev/null)
+    # Check if process exists
+    if ! kill -0 "$pid" 2>/dev/null; then
+        return 0
+    fi
     
-    # Kill children first
-    for child in $children; do
-        kill_process_tree "$child" "$signal"
-    done
+    # Try to get the process group ID
+    local pgid=$(ps -o pgid= -p "$pid" 2>/dev/null | tr -d ' ')
     
-    # Kill the parent process
-    if kill -0 "$pid" 2>/dev/null; then
+    if [ -n "$pgid" ] && [ "$pgid" != "0" ]; then
+        # Kill entire process group (includes all descendants)
+        # Use negative PGID to signal the entire process group
+        kill -"$signal" -- -"$pgid" 2>/dev/null || true
+        
+        # Also try to kill the main process directly as a fallback
         kill -"$signal" "$pid" 2>/dev/null || true
+    else
+        # Fallback to recursive tree killing if we can't get PGID
+        # Get all child PIDs recursively
+        local children=$(pgrep -P "$pid" 2>/dev/null)
+        
+        # Kill children first
+        for child in $children; do
+            kill_process_tree "$child" "$signal"
+        done
+        
+        # Kill the parent process
+        if kill -0 "$pid" 2>/dev/null; then
+            kill -"$signal" "$pid" 2>/dev/null || true
+        fi
     fi
 }
 
@@ -485,6 +503,26 @@ stop_services() {
     stop_service "Backend" "/tmp/yektayar-backend.pid" "/tmp/yektayar-backend.log" "$BACKEND_PORT" "$force_kill" || failed=1
     stop_service "Admin Panel" "/tmp/yektayar-admin.pid" "/tmp/yektayar-admin.log" "$ADMIN_PORT" "$force_kill" || failed=1
     stop_service "Mobile App" "/tmp/yektayar-mobile.pid" "/tmp/yektayar-mobile.log" "$MOBILE_PORT" "$force_kill" || failed=1
+    
+    # Final check: ensure all expected ports are freed
+    # This catches any orphaned processes that weren't tracked by PID files
+    echo ""
+    echo -e "${CYAN}Verifying all ports are freed...${NC}"
+    local ports_cleaned=0
+    
+    for port_info in "$BACKEND_PORT:Backend" "$ADMIN_PORT:Admin Panel" "$MOBILE_PORT:Mobile App"; do
+        local port="${port_info%%:*}"
+        local name="${port_info#*:}"
+        if is_port_in_use "$port"; then
+            echo -e "${YELLOW}⚠ Port $port ($name) is still in use, cleaning up...${NC}"
+            cleanup_port "$port"
+            ports_cleaned=1
+        fi
+    done
+    
+    if [ $ports_cleaned -eq 1 ]; then
+        echo -e "${GREEN}✓ Orphaned processes cleaned up${NC}"
+    fi
     
     echo ""
     if [ $failed -eq 0 ]; then
