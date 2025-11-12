@@ -3,6 +3,7 @@
 export interface ValidationResult {
   isValid: boolean;
   error?: string;
+  errorType?: 'config' | 'cors' | 'ssl' | 'network' | 'timeout' | 'dns' | 'server' | 'unknown';
 }
 
 /**
@@ -12,7 +13,8 @@ export function validateApiBaseUrlConfig(apiBaseUrl: string): ValidationResult {
   if (!apiBaseUrl || apiBaseUrl.trim() === '') {
     return {
       isValid: false,
-      error: 'API_BASE_URL environment variable is not set. Please configure the API base URL.'
+      error: 'API_BASE_URL environment variable is not set. Please configure the API base URL.',
+      errorType: 'config'
     };
   }
 
@@ -22,13 +24,15 @@ export function validateApiBaseUrlConfig(apiBaseUrl: string): ValidationResult {
     if (!url.protocol.startsWith('http')) {
       return {
         isValid: false,
-        error: 'API_BASE_URL must be a valid HTTP or HTTPS URL.'
+        error: 'API_BASE_URL must be a valid HTTP or HTTPS URL.',
+        errorType: 'config'
       };
     }
   } catch {
     return {
       isValid: false,
-      error: 'API_BASE_URL is not a valid URL format.'
+      error: 'API_BASE_URL is not a valid URL format.',
+      errorType: 'config'
     };
   }
 
@@ -56,22 +60,66 @@ export async function validateApiReachability(apiBaseUrl: string): Promise<Valid
     if (!response.ok) {
       return {
         isValid: false,
-        error: `API is not reachable. Server responded with status ${response.status}.`
+        error: `API is not reachable. Server responded with status ${response.status}.`,
+        errorType: 'server'
       };
     }
 
     return { isValid: true };
   } catch (error: any) {
+    // Timeout error
     if (error.name === 'AbortError') {
       return {
         isValid: false,
-        error: 'API health check timed out. The server may be down or unreachable.'
+        error: 'API health check timed out. The server may be down or unreachable.',
+        errorType: 'timeout'
       };
     }
 
+    // Detect specific error types based on error message
+    const errorMessage = error.message?.toLowerCase() || '';
+    
+    // CORS errors
+    if (errorMessage.includes('cors') || errorMessage.includes('cross-origin')) {
+      return {
+        isValid: false,
+        error: 'CORS error: The API server is not configured to accept requests from this origin.',
+        errorType: 'cors'
+      };
+    }
+    
+    // SSL/TLS errors
+    if (errorMessage.includes('ssl') || errorMessage.includes('tls') || errorMessage.includes('certificate')) {
+      return {
+        isValid: false,
+        error: 'SSL/TLS error: There is a problem with the API server\'s security certificate.',
+        errorType: 'ssl'
+      };
+    }
+    
+    // DNS errors
+    if (errorMessage.includes('dns') || errorMessage.includes('resolve') || errorMessage.includes('enotfound')) {
+      return {
+        isValid: false,
+        error: 'DNS error: Cannot resolve the API server hostname. Check your DNS settings or the API URL.',
+        errorType: 'dns'
+      };
+    }
+    
+    // Network errors (including "Failed to fetch")
+    if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('refused') || errorMessage.includes('econnrefused')) {
+      return {
+        isValid: false,
+        error: 'Network error: Cannot connect to the API server. The server may be offline or blocked by a firewall.',
+        errorType: 'network'
+      };
+    }
+
+    // Generic error
     return {
       isValid: false,
-      error: `Failed to connect to API: ${error.message || 'Network error'}`
+      error: `Failed to connect to API: ${error.message || 'Unknown network error'}`,
+      errorType: 'unknown'
     };
   }
 }

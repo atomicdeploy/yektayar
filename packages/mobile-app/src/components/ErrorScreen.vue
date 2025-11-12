@@ -22,19 +22,91 @@
           <div v-if="solutionExpanded" class="solution-content">
             <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
             
-            <p class="solution-text">{{ t('error_screen.fix_instruction') }}</p>
-            <div class="code-block" direction="ltr">
-              <code>./scripts/manage-env.sh</code>
-            </div>
+            <!-- Config error solutions -->
+            <template v-if="errorType === 'config'">
+              <p class="solution-text">{{ t('error_screen.fix_instruction') }}</p>
+              <div class="code-block" direction="ltr">
+                <code>./scripts/manage-env.sh</code>
+              </div>
+              
+              <p class="solution-text">{{ t('error_screen.or') }}</p>
+              
+              <p class="solution-text">{{ t('error_screen.manual_setup') }}</p>
+              <div class="code-block" direction="ltr">
+                <code>API_BASE_URL=http://localhost:3000</code>
+              </div>
+              
+              <p class="solution-note">{{ t('error_screen.restart_note') }}</p>
+            </template>
             
-            <p class="solution-text">{{ t('error_screen.or') }}</p>
+            <!-- Network error solutions -->
+            <template v-else-if="errorType === 'network'">
+              <p class="solution-text">{{ t('error_screen.network_solution_1') }}</p>
+              <ol class="solution-steps">
+                <li>{{ t('error_screen.network_step_1') }}</li>
+                <li>{{ t('error_screen.network_step_2') }}</li>
+                <li>{{ t('error_screen.network_step_3') }}</li>
+                <li>{{ t('error_screen.network_step_4') }}</li>
+              </ol>
+            </template>
             
-            <p class="solution-text">{{ t('error_screen.manual_setup') }}</p>
-            <div class="code-block" direction="ltr">
-              <code>API_BASE_URL=http://localhost:3000</code>
-            </div>
+            <!-- CORS error solutions -->
+            <template v-else-if="errorType === 'cors'">
+              <p class="solution-text">{{ t('error_screen.cors_solution_1') }}</p>
+              <div class="code-block" direction="ltr">
+                <code>CORS_ORIGIN=http://localhost:5173,http://localhost:8100</code>
+              </div>
+              <p class="solution-text">{{ t('error_screen.cors_solution_2') }}</p>
+            </template>
             
-            <p class="solution-note">{{ t('error_screen.restart_note') }}</p>
+            <!-- SSL error solutions -->
+            <template v-else-if="errorType === 'ssl'">
+              <p class="solution-text">{{ t('error_screen.ssl_solution_1') }}</p>
+              <ol class="solution-steps">
+                <li>{{ t('error_screen.ssl_step_1') }}</li>
+                <li>{{ t('error_screen.ssl_step_2') }}</li>
+                <li>{{ t('error_screen.ssl_step_3') }}</li>
+              </ol>
+            </template>
+            
+            <!-- Timeout error solutions -->
+            <template v-else-if="errorType === 'timeout'">
+              <p class="solution-text">{{ t('error_screen.timeout_solution_1') }}</p>
+              <ol class="solution-steps">
+                <li>{{ t('error_screen.timeout_step_1') }}</li>
+                <li>{{ t('error_screen.timeout_step_2') }}</li>
+                <li>{{ t('error_screen.timeout_step_3') }}</li>
+              </ol>
+            </template>
+            
+            <!-- DNS error solutions -->
+            <template v-else-if="errorType === 'dns'">
+              <p class="solution-text">{{ t('error_screen.dns_solution_1') }}</p>
+              <ol class="solution-steps">
+                <li>{{ t('error_screen.dns_step_1') }}</li>
+                <li>{{ t('error_screen.dns_step_2') }}</li>
+                <li>{{ t('error_screen.dns_step_3') }}</li>
+              </ol>
+            </template>
+            
+            <!-- Server error solutions -->
+            <template v-else-if="errorType === 'server'">
+              <p class="solution-text">{{ t('error_screen.server_solution_1') }}</p>
+              <ol class="solution-steps">
+                <li>{{ t('error_screen.server_step_1') }}</li>
+                <li>{{ t('error_screen.server_step_2') }}</li>
+              </ol>
+            </template>
+            
+            <!-- Unknown error solutions -->
+            <template v-else>
+              <p class="solution-text">{{ t('error_screen.unknown_solution_1') }}</p>
+              <ol class="solution-steps">
+                <li>{{ t('error_screen.unknown_step_1') }}</li>
+                <li>{{ t('error_screen.unknown_step_2') }}</li>
+                <li>{{ t('error_screen.unknown_step_3') }}</li>
+              </ol>
+            </template>
           </div>
         </div>
       </div>
@@ -51,10 +123,12 @@ interface Props {
   title?: string
   message: string
   details?: string
+  errorType?: 'config' | 'cors' | 'ssl' | 'network' | 'timeout' | 'dns' | 'server' | 'unknown'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Configuration Error'
+  title: 'Configuration Error',
+  errorType: 'unknown'
 })
 
 const { t, locale } = useI18n()
@@ -80,8 +154,8 @@ const translatedDetails = computed(() => {
 })
 
 const showSolution = computed(() => {
-  // Show solution only if the error is about missing API_BASE_URL
-  return props.details?.includes('API_BASE_URL') || props.details?.includes('VITE_API_BASE_URL')
+  // Show solution for all error types
+  return true
 })
 
 const toggleSolution = () => {
@@ -250,5 +324,21 @@ onMounted(() => {
 
 .dark-mode .solution-note {
   color: #a0a0a0;
+}
+
+.solution-steps {
+  font-size: 0.95rem;
+  color: #495057;
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+  line-height: 1.8;
+}
+
+.dark-mode .solution-steps {
+  color: #c0c0c0;
+}
+
+.solution-steps li {
+  margin-bottom: 0.5rem;
 }
 </style>
