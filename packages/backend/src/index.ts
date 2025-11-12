@@ -20,8 +20,17 @@ const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:51
 const app = new Elysia()
   .use(corsEnabled ? cors({
     origin: corsOrigins,
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposeHeaders: ['Content-Length', 'Content-Type'],
+    maxAge: 86400 // 24 hours
   }) : (app) => app)
+  // Even when CORS is disabled at app level, we need to handle OPTIONS for reverse proxy
+  .options('/*', ({ set }) => {
+    set.status = 204
+    return ''
+  })
   .use(
     swagger({
       documentation: {
