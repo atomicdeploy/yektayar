@@ -21,91 +21,13 @@
         <div v-if="solutionExpanded" class="solution-content">
           <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
           
-          <!-- Config error solutions -->
-          <template v-if="errorType === 'config'">
-            <p class="solution-text">{{ t('error_screen.fix_instruction') }}</p>
-            <div class="code-block" direction="ltr">
-              <code>./scripts/manage-env.sh</code>
-            </div>
-            
-            <p class="solution-text">{{ t('error_screen.or') }}</p>
-            
-            <p class="solution-text">{{ t('error_screen.manual_setup') }}</p>
-            <div class="code-block" direction="ltr">
-              <code>API_BASE_URL=http://localhost:3000</code>
-            </div>
-            
-            <p class="solution-note">{{ t('error_screen.restart_note') }}</p>
-          </template>
+          <p v-if="currentSolution.solution" class="solution-text">{{ currentSolution.solution }}</p>
           
-          <!-- Network error solutions -->
-          <template v-else-if="errorType === 'network'">
-            <p class="solution-text">{{ t('error_screen.network_solution_1') }}</p>
-            <ol class="solution-steps">
-              <li>{{ t('error_screen.network_step_1') }}</li>
-              <li>{{ t('error_screen.network_step_2') }}</li>
-              <li>{{ t('error_screen.network_step_3') }}</li>
-              <li>{{ t('error_screen.network_step_4') }}</li>
-            </ol>
-          </template>
+          <div v-for="(step, index) in currentSolution.steps" :key="index" class="code-block">
+            <code>{{ step }}</code>
+          </div>
           
-          <!-- CORS error solutions -->
-          <template v-else-if="errorType === 'cors'">
-            <p class="solution-text">{{ t('error_screen.cors_solution_1') }}</p>
-            <div class="code-block" direction="ltr">
-              <code>CORS_ORIGIN=http://localhost:5173,http://localhost:8100</code>
-            </div>
-            <p class="solution-text">{{ t('error_screen.cors_solution_2') }}</p>
-          </template>
-          
-          <!-- SSL error solutions -->
-          <template v-else-if="errorType === 'ssl'">
-            <p class="solution-text">{{ t('error_screen.ssl_solution_1') }}</p>
-            <ol class="solution-steps">
-              <li>{{ t('error_screen.ssl_step_1') }}</li>
-              <li>{{ t('error_screen.ssl_step_2') }}</li>
-              <li>{{ t('error_screen.ssl_step_3') }}</li>
-            </ol>
-          </template>
-          
-          <!-- Timeout error solutions -->
-          <template v-else-if="errorType === 'timeout'">
-            <p class="solution-text">{{ t('error_screen.timeout_solution_1') }}</p>
-            <ol class="solution-steps">
-              <li>{{ t('error_screen.timeout_step_1') }}</li>
-              <li>{{ t('error_screen.timeout_step_2') }}</li>
-              <li>{{ t('error_screen.timeout_step_3') }}</li>
-            </ol>
-          </template>
-          
-          <!-- DNS error solutions -->
-          <template v-else-if="errorType === 'dns'">
-            <p class="solution-text">{{ t('error_screen.dns_solution_1') }}</p>
-            <ol class="solution-steps">
-              <li>{{ t('error_screen.dns_step_1') }}</li>
-              <li>{{ t('error_screen.dns_step_2') }}</li>
-              <li>{{ t('error_screen.dns_step_3') }}</li>
-            </ol>
-          </template>
-          
-          <!-- Server error solutions -->
-          <template v-else-if="errorType === 'server'">
-            <p class="solution-text">{{ t('error_screen.server_solution_1') }}</p>
-            <ol class="solution-steps">
-              <li>{{ t('error_screen.server_step_1') }}</li>
-              <li>{{ t('error_screen.server_step_2') }}</li>
-            </ol>
-          </template>
-          
-          <!-- Unknown error solutions -->
-          <template v-else>
-            <p class="solution-text">{{ t('error_screen.unknown_solution_1') }}</p>
-            <ol class="solution-steps">
-              <li>{{ t('error_screen.unknown_step_1') }}</li>
-              <li>{{ t('error_screen.unknown_step_2') }}</li>
-              <li>{{ t('error_screen.unknown_step_3') }}</li>
-            </ol>
-          </template>
+          <p v-if="currentSolution.note" class="solution-note">{{ currentSolution.note }}</p>
         </div>
       </div>
     </div>
@@ -115,17 +37,20 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { Solution } from '../utils/solutions'
 
 interface Props {
   title?: string
   message: string
   details?: string
-  errorType?: 'config' | 'cors' | 'ssl' | 'network' | 'timeout' | 'dns' | 'server' | 'unknown'
+  solution?: Solution | null
+  errorType?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: 'Configuration Error',
-  errorType: 'unknown'
+  solution: null,
+  errorType: undefined
 })
 
 const { t, locale } = useI18n()
@@ -150,9 +75,12 @@ const translatedDetails = computed(() => {
   return props.details
 })
 
+const currentSolution = computed(() => {
+  return props.solution
+})
+
 const showSolution = computed(() => {
-  // Show solution for all error types
-  return true
+  return currentSolution.value !== null && currentSolution.value !== undefined
 })
 
 const toggleSolution = () => {
@@ -326,6 +254,8 @@ onMounted(() => {
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
   overflow-x: auto;
+  direction: ltr;
+  text-align: left;
 }
 
 .dark-mode .code-block {
@@ -338,6 +268,7 @@ onMounted(() => {
   font-size: 0.875rem;
   color: #e83e8c;
   white-space: pre;
+  direction: ltr;
 }
 
 .dark-mode .code-block code {
@@ -353,21 +284,5 @@ onMounted(() => {
 
 .dark-mode .solution-note {
   color: #a0a0a0;
-}
-
-.solution-steps {
-  font-size: 0.95rem;
-  color: #495057;
-  margin: 0.75rem 0;
-  padding-left: 1.5rem;
-  line-height: 1.8;
-}
-
-.dark-mode .solution-steps {
-  color: #c0c0c0;
-}
-
-.solution-steps li {
-  margin-bottom: 0.5rem;
 }
 </style>
