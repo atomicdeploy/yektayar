@@ -28,7 +28,10 @@
               <code>{{ step }}</code>
             </div>
             
-            <p v-if="currentSolution.note" class="solution-note">{{ currentSolution.note }}</p>
+            <p v-if="currentSolution.note" class="solution-note">
+              <span class="info-icon">ℹ️</span>
+              <span class="note-text">{{ currentSolution.note }}</span>
+            </p>
           </div>
         </div>
       </div>
@@ -251,6 +254,21 @@ onMounted(() => {
   color: #6c757d;
   font-style: italic;
   margin-top: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  direction: ltr;
+  text-align: left;
+}
+
+.info-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.note-text {
+  flex: 1;
 }
 
 .dark-mode .solution-note {
