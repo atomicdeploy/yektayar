@@ -28,12 +28,25 @@ BACKEND_PORT=${PORT:-3000}
 ADMIN_PORT=${VITE_ADMIN_PORT:-5173}
 MOBILE_PORT=${VITE_MOBILE_PORT:-8100}
 
+# Function to detect if running in screen or script session
+is_multiplexer_session() {
+    # Check for GNU screen
+    [ -n "$STY" ] && return 0
+    # Check for tmux
+    [ -n "$TMUX" ] && return 0
+    # Check if running inside script command (checks for script in parent process tree)
+    if ps -o comm= -p $PPID 2>/dev/null | grep -q "script"; then
+        return 0
+    fi
+    return 1
+}
+
 # Function to show usage
 show_usage() {
     echo -e "${BLUE}YektaYar Development Mode Runner${NC}"
     echo -e ""
     echo -e "${CYAN}Usage:${NC}"
-    echo -e "    $0 {backend|admin|mobile|all|stop|logs|status} [options]"
+    echo -e "    $0 {backend|admin|mobile|all|stop|logs|status|interact} [options]"
     echo -e ""
     echo -e "${CYAN}Services:${NC}"
     echo -e "    ${GREEN}backend${NC}      - Backend API server (port $BACKEND_PORT)"
@@ -43,19 +56,25 @@ show_usage() {
     echo -e ""
     echo -e "${CYAN}Commands:${NC}"
     echo -e "    ${GREEN}stop${NC}         - Stop all detached services"
-    echo -e "    ${GREEN}logs${NC}         - Display logs from detached services"
+    echo -e "    ${GREEN}logs${NC}         - Display logs from detached services (interactive)"
+    echo -e "    ${GREEN}interact${NC}     - Send interactive input to a detached service"
     echo -e "    ${GREEN}status${NC}       - Show status of services"
     echo -e ""
     echo -e "${CYAN}Options:${NC}"
-    echo -e "    ${GREEN}--detached${NC}   - Run in background"
+    echo -e "    ${GREEN}--detached${NC}   - Run in background (auto-detected in screen/tmux/script)"
     echo -e "    ${GREEN}--pm2${NC}        - Use PM2 for process management"
     echo -e "    ${GREEN}--force${NC}      - Force kill processes (with stop command)"
+    echo -e "    ${GREEN}--follow${NC}     - Use live follow mode for logs (default)"
+    echo -e "    ${GREEN}--pager${NC}      - Use less pager for logs (allows scrollback)"
     echo -e ""
     echo -e "${CYAN}Examples:${NC}"
     echo -e "    $0 backend           # Run backend in foreground"
     echo -e "    $0 all --detached    # Run all services in background"
+    echo -e "    $0 all               # In screen/tmux: auto-detached"
     echo -e "    $0 backend --pm2     # Run backend with PM2"
-    echo -e "    $0 logs backend      # Show backend logs"
+    echo -e "    $0 logs backend      # Show backend logs (live follow)"
+    echo -e "    $0 logs backend --pager  # Show backend logs with less (scrollback)"
+    echo -e "    $0 interact backend  # Send input to backend service"
     echo -e "    $0 status            # Show service status"
     echo -e "    $0 stop              # Stop all detached services gracefully"
     echo -e "    $0 stop --force      # Force kill all services immediately"
@@ -477,6 +496,114 @@ stop_services() {
     fi
 }
 
+# Function to send interactive input to a detached service
+interact_with_service() {
+    local service=$1
+    local service_name=""
+    local pid_file=""
+    
+    case "$service" in
+        backend)
+            service_name="Backend"
+            pid_file="/tmp/yektayar-backend.pid"
+            ;;
+        admin|admin-panel)
+            service_name="Admin Panel"
+            pid_file="/tmp/yektayar-admin.pid"
+            ;;
+        mobile|mobile-app)
+            service_name="Mobile App"
+            pid_file="/tmp/yektayar-mobile.pid"
+            ;;
+        *)
+            echo -e "${RED}Unknown service: $service${NC}"
+            echo "Available services: backend, admin, mobile"
+            exit 1
+            ;;
+    esac
+    
+    if [ ! -f "$pid_file" ]; then
+        echo -e "${RED}✗ ${service_name} is not running in detached mode${NC}"
+        echo "  Start it with: $0 $service --detached"
+        exit 1
+    fi
+    
+    local pid=$(cat "$pid_file")
+    
+    if ! kill -0 "$pid" 2>/dev/null; then
+        echo -e "${RED}✗ ${service_name} process is not running${NC}"
+        exit 1
+    fi
+    
+    echo -e "${BLUE}=== Interactive mode for ${service_name} (PID: $pid) ===${NC}"
+    echo -e "${YELLOW}Note: Services run in background cannot receive direct terminal input.${NC}"
+    echo -e "${YELLOW}This feature sends signals to the process for common actions.${NC}"
+    echo ""
+    echo -e "${CYAN}Available actions:${NC}"
+    echo -e "  ${GREEN}1${NC} - Send SIGUSR1 (custom signal, app-specific)"
+    echo -e "  ${GREEN}2${NC} - Send SIGUSR2 (custom signal, app-specific)"
+    echo -e "  ${GREEN}r${NC} - Restart service"
+    echo -e "  ${GREEN}s${NC} - Show service status"
+    echo -e "  ${GREEN}l${NC} - Show logs"
+    echo -e "  ${GREEN}q${NC} - Quit interactive mode"
+    echo ""
+    
+    while true; do
+        read -p "Enter action: " action
+        case "$action" in
+            1)
+                echo "Sending SIGUSR1 to $service_name..."
+                kill -USR1 "$pid" 2>/dev/null && echo -e "${GREEN}Signal sent${NC}" || echo -e "${RED}Failed to send signal${NC}"
+                ;;
+            2)
+                echo "Sending SIGUSR2 to $service_name..."
+                kill -USR2 "$pid" 2>/dev/null && echo -e "${GREEN}Signal sent${NC}" || echo -e "${RED}Failed to send signal${NC}"
+                ;;
+            r|R)
+                echo "Restarting $service_name..."
+                stop_service "$service_name" "$pid_file" "" "" false
+                sleep 2
+                case "$service" in
+                    backend) run_backend "detached" "false" ;;
+                    admin|admin-panel) run_admin "detached" "false" ;;
+                    mobile|mobile-app) run_mobile "detached" "false" ;;
+                esac
+                echo -e "${GREEN}Service restarted${NC}"
+                exit 0
+                ;;
+            s|S)
+                if kill -0 "$pid" 2>/dev/null; then
+                    echo -e "${GREEN}$service_name is running (PID: $pid)${NC}"
+                else
+                    echo -e "${RED}$service_name is not running${NC}"
+                    exit 1
+                fi
+                ;;
+            l|L)
+                local log_file=""
+                case "$service" in
+                    backend) log_file="/tmp/yektayar-backend.log" ;;
+                    admin|admin-panel) log_file="/tmp/yektayar-admin.log" ;;
+                    mobile|mobile-app) log_file="/tmp/yektayar-mobile.log" ;;
+                esac
+                if [ -f "$log_file" ]; then
+                    tail -20 "$log_file"
+                else
+                    echo -e "${RED}Log file not found${NC}"
+                fi
+                ;;
+            q|Q)
+                echo "Exiting interactive mode"
+                exit 0
+                ;;
+            *)
+                echo -e "${YELLOW}Unknown action. Please try again.${NC}"
+                ;;
+        esac
+        echo ""
+    done
+}
+
 # Function to show service status
 show_status() {
     local use_pm2=${1:-false}
@@ -564,14 +691,22 @@ show_status() {
 # Function to show logs
 show_logs() {
     local service=$1
+    local use_pager=${2:-false}
     
     case "$service" in
         backend)
             if [ -f /tmp/yektayar-backend.log ]; then
                 echo -e "${BLUE}=== Backend Logs ===${NC}"
                 echo -e "${YELLOW}Log file: /tmp/yektayar-backend.log${NC}"
-                echo ""
-                tail -f /tmp/yektayar-backend.log
+                if [ "$use_pager" = "true" ] && command_exists less; then
+                    echo -e "${CYAN}Using less pager (press 'q' to quit, 'F' to follow, 'Ctrl+C' then 'F' to resume following)${NC}"
+                    echo ""
+                    less +F /tmp/yektayar-backend.log
+                else
+                    echo -e "${CYAN}Following logs (press Ctrl+C to exit)${NC}"
+                    echo ""
+                    tail -f /tmp/yektayar-backend.log
+                fi
             else
                 echo -e "${RED}✗ Backend log file not found${NC}"
                 echo "  Make sure backend is running in detached mode"
@@ -582,8 +717,15 @@ show_logs() {
             if [ -f /tmp/yektayar-admin.log ]; then
                 echo -e "${BLUE}=== Admin Panel Logs ===${NC}"
                 echo -e "${YELLOW}Log file: /tmp/yektayar-admin.log${NC}"
-                echo ""
-                tail -f /tmp/yektayar-admin.log
+                if [ "$use_pager" = "true" ] && command_exists less; then
+                    echo -e "${CYAN}Using less pager (press 'q' to quit, 'F' to follow, 'Ctrl+C' then 'F' to resume following)${NC}"
+                    echo ""
+                    less +F /tmp/yektayar-admin.log
+                else
+                    echo -e "${CYAN}Following logs (press Ctrl+C to exit)${NC}"
+                    echo ""
+                    tail -f /tmp/yektayar-admin.log
+                fi
             else
                 echo -e "${RED}✗ Admin Panel log file not found${NC}"
                 echo "  Make sure admin panel is running in detached mode"
@@ -594,8 +736,15 @@ show_logs() {
             if [ -f /tmp/yektayar-mobile.log ]; then
                 echo -e "${BLUE}=== Mobile App Logs ===${NC}"
                 echo -e "${YELLOW}Log file: /tmp/yektayar-mobile.log${NC}"
-                echo ""
-                tail -f /tmp/yektayar-mobile.log
+                if [ "$use_pager" = "true" ] && command_exists less; then
+                    echo -e "${CYAN}Using less pager (press 'q' to quit, 'F' to follow, 'Ctrl+C' then 'F' to resume following)${NC}"
+                    echo ""
+                    less +F /tmp/yektayar-mobile.log
+                else
+                    echo -e "${CYAN}Following logs (press Ctrl+C to exit)${NC}"
+                    echo ""
+                    tail -f /tmp/yektayar-mobile.log
+                fi
             else
                 echo -e "${RED}✗ Mobile App log file not found${NC}"
                 echo "  Make sure mobile app is running in detached mode"
@@ -626,8 +775,6 @@ show_logs() {
             fi
             
             echo ""
-            echo -e "${CYAN}Press Ctrl+C to exit${NC}"
-            echo ""
             
             # Use tail to follow all available logs
             local tail_args=()
@@ -635,7 +782,26 @@ show_logs() {
             [ -f /tmp/yektayar-admin.log ] && tail_args+=("/tmp/yektayar-admin.log")
             [ -f /tmp/yektayar-mobile.log ] && tail_args+=("/tmp/yektayar-mobile.log")
             
-            tail -f "${tail_args[@]}"
+            if [ "$use_pager" = "true" ] && command_exists less; then
+                echo -e "${CYAN}Using less pager for multiple logs${NC}"
+                echo -e "${CYAN}Note: Multiple log files shown sequentially${NC}"
+                echo -e "${CYAN}(press 'q' to quit, 'F' to follow, 'Ctrl+C' then 'F' to resume following)${NC}"
+                echo ""
+                # For multiple files, we'll use multitail if available, otherwise just tail
+                if command_exists multitail; then
+                    multitail "${tail_args[@]}"
+                else
+                    # Show all files with less, using +F for follow mode
+                    for log_file in "${tail_args[@]}"; do
+                        echo -e "${YELLOW}==> $log_file <==${NC}"
+                    done
+                    tail -f "${tail_args[@]}"
+                fi
+            else
+                echo -e "${CYAN}Following logs (press Ctrl+C to exit)${NC}"
+                echo ""
+                tail -f "${tail_args[@]}"
+            fi
             ;;
         *)
             echo -e "${RED}Unknown service: $service${NC}"
@@ -655,6 +821,13 @@ SERVICE=$1
 MODE="foreground"
 USE_PM2=false
 FORCE_KILL=false
+USE_PAGER=false
+
+# Auto-detect if running in screen/tmux/script and default to detached mode
+if is_multiplexer_session; then
+    MODE="detached"
+    echo -e "${CYAN}ℹ Detected screen/tmux/script session - auto-enabling detached mode${NC}"
+fi
 
 # Parse options
 shift
@@ -669,6 +842,12 @@ while [ $# -gt 0 ]; do
             ;;
         --force)
             FORCE_KILL=true
+            ;;
+        --pager)
+            USE_PAGER=true
+            ;;
+        --follow)
+            USE_PAGER=false
             ;;
         *)
             # Could be a service name for logs/status command
@@ -714,6 +893,10 @@ case "$SERVICE" in
             else
                 echo -e "${CYAN}To view logs:${NC}"
                 echo "  $0 logs [backend|admin|mobile|all]"
+                echo "  $0 logs backend --pager  # with scrollback support"
+                echo ""
+                echo -e "${CYAN}To interact with a service:${NC}"
+                echo "  $0 interact [backend|admin|mobile]"
                 echo ""
                 echo -e "${CYAN}To check status:${NC}"
                 echo "  $0 status"
@@ -723,7 +906,7 @@ case "$SERVICE" in
             fi
         else
             echo -e "${RED}Error: Running all services in foreground mode requires a terminal multiplexer${NC}"
-            echo "Please use --detached flag or run services individually in separate terminals"
+            echo "Please use --detached flag, run in screen/tmux, or run services individually"
             exit 1
         fi
         ;;
@@ -762,8 +945,21 @@ case "$SERVICE" in
                 pm2 logs
             fi
         else
-            show_logs "$EXTRA_ARG"
+            show_logs "$EXTRA_ARG" "$USE_PAGER"
         fi
+        ;;
+    interact)
+        if [ "$USE_PM2" = "true" ]; then
+            echo -e "${RED}✗ Interactive mode is not supported with PM2${NC}"
+            echo "  Use 'pm2 logs' to view logs instead"
+            exit 1
+        fi
+        if [ -z "$EXTRA_ARG" ]; then
+            echo -e "${RED}✗ Please specify a service to interact with${NC}"
+            echo "  Usage: $0 interact [backend|admin|mobile]"
+            exit 1
+        fi
+        interact_with_service "$EXTRA_ARG"
         ;;
     help|--help|-h)
         show_usage
