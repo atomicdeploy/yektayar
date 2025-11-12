@@ -1,5 +1,7 @@
 import { Elysia } from 'elysia'
 import { createAnonymousSession, validateSessionToken, invalidateSession } from '../services/sessionService'
+import { createOTP, verifyOTP } from '../services/otpService'
+import { sendOTPSMS, validatePhoneNumber } from '../services/smsService'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request }) => {
@@ -91,17 +93,98 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
     }
   })
   .post('/otp/send', async ({ body }) => {
-    // TODO: Implement OTP sending
-    return {
-      success: true,
-      message: 'OTP send endpoint - to be implemented'
+    try {
+      // Extract phone number from body
+      const { phoneNumber } = body as { phoneNumber: string };
+
+      // Validate phone number
+      if (!phoneNumber) {
+        return {
+          success: false,
+          error: 'Phone number is required',
+          message: 'Please provide a valid phone number'
+        };
+      }
+
+      if (!validatePhoneNumber(phoneNumber)) {
+        return {
+          success: false,
+          error: 'Invalid phone number format',
+          message: 'Phone number must be in Iranian format (09xxxxxxxxx)'
+        };
+      }
+
+      // Create OTP
+      const otp = createOTP(phoneNumber);
+
+      // Send SMS
+      await sendOTPSMS(phoneNumber, otp);
+
+      return {
+        success: true,
+        message: 'OTP sent successfully to your phone number',
+        data: {
+          phoneNumber: phoneNumber.substring(0, 5) + '***' + phoneNumber.substring(phoneNumber.length - 2),
+          expiresIn: 300 // 5 minutes in seconds
+        }
+      };
+    } catch (error: any) {
+      console.error('Error sending OTP:', error);
+      return {
+        success: false,
+        error: 'Failed to send OTP',
+        message: error.message || 'Could not send OTP. Please try again.'
+      };
     }
   })
   .post('/otp/verify', async ({ body }) => {
-    // TODO: Implement OTP verification
-    return {
-      success: true,
-      message: 'OTP verify endpoint - to be implemented'
+    try {
+      // Extract phone number and OTP from body
+      const { phoneNumber, otp } = body as { phoneNumber: string; otp: string };
+
+      // Validate inputs
+      if (!phoneNumber || !otp) {
+        return {
+          success: false,
+          error: 'Missing required fields',
+          message: 'Phone number and OTP code are required'
+        };
+      }
+
+      if (!validatePhoneNumber(phoneNumber)) {
+        return {
+          success: false,
+          error: 'Invalid phone number format',
+          message: 'Phone number must be in Iranian format (09xxxxxxxxx)'
+        };
+      }
+
+      // Verify OTP
+      const result = verifyOTP(phoneNumber, otp);
+
+      if (!result.success) {
+        return {
+          success: false,
+          error: 'OTP verification failed',
+          message: result.message
+        };
+      }
+
+      return {
+        success: true,
+        message: result.message,
+        data: {
+          phoneNumber: phoneNumber.substring(0, 5) + '***' + phoneNumber.substring(phoneNumber.length - 2),
+          verified: true
+        }
+      };
+    } catch (error: any) {
+      console.error('Error verifying OTP:', error);
+      return {
+        success: false,
+        error: 'Failed to verify OTP',
+        message: error.message || 'Could not verify OTP. Please try again.'
+      };
     }
   })
   .post('/logout', async ({ headers }) => {
