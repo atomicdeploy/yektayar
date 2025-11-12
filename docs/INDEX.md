@@ -69,6 +69,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - [Ubuntu 24.04 Deployment](UBUNTU-24-DEPLOYMENT.md) - VPS deployment
 - [Network Configuration](NETWORK-CONFIGURATION.md) - Network setup
 - [Bun vs NPM](BUN-VS-NPM.md) - Runtime guide
+- [Telegram Bot Integration](TELEGRAM-BOT.md) - Telegram bot setup and usage
 
 ### Project Management
 - [Implementation Roadmap](../ROADMAP.md) - Production roadmap with prototype sprint details
@@ -100,7 +101,8 @@ yektayar/
     ├── SETUP.md                   # Setup guide (all phases)
     ├── UBUNTU-24-DEPLOYMENT.md    # Ubuntu VPS deployment
     ├── NETWORK-CONFIGURATION.md   # Network configuration
-    └── BUN-VS-NPM.md             # Bun vs NPM guide
+    ├── BUN-VS-NPM.md             # Bun vs NPM guide
+    └── TELEGRAM-BOT.md           # Telegram bot integration
 ```
 
 ---
@@ -154,6 +156,7 @@ yektayar/
 - **Deployment**: [Setup Guide](SETUP.md), [Ubuntu Deployment](UBUNTU-24-DEPLOYMENT.md)
 - **API**: [Architecture](ARCHITECTURE.md), [Development Guide](../DEVELOPMENT.md)
 - **WebSocket**: [Architecture](ARCHITECTURE.md), [Setup Guide](SETUP.md)
+- **Telegram Bot**: [Telegram Bot Integration](TELEGRAM-BOT.md), [Scripts README](../scripts/README.md)
 - **Prototype Sprint**: [Development Guide](../DEVELOPMENT.md), [Roadmap](../ROADMAP.md)
 
 ---

@@ -4,6 +4,71 @@ This directory contains scripts and service configurations for deploying and man
 
 ## Contents
 
+### Telegram Bot Management
+
+#### `manage-telegram-bot.sh`
+
+Manages Telegram bot configuration and setup for YektaYar platform.
+
+**Usage:**
+```bash
+./scripts/manage-telegram-bot.sh [command]
+```
+
+**Commands:**
+- `setup` - Interactive setup for bot token and admin chat ID
+- `config` - Show current configuration
+- `test` - Test bot connection
+- `test-message` - Send a test message to admin chat
+- `help` - Show help message
+
+**What it does:**
+- Configures Telegram bot token from BotFather
+- Sets up admin chat ID for notifications
+- Tests bot connectivity
+- Sends test notifications
+- Updates `.env` file with bot configuration
+
+**Features:**
+- ✅ Interactive setup wizard
+- ✅ Configuration validation
+- ✅ Connection testing
+- ✅ Test message sending
+- ✅ Secure token handling
+
+**Examples:**
+```bash
+# Interactive setup
+./scripts/manage-telegram-bot.sh setup
+
+# Show current configuration
+./scripts/manage-telegram-bot.sh config
+
+# Test bot connection
+./scripts/manage-telegram-bot.sh test
+
+# Send test notification
+./scripts/manage-telegram-bot.sh test-message
+```
+
+**NPM Scripts:**
+```bash
+# Use via npm for convenience
+npm run telegram:setup
+npm run telegram:config
+npm run telegram:test
+npm run telegram:test-message
+```
+
+**Environment Variables Configured:**
+- `TELEGRAM_BOT_TOKEN` - Bot token from @BotFather
+- `TELEGRAM_ADMIN_CHAT_ID` - Admin chat for notifications
+- `TELEGRAM_CHANNEL_ID` - Optional channel for broadcasts
+- `TELEGRAM_WEBHOOK_URL` - Optional webhook for production
+
+**Documentation:**
+- [Telegram Bot Setup Guide](../docs/TELEGRAM-BOT.md) - Complete setup and usage documentation
+
 ### Environment Management
 
 #### `manage-env.sh`
