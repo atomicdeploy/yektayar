@@ -23,14 +23,14 @@
             <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
             
             <p class="solution-text">{{ t('error_screen.fix_instruction') }}</p>
-            <div class="code-block">
+            <div class="code-block" direction="ltr">
               <code>./scripts/manage-env.sh</code>
             </div>
             
             <p class="solution-text">{{ t('error_screen.or') }}</p>
             
             <p class="solution-text">{{ t('error_screen.manual_setup') }}</p>
-            <div class="code-block">
+            <div class="code-block" direction="ltr">
               <code>API_BASE_URL=http://localhost:3000</code>
             </div>
             
