@@ -134,6 +134,7 @@ Priority order: `.env.local` > `.env.production` > `.env`
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `CORS_ORIGIN` | Yes | - | Allowed CORS origins (comma-separated) |
+| `DISABLE_CORS` | No | `false` | Set to `true` when behind reverse proxy (Apache/Nginx) handling CORS |
 | `WEBSOCKET_PORT` | Yes | `3001` | WebSocket server port |
 
 ### Rate Limiting

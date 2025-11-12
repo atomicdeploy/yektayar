@@ -41,7 +41,8 @@ async function initializeApp() {
     const errorApp = createApp(ErrorScreen, {
       title: 'API Configuration Error',
       message: 'Cannot start the admin panel due to API configuration issues.',
-      details: validationResult.error
+      details: validationResult.error,
+      errorType: validationResult.errorType
     })
     
     errorApp.use(i18n)
