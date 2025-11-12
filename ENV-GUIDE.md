@@ -143,6 +143,15 @@ Priority order: `.env.local` > `.env.production` > `.env`
 | `RATE_LIMIT_WINDOW` | Yes | `15` | Rate limit window (minutes) |
 | `RATE_LIMIT_MAX_REQUESTS` | Yes | `100` | Max requests per window |
 
+### API Documentation Protection
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `SWAGGER_USERNAME` | Yes (production) | `admin` | Username for accessing API documentation |
+| `SWAGGER_PASSWORD` | Yes (production) | - | Password for accessing API documentation (must be secure) |
+
+> **Note**: The API documentation endpoint (previously `/swagger`, now `/api-docs`) is protected with Basic Authentication. These credentials are required to access the API documentation in all environments.
+
 ### Frontend Configuration
 
 | Variable | Required | Default | Description |
