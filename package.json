@@ -22,7 +22,11 @@
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
-    "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android"
+    "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android",
+    "telegram:setup": "./scripts/manage-telegram-bot.sh setup",
+    "telegram:config": "./scripts/manage-telegram-bot.sh config",
+    "telegram:test": "./scripts/manage-telegram-bot.sh test",
+    "telegram:test-message": "./scripts/manage-telegram-bot.sh test-message"
   },
   "keywords": [
     "mental-health",
