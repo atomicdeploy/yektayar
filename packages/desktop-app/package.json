@@ -1,0 +1,67 @@
+{
+  "name": "@yektayar/desktop-app",
+  "version": "0.1.0",
+  "description": "YektaYar Desktop App (Electron wrapper for Admin Panel)",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "npm run build:web && electron .",
+    "build": "npm run build:web && npm run build:electron",
+    "build:web": "cd ../admin-panel && npm run build",
+    "build:electron": "electron-builder --win",
+    "build:electron:dir": "electron-builder --win --dir"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@capacitor-community/electron": "^5.0.1",
+    "@capacitor/cli": "^7.4.4",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.yektayar.desktop",
+    "productName": "YektaYar Admin",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "!electron/**/*.map",
+      {
+        "from": "../admin-panel/dist",
+        "to": "build",
+        "filter": ["**/*"]
+      }
+    ],
+    "extraResources": [
+      {
+        "from": ".env.example",
+        "to": ".env.example"
+      },
+      {
+        "from": "config.example.json",
+        "to": "config.example.json"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

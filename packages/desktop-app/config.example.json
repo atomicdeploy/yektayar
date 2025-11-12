@@ -1,0 +1,6 @@
+{
+  "apiBaseUrl": "http://localhost:3000",
+  "environment": "production",
+  "appName": "YektaYar Admin",
+  "version": "0.1.0"
+}

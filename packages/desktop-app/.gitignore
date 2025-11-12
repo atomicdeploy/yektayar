@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/index.html
+
+# Environment files
+.env
+
+# Config files (user-specific)
+config.json
+
+# Electron
+electron-builder.yml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
