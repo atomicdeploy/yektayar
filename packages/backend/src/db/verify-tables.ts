@@ -1,5 +1,5 @@
-import { getDatabase } from './connection'
-import { REQUIRED_TABLES, OPTIONAL_TABLES, ALL_TABLES, type TableDefinition } from './schema'
+import { getDatabase } from './connection.js'
+import { REQUIRED_TABLES, OPTIONAL_TABLES, ALL_TABLES, type TableDefinition } from './schema.js'
 
 interface VerificationResult {
   success: boolean

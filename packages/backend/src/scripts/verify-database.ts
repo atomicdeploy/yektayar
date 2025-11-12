@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Standalone script to verify database tables
- * Usage: bun run src/scripts/verify-database.ts
+ * Usage: npm run verify-db
  */
 
-import { initializeDatabase, closeDatabase, printTableVerificationReport } from '../db'
+import { initializeDatabase, closeDatabase, printTableVerificationReport } from '../db/index.js'
 
 async function main() {
   console.log('🔍 Starting database verification...\n')

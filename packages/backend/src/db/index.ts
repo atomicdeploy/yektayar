@@ -3,13 +3,13 @@ export {
   getDatabase,
   closeDatabase,
   verifyConnection,
-} from './connection'
+} from './connection.js'
 
 export {
   verifyTables,
   printTableVerificationReport,
   verifyTablesOrFail,
-} from './verify-tables'
+} from './verify-tables.js'
 
 export {
   REQUIRED_TABLES,
@@ -22,4 +22,4 @@ export {
   CREATE_USER_GROUPS_TABLE,
   CREATE_USER_IDENTIFIERS_TABLE,
   type TableDefinition,
-} from './schema'
+} from './schema.js'

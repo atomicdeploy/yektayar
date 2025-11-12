@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { createAnonymousSession, validateSessionToken, invalidateSession } from '../services/sessionService'
+import { createAnonymousSession, validateSessionToken, invalidateSession } from '../services/sessionService.js'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request }) => {
