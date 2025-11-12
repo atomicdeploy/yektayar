@@ -132,16 +132,30 @@ export function isValidJWTFormat(token: string): boolean {
     return false
   }
   
-  // Each part should be base64url encoded
+  // Each part should be base64url encoded and have minimum length
   const base64UrlRegex = /^[A-Za-z0-9_-]+$/
   
   for (const part of parts) {
-    if (!part || !base64UrlRegex.test(part)) {
+    if (!part || part.length < 2 || !base64UrlRegex.test(part)) {
       return false
     }
   }
   
-  return true
+  // Try to decode header and payload to ensure they're valid JSON
+  try {
+    const header = JSON.parse(base64UrlDecode(parts[0]))
+    const payload = JSON.parse(base64UrlDecode(parts[1]))
+    
+    // Basic validation: header should have alg and typ
+    if (!header.alg || !header.typ) {
+      return false
+    }
+    
+    return true
+  } catch (error) {
+    // Decoding failed, not a valid JWT
+    return false
+  }
 }
 
 /**
