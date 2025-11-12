@@ -94,27 +94,17 @@ async function initializeApp() {
 
   router.isReady().then(() => {
     app.mount('#app')
+    
+    // Acquire session after app is mounted
+    const sessionStore = useSessionStore()
+    sessionStore.acquireSession().catch((error) => {
+      logger.error('Failed to acquire session on startup:', error)
+      // Continue anyway - session will be acquired on next attempt
+    })
   })
 }
 
 // Start initialization
 initializeApp().catch((error) => {
   console.error('Failed to initialize app:', error)
-const app = createApp(App)
-const pinia = createPinia()
-
-app.use(IonicVue)
-app.use(pinia)
-app.use(router)
-app.use(i18n)
-
-router.isReady().then(() => {
-  app.mount('#app')
-  
-  // Acquire session after app is mounted
-  const sessionStore = useSessionStore()
-  sessionStore.acquireSession().catch((error) => {
-    logger.error('Failed to acquire session on startup:', error)
-    // Continue anyway - session will be acquired on next attempt
-  })
 })

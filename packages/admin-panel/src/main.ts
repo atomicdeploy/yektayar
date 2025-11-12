@@ -75,13 +75,4 @@ initializeApp().catch((error) => {
   console.error('Failed to initialize app:', error)
 })
 
-// TODO: where do we move the lines below?
-
-// Acquire session on app startup
-const sessionStore = useSessionStore()
-sessionStore.acquireSession().catch((error) => {
-  logger.error('Failed to acquire session on startup:', error)
-  // Continue anyway - session will be acquired on next attempt
-})
-
 
