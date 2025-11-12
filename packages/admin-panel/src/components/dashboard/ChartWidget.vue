@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed, toRaw } from 'vue'
 import { useDark } from '@vueuse/core'
 import {
   Chart,
@@ -61,6 +61,7 @@ const props = withDefaults(defineProps<Props>(), {
 const chartCanvas = ref<HTMLCanvasElement | null>(null)
 const chartInstance = ref<Chart | null>(null)
 const isDark = useDark()
+const isInitializing = ref(false)
 
 const chartOptions = computed(() => {
   const textColor = isDark.value ? '#e5e7eb' : '#374151'
@@ -122,23 +123,39 @@ const chartOptions = computed(() => {
 })
 
 function createChart() {
-  if (!chartCanvas.value) return
+  if (!chartCanvas.value || isInitializing.value) return
+  
+  isInitializing.value = true
 
-  const config: ChartConfiguration = {
-    type: props.type,
-    data: props.data,
-    options: chartOptions.value,
+  try {
+    // Deep clone and convert to plain object to avoid Vue reactivity issues
+    const plainData = JSON.parse(JSON.stringify(toRaw(props.data)))
+    const plainOptions = JSON.parse(JSON.stringify(toRaw(chartOptions.value)))
+
+    const config: ChartConfiguration = {
+      type: props.type,
+      data: plainData,
+      options: plainOptions,
+    }
+
+    chartInstance.value = new Chart(chartCanvas.value, config)
+  } catch (error) {
+    console.error('Error creating chart:', error)
+  } finally {
+    isInitializing.value = false
   }
-
-  chartInstance.value = new Chart(chartCanvas.value, config)
 }
 
 function updateChart() {
-  if (!chartInstance.value) return
+  if (!chartInstance.value || isInitializing.value) return
 
-  chartInstance.value.data = props.data
-  chartInstance.value.options = chartOptions.value
-  chartInstance.value.update()
+  try {
+    // Destroy and recreate chart instead of updating to avoid reactivity issues
+    destroyChart()
+    createChart()
+  } catch (error) {
+    console.error('Error updating chart:', error)
+  }
 }
 
 function destroyChart() {
@@ -156,6 +173,17 @@ onUnmounted(() => {
   destroyChart()
 })
 
-watch(() => props.data, updateChart, { deep: true })
-watch(isDark, updateChart)
+// Watch for data changes - use immediate: false to prevent initial double-render
+watch(() => JSON.stringify(props.data), () => {
+  if (chartInstance.value) {
+    updateChart()
+  }
+})
+
+// Watch for dark mode changes
+watch(isDark, () => {
+  if (chartInstance.value) {
+    updateChart()
+  }
+})
 </script>
