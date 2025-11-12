@@ -51,6 +51,7 @@ async function initializeApp() {
       details: validationResult.error,
       solution: solution,
       errorType: validationResult.errorType
+      errorType: validationResult.errorType
     })
     
     errorApp.use(i18n)
