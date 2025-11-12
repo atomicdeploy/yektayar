@@ -23,6 +23,16 @@ The installer will be created in `packages/desktop-app/dist/`.
 
 ## Manual Build Process
 
+### Step 0: Generate Icons (if not already done)
+
+From the project root:
+
+```bash
+npm run generate:icons
+```
+
+This generates the application icon (256x256 PNG) in the `build/` directory.
+
 ### Step 1: Install Dependencies
 
 ```bash
