@@ -207,6 +207,7 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 
 #### Additional Resources
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
+- **[CORS Fix Documentation](CORS-FIX.md)** - CORS OPTIONS verb support implementation
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 
