@@ -26,8 +26,8 @@ The desktop app supports two methods of configuration:
 Create a `.env` file in the installation directory:
 
 ```env
-VITE_API_BASE_URL=https://api.yektayar.ir
-VITE_ENVIRONMENT=production
+API_BASE_URL=https://api.yektayar.ir
+ENVIRONMENT=production
 ```
 
 ### 2. Config File (`config.json`)
@@ -123,7 +123,7 @@ desktop-app/
 
 ### Issue: App doesn't connect to API
 
-**Solution**: Check your `.env` or `config.json` file and ensure `VITE_API_BASE_URL` or `apiBaseUrl` points to the correct backend server.
+**Solution**: Check your `.env` or `config.json` file and ensure `API_BASE_URL` or `apiBaseUrl` points to the correct backend server.
 
 ### Issue: Build fails on non-Windows platform
 

@@ -31,9 +31,8 @@ function getApiUrl() {
   const config = loadConfig();
   
   // Priority: .env > config.json > default
-  return process.env.VITE_API_BASE_URL || 
+  return process.env.API_BASE_URL || 
          config.apiBaseUrl || 
-         config.VITE_API_BASE_URL || 
          'http://localhost:3000';
 }
 
@@ -41,9 +40,8 @@ function getApiUrl() {
 function getEnvironment() {
   const config = loadConfig();
   
-  return process.env.VITE_ENVIRONMENT || 
+  return process.env.ENVIRONMENT || 
          config.environment || 
-         config.VITE_ENVIRONMENT || 
          'production';
 }
 

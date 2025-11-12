@@ -85,8 +85,8 @@ The built application will look for configuration files in the installation dire
 
 Example `.env`:
 ```env
-VITE_API_BASE_URL=https://api.yektayar.ir
-VITE_ENVIRONMENT=production
+API_BASE_URL=https://api.yektayar.ir
+ENVIRONMENT=production
 ```
 
 Example `config.json`:
@@ -150,7 +150,7 @@ npm run generate:icons
 
 **Solution**: 
 1. Ensure backend is running
-2. Check `.env` or `config.json` has correct `VITE_API_BASE_URL`
+2. Check `.env` or `config.json` has correct `API_BASE_URL`
 3. Verify the API URL is accessible from the Windows machine
 
 ## Build Customization
