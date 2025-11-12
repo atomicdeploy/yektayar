@@ -38,6 +38,7 @@ YektaYar is a comprehensive mental health care platform that connects users with
 ### Core Features
 
 - ✅ User authentication (OTP-based, session management)
+- ✅ SMS OTP integration with FarazSMS for secure authentication
 - ✅ AI chatbot for mental health support
 - ✅ Appointment booking with professionals
 - ✅ Psychological assessments
@@ -206,6 +207,7 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Bun vs NPM](docs/BUN-VS-NPM.md)** - Runtime comparison guide
 
 #### Additional Resources
+- **[SMS OTP Integration Guide](docs/SMS-OTP-INTEGRATION.md)** - FarazSMS setup and usage
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project

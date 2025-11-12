@@ -158,7 +158,7 @@ export async function testSMSConfiguration(phoneNumber: string, testOTP: string 
     // Check configuration
     const config = getSMSConfig();
     console.log('✓ Configuration loaded successfully');
-    console.log(`  - API Key: ${config.apiKey.substring(0, 10)}...`);
+    console.log(`  - API Key: [REDACTED]`);
     console.log(`  - Pattern Code: ${config.patternCode}`);
     console.log(`  - Line Number: ${config.lineNumber}`);
     console.log('---');
