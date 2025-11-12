@@ -10,7 +10,8 @@
     "build": "tsc",
     "start": "bun run dist/index.js",
     "lint": "eslint src --ext .ts",
-    "test": "echo \"Tests not yet implemented\" && exit 0"
+    "test": "echo \"Tests not yet implemented\" && exit 0",
+    "verify-db": "bun run src/scripts/verify-database.ts"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",

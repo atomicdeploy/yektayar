@@ -10,6 +10,7 @@ import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
 import { setupSocketIO } from './websocket/socketServer'
+import { initializeDatabase, verifyTables } from './db'
 
 const app = new Elysia()
   .use(cors())
@@ -53,10 +54,48 @@ const app = new Elysia()
   .use(courseRoutes)
   .use(dashboardRoutes)
 
+// Initialize database and verify connection
+async function initializeApp() {
+  console.log('🔄 Initializing YektaYar API Server...\n')
+  
+  try {
+    // Step 1: Initialize database connection
+    await initializeDatabase()
+    
+    // Step 2: Verify database tables
+    const verificationResult = await verifyTables()
+    
+    if (verificationResult.success) {
+      console.log(`${verificationResult.message}`)
+    } else {
+      console.warn(`⚠️  ${verificationResult.message}`)
+      console.warn('⚠️  Some features may not work correctly until all required tables are created.')
+    }
+    
+    // Display table summary
+    if (verificationResult.existingTables.length > 0) {
+      console.log(`📊 Found ${verificationResult.existingTables.length} existing tables`)
+    }
+    if (verificationResult.missingRequiredTables.length > 0) {
+      console.log(`⚠️  Missing ${verificationResult.missingRequiredTables.length} required tables:`, 
+        verificationResult.missingRequiredTables.join(', '))
+    }
+    
+    console.log('') // Empty line for readability
+  } catch (error) {
+    console.error('❌ Failed to initialize database:', error)
+    console.error('⚠️  Server will start but database features will be unavailable.')
+    console.error('   Please check your database configuration in .env file\n')
+  }
+}
+
 // For Bun, we need to create an HTTP server manually to add Socket.IO
 // Bun's fetch handler is used for the Elysia app
 const port = Number(process.env.PORT) || 3000
 const hostname = process.env.HOST || 'localhost'
+
+// Initialize database before starting server
+await initializeApp()
 
 // Create HTTP server using Node's http module (works with Bun)
 const httpServer = Bun.serve({
