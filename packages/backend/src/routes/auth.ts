@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
-import { createAnonymousSession, validateSessionToken, invalidateSession } from '../services/sessionService'
+import { createSession, validateSessionToken, invalidateSession, getSessionByToken } from '../services/sessionService'
+import { isValidJWTFormat } from '../services/jwtService'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request }) => {
@@ -7,6 +8,15 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       // Extract metadata from request
       const userAgent = headers['user-agent'] || 'unknown'
       const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      
+      // Check if user agent is present (qualification check)
+      if (!headers['user-agent'] || headers['user-agent'] === 'unknown') {
+        return {
+          success: false,
+          error: 'User agent required',
+          message: 'A valid user agent is required to create a session'
+        }
+      }
       
       const metadata = {
         userAgent,
@@ -17,7 +27,48 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         }
       }
 
-      const session = await createAnonymousSession(metadata)
+      // Extract token from Authorization header (optional)
+      const authHeader = headers['authorization']
+      let providedToken: string | undefined
+      
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        providedToken = authHeader.substring(7)
+        
+        // If token is provided, validate its format
+        if (providedToken && !isValidJWTFormat(providedToken)) {
+          return {
+            success: false,
+            error: 'Invalid token format',
+            message: 'The provided token has an invalid format'
+          }
+        }
+        
+        // Check if a session already exists for this token
+        const existingSession = await getSessionByToken(providedToken)
+        if (existingSession) {
+          // Session exists, verify JWT is valid
+          const validSession = await validateSessionToken(providedToken)
+          if (validSession) {
+            return {
+              success: true,
+              data: {
+                token: validSession.token,
+                expiresAt: validSession.expiresAt.toISOString()
+              }
+            }
+          }
+        }
+      }
+
+      // Create a new session
+      // If providedToken has valid format but no existing session, reuse it
+      // Otherwise generate a new token
+      const session = await createSession({
+        metadata,
+        ipAddress: ip,
+        userAgent,
+        providedToken
+      })
       
       return {
         success: true,
