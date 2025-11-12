@@ -6,6 +6,7 @@ interface ErrorScreenMobileProps {
   message: string
   details?: string
   solution?: Solution | null
+  errorType?: string
 }
 
 declare const ErrorScreenMobile: DefineComponent<ErrorScreenMobileProps>

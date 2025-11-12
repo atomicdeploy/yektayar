@@ -41,7 +41,7 @@ async function initializeApp() {
     let solution = null
     if (import.meta.env.DEV && import.meta.env.SOLUTIONS_MD) {
       const solutionsData = parseSolutionsMarkdown(import.meta.env.SOLUTIONS_MD)
-      solution = findSolutionForError(solutionsData, validationResult.error || '')
+      solution = findSolutionForError(solutionsData, validationResult.error || '', validationResult.errorType)
     }
     
     // Create and mount error screen
@@ -49,7 +49,8 @@ async function initializeApp() {
       title: 'API Configuration Error',
       message: 'Cannot start the admin panel due to API configuration issues.',
       details: validationResult.error,
-      solution: solution
+      solution: solution,
+      errorType: validationResult.errorType
     })
     
     errorApp.use(i18n)

@@ -99,12 +99,45 @@ export function getSolution(solutions: SolutionsData, key: string): Solution | n
 }
 
 /**
- * Checks if a solution exists for a given error detail
+ * Maps error type to solution key
  */
-export function findSolutionForError(solutions: SolutionsData, errorDetails: string): Solution | null {
-  // Check for API_BASE_URL related errors
+export function mapErrorTypeToSolutionKey(errorType?: string): string | null {
+  switch (errorType) {
+    case 'config':
+      return 'CONFIG_ERROR'
+    case 'network':
+      return 'NETWORK_ERROR'
+    case 'cors':
+      return 'CORS_ERROR'
+    case 'ssl':
+      return 'SSL_ERROR'
+    case 'dns':
+      return 'DNS_ERROR'
+    case 'timeout':
+      return 'TIMEOUT_ERROR'
+    case 'server':
+      return 'SERVER_ERROR'
+    default:
+      return null
+  }
+}
+
+/**
+ * Checks if a solution exists for a given error detail or error type
+ */
+export function findSolutionForError(solutions: SolutionsData, errorDetails: string, errorType?: string): Solution | null {
+  // First try to find solution based on errorType
+  if (errorType) {
+    const solutionKey = mapErrorTypeToSolutionKey(errorType)
+    if (solutionKey) {
+      const solution = getSolution(solutions, solutionKey)
+      if (solution) return solution
+    }
+  }
+  
+  // Fallback: Check for API_BASE_URL related errors in details
   if (errorDetails.includes('API_BASE_URL') || errorDetails.includes('VITE_API_BASE_URL')) {
-    return getSolution(solutions, 'API_BASE_URL')
+    return getSolution(solutions, 'CONFIG_ERROR')
   }
   
   return null

@@ -6,6 +6,7 @@ interface ErrorScreenProps {
   message: string
   details?: string
   solution?: Solution | null
+  errorType?: string
 }
 
 declare const ErrorScreen: DefineComponent<ErrorScreenProps>

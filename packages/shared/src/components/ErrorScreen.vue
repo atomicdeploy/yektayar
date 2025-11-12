@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <div v-if="isDevelopment && currentSolution" class="error-section">
+      <div v-if="isDevelopment && showSolution" class="error-section">
         <button @click="toggleSolution" class="solution-toggle">
           {{ solutionExpanded ? t('error_screen.hide_solution') : t('error_screen.show_solution') }}
           <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
@@ -44,11 +44,13 @@ interface Props {
   message: string
   details?: string
   solution?: Solution | null
+  errorType?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: 'Configuration Error',
-  solution: null
+  solution: null,
+  errorType: undefined
 })
 
 const { t, locale } = useI18n()
@@ -75,6 +77,10 @@ const translatedDetails = computed(() => {
 
 const currentSolution = computed(() => {
   return props.solution
+})
+
+const showSolution = computed(() => {
+  return currentSolution.value !== null && currentSolution.value !== undefined
 })
 
 const toggleSolution = () => {
