@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useSessionStore } from './session'
+import config from '@/config'
 
 export interface DashboardStats {
   totalUsers: number
@@ -48,7 +49,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   async function fetchStats() {
     isLoading.value = true
     try {
-      const response = await fetch('http://localhost:3000/api/dashboard/stats', {
+      const response = await fetch(`${config.apiBaseUrl}/api/dashboard/stats`, {
         headers: {
           Authorization: `Bearer ${sessionStore.sessionToken}`,
         },
@@ -78,7 +79,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchUserGrowth() {
     try {
-      const response = await fetch('http://localhost:3000/api/dashboard/user-growth', {
+      const response = await fetch(`${config.apiBaseUrl}/api/dashboard/user-growth`, {
         headers: {
           Authorization: `Bearer ${sessionStore.sessionToken}`,
         },
@@ -104,7 +105,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchAppointmentStats() {
     try {
-      const response = await fetch('http://localhost:3000/api/dashboard/appointment-stats', {
+      const response = await fetch(`${config.apiBaseUrl}/api/dashboard/appointment-stats`, {
         headers: {
           Authorization: `Bearer ${sessionStore.sessionToken}`,
         },
@@ -130,7 +131,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchRecentActivities() {
     try {
-      const response = await fetch('http://localhost:3000/api/dashboard/recent-activities', {
+      const response = await fetch(`${config.apiBaseUrl}/api/dashboard/recent-activities`, {
         headers: {
           Authorization: `Bearer ${sessionStore.sessionToken}`,
         },

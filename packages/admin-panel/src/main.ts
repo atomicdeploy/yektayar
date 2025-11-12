@@ -12,11 +12,9 @@ import { useErrorStore } from './stores/error'
 import { messages } from './locales'
 import { logger } from '@yektayar/shared'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-
 // Log startup information
 logger.startup('YektaYar Admin Panel', {
-  'API URL': API_URL,
+  'API URL': config.apiBaseUrl,
   'Environment': import.meta.env.MODE || 'development',
   'Version': '0.1.0'
 })
