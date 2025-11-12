@@ -316,6 +316,27 @@ Based on open issues, be aware of:
 5. **Document Changes**: Update relevant documentation
 6. **Follow Patterns**: Look at existing code for patterns to follow
 
+### Accessing Issues and PRs
+
+You should have access to the GitHub API to fetch open issues and pull requests. This helps you:
+- Understand common patterns and recurring problems
+- See what features are being worked on
+- Identify related issues that might affect your work
+- Learn from previous implementations
+
+Use the GitHub API tools available to you to:
+```
+- List open issues to understand current priorities
+- Review issue comments for additional context
+- Check related PRs to see implementation approaches
+- Identify dependencies between issues
+```
+
+If you don't have access to the GitHub API, you can still:
+- Ask the user to provide relevant issue numbers
+- Review the codebase for comments with issue references
+- Check the ROADMAP.md and documentation for context
+
 ## Helpful Resources
 
 - **GitHub Issues**: Review open issues for context and common patterns
