@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
 import config from '@/config'
 import { logger } from '@yektayar/shared'
+import apiClient from '@/api'
 
 const API_URL = config.apiBaseUrl
 const STORAGE_KEY = 'yektayar_admin_session_token'
@@ -59,33 +60,27 @@ export const useSessionStore = defineStore('session', () => {
 
       // Acquire a new session
       logger.custom(logger.emoji('rocket'), 'Acquiring new session...', 'cyan')
-      const response = await fetch(`${API_URL}/api/auth/acquire-session`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to acquire session: ${response.statusText}`)
-      }
-
-      const data = await response.json()
+      const response = await apiClient.post<{ token: string; expiresAt: string }>(
+        '/api/auth/acquire-session',
+        {},
+        { skipAuth: true }
+      )
       
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to acquire session')
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to acquire session')
       }
 
       // Store the session
       session.value = {
-        token: data.data.token,
+        token: response.data.token,
         userId: null,
         isLoggedIn: false,
-        expiresAt: data.data.expiresAt
+        expiresAt: response.data.expiresAt
       }
 
-      // Persist to localStorage
-      localStorage.setItem(STORAGE_KEY, data.data.token)
+      // Persist to localStorage and API client
+      localStorage.setItem(STORAGE_KEY, response.data.token)
+      await apiClient.setToken(response.data.token)
 
       logger.success('Session acquired successfully')
 
@@ -104,28 +99,26 @@ export const useSessionStore = defineStore('session', () => {
    */
   async function validateStoredSession(token: string): Promise<boolean> {
     try {
-      const response = await fetch(`${API_URL}/api/auth/session`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
+      // Set token in API client before validation
+      await apiClient.setToken(token)
+      
+      const response = await apiClient.get<{
+        token: string
+        userId: string | null
+        isLoggedIn: boolean
+        expiresAt: string
+      }>('/api/auth/session')
 
-      if (!response.ok) {
-        return false
-      }
-
-      const data = await response.json()
-
-      if (!data.success) {
+      if (!response.success || !response.data) {
         return false
       }
 
       // Update session state
       session.value = {
-        token: data.data.token,
-        userId: data.data.userId,
-        isLoggedIn: data.data.isLoggedIn,
-        expiresAt: data.data.expiresAt
+        token: response.data.token,
+        userId: response.data.userId,
+        isLoggedIn: response.data.isLoggedIn,
+        expiresAt: response.data.expiresAt
       }
 
       return true
@@ -241,12 +234,7 @@ export const useSessionStore = defineStore('session', () => {
   async function logout(): Promise<void> {
     try {
       if (session.value?.token) {
-        await fetch(`${API_URL}/api/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.value.token}`
-          }
-        })
+        await apiClient.post('/api/auth/logout')
       }
     } catch (error) {
       logger.error('Error during logout:', error)
@@ -254,6 +242,7 @@ export const useSessionStore = defineStore('session', () => {
       // Clear local state regardless of API call result
       session.value = null
       localStorage.removeItem(STORAGE_KEY)
+      await apiClient.clearToken()
       disconnectSocket()
     }
   }
