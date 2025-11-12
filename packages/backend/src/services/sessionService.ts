@@ -1,6 +1,9 @@
 import crypto from 'crypto'
+import { getDb } from '../db/connection'
+import { generateJWT, verifyJWT, isValidJWTFormat } from './jwtService'
 
 export interface Session {
+  id: string
   token: string
   userId: string | null
   isLoggedIn: boolean
@@ -8,6 +11,8 @@ export interface Session {
   createdAt: Date
   expiresAt: Date
   lastActivityAt: Date
+  ipAddress: string | null
+  userAgent: string | null
 }
 
 export interface SessionCreationResult {
@@ -15,11 +20,11 @@ export interface SessionCreationResult {
   expiresAt: Date
 }
 
-/**
- * Generate a cryptographically secure random token for session
- */
-export function generateSessionToken(): string {
-  return crypto.randomBytes(32).toString('base64url')
+export interface SessionCreationOptions {
+  metadata?: Record<string, any>
+  ipAddress?: string
+  userAgent?: string
+  providedToken?: string
 }
 
 /**
@@ -32,19 +37,32 @@ export function calculateExpirationDate(): Date {
 }
 
 /**
- * Create a new anonymous session
- * This will be implemented with database connection
+ * Create a new session
+ * If providedToken is given and has valid JWT format, it will be used
+ * Otherwise, a new JWT token will be generated
  */
-export async function createAnonymousSession(metadata: Record<string, any> = {}): Promise<SessionCreationResult> {
-  const token = generateSessionToken()
+export async function createSession(options: SessionCreationOptions = {}): Promise<SessionCreationResult> {
+  const { metadata = {}, ipAddress = null, userAgent = null, providedToken } = options
   const expiresAt = calculateExpirationDate()
   const now = new Date()
+  const db = getDb()
 
-  // TODO: Store in database when DB connection is available
-  // For now, we return the token structure
-  // In production, this would insert into sessions table:
-  // INSERT INTO sessions (token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at)
-  // VALUES (token, NULL, false, metadata, now, expiresAt, now)
+  // Generate a unique session ID
+  const sessionId = crypto.randomUUID()
+  
+  // Use provided token if it has valid JWT format, otherwise generate new one
+  let token: string
+  if (providedToken && isValidJWTFormat(providedToken)) {
+    token = providedToken
+  } else {
+    token = await generateJWT(sessionId)
+  }
+
+  // Store in database
+  await db`
+    INSERT INTO sessions (id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent)
+    VALUES (${sessionId}, ${token}, NULL, false, ${JSON.stringify(metadata)}, ${now}, ${expiresAt}, ${now}, ${ipAddress}, ${userAgent})
+  `
   
   return {
     token,
@@ -53,26 +71,92 @@ export async function createAnonymousSession(metadata: Record<string, any> = {})
 }
 
 /**
+ * Create a new anonymous session (backward compatibility)
+ */
+export async function createAnonymousSession(metadata: Record<string, any> = {}): Promise<SessionCreationResult> {
+  return createSession({ metadata })
+}
+
+/**
  * Validate a session token
- * This will be implemented with database connection
+ * Returns the session if valid and not expired, null otherwise
  */
 export async function validateSessionToken(token: string): Promise<Session | null> {
-  // TODO: Implement with database
-  // SELECT * FROM sessions WHERE token = ? AND expires_at > NOW()
-  
-  // For now, return a mock session for any non-empty token
   if (!token || token.trim() === '') {
     return null
   }
 
+  // First, validate JWT format
+  if (!isValidJWTFormat(token)) {
+    return null
+  }
+
+  // Verify JWT signature and expiration
+  const payload = await verifyJWT(token)
+  if (!payload) {
+    return null
+  }
+
+  // Get session from database
+  const db = getDb()
+  const now = new Date()
+  
+  const sessions = await db`
+    SELECT id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent
+    FROM sessions
+    WHERE token = ${token} AND expires_at > ${now}
+    LIMIT 1
+  `
+
+  if (sessions.length === 0) {
+    return null
+  }
+
+  const session = sessions[0]
   return {
-    token,
-    userId: null,
-    isLoggedIn: false,
-    metadata: {},
-    createdAt: new Date(),
-    expiresAt: calculateExpirationDate(),
-    lastActivityAt: new Date()
+    id: session.id,
+    token: session.token,
+    userId: session.userId,
+    isLoggedIn: session.isLoggedIn,
+    metadata: session.metadata,
+    createdAt: session.createdAt,
+    expiresAt: session.expiresAt,
+    lastActivityAt: session.lastActivityAt,
+    ipAddress: session.ipAddress,
+    userAgent: session.userAgent
+  }
+}
+
+/**
+ * Get session by token without JWT verification (for internal use)
+ */
+export async function getSessionByToken(token: string): Promise<Session | null> {
+  const db = getDb()
+  const now = new Date()
+  
+  const sessions = await db`
+    SELECT id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent
+    FROM sessions
+    WHERE token = ${token} AND expires_at > ${now}
+    LIMIT 1
+  `
+
+  if (sessions.length === 0) {
+    return null
+  }
+
+  const session = sessions[0]
+  return {
+    id: session.id,
+    token: session.token,
+    userId: session.userId,
+    isLoggedIn: session.isLoggedIn,
+    metadata: session.metadata,
+    createdAt: session.createdAt,
+    expiresAt: session.expiresAt,
+    lastActivityAt: session.lastActivityAt,
+    ipAddress: session.ipAddress,
+    userAgent: session.userAgent
   }
 }
 
@@ -80,31 +164,53 @@ export async function validateSessionToken(token: string): Promise<Session | nul
  * Update session last activity timestamp
  */
 export async function updateSessionActivity(token: string): Promise<void> {
-  // TODO: Implement with database
-  // UPDATE sessions SET last_activity_at = NOW() WHERE token = ?
+  const db = getDb()
+  const now = new Date()
+  
+  await db`
+    UPDATE sessions
+    SET last_activity_at = ${now}
+    WHERE token = ${token}
+  `
 }
 
 /**
  * Link a user to an existing session (when user logs in)
  */
 export async function linkUserToSession(token: string, userId: string): Promise<void> {
-  // TODO: Implement with database
-  // UPDATE sessions SET user_id = ?, is_logged_in = true WHERE token = ?
+  const db = getDb()
+  
+  await db`
+    UPDATE sessions
+    SET user_id = ${userId}, is_logged_in = true
+    WHERE token = ${token}
+  `
 }
 
 /**
  * Invalidate a session (logout)
  */
 export async function invalidateSession(token: string): Promise<void> {
-  // TODO: Implement with database
-  // DELETE FROM sessions WHERE token = ?
+  const db = getDb()
+  
+  await db`
+    DELETE FROM sessions
+    WHERE token = ${token}
+  `
 }
 
 /**
  * Clean up expired sessions (should be run periodically)
  */
 export async function cleanupExpiredSessions(): Promise<number> {
-  // TODO: Implement with database
-  // DELETE FROM sessions WHERE expires_at < NOW()
-  return 0
+  const db = getDb()
+  const now = new Date()
+  
+  const result = await db`
+    DELETE FROM sessions
+    WHERE expires_at < ${now}
+    RETURNING id
+  `
+  
+  return result.length
 }
