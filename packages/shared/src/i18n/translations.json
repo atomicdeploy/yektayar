@@ -46,6 +46,17 @@
       "upcoming": "نوبت‌های آینده",
       "past": "نوبت‌های گذشته",
       "no_appointments": "نوبتی وجود ندارد"
+    },
+    "onboarding": {
+      "main_question": "دوست خوبم، نیاز به مشاوره در چه زمینه‌ای داری؟",
+      "skip_for_now": "الان نه، بعداً",
+      "privacy_notice": "اطلاعات شما محرمانه است و فقط استفاده می‌شود.",
+      "options": {
+        "individual": "مشاوره فردی",
+        "couple": "مشاوره زوج و روابط عاطفی",
+        "family": "مشاوره خانواده",
+        "child_teen": "مشاوره کودک و نوجوان"
+      }
     }
   },
   "en": {
@@ -95,6 +106,17 @@
       "upcoming": "Upcoming Appointments",
       "past": "Past Appointments",
       "no_appointments": "No appointments"
+    },
+    "onboarding": {
+      "main_question": "Dear friend, what area do you need counseling in?",
+      "skip_for_now": "Skip for now",
+      "privacy_notice": "Your information is confidential and will only be used.",
+      "options": {
+        "individual": "Individual Counseling",
+        "couple": "Couples & Relationship Counseling",
+        "family": "Family Counseling",
+        "child_teen": "Child & Teen Counseling"
+      }
     }
   }
 }

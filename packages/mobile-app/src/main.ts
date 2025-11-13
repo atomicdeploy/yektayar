@@ -49,6 +49,17 @@ const i18n = createI18n({
     fa: {
       welcome: 'خوش آمدید به یکتایار',
       app_title: 'یکتایار',
+      onboarding: {
+        main_question: 'دوست خوبم، نیاز به مشاوره در چه زمینه‌ای داری؟',
+        skip_for_now: 'الان نه، بعداً',
+        privacy_notice: 'اطلاعات شما محرمانه است و فقط استفاده می‌شود.',
+        options: {
+          individual: 'مشاوره فردی',
+          couple: 'مشاوره زوج و روابط عاطفی',
+          family: 'مشاوره خانواده',
+          child_teen: 'مشاوره کودک و نوجوان'
+        }
+      },
       error_screen: {
         title: 'خطای پیکربندی',
         api_config_error: 'خطای پیکربندی API',
@@ -93,6 +104,17 @@ const i18n = createI18n({
     en: {
       welcome: 'Welcome to YektaYar',
       app_title: 'YektaYar',
+      onboarding: {
+        main_question: 'Dear friend, what area do you need counseling in?',
+        skip_for_now: 'Skip for now',
+        privacy_notice: 'Your information is confidential and will only be used.',
+        options: {
+          individual: 'Individual Counseling',
+          couple: 'Couples & Relationship Counseling',
+          family: 'Family Counseling',
+          child_teen: 'Child & Teen Counseling'
+        }
+      },
       error_screen: {
         title: 'Configuration Error',
         api_config_error: 'API Configuration Error',
