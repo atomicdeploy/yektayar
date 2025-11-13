@@ -10,7 +10,8 @@
     "build": "tsc",
     "start": "bun run dist/index.js",
     "lint": "eslint src --ext .ts",
-    "test": "echo \"Tests not yet implemented\" && exit 0"
+    "test": "echo \"Tests not yet implemented\" && exit 0",
+    "db:init": "bun run scripts/init-db.ts"
   },
   "dependencies": {
     "@elysiajs/cookie": "^0.8.0",

@@ -12,6 +12,8 @@ import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
 import { aiRoutes } from './routes/ai'
 import { setupSocketIO } from './websocket/socketServer'
+import { testConnection } from './db/connection'
+import { initializeDatabase } from './db/migrate'
 import { swaggerAuth } from './middleware/swaggerAuth'
 
 // Configure CORS based on environment
@@ -79,40 +81,63 @@ const app = new Elysia()
   .use(dashboardRoutes)
   .use(aiRoutes)
 
-// For Bun, we need to create an HTTP server manually to add Socket.IO
-// Bun's fetch handler is used for the Elysia app
-const port = Number(process.env.PORT) || 3000
-const hostname = process.env.HOST || 'localhost'
-
-// Create HTTP server using Node's http module (works with Bun)
-const httpServer = Bun.serve({
-  port,
-  hostname,
-  fetch: app.fetch,
-  // Enable websocket support
-  websocket: {
-    message() {}, // Handled by Socket.IO
-    open() {},
-    close() {}
+// Initialize database before starting server
+async function startServer() {
+  // Test database connection
+  const isConnected = await testConnection()
+  
+  if (isConnected) {
+    try {
+      // Run migrations and seed database
+      await initializeDatabase()
+    } catch (error) {
+      console.error('⚠️  Database initialization failed, but continuing...', error)
+    }
+  } else {
+    console.warn('⚠️  Database not available, API will be limited')
   }
-})
 
-// Note: Socket.IO with Bun requires special handling
-// For now, we'll note that Socket.IO should be initialized when running on Node.js
-// In production, consider using Bun's native WebSocket or run Socket.IO on a separate Node.js process
+  // For Bun, we need to create an HTTP server manually to add Socket.IO
+  // Bun's fetch handler is used for the Elysia app
+  const port = Number(process.env.PORT) || 3000
+  const hostname = process.env.HOST || 'localhost'
+
+  // Create HTTP server using Node's http module (works with Bun)
+  const httpServer = Bun.serve({
+    port,
+    hostname,
+    fetch: app.fetch,
+    // Enable websocket support
+    websocket: {
+      message() {}, // Handled by Socket.IO
+      open() {},
+      close() {}
+    }
+  })
+
+  // Note: Socket.IO with Bun requires special handling
+  // For now, we'll note that Socket.IO should be initialized when running on Node.js
+  // In production, consider using Bun's native WebSocket or run Socket.IO on a separate Node.js process
+
+  console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
+  console.log(`📚 API Documentation available at http://${hostname}:${port}/swagger`)
+  console.log(`⚡ Runtime: Bun ${Bun.version}`)
+
+  // Socket.IO setup (for Node.js compatibility)
+  // When running with Node.js instead of Bun, uncomment the following:
+  // const httpServer = createServer((req, res) => app.fetch(req).then(response => {
+  //   res.writeHead(response.status, Object.fromEntries(response.headers))
+  //   res.end(await response.text())
+  // }))
+  // const io = setupSocketIO(httpServer)
+  // httpServer.listen(port, hostname)
 
 console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
 console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
 console.log(`🔒 Documentation protected with Basic Auth`)
 console.log(`⚡ Runtime: Bun ${Bun.version}`)
 
-// Socket.IO setup (for Node.js compatibility)
-// When running with Node.js instead of Bun, uncomment the following:
-// const httpServer = createServer((req, res) => app.fetch(req).then(response => {
-//   res.writeHead(response.status, Object.fromEntries(response.headers))
-//   res.end(await response.text())
-// }))
-// const io = setupSocketIO(httpServer)
-// httpServer.listen(port, hostname)
+// Start the server
+const httpServer = await startServer()
 
 export default httpServer
