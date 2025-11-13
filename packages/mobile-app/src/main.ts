@@ -245,12 +245,13 @@ initializeApp().catch((error) => {
   logger.error('Failed to initialize app:', error)
   
   // Show error screen if app failed to initialize
-  const errorApp = createApp(ErrorScreen, {
+  const errorApp = createApp(ErrorScreenMobile, {
     title: 'Initialization Error',
     message: 'Failed to start the application.',
     details: error?.message || String(error)
   })
   
   errorApp.use(IonicVue)
+  errorApp.use(i18n)
   errorApp.mount('#app')
 })

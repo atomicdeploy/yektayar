@@ -126,5 +126,6 @@ initializeApp().catch((error) => {
     details: error?.message || String(error)
   })
   
+  errorApp.use(i18n)
   errorApp.mount('#app')
 })
