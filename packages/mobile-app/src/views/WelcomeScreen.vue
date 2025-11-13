@@ -26,7 +26,7 @@
         <!-- Hero Image -->
         <div class="hero-image-container">
           <img 
-            src="/welcome-hero.svg" 
+            src="/welcome-hero.jpg" 
             alt="خانواده شاد" 
             class="hero-image"
             @error="onImageError"
@@ -57,11 +57,29 @@
 import { IonPage, IonContent, IonButton } from '@ionic/vue'
 import { useRouter } from 'vue-router'
 import { logger } from '@yektayar/shared'
+import apiClient from '@/api'
 
 const router = useRouter()
 
-const startApp = () => {
+const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
+
+const startApp = async () => {
   logger.info('User started the app from welcome screen')
+  
+  // Mark welcome screen as shown in localStorage
+  localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
+  
+  // Also mark on backend if user is authenticated
+  try {
+    await apiClient.post('/api/users/preferences', {
+      welcomeScreenShown: true
+    })
+    logger.info('Welcome screen preference saved to backend')
+  } catch (error) {
+    // If backend call fails, it's okay - localStorage will handle it
+    logger.warn('Failed to save welcome preference to backend:', error)
+  }
+  
   router.replace('/tabs/home')
 }
 

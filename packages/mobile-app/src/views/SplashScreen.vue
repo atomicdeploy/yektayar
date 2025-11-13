@@ -60,6 +60,8 @@ onMounted(async () => {
   // Load fonts first
   await checkFontsLoaded()
   
+  const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
+  
   try {
     // Attempt to acquire or restore session
     await sessionStore.acquireSession()
@@ -76,9 +78,18 @@ onMounted(async () => {
       logger.warn('Could not fetch API version:', versionError)
     }
     
-    // If successful, navigate to welcome screen after a brief delay (for UX)
+    // Check if welcome screen has been shown
+    const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
+    
+    // If successful, navigate to appropriate screen after a brief delay (for UX)
     setTimeout(() => {
-      router.replace('/welcome')
+      if (welcomeShown) {
+        logger.info('Welcome screen already shown, skipping to home')
+        router.replace('/tabs/home')
+      } else {
+        logger.info('First time user, showing welcome screen')
+        router.replace('/welcome')
+      }
     }, 2000)
   } catch (error: any) {
     logger.error('Failed to acquire session:', error)
@@ -89,7 +100,8 @@ onMounted(async () => {
       errorMessage.value = ''
       try {
         await sessionStore.acquireSession()
-        router.replace('/welcome')
+        const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
+        router.replace(welcomeShown ? '/tabs/home' : '/welcome')
       } catch (retryError) {
         errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
       }

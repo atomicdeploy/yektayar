@@ -1,0 +1,74 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Warm gradient background -->
+  <defs>
+    <linearGradient id="warmBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5e6d3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8d4c0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="plantGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#7eb892;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6b9d7a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#warmBg)"/>
+  
+  <!-- Soft shapes for ambiance -->
+  <circle cx="200" cy="200" r="100" fill="#d4a43e" opacity="0.1"/>
+  <circle cx="1000" cy="600" r="120" fill="#d4a43e" opacity="0.08"/>
+  
+  <!-- Plant decoration (left) -->
+  <ellipse cx="100" cy="650" rx="30" ry="80" fill="url(#plantGreen)" opacity="0.6"/>
+  <ellipse cx="130" cy="680" rx="25" ry="70" fill="url(#plantGreen)" opacity="0.5"/>
+  <ellipse cx="70" cy="680" rx="28" ry="75" fill="url(#plantGreen)" opacity="0.55"/>
+  
+  <!-- Plant decoration (right) -->
+  <ellipse cx="1100" cy="650" rx="30" ry="80" fill="url(#plantGreen)" opacity="0.6"/>
+  <ellipse cx="1130" cy="680" rx="25" ry="70" fill="url(#plantGreen)" opacity="0.5"/>
+  <ellipse cx="1070" cy="680" rx="28" ry="75" fill="url(#plantGreen)" opacity="0.55"/>
+  
+  <!-- Couch/sofa silhouette -->
+  <rect x="250" y="520" width="700" height="200" rx="20" fill="#c9a88a" opacity="0.3"/>
+  <rect x="230" y="500" width="80" height="180" rx="15" fill="#c9a88a" opacity="0.3"/>
+  <rect x="890" y="500" width="80" height="180" rx="15" fill="#c9a88a" opacity="0.3"/>
+  
+  <!-- Stylized family silhouettes (4 people) -->
+  <!-- Adult 1 (left) - Woman with hijab -->
+  <ellipse cx="380" cy="360" rx="45" ry="55" fill="#d4a43e" opacity="0.4"/>
+  <circle cx="380" cy="320" r="35" fill="#d4a43e" opacity="0.4"/>
+  <path d="M 345 320 Q 335 300 345 285 Q 355 270 380 270 Q 405 270 415 285 Q 425 300 415 320 Z" fill="#d4a43e" opacity="0.3"/>
+  
+  <!-- Child 1 (left-center) - Girl -->
+  <ellipse cx="500" cy="400" rx="35" ry="45" fill="#d4a43e" opacity="0.4"/>
+  <circle cx="500" cy="370" r="28" fill="#d4a43e" opacity="0.4"/>
+  <path d="M 472 370 Q 472 355 500 355 Q 528 355 528 370" fill="#d4a43e" opacity="0.3"/>
+  
+  <!-- Child 2 (right-center) - Boy -->
+  <ellipse cx="650" cy="390" rx="38" ry="48" fill="#d4a43e" opacity="0.4"/>
+  <circle cx="650" cy="360" r="30" fill="#d4a43e" opacity="0.4"/>
+  
+  <!-- Adult 2 (right) - Man -->
+  <ellipse cx="780" cy="350" rx="48" ry="60" fill="#d4a43e" opacity="0.4"/>
+  <circle cx="780" cy="305" r="38" fill="#d4a43e" opacity="0.4"/>
+  
+  <!-- Heart symbol above (representing love and care) -->
+  <path d="M 600 200 
+           Q 580 180 560 180 
+           Q 540 180 540 200 
+           Q 540 220 600 260 
+           Q 660 220 660 200 
+           Q 660 180 640 180 
+           Q 620 180 600 200 Z" 
+        fill="#d4a43e" opacity="0.5"/>
+  
+  <!-- Text overlay -->
+  <text x="600" y="120" font-family="Arial, sans-serif" font-size="48" font-weight="bold" 
+        fill="#01183a" text-anchor="middle" opacity="0.7">YektaYar</text>
+  <text x="600" y="160" font-family="Arial, sans-serif" font-size="24" 
+        fill="#6c757d" text-anchor="middle" opacity="0.6">خانواده و آرامش</text>
+  
+  <!-- Note at bottom -->
+  <text x="600" y="760" font-family="Arial, sans-serif" font-size="16" 
+        fill="#adb5bd" text-anchor="middle" opacity="0.8">Placeholder - Replace with actual family photo</text>
+</svg>
