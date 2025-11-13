@@ -1198,3 +1198,94 @@ cd packages/mobile-app/android
    ```
 
 For more details, see [APK-BUILD-SUMMARY.md](../APK-BUILD-SUMMARY.md)
+
+---
+
+## Shell Configuration Enhancement
+
+### Bashrc Feature Enhancement Scripts
+
+Scripts to enable useful bash features based on custom configurations compared to vanilla Ubuntu defaults.
+
+#### `enable-user-bashrc-features.sh`
+
+Enhances user's `~/.bashrc` with productivity features.
+
+**Usage:**
+```bash
+# Run as regular user (no sudo needed)
+./scripts/enable-user-bashrc-features.sh
+
+# Apply changes immediately
+source ~/.bashrc
+```
+
+**Features Added:**
+- 🎨 Colorful multi-line PS1 prompt
+- 📁 Enhanced ls aliases (ll, l., lsd with -GNhp flags)
+- ⌨️ Ctrl-Backspace word deletion binding
+- 🛠️ Utility aliases (diskspace, folders, ip -c)
+- 🌐 UTF-8 less charset
+- 📜 History improvements (ignoredups, ignorespace)
+
+#### `enable-system-bashrc-features.sh`
+
+Enhances system-wide `/etc/bash.bashrc` for all users (requires root).
+
+**Usage:**
+```bash
+# Must run as root
+sudo ./scripts/enable-system-bashrc-features.sh
+
+# Apply changes immediately
+source /etc/bash.bashrc
+```
+
+**Features Added:**
+- 📦 Nala wrapper for apt commands (requires nala)
+- 🔧 settitle() - Set terminal window title
+- 📂 take() - Create directory and cd into it
+- 🛠️ Global aliases (ports, df -h, du -h, incognito)
+- ⬇️ a2c - Optimized aria2c downloads (requires aria2)
+- 🚀 thefuck integration (requires thefuck)
+- 🎼 Composer superuser permission
+- 📖 Bash completion enablement
+- 🔗 PATH enhancement (/root/.local/bin)
+
+**Optional Dependencies:**
+```bash
+sudo apt update
+sudo apt install nala aria2 bash-completion
+pip3 install thefuck
+```
+
+#### `test-bashrc-features.sh`
+
+Automated test suite for bashrc enhancement scripts.
+
+**Usage:**
+```bash
+./scripts/test-bashrc-features.sh
+```
+
+**Tests:**
+- ✓ Script files exist and are executable
+- ✓ Root requirement check
+- ✓ Functionality in isolated environment
+- ✓ All features added correctly
+- ✓ Idempotency (no duplicates on re-run)
+- ✓ Backup creation
+- ✓ User-friendly output
+
+**Safety Features:**
+- Automatic timestamped backups before modifications
+- Idempotent (safe to run multiple times)
+- Non-destructive (only adds, never removes)
+- Clear feedback on what's added vs already configured
+
+**Documentation:**
+
+For detailed information about all features, comparison to vanilla Ubuntu, and usage examples, see:
+- [**BASHRC-FEATURES.md**](BASHRC-FEATURES.md) - Comprehensive bashrc enhancement documentation
+
+---
