@@ -80,6 +80,39 @@ export function setupSocketIO(httpServer: HTTPServer) {
       socket.emit('pong', { timestamp: new Date().toISOString() })
     })
 
+    // Handle AI chat messages
+    socket.on('ai:chat', async (data: { message: string; conversationHistory?: any[] }) => {
+      try {
+        const { message, conversationHistory } = data
+        const messageId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+        console.log(`AI chat request from ${socket.id}:`, message)
+
+        // Emit start event
+        socket.emit('ai:response:start', { messageId })
+
+        // Import AI service dynamically to avoid circular deps
+        const { streamAIResponseChunks } = await import('../services/aiService')
+
+        // Stream the response
+        let fullResponse = ''
+        for await (const chunk of streamAIResponseChunks(message, conversationHistory)) {
+          fullResponse += chunk
+          socket.emit('ai:response:chunk', { messageId, chunk })
+        }
+
+        // Emit completion event
+        socket.emit('ai:response:complete', { messageId, fullResponse })
+
+        console.log(`AI response completed for ${socket.id}`)
+      } catch (error) {
+        console.error('AI chat error:', error)
+        socket.emit('ai:response:error', { 
+          error: 'Failed to generate response. Please try again.' 
+        })
+      }
+    })
+
     // Handle disconnect
     socket.on('disconnect', (reason) => {
       console.log(`Socket disconnected: ${socket.id}`, { reason })

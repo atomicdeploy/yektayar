@@ -40,6 +40,10 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'profile/personal-info',
         component: () => import('@/views/PersonalInfoPage.vue')
+      },
+      {
+        path: 'chat/ai',
+        component: () => import('@/views/AIChatPage.vue')
       }
     ]
   }

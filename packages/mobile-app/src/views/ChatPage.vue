@@ -48,7 +48,7 @@
             <div class="unread-badge">3</div>
           </div>
 
-          <div class="conversation-card">
+          <div class="conversation-card" @click="navigateToAIChat">
             <div class="avatar-wrapper">
               <div class="avatar success">
                 <ion-icon :icon="chatbubbles"></ion-icon>
@@ -173,8 +173,12 @@ import {
   add,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { locale } = useI18n()
+const router = useRouter()
+
+const navigateToAIChat = () => router.push('/tabs/chat/ai')
 </script>
 
 <style scoped>
