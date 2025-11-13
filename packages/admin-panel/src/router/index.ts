@@ -49,9 +49,15 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'گزارش‌ها' },
       },
       {
+        path: 'pages',
+        name: 'pages',
+        component: () => import('../views/PagesView.vue'),
+        meta: { title: 'مدیریت صفحات' },
+      },
+      {
         path: 'settings',
         name: 'settings',
-        component: () => import('../views/PlaceholderView.vue'),
+        component: () => import('../views/SettingsView.vue'),
         meta: { title: 'تنظیمات' },
       },
     ],

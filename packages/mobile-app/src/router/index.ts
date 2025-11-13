@@ -42,6 +42,18 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/PersonalInfoPage.vue')
       },
       {
+        path: 'about',
+        component: () => import('@/views/AboutUsPage.vue')
+      },
+      {
+        path: 'support',
+        component: () => import('@/views/SupportPage.vue')
+      },
+      {
+        path: 'contact',
+        component: () => import('@/views/ContactUsPage.vue')
+      },
+      {
         path: 'chat/ai',
         component: () => import('@/views/AIChatPage.vue')
       }

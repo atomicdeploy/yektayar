@@ -11,9 +11,13 @@ import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
+import { pageRoutes } from './routes/pages'
+import { settingsRoutes } from './routes/settings'
+import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
+import { initializeDatabase } from './services/database'
 
 // Configure CORS based on environment
 // When behind a reverse proxy (like Apache), disable application-level CORS
@@ -53,6 +57,9 @@ const app = new Elysia()
           { name: 'Appointments', description: 'Appointment booking endpoints' },
           { name: 'Courses', description: 'Educational content endpoints' },
           { name: 'Dashboard', description: 'Dashboard statistics endpoints' },
+          { name: 'Pages', description: 'Content pages endpoints' },
+          { name: 'Settings', description: 'Application settings endpoints' },
+          { name: 'Support', description: 'Support tickets and messaging endpoints' },
           { name: 'AI', description: 'AI counselor chat endpoints' }
         ]
       }
@@ -78,11 +85,20 @@ const app = new Elysia()
   .use(appointmentRoutes)
   .use(courseRoutes)
   .use(dashboardRoutes)
+  .use(pageRoutes)
+  .use(settingsRoutes)
+  .use(supportRoutes)
   .use(aiRoutes)
 
 // Server configuration
 const port = Number(process.env.PORT) || 3000
 const hostname = process.env.HOST || 'localhost'
+
+// Initialize database
+initializeDatabase().catch(error => {
+  console.error('Failed to initialize database:', error)
+  console.log('⚠️  Server will continue running, but database features may not work')
+})
 
 // Detect runtime automatically
 const isBun = typeof Bun !== 'undefined'

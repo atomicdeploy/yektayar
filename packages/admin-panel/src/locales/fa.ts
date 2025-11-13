@@ -23,6 +23,7 @@ export default {
     appointments: 'نوبت‌ها',
     messages: 'پیام‌ها',
     courses: 'دوره‌ها',
+    pages: 'صفحات',
     reports: 'گزارش‌ها',
     settings: 'تنظیمات',
   },

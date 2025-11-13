@@ -23,6 +23,7 @@ export default {
     appointments: 'Appointments',
     messages: 'Messages',
     courses: 'Courses',
+    pages: 'Pages',
     reports: 'Reports',
     settings: 'Settings',
   },
