@@ -10,8 +10,12 @@ import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
+import { pageRoutes } from './routes/pages'
+import { settingsRoutes } from './routes/settings'
+import { supportRoutes } from './routes/support'
 import { setupSocketIO } from './websocket/socketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
+import { initializeDatabase } from './services/database'
 
 // Configure CORS based on environment
 // When behind a reverse proxy (like Apache), disable application-level CORS
@@ -50,7 +54,10 @@ const app = new Elysia()
           { name: 'Messages', description: 'Messaging and chat endpoints' },
           { name: 'Appointments', description: 'Appointment booking endpoints' },
           { name: 'Courses', description: 'Educational content endpoints' },
-          { name: 'Dashboard', description: 'Dashboard statistics endpoints' }
+          { name: 'Dashboard', description: 'Dashboard statistics endpoints' },
+          { name: 'Pages', description: 'Content pages endpoints' },
+          { name: 'Settings', description: 'Application settings endpoints' },
+          { name: 'Support', description: 'Support tickets and messaging endpoints' }
         ]
       }
     })
@@ -75,11 +82,20 @@ const app = new Elysia()
   .use(appointmentRoutes)
   .use(courseRoutes)
   .use(dashboardRoutes)
+  .use(pageRoutes)
+  .use(settingsRoutes)
+  .use(supportRoutes)
 
 // For Bun, we need to create an HTTP server manually to add Socket.IO
 // Bun's fetch handler is used for the Elysia app
 const port = Number(process.env.PORT) || 3000
 const hostname = process.env.HOST || 'localhost'
+
+// Initialize database
+initializeDatabase().catch(error => {
+  console.error('Failed to initialize database:', error)
+  console.log('⚠️  Server will continue running, but database features may not work')
+})
 
 // Create HTTP server using Node's http module (works with Bun)
 const httpServer = Bun.serve({

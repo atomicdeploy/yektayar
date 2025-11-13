@@ -153,14 +153,21 @@
       <div class="section">
         <h3 class="section-title">{{ locale === 'fa' ? 'پشتیبانی' : 'Support' }}</h3>
         <ion-list class="settings-list" :inset="true">
-          <ion-item button detail>
+          <ion-item button detail @click="navigateToSupport">
             <ion-icon :icon="help" slot="start" color="primary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'راهنما و پشتیبانی' : 'Help & Support' }}</h3>
             </ion-label>
           </ion-item>
 
-          <ion-item button detail>
+          <ion-item button detail @click="navigateToContact">
+            <ion-icon :icon="call" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h3>{{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}</h3>
+            </ion-label>
+          </ion-item>
+
+          <ion-item button detail @click="navigateToAbout">
             <ion-icon :icon="informationCircle" slot="start" color="tertiary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'درباره برنامه' : 'About App' }}</h3>
@@ -215,6 +222,7 @@ import {
   help,
   informationCircle,
   logOut,
+  call,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
@@ -228,6 +236,18 @@ const router = useRouter()
 
 function navigateToPersonalInfo() {
   router.push('/tabs/profile/personal-info')
+}
+
+function navigateToSupport() {
+  router.push('/tabs/support')
+}
+
+function navigateToContact() {
+  router.push('/tabs/contact')
+}
+
+function navigateToAbout() {
+  router.push('/tabs/about')
 }
 </script>
 
