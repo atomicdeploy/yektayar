@@ -252,7 +252,6 @@ import {
   send,
   checkmarkCircle,
   timeOutline,
-  closeCircle,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import apiClient from '@/api'

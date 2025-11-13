@@ -57,10 +57,10 @@
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-              {{ formatDate(page.created_at) }}
+              {{ page.created_at ? formatDate(page.created_at) : '-' }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-              {{ formatDate(page.updated_at) }}
+              {{ page.updated_at ? formatDate(page.updated_at) : '-' }}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
               <button

@@ -159,12 +159,12 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold text-gray-900 dark:text-white">صفحات اخیر</h2>
-          <button
-            @click="$router.push('/pages')"
+          <router-link
+            to="/pages"
             class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
           >
             مشاهده همه
-          </button>
+          </router-link>
         </div>
         
         <div v-if="loadingPages" class="flex justify-center py-8">
@@ -179,15 +179,15 @@
         </div>
 
         <div v-else class="space-y-3">
-          <div 
+          <router-link 
             v-for="page in recentPages.slice(0, 5)" 
             :key="page.id"
-            class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-            @click="$router.push('/pages')"
+            to="/pages"
+            class="block border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <h4 class="font-medium text-gray-900 dark:text-white text-sm">{{ page.title }}</h4>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-mono">{{ page.slug }}</p>
-          </div>
+          </router-link>
         </div>
       </div>
     </div>
@@ -211,10 +211,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import apiClient from '@/api'
-
-const router = useRouter()
 
 const loading = ref(true)
 const saving = ref(false)

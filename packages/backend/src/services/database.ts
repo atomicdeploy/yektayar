@@ -147,11 +147,11 @@ async function insertDefaultAboutUsPage(db: ReturnType<typeof postgres>) {
           'about-us',
           'درباره ما',
           ${aboutUsContent},
-          ${{
+          ${JSON.stringify({
             titleEn: 'About Us',
             description: 'Learn about YektaYar mental health platform',
             descriptionFa: 'آشنایی با پلتفرم سلامت روان یکتایار'
-          }}
+          })}
         )
       `
       console.log('✅ Default about-us page created')
