@@ -14,6 +14,11 @@ const routes: Array<RouteRecordRaw> = [
     component: SplashScreen
   },
   {
+    path: '/onboarding',
+    name: 'Onboarding',
+    component: () => import('@/views/OnboardingPage.vue')
+  },
+  {
     path: '/tabs/',
     component: TabsPage,
     children: [
