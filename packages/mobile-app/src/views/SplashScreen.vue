@@ -76,9 +76,9 @@ onMounted(async () => {
       logger.warn('Could not fetch API version:', versionError)
     }
     
-    // If successful, navigate to main app after a brief delay (for UX)
+    // If successful, navigate to welcome screen after a brief delay (for UX)
     setTimeout(() => {
-      router.replace('/tabs/home')
+      router.replace('/welcome')
     }, 2000)
   } catch (error: any) {
     logger.error('Failed to acquire session:', error)
@@ -89,7 +89,7 @@ onMounted(async () => {
       errorMessage.value = ''
       try {
         await sessionStore.acquireSession()
-        router.replace('/tabs/home')
+        router.replace('/welcome')
       } catch (retryError) {
         errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
       }
