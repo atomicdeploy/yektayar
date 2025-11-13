@@ -879,7 +879,7 @@ An interactive TUI script for testing Socket.IO connectivity and functionality w
 - ✅ Beautiful TUI with colors and progress indicators
 
 **Requirements:**
-- Backend must be running with **Node.js** (Socket.IO not available with Bun)
+- Backend must be running (supports both Bun and Node.js runtimes)
 - `curl` for HTTP requests
 - `node` for Socket.IO client
 - `python3` for JSON formatting (optional)

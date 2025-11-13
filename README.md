@@ -56,10 +56,10 @@ YektaYar is a comprehensive mental health care platform that connects users with
 
 - **Node.js** >= 18.0.0
 - **npm** >= 9.0.0
-- **Bun** >= 1.0.0 (optional for backend, Node.js recommended for Socket.IO support)
+- **Bun** >= 1.0.0 (optional for backend, both Bun and Node.js fully supported)
 - **PostgreSQL** 15+ (for database)
 
-> **Note:** The backend supports both Bun and Node.js runtimes. Socket.IO real-time features are only available when using Node.js. The backend automatically detects the runtime and configures itself accordingly.
+> **Note:** The backend supports both Bun and Node.js runtimes with full Socket.IO support. Bun uses the native `@socket.io/bun-engine` for Socket.IO. The backend automatically detects the runtime and configures itself accordingly.
 
 ### Installation
 
@@ -128,7 +128,7 @@ yektayar/
 - **Framework**: Elysia.js (TypeScript, Bun/Node.js runtime)
 - **Database**: PostgreSQL 15+
 - **Validation**: Zod
-- **Real-time**: Socket.IO (requires Node.js runtime)
+- **Real-time**: Socket.IO (supported on both Bun and Node.js)
 - **API Docs**: Swagger
 
 ### Frontend (Admin Panel)

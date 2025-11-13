@@ -55,7 +55,7 @@ YektaYar backend provides real-time communication capabilities using Socket.IO. 
 
 The backend automatically detects the runtime environment and configures Socket.IO accordingly:
 
-### Node.js Runtime (Recommended for Socket.IO)
+### Node.js Runtime
 
 ✅ **Full Socket.IO support**
 
@@ -81,9 +81,9 @@ Expected output:
 
 ### Bun Runtime
 
-⚠️ **Limited Socket.IO support**
+✅ **Full Socket.IO support**
 
-When running with Bun, Socket.IO is not available due to Bun's different server architecture:
+Bun natively supports Socket.IO via `@socket.io/bun-engine`. When running with Bun, Socket.IO is fully functional:
 
 ```bash
 cd packages/backend
@@ -96,11 +96,10 @@ Expected output:
 🚀 YektaYar API Server running at http://localhost:3000
 📚 API Documentation available at http://localhost:3000/api-docs
 🔒 Documentation protected with Basic Auth
-⚠️  Socket.IO not available with Bun runtime
-💡 Tip: Use Node.js runtime for full Socket.IO support
+✅ Socket.IO enabled on same port (3000)
 ```
 
-**Recommendation:** Use Node.js for production deployments requiring real-time features.
+**Note:** Both Bun and Node.js runtimes provide full Socket.IO functionality. Bun uses the native `@socket.io/bun-engine` for optimal performance.
 
 ---
 
@@ -653,17 +652,18 @@ main()
 2. Enable polling transport as fallback
 3. Check CORS settings in `.env`
 
-### Socket.IO Not Available with Bun
+### Bun Engine Not Installed
 
-**Problem:** Backend shows "Socket.IO not available with Bun runtime"
+**Problem:** Error about `@socket.io/bun-engine` not being available
 
 **Solution:**
-Run backend with Node.js instead:
+Install the Bun engine package:
 ```bash
 cd packages/backend
-npm run build
-node dist/index.js
+npm install @socket.io/bun-engine
 ```
+
+Then restart the backend.
 
 ### Connection Timeout
 

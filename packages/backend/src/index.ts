@@ -11,7 +11,7 @@ import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
-import { setupSocketIO } from './websocket/socketServer'
+import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
 
 // Configure CORS based on environment
@@ -89,28 +89,37 @@ let httpServer: any
 let io: SocketIOServer | undefined
 
 if (isBun) {
-  // Bun runtime: Use Bun.serve with fetch handler
+  // Bun runtime: Bun natively supports Socket.IO via @socket.io/bun-engine
   console.log(`⚡ Detected runtime: Bun ${Bun.version}`)
+  
+  // Setup Socket.IO with Bun engine
+  const { engine, ioInstance } = setupBunSocketIO()
+  io = ioInstance
+  
+  const handler = engine.handler()
   
   httpServer = Bun.serve({
     port,
     hostname,
-    fetch: app.fetch,
-    websocket: {
-      message() {}, // Placeholder for potential future Bun WebSocket usage
-      open() {},
-      close() {}
-    }
+    fetch: async (req, server) => {
+      const url = new URL(req.url)
+      // Handle Socket.IO requests
+      if (url.pathname.startsWith('/socket.io/')) {
+        return engine.handleRequest(req, server)
+      }
+      // Handle regular Elysia app requests
+      return app.fetch(req)
+    },
+    websocket: handler.websocket
   })
   
   console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
   console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
   console.log(`🔒 Documentation protected with Basic Auth`)
-  console.log(`⚠️  Socket.IO not available with Bun runtime`)
-  console.log(`💡 Tip: Use Node.js runtime for full Socket.IO support`)
+  console.log(`✅ Socket.IO enabled on same port (${port})`)
   
 } else if (isNode) {
-  // Node.js runtime: Create HTTP server and initialize Socket.IO
+  // Node.js runtime: Use traditional HTTP server with Socket.IO
   console.log(`⚡ Detected runtime: Node.js ${process.version}`)
   
   // Create HTTP server that wraps the Elysia app
