@@ -182,8 +182,8 @@ export function setupSocketIO(httpServer: HTTPServer) {
         console.log(`AI response completed for ${socket.id}`)
       } catch (error) {
         console.error('AI chat error:', error)
-        socket.emit('ai:response:error', {
-          error: 'Failed to generate response. Please try again.'
+        socket.emit('ai:response:error', { 
+          error: 'Failed to generate response. Please try again.' 
         })
       }
     })
