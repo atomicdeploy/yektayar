@@ -5,12 +5,9 @@ import App from './App.vue'
 import router from './router'
 import './assets/main.css'
 import config from './config'
-import { ErrorScreen } from '@yektayar/shared'
-import { parseSolutionsMarkdown, findSolutionForError, validateApi } from '@yektayar/shared'
+import { ErrorScreen, parseSolutionsMarkdown, findSolutionForError, validateApi, messages, logger } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
-import { messages } from './locales'
-import { logger } from '@yektayar/shared'
 
 // Log startup information
 logger.startup('YektaYar Admin Panel', {
