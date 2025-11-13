@@ -90,7 +90,7 @@ npm run dev:mobile     # Mobile App (port 8100)
 ### Access the Applications
 
 - **Backend API**: http://localhost:3000
-- **API Documentation**: http://localhost:3000/swagger
+- **API Documentation**: http://localhost:3000/api-docs (protected with Basic Auth - see `.env` for credentials)
 - **Admin Panel**: http://localhost:5173
 - **Mobile App**: http://localhost:8100
 
@@ -207,6 +207,7 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 
 #### Additional Resources
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
+- **[CORS Fix Documentation](CORS-FIX.md)** - CORS OPTIONS verb support implementation
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 

@@ -448,9 +448,15 @@ CREATE TABLE sessions (
 
 ## 📖 API Documentation
 
-### Access Swagger UI
+### Access API Documentation
 
-When backend is running: http://localhost:3000/swagger
+When backend is running: http://localhost:3000/api-docs
+
+**Note**: The API documentation is protected with Basic Authentication. Use the credentials defined in your `.env` file:
+- Username: Set via `SWAGGER_USERNAME` environment variable (default: `admin`)
+- Password: Set via `SWAGGER_PASSWORD` environment variable
+
+When prompted by your browser, enter these credentials to access the documentation.
 
 ### API Endpoints
 

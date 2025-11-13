@@ -357,6 +357,10 @@ JWT_EXPIRY=7d
 # CORS Settings (update with your domain)
 CORS_ORIGIN=https://yourdomain.com,https://www.yourdomain.com
 
+# Disable application-level CORS when behind Apache/Nginx with CORS headers
+# This prevents duplicate CORS headers that cause policy violations
+DISABLE_CORS=true
+
 # WebSocket
 WEBSOCKET_PORT=3001
 
