@@ -30,6 +30,9 @@ yektayar/
 # Install all dependencies
 npm install
 
+# Check requirements (automatically runs after install)
+npm run check:requirements
+
 # Start all services
 npm run dev
 
@@ -50,7 +53,7 @@ npm run clean
 ## 🔗 Local URLs
 
 - **Backend API**: http://localhost:3000
-- **API Docs (Swagger)**: http://localhost:3000/swagger
+- **API Documentation**: http://localhost:3000/api-docs (requires Basic Auth - see `.env`)
 - **Admin Panel**: http://localhost:5173
 - **Mobile App**: http://localhost:8100
 
@@ -378,6 +381,9 @@ npm run clean
 npm install
 ```
 
+### Issue: `ionic: not found` when building mobile app
+**Solution**: This has been fixed. The build now uses `npx cap copy` instead of `ionic capacitor copy`. Run `npm run check:requirements` to verify your setup.
+
 ---
 
 ## 💡 Development Tips
@@ -393,7 +399,7 @@ npm install
 - Mobile: Chrome DevTools for web, native debuggers for mobile
 
 ### Testing API
-- Use Swagger UI at http://localhost:3000/swagger
+- Use API Documentation at http://localhost:3000/api-docs (requires Basic Auth credentials from `.env`)
 - Or use Postman/Insomnia
 
 ### Code Style

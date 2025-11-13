@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
+import { cookie } from '@elysiajs/cookie'
 import { Server as HTTPServer } from 'http'
 import { Server as SocketIOServer } from 'socket.io'
 import { authRoutes } from './routes/auth'
@@ -12,11 +13,33 @@ import { dashboardRoutes } from './routes/dashboard'
 import { setupSocketIO } from './websocket/socketServer'
 import { testConnection } from './db/connection'
 import { initializeDatabase } from './db/migrate'
+import { swaggerAuth } from './middleware/swaggerAuth'
+
+// Configure CORS based on environment
+// When behind a reverse proxy (like Apache), disable application-level CORS
+// to avoid duplicate headers
+const corsEnabled = process.env.DISABLE_CORS !== 'true'
+const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:8100']
 
 const app = new Elysia()
-  .use(cors())
+  .use(cookie())
+  .use(corsEnabled ? cors({
+    origin: corsOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposeHeaders: ['Content-Length', 'Content-Type'],
+    maxAge: 86400 // 24 hours
+  }) : (app) => app)
+  // Even when CORS is disabled at app level, we need to handle OPTIONS for reverse proxy
+  .options('/*', ({ set }) => {
+    set.status = 204
+    return ''
+  })
+  .use(swaggerAuth)
   .use(
     swagger({
+      path: '/api-docs',
       documentation: {
         info: {
           title: 'YektaYar API',
@@ -106,8 +129,10 @@ async function startServer() {
   // const io = setupSocketIO(httpServer)
   // httpServer.listen(port, hostname)
 
-  return httpServer
-}
+console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
+console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
+console.log(`🔒 Documentation protected with Basic Auth`)
+console.log(`⚡ Runtime: Bun ${Bun.version}`)
 
 // Start the server
 const httpServer = await startServer()
