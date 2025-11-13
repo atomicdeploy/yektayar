@@ -81,7 +81,7 @@
       <div class="section">
         <h3 class="section-title">{{ locale === 'fa' ? 'تنظیمات حساب' : 'Account Settings' }}</h3>
         <ion-list class="settings-list" :inset="true">
-          <ion-item button detail>
+          <ion-item button detail @click="navigateToPersonalInfo">
             <ion-icon :icon="personCircle" slot="start" color="primary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'اطلاعات شخصی' : 'Personal Information' }}</h3>
@@ -221,6 +221,14 @@ import { useTheme } from '../composables/useTheme'
 
 const { locale } = useI18n()
 const { isDark, toggleTheme } = useTheme()
+
+// Import router for navigation
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+function navigateToPersonalInfo() {
+  router.push('/tabs/profile/personal-info')
+}
 </script>
 
 <style scoped>
