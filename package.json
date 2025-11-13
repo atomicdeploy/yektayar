@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "YektaYar - Mental Health Care Platform",
   "private": true,
+  "type": "module",
   "workspaces": [
     "packages/*"
   ],
@@ -20,6 +21,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:deps": "node scripts/test-dependencies.js",
+    "socketio:test": "node scripts/socketio-tui.js",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
@@ -50,5 +52,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
+    "socket.io-client": "^4.8.1"
   }
 }

@@ -63,6 +63,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - [Development Guide](../DEVELOPMENT.md) - Development practices and prototype sprint guide
 - [Getting Started Guide](GETTING-STARTED.md) - Onboarding guide
 - [Quick Reference](QUICK-REFERENCE.md) - Code snippets & patterns
+- [Socket.IO Guide](SOCKETIO-GUIDE.md) - Real-time WebSocket communication setup and usage
 
 ### Setup & Deployment
 - [Setup Guide](SETUP.md) - Complete setup instructions

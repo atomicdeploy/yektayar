@@ -52,6 +52,10 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'contact',
         component: () => import('@/views/ContactUsPage.vue')
+      },
+      {
+        path: 'chat/ai',
+        component: () => import('@/views/AIChatPage.vue')
       }
     ]
   }
