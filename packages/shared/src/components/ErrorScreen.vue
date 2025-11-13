@@ -1,60 +1,59 @@
 <template>
-  <ion-page>
-    <ion-content :class="['error-content', { 'dark-mode': isDarkMode }]">
-      <div class="error-container" :dir="direction">
-        <div class="error-icon">❌</div>
-        <h1 class="error-title">{{ t('error_screen.api_config_error') }}</h1>
-        <p class="error-message">{{ t('error_screen.cannot_start') }}</p>
-        
-        <div v-if="isDevelopment && details" class="error-section">
-          <h3 class="section-title">{{ t('error_screen.details') }}</h3>
-          <div class="error-details">
-            <p>{{ translatedDetails }}</p>
-          </div>
-        </div>
-
-        <div v-if="isDevelopment && showSolution" class="error-section">
-          <ion-button expand="block" @click="toggleSolution" class="solution-toggle">
-            {{ solutionExpanded ? t('error_screen.hide_solution') : t('error_screen.show_solution') }}
-            <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
-          </ion-button>
-          
-          <div v-if="solutionExpanded" class="solution-content">
-            <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
-            
-            <p class="solution-text">{{ t('error_screen.fix_instruction') }}</p>
-            <div class="code-block" direction="ltr">
-              <code>./scripts/manage-env.sh</code>
-            </div>
-            
-            <p class="solution-text">{{ t('error_screen.or') }}</p>
-            
-            <p class="solution-text">{{ t('error_screen.manual_setup') }}</p>
-            <div class="code-block" direction="ltr">
-              <code>API_BASE_URL=http://localhost:3000</code>
-            </div>
-            
-            <p class="solution-note">{{ t('error_screen.restart_note') }}</p>
-          </div>
+  <div class="error-screen" :class="{ 'dark-mode': isDarkMode }" :dir="direction">
+    <div class="error-container">
+      <div class="error-icon">❌</div>
+      <h1 class="error-title">{{ t('error_screen.api_config_error') }}</h1>
+      <p class="error-message">{{ t('error_screen.cannot_start') }}</p>
+      
+      <div v-if="isDevelopment && details" class="error-section">
+        <h3 class="section-title">{{ t('error_screen.details') }}</h3>
+        <div class="error-details">
+          <p>{{ translatedDetails }}</p>
         </div>
       </div>
-    </ion-content>
-  </ion-page>
+
+      <div v-if="isDevelopment && showSolution" class="error-section">
+        <button @click="toggleSolution" class="solution-toggle">
+          {{ solutionExpanded ? t('error_screen.hide_solution') : t('error_screen.show_solution') }}
+          <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
+        </button>
+        
+        <div v-if="solutionExpanded" class="solution-content">
+          <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
+          
+          <p v-if="currentSolution.solution" class="solution-text">{{ currentSolution.solution }}</p>
+          
+          <div v-for="(step, index) in currentSolution.steps" :key="index" class="code-block">
+            <code>{{ step }}</code>
+          </div>
+          
+          <p v-if="currentSolution.note" class="solution-note">
+            <span class="info-icon">ℹ️</span>
+            <span class="note-text">{{ currentSolution.note }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { IonPage, IonContent, IonButton } from '@ionic/vue'
 import { useI18n } from 'vue-i18n'
+import type { Solution } from '../utils/solutions'
 
 interface Props {
   title?: string
   message: string
   details?: string
+  solution?: Solution | null
+  errorType?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Configuration Error'
+  title: 'Configuration Error',
+  solution: null,
+  errorType: undefined
 })
 
 const { t, locale } = useI18n()
@@ -79,9 +78,12 @@ const translatedDetails = computed(() => {
   return props.details
 })
 
+const currentSolution = computed(() => {
+  return props.solution
+})
+
 const showSolution = computed(() => {
-  // Show solution only if the error is about missing API_BASE_URL
-  return props.details?.includes('API_BASE_URL') || props.details?.includes('VITE_API_BASE_URL')
+  return currentSolution.value !== null && currentSolution.value !== undefined
 })
 
 const toggleSolution = () => {
@@ -102,22 +104,32 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.error-content {
-  --background: #f8f9fa;
+.error-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: background 0.3s ease;
 }
 
-.error-content.dark-mode {
-  --background: #1a1a1a;
+.error-screen.dark-mode {
+  background: #1a1a1a;
 }
 
 .error-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 2rem;
   text-align: center;
+  padding: 2rem;
+  max-width: 700px;
+  width: 100%;
 }
 
 .error-icon {
@@ -140,7 +152,6 @@ onMounted(() => {
   font-size: 1.125rem;
   color: #495057;
   margin-bottom: 1.5rem;
-  max-width: 600px;
   line-height: 1.6;
 }
 
@@ -150,7 +161,6 @@ onMounted(() => {
 
 .error-section {
   width: 100%;
-  max-width: 600px;
   margin-top: 1.5rem;
 }
 
@@ -193,11 +203,35 @@ onMounted(() => {
 }
 
 .solution-toggle {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s ease;
   margin-bottom: 1rem;
 }
 
+.solution-toggle:hover {
+  background: #0056b3;
+}
+
+.dark-mode .solution-toggle {
+  background: #0d6efd;
+}
+
+.dark-mode .solution-toggle:hover {
+  background: #0a58ca;
+}
+
 .toggle-icon {
-  margin-inline-start: 0.5rem;
   font-size: 0.875rem;
 }
 
@@ -223,6 +257,8 @@ onMounted(() => {
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
   overflow-x: auto;
+  direction: ltr;
+  text-align: left;
 }
 
 .dark-mode .code-block {
@@ -235,6 +271,7 @@ onMounted(() => {
   font-size: 0.875rem;
   color: #e83e8c;
   white-space: pre;
+  direction: ltr;
 }
 
 .dark-mode .code-block code {
@@ -246,6 +283,21 @@ onMounted(() => {
   color: #6c757d;
   font-style: italic;
   margin-top: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  direction: ltr;
+  text-align: left;
+}
+
+.info-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.note-text {
+  flex: 1;
 }
 
 .dark-mode .solution-note {

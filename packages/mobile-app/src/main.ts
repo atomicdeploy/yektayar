@@ -5,10 +5,8 @@ import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
 import config from './config'
-import { validateApi } from '@yektayar/shared'
-import ErrorScreen from './components/ErrorScreen.vue'
+import { ErrorScreenMobile, parseSolutionsMarkdown, findSolutionForError, validateApi, logger, messages } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
-import { logger, messages } from '@yektayar/shared'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -58,20 +56,39 @@ async function initializeApp() {
   if (!validationResult.isValid) {
     logger.error('❌ API Configuration Error:', validationResult.error)
     
-    // Create and mount error screen
-    const errorApp = createApp(ErrorScreen, {
-      title: 'API Configuration Error',
-      message: 'Cannot start the application due to API configuration issues.',
-      details: validationResult.error
-    })
+    // Allow bypassing API validation only if explicitly enabled via environment variable
+    // Set VITE_SKIP_API_VALIDATION=true in .env to enable this for UI testing
+    const skipApiValidation = import.meta.env.VITE_SKIP_API_VALIDATION === 'true'
     
-    errorApp.use(IonicVue)
-    errorApp.use(i18n)
-    errorApp.mount('#app')
-    return
+    if (skipApiValidation) {
+      logger.warn('⚠️ VITE_SKIP_API_VALIDATION is enabled - bypassing API validation')
+      logger.warn('⚠️ This should only be used for UI development/testing')
+    } else {
+      // Show error screen with solution parsing
+      let solution = null
+      if (import.meta.env.DEV && import.meta.env.SOLUTIONS_MD) {
+        const solutionsData = parseSolutionsMarkdown(import.meta.env.SOLUTIONS_MD)
+        solution = findSolutionForError(solutionsData, validationResult.error || '', validationResult.errorType)
+      }
+      
+    // Create and mount error screen
+      const errorApp = createApp(ErrorScreenMobile, {
+        title: 'API Configuration Error',
+        message: 'Cannot start the application due to API configuration issues.',
+        details: validationResult.error,
+        solution: solution,
+        errorType: validationResult.errorType
+      })
+      
+      errorApp.use(IonicVue)
+      errorApp.use(i18n)
+      errorApp.mount('#app')
+      return
+    }
+  } else {
+    logger.info(`✅ API Base URL: ${config.apiBaseUrl}`)
   }
-
-  logger.info(`✅ API Base URL: ${config.apiBaseUrl}`)
+  
   logger.info('=== Initialization Complete ===')
 
   // Create and mount the main app
