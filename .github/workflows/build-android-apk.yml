@@ -78,6 +78,32 @@ jobs:
           cd packages/mobile-app
           npm run android:build:release
 
+      - name: Analyze Debug APK
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
+        id: analyze-debug
+        run: |
+          chmod +x scripts/analyze-apk.sh
+          APK_PATH="packages/mobile-app/android/app/build/outputs/apk/debug/app-debug.apk"
+          echo "Analyzing APK at: $APK_PATH"
+          ./scripts/analyze-apk.sh "$APK_PATH" > apk-analysis.txt
+          cat apk-analysis.txt
+          echo "analysis<<EOF" >> $GITHUB_OUTPUT
+          cat apk-analysis.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Analyze Release APK
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        id: analyze-release
+        run: |
+          chmod +x scripts/analyze-apk.sh
+          APK_PATH="packages/mobile-app/android/app/build/outputs/apk/release/app-release-unsigned.apk"
+          echo "Analyzing APK at: $APK_PATH"
+          ./scripts/analyze-apk.sh "$APK_PATH" > apk-analysis.txt
+          cat apk-analysis.txt
+          echo "analysis<<EOF" >> $GITHUB_OUTPUT
+          cat apk-analysis.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Upload Debug APK
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
         uses: actions/upload-artifact@v4
@@ -94,15 +120,36 @@ jobs:
           path: packages/mobile-app/android/app/build/outputs/apk/release/app-release-unsigned.apk
           retention-days: 30
 
+      - name: Upload APK Analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-analysis
+          path: apk-analysis.txt
+          retention-days: 30
+
       - name: Comment PR with APK
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const fs = require('fs');
+            const analysis = fs.readFileSync('apk-analysis.txt', 'utf8');
+            
+            const body = `## ✅ Android APK Built Successfully!
+            
+            Download the artifact from the [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+            
+            ### APK Analysis
+            
+            \`\`\`
+            ${analysis}
+            \`\`\`
+            `;
+            
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '✅ Android APK built successfully! Download the artifact from the Actions tab.'
+              body: body
             })

@@ -23,8 +23,10 @@
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
-    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs",
-    "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android"
+    "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android",
+    "android:build": "npm run build:mobile && cd packages/mobile-app && npm run cap:sync && npm run android:build:debug",
+    "android:analyze": "bash scripts/analyze-apk.sh",
+    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs"
   },
   "keywords": [
     "mental-health",
