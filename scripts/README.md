@@ -261,6 +261,54 @@ sudo ./scripts/install-caddy.sh
 2. Wait for DNS propagation (5-30 minutes)
 3. Caddy will automatically obtain SSL certificates!
 
+#### `compare-webserver-configs.sh`
+
+Compares installed webserver configurations with repository versions and alerts users about differences.
+
+**Usage:**
+```bash
+./scripts/compare-webserver-configs.sh
+```
+
+**What it does:**
+- Detects which webservers are installed (Apache, Nginx, Caddy)
+- Compares installed configuration files with repository versions
+- Shows differences between configs in unified diff format
+- Provides step-by-step instructions to update configurations
+- Warns about outdated or missing configurations
+
+**Features:**
+- ✅ Automatic webserver detection
+- ✅ Interactive diff viewing
+- ✅ Color-coded output for easy reading
+- ✅ Step-by-step update instructions
+- ✅ Highlights important changes (e.g., WebSocket improvements)
+
+**When to run:**
+- After pulling updates from the repository
+- Before and after system updates
+- When troubleshooting configuration issues
+- When migrating to a new server
+- After modifying webserver configs
+
+**Example output:**
+```
+✅ Detected webservers: nginx 
+=========================================
+Checking nginx configurations
+=========================================
+✅ api.yektayar.ir.conf - Up to date
+❌ panel.yektayar.ir.conf - Differs from repository
+  
+Would you like to see the differences? [y/N]:
+```
+
+**Important notes:**
+- The script is read-only and safe to run
+- It does not modify any system files
+- Update instructions are provided for manual review
+- Recent updates include improved WebSocket support for Nginx
+
 #### `install-services.sh`
 
 Installs systemd service files and sets up logging infrastructure.
