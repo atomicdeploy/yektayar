@@ -80,6 +80,75 @@ export function setupSocketIO(httpServer: HTTPServer) {
       socket.emit('pong', { timestamp: new Date().toISOString() })
     })
 
+    // Handle status command - returns server and connection status
+    socket.on('status', () => {
+      socket.emit('status_response', {
+        server: {
+          name: 'YektaYar API Server',
+          version: '0.1.0',
+          status: 'running',
+          timestamp: new Date().toISOString()
+        },
+        connection: {
+          socketId: socket.id,
+          sessionToken: socketData.sessionToken,
+          userId: socketData.userId,
+          isLoggedIn: socketData.isLoggedIn,
+          rooms: Array.from(socket.rooms)
+        }
+      })
+    })
+
+    // Handle echo command - echoes back the received message
+    socket.on('echo', (data) => {
+      socket.emit('echo_response', {
+        received: data,
+        timestamp: new Date().toISOString(),
+        socketId: socket.id
+      })
+    })
+
+    // Handle info command - returns detailed server information
+    socket.on('info', () => {
+      const connections = io.sockets.sockets.size
+      socket.emit('info_response', {
+        server: {
+          name: 'YektaYar Mental Health Platform API',
+          version: '0.1.0',
+          description: 'Backend API with Socket.IO real-time communication',
+          features: {
+            rest: true,
+            websocket: true,
+            authentication: true,
+            realtime: true
+          }
+        },
+        websocket: {
+          connected: true,
+          transport: socket.conn.transport.name,
+          protocol: socket.conn.protocol,
+          activeConnections: connections
+        },
+        session: {
+          authenticated: socketData.isLoggedIn,
+          userId: socketData.userId || 'anonymous',
+          sessionToken: socketData.sessionToken ? '***' + socketData.sessionToken.slice(-4) : null
+        },
+        timestamp: new Date().toISOString()
+      })
+    })
+
+    // Handle custom message command
+    socket.on('message', (data) => {
+      console.log(`Message received from ${socket.id}:`, data)
+      socket.emit('message_received', {
+        success: true,
+        message: 'Message received successfully',
+        data: data,
+        timestamp: new Date().toISOString()
+      })
+    })
+
     // Handle disconnect
     socket.on('disconnect', (reason) => {
       console.log(`Socket disconnected: ${socket.id}`, { reason })
