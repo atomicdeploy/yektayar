@@ -857,6 +857,60 @@ Android APK Analysis
 **Integration with CI/CD:**
 The script is automatically used in the GitHub Actions workflow to analyze built APKs and post the analysis as a comment on pull requests.
 
+## Testing Scripts
+
+### `test-socketio.sh`
+
+An interactive TUI script for testing Socket.IO connectivity and functionality with the YektaYar backend server.
+
+**Usage:**
+```bash
+./scripts/test-socketio.sh [backend-url]
+```
+
+**Default backend URL:** `http://localhost:3000`
+
+**What it does:**
+- ✅ Checks backend health
+- ✅ Acquires a session token
+- ✅ Establishes Socket.IO connection
+- ✅ Tests all Socket.IO commands (ping, status, info, echo, message)
+- ✅ Provides interactive mode for manual testing
+- ✅ Beautiful TUI with colors and progress indicators
+
+**Requirements:**
+- Backend must be running with **Node.js** (Socket.IO not available with Bun)
+- `curl` for HTTP requests
+- `node` for Socket.IO client
+- `python3` for JSON formatting (optional)
+
+**Example:**
+```bash
+# Test local backend
+./scripts/test-socketio.sh
+
+# Test remote backend
+./scripts/test-socketio.sh https://api.yektayar.com
+```
+
+**Socket.IO Commands Tested:**
+1. **ping/pong** - Connection health check
+2. **status** - Server and connection status
+3. **info** - Detailed server information
+4. **echo** - Message echo for testing
+5. **message** - Custom message handling
+
+**Features:**
+- Automated test suite with all commands
+- Interactive mode for manual testing
+- Clear visual feedback with emojis and colors
+- Detailed JSON response display
+- Automatic cleanup of temporary files
+
+**See also:** [Socket.IO Guide](../docs/SOCKETIO-GUIDE.md) for complete documentation.
+
+---
+
 ## Dependency Testing
 
 ### `test-dependencies.js`
