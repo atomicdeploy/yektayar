@@ -108,11 +108,21 @@ Content-Type: application/json
 Add the following to your `.env` file:
 
 ```bash
-# FarazSMS Configuration
+# FarazSMS Configuration (Required)
 FARAZSMS_API_KEY=your_api_key_here
 FARAZSMS_PATTERN_CODE=your_pattern_uid
 FARAZSMS_LINE_NUMBER=your_line_number
+
+# Advanced Configuration (Optional)
+# FARAZSMS_API_ENDPOINT=https://api.iranpayamak.com/ws/v1/sms/pattern
+# FARAZSMS_AUTH_FORMAT=Api-Key
 ```
+
+**Advanced Options:**
+- `FARAZSMS_API_ENDPOINT`: Custom API endpoint (supports both iranpayamak.com and ippanel.com formats)
+- `FARAZSMS_AUTH_FORMAT`: Authentication header format (`Api-Key` or `AccessKey`)
+
+**Note:** The implementation supports both FarazSMS API formats for maximum compatibility.
 
 ### FarazSMS Setup
 
@@ -282,8 +292,13 @@ The system automatically cleans up expired and verified OTPs every 5 minutes to 
 | `Please wait X seconds before requesting a new OTP` | Rate limit exceeded | Wait for the specified time |
 | `OTP has expired` | OTP validity expired | Request a new OTP |
 | `Maximum verification attempts exceeded` | Too many wrong attempts | Request a new OTP |
-| `FarazSMS API request failed: 401` | Invalid API key | Check your API key in `.env` |
-| `FarazSMS API request failed: 400` | Invalid pattern or config | Verify pattern code and line number |
+| `FarazSMS API request failed: 401 - Invalid API key` | Invalid API key | Check your API key in `.env` |
+| `FarazSMS API request failed: 400 - Invalid request` | Invalid pattern or config | Verify pattern code and line number |
+| `FarazSMS API request failed: 429 - Rate limit exceeded` | Too many requests | Wait before sending more messages |
+
+### Enhanced Error Messages
+
+The implementation provides context-aware error messages based on HTTP status codes to help diagnose issues quickly.
 
 ## Future Enhancements
 
@@ -294,9 +309,39 @@ The system automatically cleans up expired and verified OTPs every 5 minutes to 
 - [ ] Multi-language pattern support
 - [ ] Email OTP as fallback option
 
+## Implementation Notes
+
+### API Compatibility
+
+This implementation supports both FarazSMS API formats:
+
+1. **iranpayamak.com API** (default)
+   - Endpoint: `https://api.iranpayamak.com/ws/v1/sms/pattern`
+   - Auth header: `Api-Key: <key>`
+
+2. **ippanel.com API** (alternative)
+   - Endpoint: `http://rest.ippanel.com/v1/messages/patterns/send`
+   - Auth header: `Authorization: AccessKey <key>`
+
+Both formats are supported through environment configuration for maximum compatibility.
+
+### Design Decisions
+
+**Why not use @aspianet/faraz-sms?**
+- Package contains security vulnerabilities (outdated axios with known CVEs)
+- Our implementation uses native fetch API (no dependencies)
+- Analyzed their code and adopted best practices while maintaining security
+
+**Architecture Benefits:**
+- Stateless functions (better for serverless/microservices)
+- Environment-based configuration (no global state)
+- Flexible authentication and endpoint support
+- Enhanced error handling with helpful messages
+
 ## References
 
 - [FarazSMS Official Documentation](https://docs.iranpayamak.com/)
+- [IPPanel REST API Documentation](http://docs.ippanel.com/)
 - [FarazSMS Pattern API](https://docs.iranpayamak.com/send-pattern-based-sms-13925177e0)
 - [FarazSMS Panel](https://panel.farazsms.com/)
 

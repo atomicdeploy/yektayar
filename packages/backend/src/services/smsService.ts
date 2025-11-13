@@ -3,10 +3,14 @@
  * 
  * Handles sending SMS messages through FarazSMS (iranpayamak.com) provider
  * Uses pattern-based SMS API for fast OTP delivery
+ * 
+ * @see {@link https://docs.iranpayamak.com/ | FarazSMS Official Documentation}
+ * @see {@link http://docs.ippanel.com/ | IPPanel REST API Documentation}
  */
 
 /**
  * FarazSMS pattern-based SMS request body
+ * Supports both iranpayamak.com and ippanel.com API formats
  */
 interface FarazSMSPatternRequest {
   /** Pattern UID from FarazSMS panel */
@@ -37,15 +41,22 @@ interface SMSConfig {
   apiKey: string;
   patternCode: string;
   lineNumber: string;
+  /** API endpoint to use (defaults to iranpayamak.com) */
+  apiEndpoint?: string;
+  /** Authentication header format (defaults to 'Api-Key') */
+  authFormat?: 'Api-Key' | 'AccessKey';
 }
 
 /**
  * Get SMS configuration from environment variables
+ * Supports both iranpayamak.com and ippanel.com API formats
  */
 function getSMSConfig(): SMSConfig {
   const apiKey = process.env.FARAZSMS_API_KEY;
   const patternCode = process.env.FARAZSMS_PATTERN_CODE;
   const lineNumber = process.env.FARAZSMS_LINE_NUMBER;
+  const apiEndpoint = process.env.FARAZSMS_API_ENDPOINT || 'https://api.iranpayamak.com/ws/v1/sms/pattern';
+  const authFormat = (process.env.FARAZSMS_AUTH_FORMAT as 'Api-Key' | 'AccessKey') || 'Api-Key';
 
   if (!apiKey) {
     throw new Error('FARAZSMS_API_KEY is not configured in environment variables');
@@ -57,7 +68,7 @@ function getSMSConfig(): SMSConfig {
     throw new Error('FARAZSMS_LINE_NUMBER is not configured in environment variables');
   }
 
-  return { apiKey, patternCode, lineNumber };
+  return { apiKey, patternCode, lineNumber, apiEndpoint, authFormat };
 }
 
 /**
@@ -99,13 +110,21 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
       number_format: 'english'
     };
 
-    // Make API request
-    const response = await fetch('https://api.iranpayamak.com/ws/v1/sms/pattern', {
+    // Prepare headers with authentication based on format
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (config.authFormat === 'AccessKey') {
+      headers['Authorization'] = `AccessKey ${config.apiKey}`;
+    } else {
+      headers['Api-Key'] = config.apiKey;
+    }
+
+    // Make API request with configurable endpoint and auth format
+    const response = await fetch(config.apiEndpoint!, {
       method: 'POST',
-      headers: {
-        'Api-Key': config.apiKey,
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify(requestBody)
     });
 
@@ -115,9 +134,21 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
       console.error('FarazSMS API error:', {
         status: response.status,
         statusText: response.statusText,
-        body: errorText
+        body: errorText,
+        endpoint: config.apiEndpoint
       });
-      throw new Error(`FarazSMS API request failed: ${response.status} ${response.statusText}`);
+      
+      // Provide helpful error messages based on status code
+      let errorMessage = `FarazSMS API request failed: ${response.status} ${response.statusText}`;
+      if (response.status === 401) {
+        errorMessage += ' - Invalid API key. Please check FARAZSMS_API_KEY in your environment variables.';
+      } else if (response.status === 400) {
+        errorMessage += ' - Invalid request. Please verify pattern code and line number are correct.';
+      } else if (response.status === 429) {
+        errorMessage += ' - Rate limit exceeded. Please wait before sending more messages.';
+      }
+      
+      throw new Error(errorMessage);
     }
 
     // Parse response
