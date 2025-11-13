@@ -30,6 +30,9 @@ yektayar/
 # Install all dependencies
 npm install
 
+# Check requirements (automatically runs after install)
+npm run check:requirements
+
 # Start all services
 npm run dev
 
@@ -377,6 +380,9 @@ sudo systemctl start postgresql
 npm run clean
 npm install
 ```
+
+### Issue: `ionic: not found` when building mobile app
+**Solution**: This has been fixed. The build now uses `npx cap copy` instead of `ionic capacitor copy`. Run `npm run check:requirements` to verify your setup.
 
 ---
 
