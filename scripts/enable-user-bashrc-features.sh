@@ -13,8 +13,9 @@ echo ""
 
 # Backup existing bashrc
 if [ -f ~/.bashrc ]; then
-    echo "📋 Backing up existing ~/.bashrc to ~/.bashrc.backup.$(date +%Y%m%d_%H%M%S)"
-    cp ~/.bashrc ~/.bashrc.backup.$(date +%Y%m%d_%H%M%S)
+    BACKUP_NAME="$HOME/.bashrc.backup.$(date +%Y%m%d_%H%M%S)"
+    echo "📋 Backing up existing ~/.bashrc to $BACKUP_NAME"
+    cp ~/.bashrc "$BACKUP_NAME"
 fi
 
 # Function to add configuration if not already present
