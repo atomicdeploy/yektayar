@@ -105,7 +105,7 @@ export async function streamAIResponse(
     }
 
     // Parse JSON response
-    const data = await response.json()
+    const data = await response.json() as any
     
     // Extract the response text
     let aiResponse = ''
