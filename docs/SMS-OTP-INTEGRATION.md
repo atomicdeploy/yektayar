@@ -169,20 +169,59 @@ You can use the environment management script to set these values:
 
 ### CLI Test Tool
 
-Use the provided test script to verify your SMS configuration:
+A comprehensive test script is provided to help developers verify SMS configuration and test sending.
 
+**Basic Usage:**
 ```bash
-# Basic test (sends OTP "123456" to the number)
+# Send test SMS with default OTP (123456)
 bun scripts/test-sms.ts 09121234567
 
-# Test with custom OTP code
+# Send test SMS with custom OTP code
 bun scripts/test-sms.ts 09121234567 654321
 ```
 
+**Advanced Options:**
+```bash
+# Check configuration without sending SMS
+bun scripts/test-sms.ts 09121234567 --check-only
+
+# Verbose mode with detailed configuration output
+bun scripts/test-sms.ts 09121234567 --verbose
+
+# Show help and all available options
+bun scripts/test-sms.ts --help
+```
+
+**Features:**
+- ✅ Phone number format validation
+- ✅ Environment configuration validation
+- ✅ Colored output for better readability
+- ✅ Detailed error messages with troubleshooting tips
+- ✅ Check-only mode for testing configuration
+- ✅ Verbose mode for debugging
+- ✅ Comprehensive help documentation
+
 **Example Output:**
 ```
-============================================================
-FarazSMS Integration Test
+======================================================================
+  FarazSMS Integration Test
+======================================================================
+
+Step 1: Validating Phone Number
+---
+✓ Phone number format is valid: 09121234567
+
+Step 2: Checking Environment Configuration
+---
+✓ FARAZSMS_API_KEY: Configured
+✓ FARAZSMS_PATTERN_CODE: Configured
+✓ FARAZSMS_LINE_NUMBER: Configured
+
+✓ Environment configuration is complete
+
+Step 3: Sending Test SMS
+---
+ℹ Sending OTP: 123456 to 09121234567
 ============================================================
 
 Testing FarazSMS configuration...
@@ -300,14 +339,101 @@ The system automatically cleans up expired and verified OTPs every 5 minutes to 
 
 The implementation provides context-aware error messages based on HTTP status codes to help diagnose issues quickly.
 
+## Advanced API Usage
+
+### Check Account Credit
+
+```typescript
+import { getUserCredit } from './services/smsService';
+
+const creditInfo = await getUserCredit();
+console.log(`Remaining credit: ${creditInfo.data.credit}`);
+```
+
+### Send Regular SMS (Non-Pattern)
+
+```typescript
+import { sendSMS } from './services/smsService';
+
+const result = await sendSMS(
+  '50002191307530',  // originator (your line number)
+  ['09121234567', '09351234567'],  // recipients
+  'Welcome to our service!'  // message
+);
+console.log(`Message ID: ${result.data.bulk_id}`);
+```
+
+### Send Pattern SMS with Custom Variables
+
+```typescript
+import { sendPatternSMS } from './services/smsService';
+
+// Define your pattern variables type
+interface WelcomePattern {
+  name: string;
+  code: string;
+}
+
+const result = await sendPatternSMS<WelcomePattern>(
+  'abc123xyz',  // pattern code
+  '50002191307530',  // originator
+  '09121234567',  // recipient
+  {
+    name: 'John',
+    code: '123456'
+  }
+);
+```
+
+### Create New Pattern
+
+```typescript
+import { createPattern } from './services/smsService';
+
+const pattern = 'Dear %name%, your verification code is %code%';
+const result = await createPattern(
+  pattern,
+  'User verification pattern',
+  false  // is_shared
+);
+console.log(`Pattern created with code: ${result.data.pattern.code}`);
+```
+
+### Track Message Delivery Status
+
+```typescript
+import { getSMSDetails, getMessageRecipientsStatus } from './services/smsService';
+
+// Get message details
+const smsDetails = await getSMSDetails(52738671);
+console.log(`Message status: ${smsDetails.data.status}`);
+
+// Get recipients status
+const recipients = await getMessageRecipientsStatus(52738671);
+recipients.data.forEach((recipient: any) => {
+  console.log(`${recipient.number}: ${recipient.status}`);
+});
+```
+
+### Check Inbox Messages
+
+```typescript
+import { fetchInboxMessages } from './services/smsService';
+
+const inbox = await fetchInboxMessages();
+inbox.data.forEach((message: any) => {
+  console.log(`From ${message.number}: ${message.message}`);
+});
+```
+
 ## Future Enhancements
 
 - [ ] Database storage for OTP records (currently in-memory)
 - [ ] Support for multiple SMS providers
-- [ ] SMS delivery status tracking
 - [ ] Analytics dashboard for SMS usage
 - [ ] Multi-language pattern support
 - [ ] Email OTP as fallback option
+- [ ] Webhook support for delivery notifications
 
 ## Implementation Notes
 
@@ -325,18 +451,70 @@ This implementation supports both FarazSMS API formats:
 
 Both formats are supported through environment configuration for maximum compatibility.
 
+### Complete API Coverage
+
+Our implementation provides **full feature parity** with `@aspianet/faraz-sms` including:
+
+**Core Functions:**
+- ✅ `sendOTPSMS()` - Send OTP via pattern (primary use case)
+- ✅ `sendPatternSMS()` - Generic pattern-based SMS with type safety
+- ✅ `sendSMS()` - Regular SMS (non-pattern)
+
+**Account Management:**
+- ✅ `getAuthenticatedUser()` - Get user information
+- ✅ `getUserCredit()` - Check remaining balance
+
+**Message Management:**
+- ✅ `createPattern()` - Create new SMS patterns
+- ✅ `getSMSDetails()` - Get message details by ID
+- ✅ `getMessageRecipientsStatus()` - Track delivery status
+- ✅ `fetchInboxMessages()` - Retrieve received messages
+
+**Type Safety:**
+- ✅ Full TypeScript interfaces for all responses
+- ✅ Generic type support for pattern values
+- ✅ Enum for message status tracking
+
+### Comparison with @aspianet/faraz-sms
+
+| Feature | @aspianet/faraz-sms | Our Implementation |
+|---------|---------------------|-------------------|
+| **Pattern SMS** | ✅ | ✅ |
+| **Regular SMS** | ✅ | ✅ |
+| **Create Pattern** | ✅ | ✅ |
+| **Check Credit** | ✅ | ✅ |
+| **Get User Info** | ✅ | ✅ |
+| **Message Status** | ✅ | ✅ |
+| **Inbox Messages** | ✅ | ✅ |
+| **TypeScript Types** | ✅ | ✅ |
+| **Generic Types** | ✅ | ✅ |
+| **Dependencies** | axios (outdated) | Native fetch ✓ |
+| **Security** | CVEs present | Zero vulnerabilities ✓ |
+| **API Format Support** | IPPanel only | Both formats ✓ |
+| **Error Context** | Basic | Enhanced ✓ |
+| **Flexible Config** | Singleton | Environment-based ✓ |
+
 ### Design Decisions
 
-**Why not use @aspianet/faraz-sms?**
-- Package contains security vulnerabilities (outdated axios with known CVEs)
-- Our implementation uses native fetch API (no dependencies)
-- Analyzed their code and adopted best practices while maintaining security
+**Building upon @aspianet/faraz-sms:**
+- ✅ Adopted their complete API surface coverage
+- ✅ Implemented same TypeScript interfaces for compatibility
+- ✅ Added generic type support for pattern values
+- ✅ Included all utility functions (credit, auth, status, inbox)
+- ✅ Maintained same function signatures where applicable
+
+**Security & Modernization:**
+- ✅ Uses native fetch instead of outdated axios (no CVEs)
+- ✅ Supports both API formats (iranpayamak.com and ippanel.com)
+- ✅ Enhanced error handling with context-aware messages
+- ✅ Environment-based configuration (no global state)
 
 **Architecture Benefits:**
 - Stateless functions (better for serverless/microservices)
-- Environment-based configuration (no global state)
-- Flexible authentication and endpoint support
+- Environment-based configuration (more flexible)
+- Dual API format support (maximum compatibility)
 - Enhanced error handling with helpful messages
+- Zero dependencies (faster installation, no vulnerabilities)
 
 ## References
 

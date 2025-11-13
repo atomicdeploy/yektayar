@@ -26,12 +26,89 @@ interface FarazSMSPatternRequest {
 }
 
 /**
- * FarazSMS API response
+ * FarazSMS API response (iranpayamak.com format)
  */
 interface FarazSMSResponse {
   status: string;
   data?: any;
   messages?: string;
+}
+
+/**
+ * FarazSMS Send Pattern Result (IPPanel format)
+ * Based on @aspianet/faraz-sms interfaces
+ */
+export interface IFarazSendPatternResult {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    bulk_id: number;
+  };
+}
+
+/**
+ * FarazSMS Send SMS Result (IPPanel format)
+ */
+export interface IFarazSendSMSResult {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    bulk_id: number;
+  };
+}
+
+/**
+ * FarazSMS Auth Result
+ */
+export interface IFarazAuthResult {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    username: string;
+    credit: number;
+  };
+}
+
+/**
+ * FarazSMS Credit Result
+ */
+export interface IFarazCreditResult {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    credit: number;
+  };
+}
+
+/**
+ * FarazSMS Get SMS Result
+ */
+export interface IFarazGetSMSResult {
+  status: string;
+  code: number;
+  message: string;
+  data: {
+    bulk_id: number;
+    number: string;
+    message: string;
+    status: number;
+    type: number;
+    cost: number;
+  };
+}
+
+/**
+ * Message Recipients Status Enum
+ */
+export enum FarazMessageStatusEnum {
+  SEND = 'send',
+  DISCARDED = 'discarded',
+  PENDING = 'pending',
+  FAILED = 'failed'
 }
 
 /**
@@ -211,4 +288,176 @@ export async function testSMSConfiguration(phoneNumber: string, testOTP: string 
     console.error('✗ Test failed:', error);
     throw error;
   }
+}
+
+// ============================================================================
+// Additional FarazSMS API Functions
+// Based on @aspianet/faraz-sms package functionality
+// ============================================================================
+
+/**
+ * Helper function to make authenticated API requests
+ * @internal
+ */
+async function makeAuthenticatedRequest<T>(
+  endpoint: string,
+  method: 'GET' | 'POST' = 'GET',
+  body?: any
+): Promise<T> {
+  const config = getSMSConfig();
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  
+  if (config.authFormat === 'AccessKey') {
+    headers['Authorization'] = `AccessKey ${config.apiKey}`;
+  } else {
+    headers['Api-Key'] = config.apiKey;
+  }
+
+  const options: RequestInit = {
+    method,
+    headers
+  };
+
+  if (body && method === 'POST') {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(endpoint, options);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`FarazSMS API error: ${response.status} - ${errorText}`);
+  }
+
+  return await response.json() as T;
+}
+
+/**
+ * Get authenticated user information
+ * 
+ * @returns Promise<IFarazAuthResult>
+ * @see {@link http://docs.ippanel.com/#section/Authentication}
+ */
+export async function getAuthenticatedUser(): Promise<IFarazAuthResult> {
+  const endpoint = 'http://rest.ippanel.com/v1/user';
+  return makeAuthenticatedRequest<IFarazAuthResult>(endpoint, 'GET');
+}
+
+/**
+ * Get user's remaining credit/balance
+ * 
+ * @returns Promise<IFarazCreditResult>
+ * @see {@link http://docs.ippanel.com/#operation/GetCredit}
+ */
+export async function getUserCredit(): Promise<IFarazCreditResult> {
+  const endpoint = 'http://rest.ippanel.com/v1/credit';
+  return makeAuthenticatedRequest<IFarazCreditResult>(endpoint, 'GET');
+}
+
+/**
+ * Send regular SMS (non-pattern based)
+ * 
+ * @param originator Sender line number
+ * @param recipients Array of recipient phone numbers
+ * @param message Message text to send
+ * @returns Promise<IFarazSendSMSResult>
+ * @see {@link http://docs.ippanel.com/#operation/SendSMS}
+ */
+export async function sendSMS(
+  originator: string,
+  recipients: string[],
+  message: string
+): Promise<IFarazSendSMSResult> {
+  const endpoint = 'http://rest.ippanel.com/v1/messages';
+  return makeAuthenticatedRequest<IFarazSendSMSResult>(endpoint, 'POST', {
+    originator,
+    recipients,
+    message
+  });
+}
+
+/**
+ * Send pattern-based SMS with generic values type
+ * This is the generic version compatible with @aspianet/faraz-sms
+ * 
+ * @param patternCode Pattern UID from FarazSMS panel
+ * @param originator Sender line number
+ * @param recipient Recipient phone number
+ * @param values Pattern variables (generic type)
+ * @returns Promise<IFarazSendPatternResult>
+ * @see {@link http://docs.ippanel.com/#operation/SendPattern}
+ */
+export async function sendPatternSMS<T = Record<string, string>>(
+  patternCode: string,
+  originator: string,
+  recipient: string,
+  values: T
+): Promise<IFarazSendPatternResult> {
+  const endpoint = 'http://rest.ippanel.com/v1/messages/patterns/send';
+  return makeAuthenticatedRequest<IFarazSendPatternResult>(endpoint, 'POST', {
+    pattern_code: patternCode,
+    originator,
+    recipient,
+    values
+  });
+}
+
+/**
+ * Create a new SMS pattern
+ * 
+ * @param pattern Pattern template text (use %variable% for placeholders)
+ * @param description Pattern description
+ * @param isShared Whether the pattern is shared
+ * @returns Promise with created pattern details
+ * @see {@link http://docs.ippanel.com/#operation/CreatePattern}
+ */
+export async function createPattern(
+  pattern: string,
+  description: string,
+  isShared: boolean = false
+): Promise<any> {
+  const endpoint = 'http://rest.ippanel.com/v1/messages/patterns';
+  return makeAuthenticatedRequest(endpoint, 'POST', {
+    pattern,
+    description,
+    is_shared: isShared
+  });
+}
+
+/**
+ * Get SMS details by bulk ID
+ * 
+ * @param bulkId Message bulk ID
+ * @returns Promise<IFarazGetSMSResult>
+ * @see {@link http://docs.ippanel.com/#operation/GetSMS}
+ */
+export async function getSMSDetails(bulkId: number): Promise<IFarazGetSMSResult> {
+  const endpoint = `http://rest.ippanel.com/v1/messages/${bulkId}`;
+  return makeAuthenticatedRequest<IFarazGetSMSResult>(endpoint, 'GET');
+}
+
+/**
+ * Get message recipients status
+ * 
+ * @param bulkId Message bulk ID
+ * @returns Promise with recipients status details
+ * @see {@link http://docs.ippanel.com/#operation/GetMessageRecipientsStatus}
+ */
+export async function getMessageRecipientsStatus(bulkId: number): Promise<any> {
+  const endpoint = `http://rest.ippanel.com/v1/messages/${bulkId}/recipients`;
+  return makeAuthenticatedRequest(endpoint, 'GET');
+}
+
+/**
+ * Fetch inbox messages
+ * 
+ * @returns Promise with inbox messages
+ * @see {@link http://docs.ippanel.com/#operation/FetchInboxMessages}
+ */
+export async function fetchInboxMessages(): Promise<any> {
+  const endpoint = 'http://rest.ippanel.com/v1/messages/inbox';
+  return makeAuthenticatedRequest(endpoint, 'GET');
 }
