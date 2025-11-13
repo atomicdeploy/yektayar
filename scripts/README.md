@@ -943,3 +943,312 @@ npm run test:deps
 **Exit codes:**
 - `0`: All checks passed (warnings are non-blocking)
 - `1`: Critical compatibility issues found (blocking)
+
+## Android Development Setup
+
+### `setup-android.sh` (Ubuntu/Linux)
+
+Automated setup script for Android development tooling on Ubuntu/Linux systems. This script installs and configures all required tools to build the YektaYar mobile app for Android.
+
+**Usage:**
+```bash
+./scripts/setup-android.sh
+```
+
+**What it does:**
+
+1. **Java JDK Installation:**
+   - Checks for Java JDK 17 or higher
+   - Automatically installs OpenJDK 17 if not present or version is too old
+   - Uses system package manager (apt for Ubuntu/Debian)
+
+2. **JAVA_HOME Configuration:**
+   - Automatically detects Java installation path
+   - Sets JAVA_HOME environment variable
+   - Adds to shell profile (~/.bashrc, ~/.zshrc, or ~/.profile)
+
+3. **Android SDK Installation:**
+   - Downloads Android command-line tools
+   - Installs to `~/Android/Sdk` (or $ANDROID_SDK_ROOT if set)
+   - Properly organizes directory structure
+
+4. **Android Environment Setup:**
+   - Sets ANDROID_SDK_ROOT and ANDROID_HOME variables
+   - Adds Android tools to PATH (sdkmanager, platform-tools, build-tools)
+   - Persists environment variables to shell profile
+
+5. **SDK Components Installation:**
+   - Accepts Android SDK licenses automatically
+   - Installs required components:
+     - platform-tools (adb, fastboot)
+     - platforms;android-34
+     - build-tools;34.0.0
+     - cmdline-tools;latest
+
+6. **Verification:**
+   - Tests Java installation and version
+   - Verifies environment variables are set
+   - Tests Gradle wrapper if available
+
+**Requirements:**
+- Ubuntu 18.04+ or Debian-based Linux distribution
+- Internet connection for downloading packages
+- ~2GB free disk space for Android SDK
+- sudo privileges for package installation
+
+**Environment Variables:**
+The script sets the following environment variables:
+- `JAVA_HOME` - Java JDK installation directory
+- `ANDROID_SDK_ROOT` - Android SDK root directory
+- `ANDROID_HOME` - Android SDK home (same as ANDROID_SDK_ROOT)
+- `PATH` - Updated to include Android tools
+
+**Custom Installation Path:**
+```bash
+# Install to custom location
+ANDROID_SDK_ROOT=/opt/android-sdk ./scripts/setup-android.sh
+```
+
+**After Installation:**
+```bash
+# Reload shell to apply environment changes
+source ~/.bashrc
+# or
+source ~/.zshrc
+
+# Build the Android app
+npm run android:build
+
+# Or manually test gradle
+cd packages/mobile-app/android
+./gradlew assembleDebug
+```
+
+**Troubleshooting:**
+
+If you get "JAVA_HOME is not set" error:
+```bash
+# Check if JAVA_HOME is set
+echo $JAVA_HOME
+
+# If not, reload your shell
+source ~/.bashrc
+
+# Or set it manually
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+```
+
+If you get Android SDK errors:
+```bash
+# Check environment variables
+echo $ANDROID_SDK_ROOT
+echo $ANDROID_HOME
+
+# Check if SDK is installed
+ls -la ~/Android/Sdk
+
+# Re-run the setup script
+./scripts/setup-android.sh
+```
+
+### `setup-android.ps1` (Windows)
+
+Automated setup script for Android development tooling on Windows systems using PowerShell.
+
+**Usage:**
+```powershell
+# Run from PowerShell (may need to run as Administrator for some operations)
+.\scripts\setup-android.ps1
+
+# Skip specific package managers
+.\scripts\setup-android.ps1 -SkipChocolatey
+.\scripts\setup-android.ps1 -SkipWinget
+```
+
+**What it does:**
+
+1. **Java JDK Installation:**
+   - Checks for Java JDK 17 or higher
+   - Attempts installation using winget (Windows 10 1809+/Windows 11)
+   - Falls back to Chocolatey if winget fails or is unavailable
+   - Provides manual installation instructions if automation fails
+
+2. **JAVA_HOME Configuration:**
+   - Automatically detects Java installation path
+   - Sets JAVA_HOME environment variable (user-level)
+   - Updates current PowerShell session
+
+3. **Android SDK Installation:**
+   - Downloads Android command-line tools for Windows
+   - Installs to `%LOCALAPPDATA%\Android\Sdk` (or $env:ANDROID_SDK_ROOT if set)
+   - Properly organizes directory structure
+
+4. **Android Environment Setup:**
+   - Sets ANDROID_SDK_ROOT and ANDROID_HOME variables (user-level)
+   - Adds Android tools to PATH (sdkmanager, platform-tools, build-tools)
+   - Updates current PowerShell session
+
+5. **SDK Components Installation:**
+   - Accepts Android SDK licenses automatically
+   - Installs required components:
+     - platform-tools (adb, fastboot)
+     - platforms;android-34
+     - build-tools;34.0.0
+     - cmdline-tools;latest
+
+6. **Verification:**
+   - Tests Java installation and version
+   - Verifies environment variables are set
+   - Tests Gradle wrapper if available
+
+**Requirements:**
+- Windows 10 (1809+) or Windows 11
+- PowerShell 5.1 or later
+- Internet connection for downloading packages
+- ~2GB free disk space for Android SDK
+- Administrator privileges (for package manager installations)
+
+**Package Managers:**
+The script supports two package managers:
+- **winget** - Built into modern Windows (preferred)
+- **Chocolatey** - Third-party package manager (fallback)
+
+**Environment Variables:**
+The script sets the following environment variables (user-level):
+- `JAVA_HOME` - Java JDK installation directory
+- `ANDROID_SDK_ROOT` - Android SDK root directory
+- `ANDROID_HOME` - Android SDK home (same as ANDROID_SDK_ROOT)
+- `PATH` - Updated to include Android tools
+
+**Custom Installation Path:**
+```powershell
+# Install to custom location
+$env:ANDROID_SDK_ROOT = "C:\Android\Sdk"
+.\scripts\setup-android.ps1
+```
+
+**After Installation:**
+```powershell
+# Restart your terminal or IDE to apply environment changes
+
+# Build the Android app
+npm run android:build
+
+# Or manually test gradle
+cd packages\mobile-app\android
+.\gradlew.bat assembleDebug
+```
+
+**Troubleshooting:**
+
+If you get "JAVA_HOME is not set" error:
+```powershell
+# Check if JAVA_HOME is set
+echo $env:JAVA_HOME
+
+# Restart your terminal/IDE to load new environment variables
+
+# Or set it manually for current session
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17.0.8.7-hotspot"
+```
+
+If you get Android SDK errors:
+```powershell
+# Check environment variables
+echo $env:ANDROID_SDK_ROOT
+echo $env:ANDROID_HOME
+
+# Check if SDK is installed
+dir $env:LOCALAPPDATA\Android\Sdk
+
+# Re-run the setup script
+.\scripts\setup-android.ps1
+```
+
+If package manager installation fails:
+```powershell
+# For winget issues, update Windows or App Installer from Microsoft Store
+
+# For Chocolatey, install it manually:
+Set-ExecutionPolicy Bypass -Scope Process -Force
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+
+**Notes:**
+- Environment variables are set at user-level (not system-level) to avoid requiring administrator privileges
+- Some operations (like Chocolatey package installation) may require administrator privileges
+- After installation, restart your terminal/IDE to load new environment variables
+- The script is idempotent - safe to run multiple times
+
+### Building Android APK
+
+After setting up Android development tools, you can build the Android APK:
+
+**From Project Root:**
+```bash
+# Build debug APK (includes full build pipeline)
+npm run android:build
+
+# The APK will be located at:
+# packages/mobile-app/android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+**Manual Build Process:**
+```bash
+# 1. Build the web app
+npm run build:mobile
+
+# 2. Sync Capacitor (copies web assets to Android)
+cd packages/mobile-app
+npm run cap:sync
+
+# 3. Build Android APK
+npm run android:build:debug
+
+# Or for release build
+npm run android:build:release
+```
+
+**Gradle Commands:**
+```bash
+cd packages/mobile-app/android
+
+# Debug build
+./gradlew assembleDebug
+
+# Release build
+./gradlew assembleRelease
+
+# Clean build artifacts
+./gradlew clean
+
+# View all tasks
+./gradlew tasks
+```
+
+**Common Build Issues:**
+
+1. **"JAVA_HOME is not set"**
+   - Solution: Run the setup script or set JAVA_HOME manually
+   - Verify: `echo $JAVA_HOME` (Linux/Mac) or `echo %JAVA_HOME%` (Windows)
+
+2. **"SDK location not found"**
+   - Solution: Set ANDROID_SDK_ROOT or create local.properties
+   - Verify: `echo $ANDROID_SDK_ROOT`
+
+3. **Gradle daemon issues**
+   - Solution: Stop and restart gradle daemon
+   ```bash
+   cd packages/mobile-app/android
+   ./gradlew --stop
+   ./gradlew assembleDebug
+   ```
+
+4. **Out of memory during build**
+   - Solution: Increase gradle memory in gradle.properties
+   ```properties
+   org.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m
+   ```
+
+For more details, see [APK-BUILD-SUMMARY.md](../APK-BUILD-SUMMARY.md)

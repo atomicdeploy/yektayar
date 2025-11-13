@@ -11,6 +11,7 @@ import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
+import { aiRoutes } from './routes/ai'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
 
@@ -51,7 +52,8 @@ const app = new Elysia()
           { name: 'Messages', description: 'Messaging and chat endpoints' },
           { name: 'Appointments', description: 'Appointment booking endpoints' },
           { name: 'Courses', description: 'Educational content endpoints' },
-          { name: 'Dashboard', description: 'Dashboard statistics endpoints' }
+          { name: 'Dashboard', description: 'Dashboard statistics endpoints' },
+          { name: 'AI', description: 'AI counselor chat endpoints' }
         ]
       }
     })
@@ -76,6 +78,7 @@ const app = new Elysia()
   .use(appointmentRoutes)
   .use(courseRoutes)
   .use(dashboardRoutes)
+  .use(aiRoutes)
 
 // Server configuration
 const port = Number(process.env.PORT) || 3000
