@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import AdminLayout from '../layouts/AdminLayout.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -59,6 +60,13 @@ const routes: RouteRecordRaw[] = [
         name: 'settings',
         component: () => import('../views/SettingsView.vue'),
         meta: { title: 'تنظیمات' },
+      },
+      // 404 route - must be within AdminLayout for proper styling
+      {
+        path: ':pathMatch(.*)*',
+        name: 'notFound',
+        component: NotFoundView,
+        meta: { title: 'صفحه یافت نشد' },
       },
     ],
   },

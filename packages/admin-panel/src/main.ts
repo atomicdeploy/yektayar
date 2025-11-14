@@ -39,28 +39,37 @@ async function initializeApp() {
   if (!validationResult.isValid) {
     logger.error('❌ API Configuration Error:', validationResult.error)
     
-    // Parse solutions if available in development mode
-    let solution = null
-    if (import.meta.env.DEV && import.meta.env.SOLUTIONS_MD) {
-      const solutionsData = parseSolutionsMarkdown(import.meta.env.SOLUTIONS_MD)
-      solution = findSolutionForError(solutionsData, validationResult.error || '', validationResult.errorType)
+    // Allow bypassing API validation only if explicitly enabled via environment variable
+    // Set VITE_SKIP_API_VALIDATION=true in .env to enable this for UI testing
+    const skipApiValidation = import.meta.env.VITE_SKIP_API_VALIDATION === 'true'
+    
+    if (skipApiValidation) {
+      logger.warn('⚠️ VITE_SKIP_API_VALIDATION is enabled - bypassing API validation')
+      logger.warn('⚠️ This should only be used for UI development/testing')
+    } else {
+      // Parse solutions if available in development mode
+      let solution = null
+      if (import.meta.env.DEV && import.meta.env.SOLUTIONS_MD) {
+        const solutionsData = parseSolutionsMarkdown(import.meta.env.SOLUTIONS_MD)
+        solution = findSolutionForError(solutionsData, validationResult.error || '', validationResult.errorType)
+      }
+      
+      // Create and mount error screen
+      const errorApp = createApp(ErrorScreen, {
+        title: 'API Configuration Error',
+        message: 'Cannot start the admin panel due to API configuration issues.',
+        details: validationResult.error,
+        solution: solution,
+        errorType: validationResult.errorType
+      })
+      
+      errorApp.use(i18n)
+      errorApp.mount('#app')
+      return
     }
-    
-    // Create and mount error screen
-    const errorApp = createApp(ErrorScreen, {
-      title: 'API Configuration Error',
-      message: 'Cannot start the admin panel due to API configuration issues.',
-      details: validationResult.error,
-      solution: solution,
-      errorType: validationResult.errorType
-    })
-    
-    errorApp.use(i18n)
-    errorApp.mount('#app')
-    return
+  } else {
+    logger.info(`✅ API Base URL: ${config.apiBaseUrl}`)
   }
-
-  logger.info(`✅ API Base URL: ${config.apiBaseUrl}`)
   logger.info('=== Initialization Complete ===')
 
   // Create and mount the main app
