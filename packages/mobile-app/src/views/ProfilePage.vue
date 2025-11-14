@@ -11,13 +11,26 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ locale === 'fa' ? 'پروفایل' : 'Profile' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
+        <div class="content-wrapper">
       <!-- Profile Header -->
       <div class="profile-header">
         <div class="profile-avatar">
@@ -194,6 +207,8 @@
 
       <!-- Bottom Spacing -->
       <div style="height: 2rem;"></div>
+        </div>
+      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -261,6 +276,16 @@ function navigateToAbout() {
 </script>
 
 <style scoped>
+/* OverlayScrollbars container */
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
+.content-wrapper {
+  min-height: 100%;
+}
+
 /* Profile Header */
 .profile-header {
   background: var(--accent-gradient);

@@ -9,13 +9,26 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ locale === 'fa' ? 'اطلاعات شخصی' : 'Personal Information' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
+        <div class="content-wrapper">
       <!-- Profile Avatar Section with Beautiful Gradient -->
       <div class="avatar-section">
         <div class="gradient-overlay"></div>
@@ -189,6 +202,8 @@
 
       <!-- Bottom Spacing -->
       <div style="height: 2rem;"></div>
+        </div>
+      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -448,6 +463,16 @@ async function handleCancel() {
 </script>
 
 <style scoped>
+/* OverlayScrollbars container */
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
+.content-wrapper {
+  min-height: 100%;
+}
+
 /* Avatar Section - Enhanced with Beautiful Gradient */
 .avatar-section {
   padding: 3rem 1.5rem 2rem;
