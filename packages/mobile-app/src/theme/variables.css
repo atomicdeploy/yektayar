@@ -113,6 +113,13 @@
   --text-tertiary: #80868b;
   --accent-soft: #f8f1e5;
   --accent-light: #fef9f0;
+  
+  /* Navy Seal (Secondary) Accent Variables - For Beautiful Accents */
+  --secondary-accent: #01183a;
+  --secondary-accent-light: rgba(1, 24, 58, 0.08);
+  --secondary-accent-medium: rgba(1, 24, 58, 0.15);
+  --secondary-gradient: linear-gradient(135deg, #01183a 0%, #1a2f4e 100%);
+  --secondary-glow: 0 2px 8px rgba(1, 24, 58, 0.2);
 }
 
 /* ========================================
