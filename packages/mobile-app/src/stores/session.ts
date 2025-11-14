@@ -206,6 +206,17 @@ export const useSessionStore = defineStore('session', () => {
         logger.debug('Received pong:', data)
       })
 
+      // Handle session revocation from server
+      socket.value.on('session:revoked', async (data) => {
+        logger.warn('Session revoked by server:', data)
+        await handleSessionRevocation()
+      })
+
+      socket.value.on('session:invalid', async (data) => {
+        logger.warn('Session marked as invalid by server:', data)
+        await handleSessionRevocation()
+      })
+
       // Now manually connect after all handlers are set up and token is confirmed
       socket.value.connect()
       logger.info('Socket connection initiated with valid token')
@@ -257,6 +268,47 @@ export const useSessionStore = defineStore('session', () => {
     }
   }
 
+  /**
+   * Handle session revocation from server
+   */
+  async function handleSessionRevocation(): Promise<void> {
+    logger.warn('Handling session revocation - clearing local session and redirecting')
+    
+    // Clear local state
+    session.value = null
+    localStorage.removeItem(STORAGE_KEY)
+    await apiClient.clearToken()
+    disconnectSocket()
+    
+    // Redirect to splash screen
+    // Using dynamic import to avoid circular dependency
+    const router = await import('../router').then(m => m.default)
+    router.replace('/splash')
+  }
+
+  /**
+   * Validate current session with backend
+   */
+  async function validateSession(): Promise<boolean> {
+    if (!session.value?.token) {
+      logger.warn('No session to validate')
+      return false
+    }
+
+    try {
+      const isValid = await validateStoredSession(session.value.token)
+      if (!isValid) {
+        logger.warn('Session validation failed')
+        await handleSessionRevocation()
+      }
+      return isValid
+    } catch (error) {
+      logger.error('Error validating session:', error)
+      await handleSessionRevocation()
+      return false
+    }
+  }
+
   return {
     // State
     session,
@@ -272,9 +324,11 @@ export const useSessionStore = defineStore('session', () => {
     // Actions
     acquireSession,
     validateStoredSession,
+    validateSession,
     connectSocket,
     disconnectSocket,
     logout,
-    linkUserToSession
+    linkUserToSession,
+    handleSessionRevocation
   }
 })

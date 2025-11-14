@@ -93,7 +93,14 @@ onMounted(async () => {
     }, 2000)
   } catch (error: any) {
     logger.error('Failed to acquire session:', error)
-    errorMessage.value = 'خطا در برقراری ارتباط. لطفاً مجدداً تلاش کنید.'
+    
+    // Check if error has a specific message from backend
+    const backendMessage = error?.message || error?.error
+    if (backendMessage && typeof backendMessage === 'string') {
+      errorMessage.value = backendMessage
+    } else {
+      errorMessage.value = 'خطا در برقراری ارتباط. لطفاً مجدداً تلاش کنید.'
+    }
     
     // Retry after 3 seconds
     setTimeout(async () => {
@@ -102,8 +109,13 @@ onMounted(async () => {
         await sessionStore.acquireSession()
         const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
         router.replace(welcomeShown ? '/tabs/home' : '/welcome')
-      } catch (retryError) {
-        errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
+      } catch (retryError: any) {
+        const retryBackendMessage = retryError?.message || retryError?.error
+        if (retryBackendMessage && typeof retryBackendMessage === 'string') {
+          errorMessage.value = retryBackendMessage
+        } else {
+          errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
+        }
       }
     }, 3000)
   }

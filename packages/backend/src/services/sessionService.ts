@@ -94,10 +94,19 @@ export async function linkUserToSession(token: string, userId: string): Promise<
 
 /**
  * Invalidate a session (logout)
+ * Emits socket event to notify client
  */
-export async function invalidateSession(token: string): Promise<void> {
+export async function invalidateSession(token: string, io?: any): Promise<void> {
   // TODO: Implement with database
   // DELETE FROM sessions WHERE token = ?
+  
+  // If Socket.IO instance is provided, emit session revocation event
+  if (io) {
+    io.to(`session:${token}`).emit('session:revoked', {
+      reason: 'Session invalidated',
+      timestamp: new Date().toISOString()
+    })
+  }
 }
 
 /**
