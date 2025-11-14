@@ -61,7 +61,7 @@
             </template>
           </p>
 
-          <!-- Error Message with Type Instead option -->
+          <!-- Error Message with Type Instead Button -->
           <div v-if="errorMessage" class="error-message">
             <div class="error-content">
               <ion-icon :icon="alertCircle"></ion-icon>
@@ -188,17 +188,16 @@ const progressPercent = computed(() => {
   return Math.round((currentStep.value / TOTAL_STEPS) * 100)
 })
 
-// Web Speech API
+// Web Speech API - Production-grade implementation
 let recognition: any = null
-// Store finalized transcript separately from what's displayed
-let finalizedTranscript = ''
+// Store ALL finalized transcripts separately from display
+let allFinalizedText = ''
 
-// Computed property for arrow icon based on locale
+// Computed properties for RTL support
 const continueArrowIcon = computed(() => {
   return locale.value === 'fa' ? arrowBack : arrowForward
 })
 
-// Computed property for icon slot position based on locale
 const iconSlot = computed(() => {
   return locale.value === 'fa' ? 'end' : 'start'
 })
@@ -229,38 +228,36 @@ function initializeSpeechRecognition() {
   recognition.continuous = true
   recognition.interimResults = true
   
-  // Set language based on current locale
-  const langCode = locale.value === 'fa' ? 'fa-IR' : 'en-US'
-  recognition.lang = langCode
+  // Set language dynamically based on current locale
+  recognition.lang = locale.value === 'fa' ? 'fa-IR' : 'en-US'
 
   recognition.onstart = () => {
     isRecording.value = true
     isProcessing.value = false
     errorMessage.value = ''
-    // Store the current text as the starting point for this recording session
-    finalizedTranscript = transcriptText.value
+    // Store current text as base for this session
+    allFinalizedText = transcriptText.value
   }
 
   recognition.onresult = (event: any) => {
-    // Build transcript from results
-    let interimTranscript = ''
+    // CRITICAL: Build the complete state, never append in handler
+    let interimText = ''
 
-    // Process only new results starting from resultIndex
+    // Process ONLY new results from resultIndex onwards
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const transcript = event.results[i][0].transcript
       
       if (event.results[i].isFinal) {
-        // Add final results to the finalized storage
-        finalizedTranscript += transcript + ' '
+        // Add to finalized storage
+        allFinalizedText += transcript + ' '
       } else {
-        // Accumulate interim results to show live feedback
-        interimTranscript += transcript
+        // Accumulate interim for live preview
+        interimText += transcript
       }
     }
 
-    // IMPORTANT: SET the display value (don't append!)
-    // This shows finalized text + current interim text for live feedback
-    transcriptText.value = finalizedTranscript + interimTranscript
+    // SET (not append) the display to show finalized + interim
+    transcriptText.value = allFinalizedText + interimText
   }
 
   recognition.onerror = (event: any) => {
@@ -283,8 +280,8 @@ function initializeSpeechRecognition() {
   }
 
   recognition.onend = () => {
-    // When recording ends, ensure we only keep finalized text
-    transcriptText.value = finalizedTranscript
+    // Clean up: remove interim text, keep only finalized
+    transcriptText.value = allFinalizedText
     
     if (isRecording.value) {
       // Restart if still recording (for continuous recording)
@@ -326,21 +323,20 @@ function stopRecording() {
   if (recognition) {
     isRecording.value = false
     recognition.stop()
-    // Ensure we only show finalized text when stopped
-    transcriptText.value = finalizedTranscript
+    // Ensure only finalized text is shown
+    transcriptText.value = allFinalizedText
   }
 }
 
 function clearTranscript() {
   transcriptText.value = ''
-  finalizedTranscript = ''
+  allFinalizedText = ''
   errorMessage.value = ''
 }
 
 function typeInstead() {
   errorMessage.value = ''
-  // Show the text area by setting some initial text or just clearing error
-  // The textarea will be shown when errorMessage is cleared
+  // This will show the textarea for manual input
 }
 
 const canContinue = computed(() => {
@@ -490,7 +486,6 @@ async function showAlert(header: string, message: string) {
 .question-section {
   text-align: center;
   animation: fadeIn 0.6s ease-out;
-  padding: 1rem 0;
 }
 
 .question-text {
@@ -501,7 +496,6 @@ async function showAlert(header: string, message: string) {
   margin: 0;
   direction: rtl;
   font-family: var(--ion-font-family);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Recording Section */
@@ -522,21 +516,13 @@ async function showAlert(header: string, message: string) {
   color: white;
   cursor: pointer;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   box-shadow: 
     0 8px 24px rgba(212, 164, 62, 0.4),
     0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: scale(1);
-}
-
-.mic-button:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 
-    0 12px 32px rgba(212, 164, 62, 0.5),
-    0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .mic-button:active:not(:disabled) {
@@ -620,8 +606,6 @@ async function showAlert(header: string, message: string) {
   direction: rtl;
   max-width: 350px;
   line-height: 1.5;
-  font-weight: 500;
-  transition: all 0.3s ease;
 }
 
 .error-message {
@@ -685,8 +669,7 @@ async function showAlert(header: string, message: string) {
   padding: 1.5rem;
   box-shadow: var(--card-shadow);
   border: 2px solid var(--glass-border);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
 }
 
 .transcript-card:focus-within {
@@ -694,7 +677,6 @@ async function showAlert(header: string, message: string) {
   box-shadow: 
     var(--card-shadow-hover),
     0 0 0 4px rgba(212, 164, 62, 0.1);
-  transform: translateY(-2px);
 }
 
 .transcript-textarea {
@@ -732,17 +714,12 @@ async function showAlert(header: string, message: string) {
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   font-family: var(--ion-font-family);
-  transform: scale(1);
-}
-
-.action-button:hover:not(:disabled) {
-  transform: scale(1.02);
 }
 
 .action-button:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: translateY(2px);
 }
 
 .action-button:disabled {
@@ -785,17 +762,11 @@ async function showAlert(header: string, message: string) {
   font-size: 1.1rem;
   direction: rtl;
   font-family: var(--ion-font-family);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.continue-button:hover:not([disabled]) {
-  --box-shadow: 0 8px 24px rgba(45, 211, 111, 0.5);
-  transform: translateY(-2px);
 }
 
 .continue-button:not([disabled]):active {
-  transform: translateY(0);
-  --box-shadow: 0 4px 16px rgba(45, 211, 111, 0.3);
+  transform: translateY(2px);
+  --box-shadow: 0 3px 12px rgba(45, 211, 111, 0.3);
 }
 
 .continue-button ion-icon,
