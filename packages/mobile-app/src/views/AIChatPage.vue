@@ -14,7 +14,20 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true" ref="contentRef">
+    <ion-content :fullscreen="true" :scroll-y="false" ref="contentRef">
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
+        <div class="content-wrapper">
       <!-- Chat Header Info -->
       <div class="chat-info-banner">
         <div class="ai-avatar">
@@ -95,6 +108,8 @@
           </div>
         </div>
       </div>
+        </div>
+      </OverlayScrollbarsComponent>
     </ion-content>
 
     <!-- Message Input Footer -->
@@ -270,6 +285,18 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* OverlayScrollbars container */
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
+.content-wrapper {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Chat Info Banner */
 .chat-info-banner {
   display: flex;
