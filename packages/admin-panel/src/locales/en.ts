@@ -158,4 +158,24 @@ export default {
     unknown_step_2: 'Verify all environment variables are correctly configured',
     unknown_step_3: 'Try restarting both the frontend and backend servers',
   },
+  
+  // 404 Not Found Page
+  not_found: {
+    title: 'Page Not Found',
+    description: 'The page you\'re looking for doesn\'t exist or has been moved.',
+    error_code: '404',
+    go_home: 'Go to Dashboard',
+    go_back: 'Go Back',
+    request_info: 'Request Information',
+    requested_url: 'Requested URL',
+    request_method: 'Request Method',
+    timestamp: 'Timestamp',
+    suggestions: 'Suggestions',
+    suggestion_1: 'Check the URL for typos or errors',
+    suggestion_2: 'Use the navigation menu to find what you\'re looking for',
+    suggestion_3: 'Go back to the dashboard and start over',
+    suggestion_4: 'Search for the content you need',
+    helpful_links: 'Quick Links',
+    search_placeholder: 'Search admin panel...',
+  },
 }

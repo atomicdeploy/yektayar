@@ -3,6 +3,7 @@ import { RouteRecordRaw } from 'vue-router'
 import TabsPage from '../views/TabsPage.vue'
 import SplashScreen from '../views/SplashScreen.vue'
 import WelcomeScreen from '../views/WelcomeScreen.vue'
+import NotFoundPage from '../views/NotFoundPage.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -64,6 +65,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AIChatPage.vue')
       }
     ]
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFoundPage
   }
 ]
 
