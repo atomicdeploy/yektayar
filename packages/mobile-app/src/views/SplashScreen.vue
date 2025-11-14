@@ -17,9 +17,31 @@
 
         <!-- Loading indicator -->
         <div class="loading-container" :class="{ 'fade-in': fontsLoaded }">
-          <ion-spinner name="crescent" color="primary"></ion-spinner>
+          <ion-spinner v-if="isConnecting" name="crescent" color="primary"></ion-spinner>
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-          <p v-else class="loading-text">در حال آماده‌سازی...</p>
+          <p v-else-if="isConnecting" class="loading-text">در حال آماده‌سازی...</p>
+          
+          <!-- Action buttons -->
+          <div v-if="showActionButtons" class="action-buttons">
+            <ion-button 
+              expand="block" 
+              color="primary" 
+              @click="handleRetry"
+              class="retry-button"
+            >
+              تلاش مجدد
+            </ion-button>
+            <ion-button 
+              v-if="showCancelButton"
+              expand="block" 
+              fill="outline"
+              color="light"
+              @click="handleCancel"
+              class="cancel-button"
+            >
+              لغو
+            </ion-button>
+          </div>
         </div>
       </div>
     </ion-content>
@@ -27,9 +49,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { IonPage, IonContent, IonSpinner } from '@ionic/vue'
+import { IonPage, IonContent, IonSpinner, IonButton } from '@ionic/vue'
 import { useSessionStore } from '../stores/session'
 import { logger } from '@yektayar/shared'
 
@@ -39,6 +61,12 @@ const errorMessage = ref<string>('')
 const fontsLoaded = ref<boolean>(false)
 const appVersion = ref<string>('0.1.0')
 const apiVersion = ref<string>('')
+const isConnecting = ref<boolean>(true)
+const showActionButtons = ref<boolean>(false)
+const showCancelButton = ref<boolean>(false)
+const autoRetryEnabled = ref<boolean>(true)
+const retryTimeoutId = ref<number | null>(null)
+const cancelTimeoutId = ref<number | null>(null)
 
 // Wait for fonts to load before displaying content
 const checkFontsLoaded = async () => {
@@ -56,13 +84,44 @@ const checkFontsLoaded = async () => {
   }
 }
 
-onMounted(async () => {
-  // Load fonts first
-  await checkFontsLoaded()
-  
+// Clear all timeouts
+const clearTimeouts = () => {
+  if (retryTimeoutId.value) {
+    clearTimeout(retryTimeoutId.value)
+    retryTimeoutId.value = null
+  }
+  if (cancelTimeoutId.value) {
+    clearTimeout(cancelTimeoutId.value)
+    cancelTimeoutId.value = null
+  }
+}
+
+// Handle manual retry
+const handleRetry = async () => {
+  logger.info('Manual retry triggered by user')
+  clearTimeouts()
+  showActionButtons.value = false
+  showCancelButton.value = false
+  isConnecting.value = true
+  errorMessage.value = ''
+  await attemptConnection()
+}
+
+// Handle cancel - stops auto-retry
+const handleCancel = () => {
+  logger.info('Connection attempt cancelled by user')
+  clearTimeouts()
+  autoRetryEnabled.value = false
+  showCancelButton.value = false
+  isConnecting.value = false
+}
+
+// Attempt to connect/acquire session
+const attemptConnection = async () => {
   const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
   
   try {
+    isConnecting.value = true
     // Attempt to acquire or restore session
     await sessionStore.acquireSession()
     
@@ -93,32 +152,73 @@ onMounted(async () => {
     }, 2000)
   } catch (error: any) {
     logger.error('Failed to acquire session:', error)
+    isConnecting.value = false
     
     // Check if error has a specific message from backend
     const backendMessage = error?.message || error?.error
+    
+    // Check if backend disabled auto-retry
+    const disableAutoRetry = error?.disableAutoRetry === true
+    if (disableAutoRetry) {
+      autoRetryEnabled.value = false
+      logger.info('Auto-retry disabled by backend')
+    }
+    
     if (backendMessage && typeof backendMessage === 'string') {
       errorMessage.value = backendMessage
     } else {
       errorMessage.value = 'خطا در برقراری ارتباط. لطفاً مجدداً تلاش کنید.'
     }
     
-    // Retry after 3 seconds
-    setTimeout(async () => {
-      errorMessage.value = ''
-      try {
-        await sessionStore.acquireSession()
-        const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
-        router.replace(welcomeShown ? '/tabs/home' : '/welcome')
-      } catch (retryError: any) {
-        const retryBackendMessage = retryError?.message || retryError?.error
-        if (retryBackendMessage && typeof retryBackendMessage === 'string') {
-          errorMessage.value = retryBackendMessage
-        } else {
-          errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
-        }
+    // Schedule cancel button to appear after 15 seconds
+    cancelTimeoutId.value = window.setTimeout(() => {
+      if (isConnecting.value) {
+        showCancelButton.value = true
       }
-    }, 3000)
+    }, 15000)
+    
+    // Retry automatically if enabled
+    if (autoRetryEnabled.value) {
+      retryTimeoutId.value = window.setTimeout(async () => {
+        errorMessage.value = ''
+        try {
+          await sessionStore.acquireSession()
+          const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
+          router.replace(welcomeShown ? '/tabs/home' : '/welcome')
+        } catch (retryError: any) {
+          isConnecting.value = false
+          const retryBackendMessage = retryError?.message || retryError?.error
+          
+          // Check if backend disabled auto-retry on second attempt
+          if (retryError?.disableAutoRetry === true) {
+            autoRetryEnabled.value = false
+          }
+          
+          if (retryBackendMessage && typeof retryBackendMessage === 'string') {
+            errorMessage.value = retryBackendMessage
+          } else {
+            errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
+          }
+          
+          // Show action buttons after failed retry
+          showActionButtons.value = true
+        }
+      }, 3000)
+    } else {
+      // Auto-retry disabled, show action buttons immediately
+      showActionButtons.value = true
+    }
   }
+}
+
+onMounted(async () => {
+  // Load fonts first
+  await checkFontsLoaded()
+  await attemptConnection()
+})
+
+onUnmounted(() => {
+  clearTimeouts()
 })
 </script>
 
@@ -236,6 +336,39 @@ onMounted(async () => {
   font-size: 0.95rem;
   font-weight: 500;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.action-buttons {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.retry-button {
+  --background: #d4a43e;
+  --background-hover: #c99433;
+  --background-activated: #b8842d;
+  --border-radius: 12px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  --box-shadow: 0 4px 12px rgba(212, 164, 62, 0.3);
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.cancel-button {
+  --border-color: rgba(255, 255, 255, 0.3);
+  --color: rgba(255, 255, 255, 0.9);
+  --border-radius: 12px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-transform: none;
 }
 
 ion-spinner {
