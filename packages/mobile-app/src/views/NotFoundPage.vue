@@ -1,5 +1,9 @@
 <template>
-  <ion-page>
+  <!-- Use debug mode component if flag is enabled -->
+  <NotFoundPageDebug v-if="isDebugMode" />
+  
+  <!-- Otherwise use standard styled component -->
+  <ion-page v-else>
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>{{ locale === 'fa' ? 'صفحه یافت نشد' : 'Page Not Found' }}</ion-title>
@@ -138,10 +142,14 @@ import {
   calendarOutline,
   personOutline,
 } from 'ionicons/icons'
+import NotFoundPageDebug from './NotFoundPageDebug.vue'
 
 const router = useRouter()
 const route = useRoute()
 const { locale } = useI18n()
+
+// Check if debug mode is enabled via environment variable
+const isDebugMode = computed(() => import.meta.env.VITE_404_DEBUG_MODE === 'true')
 
 const currentPath = computed(() => route.fullPath)
 

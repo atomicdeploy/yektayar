@@ -1,5 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center px-6 py-12">
+  <!-- Use debug mode component if flag is enabled -->
+  <NotFoundViewDebug v-if="isDebugMode" />
+  
+  <!-- Otherwise use standard styled component -->
+  <div v-else class="min-h-screen flex items-center justify-center px-6 py-12">
     <div class="max-w-4xl w-full">
       <!-- Main 404 Section -->
       <div class="text-center mb-12">
@@ -262,12 +266,14 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import NotFoundViewDebug from './NotFoundViewDebug.vue'
 import {
   HomeIcon,
   ArrowLeftIcon,
@@ -290,6 +296,9 @@ import {
 const router = useRouter()
 const route = useRoute()
 const { t, locale } = useI18n()
+
+// Check if debug mode is enabled via environment variable
+const isDebugMode = computed(() => import.meta.env.VITE_404_DEBUG_MODE === 'true')
 
 const searchQuery = ref('')
 const userAgent = ref('')
