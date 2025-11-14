@@ -116,6 +116,20 @@ function checkNodeVersion() {
   
   if (isValid) {
     print(icons.success, colors.green, `Node.js ${version} (>= ${required} required)`, 1);
+    
+    // Check if .nvmrc exists and compare versions
+    const nvmrcPath = path.join(process.cwd(), '.nvmrc');
+    if (fs.existsSync(nvmrcPath)) {
+      const nvmrcVersion = fs.readFileSync(nvmrcPath, 'utf-8').trim();
+      const currentVersion = version.replace('v', '');
+      
+      if (currentVersion !== nvmrcVersion) {
+        print(icons.warning, colors.yellow, `Recommended version from .nvmrc: ${nvmrcVersion} (current: ${currentVersion})`, 1);
+        print(icons.info, colors.cyan, 'Using the exact version prevents package-lock.json inconsistencies', 1);
+        print(icons.info, colors.cyan, 'Run: nvm use (if you have nvm installed)', 1);
+        hasWarnings = true;
+      }
+    }
   } else {
     print(icons.error, colors.red, `Node.js ${version} is too old (>= ${required} required)`, 1);
     print(icons.info, colors.yellow, 'Update from: https://nodejs.org/', 1);
