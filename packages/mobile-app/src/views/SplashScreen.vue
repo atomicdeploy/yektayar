@@ -39,6 +39,7 @@ const errorMessage = ref<string>('')
 const fontsLoaded = ref<boolean>(false)
 const appVersion = ref<string>('0.1.0')
 const apiVersion = ref<string>('')
+const heroImageLoaded = ref<boolean>(false)
 
 // Wait for fonts to load before displaying content
 const checkFontsLoaded = async () => {
@@ -56,9 +57,58 @@ const checkFontsLoaded = async () => {
   }
 }
 
+// Preload the welcome screen hero image
+const preloadHeroImage = async () => {
+  try {
+    // Preload the hero image (prefer WebP for better performance)
+    const img = new Image()
+    
+    // Use a promise to track when the image loads
+    const imageLoadPromise = new Promise<void>((resolve) => {
+      img.onload = () => {
+        heroImageLoaded.value = true
+        logger.info('Welcome hero image preloaded successfully')
+        resolve()
+      }
+      img.onerror = () => {
+        logger.warn('Failed to preload welcome hero image')
+        // Still mark as loaded to not block navigation
+        heroImageLoaded.value = true
+        resolve()
+      }
+    })
+    
+    // Check if browser supports WebP format
+    const supportsWebP = await new Promise<boolean>((resolve) => {
+      const webpImg = new Image()
+      webpImg.onload = () => resolve(true)
+      webpImg.onerror = () => resolve(false)
+      webpImg.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
+    })
+    
+    // Start loading the image (prefer WebP for smaller size)
+    img.src = supportsWebP ? '/welcome-hero.webp' : '/welcome-hero.jpg'
+    
+    // Wait for the image to load or timeout after 1.5 seconds
+    await Promise.race([
+      imageLoadPromise,
+      new Promise(resolve => setTimeout(() => {
+        heroImageLoaded.value = true
+        resolve(undefined)
+      }, 1500))
+    ])
+  } catch (error) {
+    logger.warn('Error preloading hero image:', error)
+    heroImageLoaded.value = true
+  }
+}
+
 onMounted(async () => {
   // Load fonts first
   await checkFontsLoaded()
+  
+  // Preload hero image in parallel with other initialization
+  const heroImagePreloadPromise = preloadHeroImage()
   
   const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
   
@@ -81,6 +131,12 @@ onMounted(async () => {
     // Check if welcome screen has been shown
     const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
     
+    // Wait for hero image to be preloaded if navigating to welcome screen
+    if (!welcomeShown) {
+      logger.info('First time user, ensuring hero image is loaded before showing welcome screen')
+      await heroImagePreloadPromise
+    }
+    
     // If successful, navigate to appropriate screen after a brief delay (for UX)
     setTimeout(() => {
       if (welcomeShown) {
@@ -101,6 +157,12 @@ onMounted(async () => {
       try {
         await sessionStore.acquireSession()
         const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
+        
+        // Ensure hero image is loaded before navigating to welcome screen
+        if (!welcomeShown) {
+          await heroImagePreloadPromise
+        }
+        
         router.replace(welcomeShown ? '/tabs/home' : '/welcome')
       } catch (retryError) {
         errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
