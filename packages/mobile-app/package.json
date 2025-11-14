@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/optimize-images.mjs",
-    "build": "vue-tsc && vite build && ionic capacitor copy",
+    "build": "vue-tsc && vite build && npx cap copy",
     "build:production": "node scripts/optimize-images.mjs && vite build --mode production && npx cap copy android",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
@@ -32,6 +32,8 @@
     "@ionic/vue-router": "^8.7.9",
     "axios": "^1.13.2",
     "ionicons": "^8.0.13",
+    "overlayscrollbars": "^2.12.0",
+    "overlayscrollbars-vue": "^0.5.9",
     "pinia": "^3.0.4",
     "socket.io-client": "^4.8.1",
     "vue": "^3.5.24",

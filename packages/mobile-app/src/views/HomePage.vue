@@ -35,6 +35,17 @@
       <div class="section">
         <h2 class="section-title">{{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}</h2>
         <div class="quick-actions">
+          <div class="action-card" @click="navigateToAIChat">
+            <div class="action-icon-wrapper ai">
+              <ion-icon :icon="sparkles" class="action-icon"></ion-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</h3>
+              <p>{{ locale === 'fa' ? 'گفتگو با هوش مصنوعی' : 'Chat with AI assistant' }}</p>
+            </div>
+            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+          </div>
+
           <div class="action-card" @click="navigateToChat">
             <div class="action-icon-wrapper primary">
               <ion-icon :icon="chatbubbles" class="action-icon"></ion-icon>
@@ -176,6 +187,7 @@ const { t, locale } = useI18n()
 const router = useRouter()
 const { isDark, toggleTheme } = useTheme()
 
+const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')
 const navigateToAppointments = () => router.push('/tabs/appointments')
 const navigateToProfile = () => router.push('/tabs/profile')
@@ -303,6 +315,10 @@ const navigateToProfile = () => router.push('/tabs/profile')
   background: linear-gradient(135deg, #ff9500 0%, #ffb038 100%);
 }
 
+.action-icon-wrapper.ai {
+  background: var(--accent-gradient);
+}
+
 .action-icon {
   font-size: 28px;
   color: white;
@@ -328,6 +344,11 @@ const navigateToProfile = () => router.push('/tabs/profile')
 .action-arrow {
   font-size: 20px;
   color: var(--text-tertiary);
+}
+
+/* RTL Support - Flip arrow direction for right-to-left languages */
+[dir="rtl"] .action-arrow {
+  transform: scaleX(-1);
 }
 
 /* Features Grid */
