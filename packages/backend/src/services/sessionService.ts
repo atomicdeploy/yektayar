@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { getDb } from '../db/connection'
+import { getDatabase } from './database'
 import { generateJWT, verifyJWT, isValidJWTFormat } from './jwtService'
 
 export interface Session {
@@ -45,7 +45,7 @@ export async function createSession(options: SessionCreationOptions = {}): Promi
   const { metadata = {}, ipAddress = null, userAgent = null, providedToken } = options
   const expiresAt = calculateExpirationDate()
   const now = new Date()
-  const db = getDb()
+  const db = getDatabase()
 
   // Generate a unique session ID
   const sessionId = crypto.randomUUID()
@@ -58,15 +58,20 @@ export async function createSession(options: SessionCreationOptions = {}): Promi
     token = await generateJWT(sessionId)
   }
 
-  // Store in database
-  await db`
-    INSERT INTO sessions (id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent)
-    VALUES (${sessionId}, ${token}, NULL, false, ${JSON.stringify(metadata)}, ${now}, ${expiresAt}, ${now}, ${ipAddress}, ${userAgent})
-  `
-  
-  return {
-    token,
-    expiresAt
+  try {
+    // Store in database
+    await db`
+      INSERT INTO sessions (id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent)
+      VALUES (${sessionId}, ${token}, NULL, false, ${JSON.stringify(metadata)}, ${now}, ${expiresAt}, ${now}, ${ipAddress}, ${userAgent})
+    `
+    
+    return {
+      token,
+      expiresAt
+    }
+  } catch (error) {
+    console.error('Error creating session:', error)
+    throw error
   }
 }
 
@@ -98,32 +103,41 @@ export async function validateSessionToken(token: string): Promise<Session | nul
   }
 
   // Get session from database
-  const db = getDb()
+  const db = getDatabase()
   const now = new Date()
   
-  const sessions = await db`
-    SELECT id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent
-    FROM sessions
-    WHERE token = ${token} AND expires_at > ${now}
-    LIMIT 1
-  `
+  try {
+    const sessions = await db`
+      SELECT id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent
+      FROM sessions
+      WHERE token = ${token} AND expires_at > ${now}
+      LIMIT 1
+    `
 
-  if (sessions.length === 0) {
+    if (sessions.length === 0) {
+      return null
+    }
+
+    const session = sessions[0]
+    
+    // Update last activity
+    await updateSessionActivity(token)
+
+    return {
+      id: session.id,
+      token: session.token,
+      userId: session.userId ? session.userId.toString() : null,
+      isLoggedIn: session.isLoggedIn,
+      metadata: session.metadata,
+      createdAt: session.createdAt,
+      expiresAt: session.expiresAt,
+      lastActivityAt: session.lastActivityAt,
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent
+    }
+  } catch (error) {
+    console.error('Error validating session:', error)
     return null
-  }
-
-  const session = sessions[0]
-  return {
-    id: session.id,
-    token: session.token,
-    userId: session.userId,
-    isLoggedIn: session.isLoggedIn,
-    metadata: session.metadata,
-    createdAt: session.createdAt,
-    expiresAt: session.expiresAt,
-    lastActivityAt: session.lastActivityAt,
-    ipAddress: session.ipAddress,
-    userAgent: session.userAgent
   }
 }
 
@@ -131,32 +145,37 @@ export async function validateSessionToken(token: string): Promise<Session | nul
  * Get session by token without JWT verification (for internal use)
  */
 export async function getSessionByToken(token: string): Promise<Session | null> {
-  const db = getDb()
+  const db = getDatabase()
   const now = new Date()
   
-  const sessions = await db`
-    SELECT id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent
-    FROM sessions
-    WHERE token = ${token} AND expires_at > ${now}
-    LIMIT 1
-  `
+  try {
+    const sessions = await db`
+      SELECT id, token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at, ip_address, user_agent
+      FROM sessions
+      WHERE token = ${token} AND expires_at > ${now}
+      LIMIT 1
+    `
 
-  if (sessions.length === 0) {
+    if (sessions.length === 0) {
+      return null
+    }
+
+    const session = sessions[0]
+    return {
+      id: session.id,
+      token: session.token,
+      userId: session.userId ? session.userId.toString() : null,
+      isLoggedIn: session.isLoggedIn,
+      metadata: session.metadata,
+      createdAt: session.createdAt,
+      expiresAt: session.expiresAt,
+      lastActivityAt: session.lastActivityAt,
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent
+    }
+  } catch (error) {
+    console.error('Error getting session by token:', error)
     return null
-  }
-
-  const session = sessions[0]
-  return {
-    id: session.id,
-    token: session.token,
-    userId: session.userId,
-    isLoggedIn: session.isLoggedIn,
-    metadata: session.metadata,
-    createdAt: session.createdAt,
-    expiresAt: session.expiresAt,
-    lastActivityAt: session.lastActivityAt,
-    ipAddress: session.ipAddress,
-    userAgent: session.userAgent
   }
 }
 
@@ -164,53 +183,71 @@ export async function getSessionByToken(token: string): Promise<Session | null> 
  * Update session last activity timestamp
  */
 export async function updateSessionActivity(token: string): Promise<void> {
-  const db = getDb()
+  const db = getDatabase()
   const now = new Date()
   
-  await db`
-    UPDATE sessions
-    SET last_activity_at = ${now}
-    WHERE token = ${token}
-  `
+  try {
+    await db`
+      UPDATE sessions
+      SET last_activity_at = ${now}
+      WHERE token = ${token}
+    `
+  } catch (error) {
+    console.error('Error updating session activity:', error)
+  }
 }
 
 /**
  * Link a user to an existing session (when user logs in)
  */
 export async function linkUserToSession(token: string, userId: string): Promise<void> {
-  const db = getDb()
+  const db = getDatabase()
   
-  await db`
-    UPDATE sessions
-    SET user_id = ${userId}, is_logged_in = true
-    WHERE token = ${token}
-  `
+  try {
+    await db`
+      UPDATE sessions
+      SET user_id = ${parseInt(userId)}, is_logged_in = true
+      WHERE token = ${token}
+    `
+  } catch (error) {
+    console.error('Error linking user to session:', error)
+    throw error
+  }
 }
 
 /**
  * Invalidate a session (logout)
  */
 export async function invalidateSession(token: string): Promise<void> {
-  const db = getDb()
+  const db = getDatabase()
   
-  await db`
-    DELETE FROM sessions
-    WHERE token = ${token}
-  `
+  try {
+    await db`
+      DELETE FROM sessions
+      WHERE token = ${token}
+    `
+  } catch (error) {
+    console.error('Error invalidating session:', error)
+    throw error
+  }
 }
 
 /**
  * Clean up expired sessions (should be run periodically)
  */
 export async function cleanupExpiredSessions(): Promise<number> {
-  const db = getDb()
+  const db = getDatabase()
   const now = new Date()
   
-  const result = await db`
-    DELETE FROM sessions
-    WHERE expires_at < ${now}
-    RETURNING id
-  `
-  
-  return result.length
+  try {
+    const result = await db`
+      DELETE FROM sessions
+      WHERE expires_at < ${now}
+      RETURNING id
+    `
+    return result.length
+  } catch (error) {
+    console.error('Error cleaning up expired sessions:', error)
+    return 0
+  }
 }

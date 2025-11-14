@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+  <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
     <div class="flex items-center justify-between">
       <div>
         <p class="text-sm text-gray-500 dark:text-gray-400">{{ label }}</p>
@@ -26,8 +26,8 @@
         <component :is="icon" :class="['w-8 h-8', iconColor]" />
       </div>
     </div>
-    <div v-if="loading" class="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-50 flex items-center justify-center rounded-lg">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+    <div v-if="loading" class="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 flex items-center justify-center rounded-lg">
+      <LoadingSpinner size="32px" class="text-primary-500" />
     </div>
   </div>
 </template>
@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/vue/24/solid'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 interface Props {
   label: string

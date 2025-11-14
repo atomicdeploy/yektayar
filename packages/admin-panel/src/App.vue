@@ -7,9 +7,9 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { useDark } from '@vueuse/core'
+import { useTheme } from './composables/useTheme'
 import ErrorNotification from './components/ErrorNotification.vue'
 
 const { locale } = useI18n()
-const isDark = useDark()
+const { isDark } = useTheme()
 </script>
