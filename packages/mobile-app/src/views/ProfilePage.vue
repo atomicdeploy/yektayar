@@ -119,16 +119,20 @@
       <div class="section">
         <h3 class="section-title">{{ locale === 'fa' ? 'تنظیمات برنامه' : 'App Preferences' }}</h3>
         <ion-list class="settings-list" :inset="true">
-          <ion-item>
+          <ion-item button @click="toggleTheme">
             <ion-icon :icon="moon" slot="start" :color="isDark ? 'primary' : 'medium'"></ion-icon>
             <ion-label>
-              <h3>{{ locale === 'fa' ? 'حالت تاریک' : 'Dark Mode' }}</h3>
+              <h3>{{ locale === 'fa' ? 'حالت نمایش' : 'Display Mode' }}</h3>
+              <p>
+                {{ 
+                  currentTheme === 'auto' 
+                    ? (locale === 'fa' ? 'سیستم (پیش‌فرض)' : 'System (Default)')
+                    : currentTheme === 'dark'
+                    ? (locale === 'fa' ? 'تاریک' : 'Dark')
+                    : (locale === 'fa' ? 'روشن' : 'Light')
+                }}
+              </p>
             </ion-label>
-            <ion-toggle 
-              :checked="isDark" 
-              @ion-change="toggleTheme"
-              slot="end"
-            ></ion-toggle>
           </ion-item>
 
           <ion-item button detail>
@@ -203,7 +207,6 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonToggle,
 } from '@ionic/vue'
 import { 
   person,
@@ -228,7 +231,7 @@ import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
 
 const { locale } = useI18n()
-const { isDark, toggleTheme } = useTheme()
+const { currentTheme, isDark, toggleTheme } = useTheme()
 
 // Import router for navigation
 import { useRouter } from 'vue-router'

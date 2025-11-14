@@ -88,13 +88,15 @@
         </div>
 
         <div class="flex items-center gap-4">
-          <!-- Dark mode toggle -->
+          <!-- Theme toggle -->
           <button
-            @click="toggleDark()"
+            @click="toggleTheme()"
+            :title="currentTheme === 'auto' ? 'سیستم (پیش‌فرض)' : currentTheme === 'dark' ? 'حالت تاریک' : 'حالت روشن'"
             class="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            <SunIcon v-if="isDark" class="w-5 h-5" />
-            <MoonIcon v-else class="w-5 h-5" />
+            <ComputerDesktopIcon v-if="currentTheme === 'auto'" class="w-5 h-5" />
+            <MoonIcon v-else-if="currentTheme === 'dark'" class="w-5 h-5" />
+            <SunIcon v-else class="w-5 h-5" />
           </button>
 
           <!-- Connection status -->
@@ -132,7 +134,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { useDark, useToggle } from '@vueuse/core'
+import { useTheme } from '@/composables/useTheme'
 import {
   HomeIcon,
   UsersIcon,
@@ -147,6 +149,7 @@ import {
   SunIcon,
   MoonIcon,
   DocumentTextIcon,
+  ComputerDesktopIcon,
 } from '@heroicons/vue/24/outline'
 import { useSessionStore } from '@/stores/session'
 import { usePermissionsStore } from '@/stores/permissions'
@@ -157,8 +160,7 @@ const router = useRouter()
 const sessionStore = useSessionStore()
 const permissionsStore = usePermissionsStore()
 
-const isDark = useDark()
-const toggleDark = useToggle(isDark)
+const { currentTheme, toggleTheme } = useTheme()
 
 const isSidebarOpen = ref(false)
 const isRTL = computed(() => locale.value === 'fa')
