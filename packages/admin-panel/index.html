@@ -2,6 +2,23 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
+    <meta name="color-scheme" content="light dark">
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        background-color: #fafbfc;
+        color: #1a1a1a;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #0a0f1a;
+          color: #e8e9ed;
+        }
+      }
+    </style>
     <!-- Light mode icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" media="(prefers-color-scheme: light)" />
