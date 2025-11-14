@@ -190,6 +190,8 @@ const progressPercent = computed(() => {
 
 // Web Speech API
 let recognition: any = null
+// Store finalized transcript separately from what's displayed
+let finalizedTranscript = ''
 
 // Computed property for arrow icon based on locale
 const continueArrowIcon = computed(() => {
@@ -235,27 +237,30 @@ function initializeSpeechRecognition() {
     isRecording.value = true
     isProcessing.value = false
     errorMessage.value = ''
+    // Store the current text as the starting point for this recording session
+    finalizedTranscript = transcriptText.value
   }
 
   recognition.onresult = (event: any) => {
-    // The Web Speech API provides event.resultIndex to tell us where NEW results start
-    // We should only process results from resultIndex onwards to avoid duplicates
-    let finalTranscript = ''
+    // Build transcript from results
+    let interimTranscript = ''
 
+    // Process only new results starting from resultIndex
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const transcript = event.results[i][0].transcript
       
-      // Only add final results to the permanent transcript
-      // Interim results are ignored to prevent duplicates
       if (event.results[i].isFinal) {
-        finalTranscript += transcript + ' '
+        // Add final results to the finalized storage
+        finalizedTranscript += transcript + ' '
+      } else {
+        // Accumulate interim results to show live feedback
+        interimTranscript += transcript
       }
     }
 
-    // Append only the final transcript
-    if (finalTranscript) {
-      transcriptText.value += finalTranscript
-    }
+    // IMPORTANT: SET the display value (don't append!)
+    // This shows finalized text + current interim text for live feedback
+    transcriptText.value = finalizedTranscript + interimTranscript
   }
 
   recognition.onerror = (event: any) => {
@@ -278,6 +283,9 @@ function initializeSpeechRecognition() {
   }
 
   recognition.onend = () => {
+    // When recording ends, ensure we only keep finalized text
+    transcriptText.value = finalizedTranscript
+    
     if (isRecording.value) {
       // Restart if still recording (for continuous recording)
       try {
@@ -318,11 +326,14 @@ function stopRecording() {
   if (recognition) {
     isRecording.value = false
     recognition.stop()
+    // Ensure we only show finalized text when stopped
+    transcriptText.value = finalizedTranscript
   }
 }
 
 function clearTranscript() {
   transcriptText.value = ''
+  finalizedTranscript = ''
   errorMessage.value = ''
 }
 
