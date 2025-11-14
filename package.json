@@ -54,5 +54,9 @@
   "dependencies": {
     "dotenv": "^17.2.3",
     "socket.io-client": "^4.8.1"
+  },
+  "overrides": {
+    "cookie": ">=0.7.0",
+    "tmp": ">=0.2.4"
   }
 }
