@@ -6,13 +6,26 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ locale === 'fa' ? 'گفتگو' : 'Chat' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
+        <div class="content-wrapper">
       <!-- Chat List Header -->
       <div class="chat-header">
         <div class="search-wrapper">
@@ -48,7 +61,7 @@
             <div class="unread-badge">3</div>
           </div>
 
-          <div class="conversation-card">
+          <div class="conversation-card" @click="navigateToAIChat">
             <div class="avatar-wrapper">
               <div class="avatar success">
                 <ion-icon :icon="chatbubbles"></ion-icon>
@@ -132,6 +145,8 @@
           </ion-card-content>
         </ion-card>
       </div>
+        </div>
+      </OverlayScrollbarsComponent>
 
       <!-- New Chat FAB -->
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
@@ -173,11 +188,25 @@ import {
   add,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { locale } = useI18n()
+const router = useRouter()
+
+const navigateToAIChat = () => router.push('/tabs/chat/ai')
 </script>
 
 <style scoped>
+/* OverlayScrollbars container */
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
+.content-wrapper {
+  min-height: 100%;
+}
+
 .chat-header {
   padding: 1rem 0.5rem 0.5rem;
   background: var(--ion-toolbar-background);

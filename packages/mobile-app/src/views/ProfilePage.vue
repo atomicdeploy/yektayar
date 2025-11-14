@@ -11,13 +11,26 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ locale === 'fa' ? 'پروفایل' : 'Profile' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
+        <div class="content-wrapper">
       <!-- Profile Header -->
       <div class="profile-header">
         <div class="profile-avatar">
@@ -119,16 +132,24 @@
       <div class="section">
         <h3 class="section-title">{{ locale === 'fa' ? 'تنظیمات برنامه' : 'App Preferences' }}</h3>
         <ion-list class="settings-list" :inset="true">
-          <ion-item>
-            <ion-icon :icon="moon" slot="start" :color="isDark ? 'primary' : 'medium'"></ion-icon>
+          <ion-item button @click="toggleTheme">
+            <ion-icon 
+              :icon="currentTheme === 'auto' ? desktop : currentTheme === 'dark' ? moon : sunny" 
+              slot="start" 
+              :color="currentTheme === 'light' ? 'warning' : 'primary'"
+            ></ion-icon>
             <ion-label>
-              <h3>{{ locale === 'fa' ? 'حالت تاریک' : 'Dark Mode' }}</h3>
+              <h3>{{ locale === 'fa' ? 'حالت نمایش' : 'Display Mode' }}</h3>
+              <p>
+                {{ 
+                  currentTheme === 'auto' 
+                    ? (locale === 'fa' ? 'سیستم (پیش‌فرض)' : 'System (Default)')
+                    : currentTheme === 'dark'
+                    ? (locale === 'fa' ? 'تاریک' : 'Dark')
+                    : (locale === 'fa' ? 'روشن' : 'Light')
+                }}
+              </p>
             </ion-label>
-            <ion-toggle 
-              :checked="isDark" 
-              @ion-change="toggleTheme"
-              slot="end"
-            ></ion-toggle>
           </ion-item>
 
           <ion-item button detail>
@@ -153,14 +174,21 @@
       <div class="section">
         <h3 class="section-title">{{ locale === 'fa' ? 'پشتیبانی' : 'Support' }}</h3>
         <ion-list class="settings-list" :inset="true">
-          <ion-item button detail>
+          <ion-item button detail @click="navigateToSupport">
             <ion-icon :icon="help" slot="start" color="primary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'راهنما و پشتیبانی' : 'Help & Support' }}</h3>
             </ion-label>
           </ion-item>
 
-          <ion-item button detail>
+          <ion-item button detail @click="navigateToContact">
+            <ion-icon :icon="call" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h3>{{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}</h3>
+            </ion-label>
+          </ion-item>
+
+          <ion-item button detail @click="navigateToAbout">
             <ion-icon :icon="informationCircle" slot="start" color="tertiary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'درباره برنامه' : 'About App' }}</h3>
@@ -179,6 +207,8 @@
 
       <!-- Bottom Spacing -->
       <div style="height: 2rem;"></div>
+        </div>
+      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -196,7 +226,6 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonToggle,
 } from '@ionic/vue'
 import { 
   person,
@@ -210,17 +239,20 @@ import {
   shield,
   card,
   moon,
+  sunny,
+  desktop,
   language,
   volumeMedium,
   help,
   informationCircle,
   logOut,
+  call,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
 
 const { locale } = useI18n()
-const { isDark, toggleTheme } = useTheme()
+const { currentTheme, toggleTheme } = useTheme()
 
 // Import router for navigation
 import { useRouter } from 'vue-router'
@@ -229,9 +261,31 @@ const router = useRouter()
 function navigateToPersonalInfo() {
   router.push('/tabs/profile/personal-info')
 }
+
+function navigateToSupport() {
+  router.push('/tabs/support')
+}
+
+function navigateToContact() {
+  router.push('/tabs/contact')
+}
+
+function navigateToAbout() {
+  router.push('/tabs/about')
+}
 </script>
 
 <style scoped>
+/* OverlayScrollbars container */
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
+.content-wrapper {
+  min-height: 100%;
+}
+
 /* Profile Header */
 .profile-header {
   background: var(--accent-gradient);

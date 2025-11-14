@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { getDatabase } from './database'
 
 export interface Session {
   token: string
@@ -33,46 +34,63 @@ export function calculateExpirationDate(): Date {
 
 /**
  * Create a new anonymous session
- * This will be implemented with database connection
  */
 export async function createAnonymousSession(metadata: Record<string, any> = {}): Promise<SessionCreationResult> {
+  const db = getDatabase()
   const token = generateSessionToken()
   const expiresAt = calculateExpirationDate()
   const now = new Date()
 
-  // TODO: Store in database when DB connection is available
-  // For now, we return the token structure
-  // In production, this would insert into sessions table:
-  // INSERT INTO sessions (token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at)
-  // VALUES (token, NULL, false, metadata, now, expiresAt, now)
-  
-  return {
-    token,
-    expiresAt
+  try {
+    await db`
+      INSERT INTO sessions (token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at)
+      VALUES (${token}, NULL, false, ${JSON.stringify(metadata)}, ${now}, ${expiresAt}, ${now})
+    `
+    
+    return {
+      token,
+      expiresAt
+    }
+  } catch (error) {
+    console.error('Error creating session:', error)
+    throw error
   }
 }
 
 /**
  * Validate a session token
- * This will be implemented with database connection
  */
 export async function validateSessionToken(token: string): Promise<Session | null> {
-  // TODO: Implement with database
-  // SELECT * FROM sessions WHERE token = ? AND expires_at > NOW()
+  const db = getDatabase()
   
-  // For now, return a mock session for any non-empty token
-  if (!token || token.trim() === '') {
-    return null
-  }
+  try {
+    const sessions = await db`
+      SELECT token, user_id, is_logged_in, metadata, created_at, expires_at, last_activity_at
+      FROM sessions
+      WHERE token = ${token} AND expires_at > NOW()
+    `
+    
+    if (sessions.length === 0) {
+      return null
+    }
 
-  return {
-    token,
-    userId: null,
-    isLoggedIn: false,
-    metadata: {},
-    createdAt: new Date(),
-    expiresAt: calculateExpirationDate(),
-    lastActivityAt: new Date()
+    const session = sessions[0]
+    
+    // Update last activity
+    await updateSessionActivity(token)
+
+    return {
+      token: session.token,
+      userId: session.user_id ? session.user_id.toString() : null,
+      isLoggedIn: session.is_logged_in,
+      metadata: session.metadata || {},
+      createdAt: new Date(session.created_at),
+      expiresAt: new Date(session.expires_at),
+      lastActivityAt: new Date(session.last_activity_at)
+    }
+  } catch (error) {
+    console.error('Error validating session:', error)
+    return null
   }
 }
 
@@ -80,31 +98,69 @@ export async function validateSessionToken(token: string): Promise<Session | nul
  * Update session last activity timestamp
  */
 export async function updateSessionActivity(token: string): Promise<void> {
-  // TODO: Implement with database
-  // UPDATE sessions SET last_activity_at = NOW() WHERE token = ?
+  const db = getDatabase()
+  
+  try {
+    await db`
+      UPDATE sessions 
+      SET last_activity_at = NOW() 
+      WHERE token = ${token}
+    `
+  } catch (error) {
+    console.error('Error updating session activity:', error)
+  }
 }
 
 /**
  * Link a user to an existing session (when user logs in)
  */
 export async function linkUserToSession(token: string, userId: string): Promise<void> {
-  // TODO: Implement with database
-  // UPDATE sessions SET user_id = ?, is_logged_in = true WHERE token = ?
+  const db = getDatabase()
+  
+  try {
+    await db`
+      UPDATE sessions 
+      SET user_id = ${parseInt(userId)}, is_logged_in = true 
+      WHERE token = ${token}
+    `
+  } catch (error) {
+    console.error('Error linking user to session:', error)
+    throw error
+  }
 }
 
 /**
  * Invalidate a session (logout)
  */
 export async function invalidateSession(token: string): Promise<void> {
-  // TODO: Implement with database
-  // DELETE FROM sessions WHERE token = ?
+  const db = getDatabase()
+  
+  try {
+    await db`
+      DELETE FROM sessions 
+      WHERE token = ${token}
+    `
+  } catch (error) {
+    console.error('Error invalidating session:', error)
+    throw error
+  }
 }
 
 /**
  * Clean up expired sessions (should be run periodically)
  */
 export async function cleanupExpiredSessions(): Promise<number> {
-  // TODO: Implement with database
-  // DELETE FROM sessions WHERE expires_at < NOW()
-  return 0
+  const db = getDatabase()
+  
+  try {
+    const result = await db`
+      DELETE FROM sessions 
+      WHERE expires_at < NOW()
+      RETURNING id
+    `
+    return result.length
+  } catch (error) {
+    console.error('Error cleaning up expired sessions:', error)
+    return 0
+  }
 }

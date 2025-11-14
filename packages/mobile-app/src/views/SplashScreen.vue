@@ -32,6 +32,7 @@ import { useRouter } from 'vue-router'
 import { IonPage, IonContent, IonSpinner } from '@ionic/vue'
 import { useSessionStore } from '../stores/session'
 import { logger } from '@yektayar/shared'
+import apiClient from '@/api'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
@@ -39,6 +40,7 @@ const errorMessage = ref<string>('')
 const fontsLoaded = ref<boolean>(false)
 const appVersion = ref<string>('0.1.0')
 const apiVersion = ref<string>('')
+const heroImageLoaded = ref<boolean>(false)
 
 // Wait for fonts to load before displaying content
 const checkFontsLoaded = async () => {
@@ -56,9 +58,60 @@ const checkFontsLoaded = async () => {
   }
 }
 
+// Preload the welcome screen hero image
+const preloadHeroImage = async () => {
+  try {
+    // Preload the hero image (prefer WebP for better performance)
+    const img = new Image()
+    
+    // Use a promise to track when the image loads
+    const imageLoadPromise = new Promise<void>((resolve) => {
+      img.onload = () => {
+        heroImageLoaded.value = true
+        logger.info('Welcome hero image preloaded successfully')
+        resolve()
+      }
+      img.onerror = () => {
+        logger.warn('Failed to preload welcome hero image')
+        // Still mark as loaded to not block navigation
+        heroImageLoaded.value = true
+        resolve()
+      }
+    })
+    
+    // Check if browser supports WebP format
+    const supportsWebP = await new Promise<boolean>((resolve) => {
+      const webpImg = new Image()
+      webpImg.onload = () => resolve(true)
+      webpImg.onerror = () => resolve(false)
+      webpImg.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
+    })
+    
+    // Start loading the image (prefer WebP for smaller size)
+    img.src = supportsWebP ? '/welcome-hero.webp' : '/welcome-hero.jpg'
+    
+    // Wait for the image to load or timeout after 1.5 seconds
+    await Promise.race([
+      imageLoadPromise,
+      new Promise(resolve => setTimeout(() => {
+        heroImageLoaded.value = true
+        resolve(undefined)
+      }, 1500))
+    ])
+  } catch (error) {
+    logger.warn('Error preloading hero image:', error)
+    heroImageLoaded.value = true
+  }
+}
+
 onMounted(async () => {
   // Load fonts first
   await checkFontsLoaded()
+  
+  // Preload hero image in parallel with other initialization
+  const heroImagePreloadPromise = preloadHeroImage()
+  
+  const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
   
   try {
     // Attempt to acquire or restore session
@@ -66,19 +119,32 @@ onMounted(async () => {
     
     // Fetch API version from backend
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/`)
-      if (response.ok) {
-        const data = await response.json()
-        apiVersion.value = data.version || '0.1.0'
+      const response = await apiClient.get<{ version: string }>('/', { skipAuth: true })
+      if (response.success && response.data) {
+        apiVersion.value = response.data.version || '0.1.0'
       }
     } catch (versionError) {
       logger.warn('Could not fetch API version:', versionError)
     }
     
-    // If successful, navigate to main app after a brief delay (for UX)
+    // Check if welcome screen has been shown
+    const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
+    
+    // Wait for hero image to be preloaded if navigating to welcome screen
+    if (!welcomeShown) {
+      logger.info('First time user, ensuring hero image is loaded before showing welcome screen')
+      await heroImagePreloadPromise
+    }
+    
+    // If successful, navigate to appropriate screen after a brief delay (for UX)
     setTimeout(() => {
-      router.replace('/tabs/home')
+      if (welcomeShown) {
+        logger.info('Welcome screen already shown, skipping to home')
+        router.replace('/tabs/home')
+      } else {
+        logger.info('First time user, showing welcome screen')
+        router.replace('/welcome')
+      }
     }, 2000)
   } catch (error: any) {
     logger.error('Failed to acquire session:', error)
@@ -89,7 +155,14 @@ onMounted(async () => {
       errorMessage.value = ''
       try {
         await sessionStore.acquireSession()
-        router.replace('/tabs/home')
+        const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true'
+        
+        // Ensure hero image is loaded before navigating to welcome screen
+        if (!welcomeShown) {
+          await heroImagePreloadPromise
+        }
+        
+        router.replace(welcomeShown ? '/tabs/home' : '/welcome')
       } catch (retryError) {
         errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
       }
