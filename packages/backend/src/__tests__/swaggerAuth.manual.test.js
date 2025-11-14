@@ -102,29 +102,29 @@ async function runTests() {
     .get('/api-docs', () => ({ success: true }))
   
   const response5 = await app2.handle(new Request('http://localhost/api-docs'))
-  assert(response5.status === 200, 'Should return 200 without auth in production')
+  assert(response5.status === 404, 'Should return 404 in production (docs disabled)')
   const body5 = await response5.json()
-  assert(body5.success === true, 'Should return success response in production without auth')
+  assert(body5.error === 'Not Found', 'Should return Not Found error in production')
   
-  // Test 6: Production mode - with invalid credentials (should still work)
+  // Test 6: Production mode - with invalid credentials (should still return 404)
   const response6 = await app2.handle(
     new Request('http://localhost/api-docs', {
       headers: { 'Authorization': `Basic ${invalidCreds}` }
     })
   )
-  assert(response6.status === 200, 'Should return 200 even with invalid credentials in production')
+  assert(response6.status === 404, 'Should return 404 even with invalid credentials in production')
   const body6 = await response6.json()
-  assert(body6.success === true, 'Should return success even with invalid creds in production')
+  assert(body6.error === 'Not Found', 'Should return Not Found even with invalid creds in production')
   
-  // Test 7: Production mode - with valid credentials (should work)
+  // Test 7: Production mode - with valid credentials (should still return 404)
   const response7 = await app2.handle(
     new Request('http://localhost/api-docs', {
       headers: { 'Authorization': `Basic ${validCreds}` }
     })
   )
-  assert(response7.status === 200, 'Should return 200 with valid credentials in production')
+  assert(response7.status === 404, 'Should return 404 even with valid credentials in production')
   const body7 = await response7.json()
-  assert(body7.success === true, 'Should return success with valid creds in production')
+  assert(body7.error === 'Not Found', 'Should return Not Found even with valid creds in production')
   
   // Restore environment
   process.env = originalEnv

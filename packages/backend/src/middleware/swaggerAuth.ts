@@ -3,7 +3,7 @@ import { Elysia } from 'elysia'
 /**
  * Basic Authentication middleware for Swagger documentation
  * Protects API documentation endpoints with username/password authentication
- * Only enabled in development environment - disabled in production
+ * Only enabled in development environment - completely disabled in production
  */
 export const swaggerAuth = new Elysia()
   .onRequest(({ request, path, set }) => {
@@ -12,10 +12,22 @@ export const swaggerAuth = new Elysia()
       return
     }
 
-    // Skip authentication in production environment
+    // Disable API documentation completely in production environment
     const isProduction = process.env.NODE_ENV === 'production'
     if (isProduction) {
-      return
+      set.status = 404
+      return new Response(
+        JSON.stringify({
+          error: 'Not Found',
+          message: 'API documentation is not available in production'
+        }),
+        {
+          status: 404,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
     }
 
     // Get authorization header
