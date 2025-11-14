@@ -47,8 +47,9 @@ const i18n = createI18n({
   fallbackLocale: 'en',
   messages: {
     fa: {
-      welcome: 'خوش آمدید به یکتایار',
       app_title: 'یکتایار',
+      tagline: 'پلتفرم مراقبت سلامت روان',
+      welcome: 'خوش آمدید به یکتایار',
       error_screen: {
         title: 'خطای پیکربندی',
         api_config_error: 'خطای پیکربندی API',
@@ -91,8 +92,9 @@ const i18n = createI18n({
       }
     },
     en: {
-      welcome: 'Welcome to YektaYar',
       app_title: 'YektaYar',
+      tagline: 'Mental Health Care Platform',
+      welcome: 'Welcome to YektaYar',
       error_screen: {
         title: 'Configuration Error',
         api_config_error: 'API Configuration Error',

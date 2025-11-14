@@ -25,25 +25,9 @@ export function useTheme() {
 
     // Update document class
     if (isDark.value) {
-      document.documentElement.classList.add('ion-palette-dark')
+      document.documentElement.classList.add('dark')
     } else {
-      document.documentElement.classList.remove('ion-palette-dark')
-    }
-
-    // Update meta theme-color for status bar
-    updateMetaThemeColor(isDark.value)
-  }
-
-  // Update meta theme color for mobile browsers
-  const updateMetaThemeColor = (dark: boolean) => {
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', dark ? '#0a0f1a' : '#fafbfc')
-    } else {
-      const meta = document.createElement('meta')
-      meta.name = 'theme-color'
-      meta.content = dark ? '#0a0f1a' : '#fafbfc'
-      document.head.appendChild(meta)
+      document.documentElement.classList.remove('dark')
     }
   }
 
@@ -69,7 +53,7 @@ export function useTheme() {
   onMounted(() => {
     // Load saved theme preference
     const savedTheme = localStorage.getItem('yektayar-theme') as Theme | null
-    if (savedTheme) {
+    if (savedTheme && ['light', 'dark', 'auto'].includes(savedTheme)) {
       currentTheme.value = savedTheme
     }
 

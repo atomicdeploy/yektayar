@@ -1,7 +1,7 @@
 {
-  "name": "YektaYar Admin Panel",
-  "short_name": "YektaYar",
-  "description": "YektaYar Mental Health Care Platform - Admin Panel",
+  "name": "یکتایار - پنل مدیریت",
+  "short_name": "یکتایار",
+  "description": "پلتفرم مراقبت سلامت روان یکتایار - پنل مدیریت",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#01183a",
