@@ -226,7 +226,7 @@ const onImageError = () => {
 }
 
 .hero-image-container:hover :deep(.lazy-image) {
-  transform: scale(1.02);
+  /* transform: scale(1.02); */
 }
 
 .image-overlay {
