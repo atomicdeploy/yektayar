@@ -32,6 +32,7 @@ import { useRouter } from 'vue-router'
 import { IonPage, IonContent, IonSpinner } from '@ionic/vue'
 import { useSessionStore } from '../stores/session'
 import { logger } from '@yektayar/shared'
+import apiClient from '@/api'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
@@ -118,11 +119,9 @@ onMounted(async () => {
     
     // Fetch API version from backend
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/`)
-      if (response.ok) {
-        const data = await response.json()
-        apiVersion.value = data.version || '0.1.0'
+      const response = await apiClient.get<{ version: string }>('/', { skipAuth: true })
+      if (response.success && response.data) {
+        apiVersion.value = response.data.version || '0.1.0'
       }
     } catch (versionError) {
       logger.warn('Could not fetch API version:', versionError)
