@@ -68,7 +68,11 @@ YektaYar is a comprehensive mental health care platform that connects users with
 git clone https://github.com/atomicdeploy/yektayar.git
 cd yektayar
 
-# Install all dependencies
+# Quick setup with git sync (recommended)
+npm run sync
+# This will install dependencies, build packages, and verify requirements
+
+# Or manual installation:
 npm install
 
 # If you need to ensure all packages have up-to-date dependencies:
@@ -79,6 +83,8 @@ npm run install:deps
 # Then edit .env with your configuration, or use interactive mode:
 ./scripts/manage-env.sh edit
 ```
+
+> **🚀 Tip:** Use `git sync` or `npm run sync` anytime to fetch latest changes, update dependencies, and ensure everything is up to date. See [Git Sync Guide](docs/GIT-SYNC.md) for details.
 
 ### Development
 
@@ -196,6 +202,7 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 
 #### Getting Started
 - **[Quick Start Guide](QUICK-START.md)** - Fast setup for the monorepo
+- **[Git Sync Guide](docs/GIT-SYNC.md)** - Automated sync workflow (fetch, pull, push, deps, build) ⭐
 - **[Getting Started Guide](docs/GETTING-STARTED.md)** - Comprehensive developer onboarding
 - **[Development Guide](DEVELOPMENT.md)** - Detailed development practices
 - **[Quick Reference](docs/QUICK-REFERENCE.md)** - Code snippets and daily checklist
@@ -247,11 +254,14 @@ This mono repo addresses all requirements from the issue:
 ## 📝 Scripts
 
 ### Root-level Scripts
+- `npm run sync` - **Sync with remote, update deps, and verify setup** ⭐
 - `npm run dev` - Start all packages in development
 - `npm run build` - Build all packages
 - `npm run lint` - Lint all packages
 - `npm run test` - Test all packages
 - `npm run clean` - Clean all build artifacts
+- `npm run install:deps` - Install/update all dependencies
+- `npm run check:requirements` - Check system requirements
 
 ### Package-specific Scripts
 - `npm run dev:backend` - Backend only

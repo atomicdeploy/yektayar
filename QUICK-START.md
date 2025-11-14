@@ -27,6 +27,10 @@ yektayar/
 ## 🚀 Quick Start Commands
 
 ```bash
+# Quick setup (recommended) - does everything below automatically
+npm run sync
+
+# Or manual setup:
 # Install all dependencies
 npm install
 
@@ -46,7 +50,13 @@ npm run build
 
 # Clean everything
 npm run clean
+
+# Daily workflow - sync with remote and update everything
+git sync              # (after running ./scripts/setup-git-sync.sh)
+npm run sync          # (alternative, works without setup)
 ```
+
+> **🚀 Pro Tip:** Use `npm run sync` or `git sync` to fetch latest changes, update dependencies, and ensure everything is up to date in one command. See [Git Sync Guide](docs/GIT-SYNC.md) for details.
 
 ---
 
