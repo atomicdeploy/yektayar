@@ -187,7 +187,7 @@
 
 /* Apply dark theme when system prefers dark mode AND not in forced mode */
 @media (prefers-color-scheme: dark) {
-  :root:not(.theme-forced) {
+  html:not(.theme-forced) {
     /* Background - Rich Navy gradients */
     --ion-background-color: #0a0f1a;
     --ion-background-color-rgb: 10, 15, 26;
