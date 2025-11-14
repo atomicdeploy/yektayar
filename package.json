@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "description": "YektaYar - Mental Health Care Platform",
   "private": true,
+  "type": "module",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "npm run build -w @yektayar/shared",
+    "postinstall": "npm run build -w @yektayar/shared && node scripts/check-requirements.js",
+    "check:requirements": "node scripts/check-requirements.js",
+    "install:deps": "node scripts/install-dependencies.js",
     "dev": "npm run dev --workspaces --if-present",
     "dev:backend": "npm run dev -w @yektayar/backend",
     "dev:admin": "npm run dev -w @yektayar/admin-panel",
@@ -19,11 +22,15 @@
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:deps": "node scripts/test-dependencies.js",
+    "socketio:test": "node scripts/socketio-tui.js",
+    "ai:test": "node scripts/pollination-ai-tui.js",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
-    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs",
-    "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android"
+    "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android",
+    "android:build": "npm run build:mobile && cd packages/mobile-app && npm run cap:sync && npm run android:build:debug",
+    "android:analyze": "bash scripts/analyze-apk.sh",
+    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs"
   },
   "keywords": [
     "mental-health",
@@ -40,9 +47,18 @@
     "npm": ">=9.0.0"
   },
   "devDependencies": {
+    "@ionic/cli": "^7.2.1",
     "@capacitor/assets": "^3.0.5",
     "@types/node": "^24.10.1",
     "sharp": "^0.34.5",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "socket.io-client": "^4.8.1"
+  },
+  "overrides": {
+    "cookie": ">=0.7.0",
+    "tmp": ">=0.2.4"
   }
 }

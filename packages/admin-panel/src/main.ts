@@ -11,6 +11,8 @@ import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
 import { messages } from './locales'
 import { logger } from '@yektayar/shared'
+import 'overlayscrollbars/overlayscrollbars.css'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 
 // Log startup information
 logger.startup('YektaYar Admin Panel', {
@@ -68,6 +70,9 @@ async function initializeApp() {
   app.use(pinia)
   app.use(router)
   app.use(i18n)
+  
+  // Register OverlayScrollbars component globally
+  app.component('OverlayScrollbarsComponent', OverlayScrollbarsComponent)
 
   // Setup global error handlers
   const errorStore = useErrorStore(pinia)

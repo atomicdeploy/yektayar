@@ -67,3 +67,298 @@
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
 }
+
+/* ========================================
+   LIGHT THEME - Calm, Modern, Lively
+   ======================================== */
+:root {
+  /* Background Colors - Soft and airy */
+  --ion-background-color: #fafbfc;
+  --ion-background-color-rgb: 250, 251, 252;
+
+  /* Text Colors - High contrast for readability */
+  --ion-text-color: #1a1a1a;
+  --ion-text-color-rgb: 26, 26, 26;
+
+  /* Toolbar & Header */
+  --ion-toolbar-background: #ffffff;
+  --ion-toolbar-border-color: #e8eaed;
+  --ion-toolbar-color: #1a1a1a;
+
+  /* Card & Surface */
+  --ion-card-background: #ffffff;
+  --ion-item-background: #ffffff;
+
+  /* Borders & Dividers */
+  --ion-border-color: #e8eaed;
+
+  /* Tab Bar */
+  --ion-tab-bar-background: #ffffff;
+  --ion-tab-bar-border-color: #e8eaed;
+
+  /* Custom Light Theme Variables */
+  --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #e8c170 100%);
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --glass-background: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --overlay-background: rgba(0, 0, 0, 0.4);
+  
+  /* Light theme specific colors */
+  --surface-1: #ffffff;
+  --surface-2: #f7f8fa;
+  --surface-3: #eef0f3;
+  --text-primary: #1a1a1a;
+  --text-secondary: #5f6368;
+  --text-tertiary: #80868b;
+  --accent-soft: #f8f1e5;
+  --accent-light: #fef9f0;
+}
+
+/* ========================================
+   DARK THEME - Premium, Professional
+   Based on Navy Seal + Gold Branding
+   ======================================== */
+/* Apply dark theme when .ion-palette-dark class is present (forced dark mode) */
+.ion-palette-dark {
+  /* Background - Rich Navy gradients */
+  --ion-background-color: #0a0f1a;
+  --ion-background-color-rgb: 10, 15, 26;
+
+  /* Text Colors - Warm and readable */
+  --ion-text-color: #e8e9ed;
+  --ion-text-color-rgb: 232, 233, 237;
+
+  /* Toolbar & Header - Elevated dark surface */
+  --ion-toolbar-background: #101826;
+  --ion-toolbar-border-color: #1a2436;
+  --ion-toolbar-color: #e8e9ed;
+
+  /* Card & Surface - Layered depth */
+  --ion-card-background: #121a2b;
+  --ion-item-background: #121a2b;
+
+  /* Borders & Dividers - Subtle separation */
+  --ion-border-color: #1e2a3f;
+
+  /* Tab Bar - Premium feel */
+  --ion-tab-bar-background: #0d1421;
+  --ion-tab-bar-border-color: #1a2436;
+
+  /* Custom Dark Theme Variables */
+  --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #f0ca6f 100%);
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --glass-background: rgba(18, 26, 43, 0.75);
+  --glass-border: rgba(212, 164, 62, 0.2);
+  --overlay-background: rgba(0, 0, 0, 0.7);
+
+  /* Dark theme specific colors */
+  --surface-1: #121a2b;
+  --surface-2: #162033;
+  --surface-3: #1a2436;
+  --text-primary: #e8e9ed;
+  --text-secondary: #b4b8c5;
+  --text-tertiary: #7a7f8f;
+  --accent-soft: #2a2416;
+  --accent-light: #1f1d15;
+
+  /* Adjust Ionic component colors for dark mode */
+  --ion-color-step-50: #14202f;
+  --ion-color-step-100: #182638;
+  --ion-color-step-150: #1c2c41;
+  --ion-color-step-200: #20324a;
+  --ion-color-step-250: #243853;
+  --ion-color-step-300: #283e5c;
+  --ion-color-step-350: #2c4465;
+  --ion-color-step-400: #304a6e;
+  --ion-color-step-450: #345077;
+  --ion-color-step-500: #385680;
+  --ion-color-step-550: #3c5c89;
+  --ion-color-step-600: #406292;
+  --ion-color-step-650: #44689b;
+  --ion-color-step-700: #486ea4;
+  --ion-color-step-750: #4c74ad;
+  --ion-color-step-800: #507ab6;
+  --ion-color-step-850: #5480bf;
+  --ion-color-step-900: #5886c8;
+  --ion-color-step-950: #5c8cd1;
+}
+
+/* Apply dark theme when system prefers dark mode AND not in forced mode */
+@media (prefers-color-scheme: dark) {
+  html:not(.theme-forced) {
+    /* Background - Rich Navy gradients */
+    --ion-background-color: #0a0f1a;
+    --ion-background-color-rgb: 10, 15, 26;
+
+    /* Text Colors - Warm and readable */
+    --ion-text-color: #e8e9ed;
+    --ion-text-color-rgb: 232, 233, 237;
+
+    /* Toolbar & Header - Elevated dark surface */
+    --ion-toolbar-background: #101826;
+    --ion-toolbar-border-color: #1a2436;
+    --ion-toolbar-color: #e8e9ed;
+
+    /* Card & Surface - Layered depth */
+    --ion-card-background: #121a2b;
+    --ion-item-background: #121a2b;
+
+    /* Borders & Dividers - Subtle separation */
+    --ion-border-color: #1e2a3f;
+
+    /* Tab Bar - Premium feel */
+    --ion-tab-bar-background: #0d1421;
+    --ion-tab-bar-border-color: #1a2436;
+
+    /* Custom Dark Theme Variables */
+    --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #f0ca6f 100%);
+    --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --glass-background: rgba(18, 26, 43, 0.75);
+    --glass-border: rgba(212, 164, 62, 0.2);
+    --overlay-background: rgba(0, 0, 0, 0.7);
+
+    /* Dark theme specific colors */
+    --surface-1: #121a2b;
+    --surface-2: #162033;
+    --surface-3: #1a2436;
+    --text-primary: #e8e9ed;
+    --text-secondary: #b4b8c5;
+    --text-tertiary: #7a7f8f;
+    --accent-soft: #2a2416;
+    --accent-light: #1f1d15;
+
+    /* Adjust Ionic component colors for dark mode */
+    --ion-color-step-50: #14202f;
+    --ion-color-step-100: #182638;
+    --ion-color-step-150: #1c2c41;
+    --ion-color-step-200: #20324a;
+    --ion-color-step-250: #243853;
+    --ion-color-step-300: #283e5c;
+    --ion-color-step-350: #2c4465;
+    --ion-color-step-400: #304a6e;
+    --ion-color-step-450: #345077;
+    --ion-color-step-500: #385680;
+    --ion-color-step-550: #3c5c89;
+    --ion-color-step-600: #406292;
+    --ion-color-step-650: #44689b;
+    --ion-color-step-700: #486ea4;
+    --ion-color-step-750: #4c74ad;
+    --ion-color-step-800: #507ab6;
+    --ion-color-step-850: #5480bf;
+    --ion-color-step-900: #5886c8;
+    --ion-color-step-950: #5c8cd1;
+  }
+}
+
+/* ========================================
+   Global Enhancements
+   ======================================== */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* OverlayScrollbars Custom Styling - Light Theme */
+.os-theme-yektayar-mobile.os-scrollbar-horizontal,
+.os-theme-yektayar-mobile.os-scrollbar-vertical {
+  --os-size: 8px;
+  --os-padding-perpendicular: 0px;
+  --os-padding-axis: 0px;
+  --os-track-border-radius: 4px;
+  --os-track-bg: transparent;
+  --os-handle-border-radius: 4px;
+  --os-handle-bg: var(--ion-color-primary);
+  --os-handle-bg-hover: var(--ion-color-primary-shade);
+  --os-handle-bg-active: var(--ion-color-primary-shade);
+}
+
+/* OverlayScrollbars Custom Styling - Dark Theme */
+.ion-palette-dark .os-theme-yektayar-mobile.os-scrollbar-horizontal,
+.ion-palette-dark .os-theme-yektayar-mobile.os-scrollbar-vertical {
+  --os-handle-bg: var(--ion-color-primary);
+  --os-handle-bg-hover: var(--ion-color-primary-tint);
+  --os-handle-bg-active: var(--ion-color-primary-tint);
+}
+
+/* Apply dark theme scrollbar styles when system prefers dark mode AND not in forced mode */
+@media (prefers-color-scheme: dark) {
+  html:not(.theme-forced) .os-theme-yektayar-mobile.os-scrollbar-horizontal,
+  html:not(.theme-forced) .os-theme-yektayar-mobile.os-scrollbar-vertical {
+    --os-handle-bg: var(--ion-color-primary);
+    --os-handle-bg-hover: var(--ion-color-primary-tint);
+    --os-handle-bg-active: var(--ion-color-primary-tint);
+  }
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Enhanced card styling */
+ion-card {
+  box-shadow: var(--card-shadow);
+  border-radius: 16px;
+  margin: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+ion-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Enhanced toolbar styling */
+ion-toolbar {
+  --background: var(--ion-toolbar-background);
+  --color: var(--ion-toolbar-color);
+  --border-color: var(--ion-toolbar-border-color);
+  --border-width: 0 0 1px 0;
+}
+
+/* Enhanced tab bar styling */
+ion-tab-bar {
+  --background: var(--ion-tab-bar-background);
+  --border: 1px solid var(--ion-tab-bar-border-color);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+ion-tab-button {
+  --color: var(--text-secondary);
+  --color-selected: var(--ion-color-primary);
+}
+
+/* Content area styling */
+ion-content {
+  --background: var(--ion-background-color);
+  --color: var(--ion-text-color);
+}

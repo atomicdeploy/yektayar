@@ -6,6 +6,7 @@
  */
 
 import config from '@/config';
+import apiClient from '@/api';
 import { registerPlugin } from '@capacitor/core';
 import type { DeviceInfoPlugin } from '@/plugins/device-info';
 
@@ -28,11 +29,18 @@ export function isProduction(): boolean {
 }
 
 /**
- * Make an API request with the configured base URL
+ * Make an API request using the unified API client
+ * 
+ * IMPORTANT: Always use the unified API client from @/api instead of
+ * direct fetch() calls. The API client handles authentication,
+ * error handling, and provides a consistent interface.
  */
-export async function apiRequest(endpoint: string, options?: RequestInit): Promise<Response> {
-  const url = `${config.apiBaseUrl}${endpoint}`;
-  return fetch(url, options);
+export async function apiRequest<T>(endpoint: string): Promise<T> {
+  const response = await apiClient.get<T>(endpoint);
+  if (!response.success) {
+    throw new Error(response.error || 'API request failed');
+  }
+  return response.data!;
 }
 
 // ===== Native Plugin Usage =====
