@@ -53,8 +53,8 @@
               <ion-icon :icon="sparkles" class="action-icon"></ion-icon>
             </div>
             <div class="action-content">
-              <h3>{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</h3>
-              <p>{{ locale === 'fa' ? 'گفتگو با هوش مصنوعی' : 'Chat with AI assistant' }}</p>
+              <h3>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
+              <p>{{ locale === 'fa' ? 'گفتگو با هوشمند' : 'Chat with AI assistant' }}</p>
             </div>
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>

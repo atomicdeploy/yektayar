@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</ion-title>
+        <ion-title>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="clearChat">
             <ion-icon slot="icon-only" :icon="trash"></ion-icon>
@@ -34,7 +34,7 @@
           <ion-icon :icon="sparkles"></ion-icon>
         </div>
         <div class="ai-info">
-          <h3>{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</h3>
+          <h3>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
           <p>{{ locale === 'fa' ? 'همیشه آماده کمک به شما' : 'Always ready to help you' }}</p>
         </div>
         <div :class="['status-badge', isConnected ? 'online' : 'offline']">
@@ -75,7 +75,7 @@
               <div class="assistant-avatar">
                 <ion-icon :icon="sparkles"></ion-icon>
               </div>
-              <span class="assistant-name">{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</span>
+              <span class="assistant-name">{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</span>
             </div>
             <div class="message-content">
               {{ message.content }}
@@ -98,7 +98,7 @@
               <div class="assistant-avatar">
                 <ion-icon :icon="sparkles"></ion-icon>
               </div>
-              <span class="assistant-name">{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</span>
+              <span class="assistant-name">{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</span>
             </div>
             <div class="typing-indicator">
               <span></span>
