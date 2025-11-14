@@ -4,6 +4,7 @@
  */
 
 import postgres from 'postgres'
+import bcrypt from 'bcrypt'
 
 // Initialize PostgreSQL connection
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar'
@@ -31,6 +32,132 @@ export async function initializeDatabase() {
   const db = getDatabase()
 
   try {
+    // Create users table
+    await db`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE,
+        phone VARCHAR(50) UNIQUE,
+        name VARCHAR(255) NOT NULL,
+        password_hash VARCHAR(255),
+        type VARCHAR(50) NOT NULL DEFAULT 'patient',
+        avatar VARCHAR(500),
+        bio TEXT,
+        specialization VARCHAR(255),
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
+    // Create sessions table
+    await db`
+      CREATE TABLE IF NOT EXISTS sessions (
+        id SERIAL PRIMARY KEY,
+        token VARCHAR(255) UNIQUE NOT NULL,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        is_logged_in BOOLEAN DEFAULT false,
+        metadata JSONB DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NOT NULL,
+        last_activity_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
+    // Create appointments table
+    await db`
+      CREATE TABLE IF NOT EXISTS appointments (
+        id SERIAL PRIMARY KEY,
+        patient_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        psychologist_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        scheduled_at TIMESTAMP NOT NULL,
+        duration INTEGER NOT NULL DEFAULT 60,
+        status VARCHAR(50) NOT NULL DEFAULT 'pending',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
+    // Create courses table
+    await db`
+      CREATE TABLE IF NOT EXISTS courses (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT NOT NULL,
+        category VARCHAR(100),
+        duration INTEGER NOT NULL,
+        difficulty VARCHAR(50) DEFAULT 'beginner',
+        thumbnail_url VARCHAR(500),
+        is_published BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
+    // Create course_enrollments table
+    await db`
+      CREATE TABLE IF NOT EXISTS course_enrollments (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        course_id INTEGER NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        progress INTEGER DEFAULT 0,
+        completed BOOLEAN DEFAULT false,
+        enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP,
+        UNIQUE(user_id, course_id)
+      )
+    `
+
+    // Create assessments table
+    await db`
+      CREATE TABLE IF NOT EXISTS assessments (
+        id SERIAL PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        questions JSONB NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
+    // Create assessment_results table
+    await db`
+      CREATE TABLE IF NOT EXISTS assessment_results (
+        id SERIAL PRIMARY KEY,
+        assessment_id INTEGER NOT NULL REFERENCES assessments(id) ON DELETE CASCADE,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        answers JSONB NOT NULL,
+        score INTEGER,
+        personality_type VARCHAR(100),
+        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
+    // Create message_threads table
+    await db`
+      CREATE TABLE IF NOT EXISTS message_threads (
+        id SERIAL PRIMARY KEY,
+        participants INTEGER[] NOT NULL,
+        category VARCHAR(100),
+        status VARCHAR(50) DEFAULT 'open',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
+    // Create messages table
+    await db`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        thread_id INTEGER NOT NULL REFERENCES message_threads(id) ON DELETE CASCADE,
+        sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        content TEXT NOT NULL,
+        is_read BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
     // Create pages table
     await db`
       CREATE TABLE IF NOT EXISTS pages (
@@ -60,7 +187,7 @@ export async function initializeDatabase() {
     await db`
       CREATE TABLE IF NOT EXISTS support_tickets (
         id SERIAL PRIMARY KEY,
-        user_id INTEGER,
+        user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
         subject VARCHAR(255) NOT NULL,
         message TEXT NOT NULL,
         status VARCHAR(50) DEFAULT 'open',
@@ -82,13 +209,25 @@ export async function initializeDatabase() {
       )
     `
 
+    // Create user_preferences table
+    await db`
+      CREATE TABLE IF NOT EXISTS user_preferences (
+        user_id VARCHAR(255) PRIMARY KEY,
+        welcome_screen_shown BOOLEAN DEFAULT FALSE,
+        language VARCHAR(10) DEFAULT 'fa',
+        theme VARCHAR(20) DEFAULT 'auto',
+        notifications BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `
+
     console.log('✅ Database tables initialized successfully')
 
-    // Insert default about-us page if not exists
+    // Insert default data
     await insertDefaultAboutUsPage(db)
-    
-    // Insert default contact settings if not exist
     await insertDefaultContactSettings(db)
+    await insertDefaultUsers(db)
 
   } catch (error) {
     console.error('❌ Failed to initialize database:', error)
@@ -190,6 +329,33 @@ async function insertDefaultContactSettings(db: ReturnType<typeof postgres>) {
     console.log('✅ Default contact settings created')
   } catch (error) {
     console.error('❌ Failed to create default contact settings:', error)
+  }
+}
+
+/**
+ * Insert default users for testing
+ */
+async function insertDefaultUsers(db: ReturnType<typeof postgres>) {
+  try {
+    // Check if admin user exists
+    const existingAdmin = await db`
+      SELECT id FROM users WHERE email = 'admin@yektayar.com'
+    `
+    
+    if (existingAdmin.length === 0) {
+      const adminPassword = await bcrypt.hash('admin123', 10)
+      
+      await db`
+        INSERT INTO users (email, name, password_hash, type, bio)
+        VALUES 
+          ('admin@yektayar.com', 'Admin User', ${adminPassword}, 'admin', 'System Administrator'),
+          ('psychologist@yektayar.com', 'Dr. Sara Mohammadi', ${await bcrypt.hash('psych123', 10)}, 'psychologist', 'Licensed Clinical Psychologist with 10 years of experience'),
+          ('patient@yektayar.com', 'Ali Ahmadi', ${await bcrypt.hash('patient123', 10)}, 'patient', NULL)
+      `
+      console.log('✅ Default users created (admin@yektayar.com / admin123, psychologist@yektayar.com / psych123, patient@yektayar.com / patient123)')
+    }
+  } catch (error) {
+    console.error('❌ Failed to create default users:', error)
   }
 }
 
