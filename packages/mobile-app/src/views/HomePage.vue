@@ -11,13 +11,26 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ t('app_title') }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
+        <div class="content-wrapper">
       <!-- Hero Section -->
       <div class="hero-section">
         <div class="hero-content">
@@ -146,6 +159,8 @@
             : '"Mental health is the foundation of a happy and meaningful life"' }}
         </p>
       </div>
+        </div>
+      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -194,6 +209,16 @@ const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
 <style scoped>
+/* OverlayScrollbars container */
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
+.content-wrapper {
+  min-height: 100%;
+}
+
 /* Hero Section */
 .hero-section {
   background: var(--accent-gradient);
@@ -344,6 +369,11 @@ const navigateToProfile = () => router.push('/tabs/profile')
 .action-arrow {
   font-size: 20px;
   color: var(--text-tertiary);
+}
+
+/* RTL Support - Flip arrow direction for right-to-left languages */
+[dir="rtl"] .action-arrow {
+  transform: scaleX(-1);
 }
 
 /* Features Grid */

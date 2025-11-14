@@ -944,6 +944,71 @@ npm run test:deps
 - `0`: All checks passed (warnings are non-blocking)
 - `1`: Critical compatibility issues found (blocking)
 
+### `install-dependencies.js`
+
+A script that ensures all directories containing `package.json` files have their dependencies properly installed. This is particularly useful when:
+- A new dependency is added to any package in the monorepo
+- You've pulled changes that update `package.json` files
+- Local dependencies are out of sync with the repository
+
+**Usage:**
+```bash
+npm run install:deps
+# or directly:
+node scripts/install-dependencies.js
+```
+
+**What it does:**
+
+1. **Scans for packages**: Recursively finds all directories containing `package.json` files
+2. **Checks installation status**: Verifies if dependencies need to be installed by comparing:
+   - Existence of `node_modules` directories
+   - Timestamps of `package.json`, `package-lock.json`, and `node_modules`
+3. **Workspace-aware**: Intelligently handles npm workspaces monorepos:
+   - For workspace packages, checks the root `package-lock.json` vs root `node_modules`
+   - Runs a single `npm install` at root level to update all workspaces
+4. **Installs dependencies**: Runs `npm install` for packages that need updates
+
+**Example output:**
+```
+YektaYar Dependency Installer
+============================================================
+
+ℹ️ Scanning for package.json files...
+  ✅ Found 5 package(s)
+  ℹ️ Detected npm workspaces monorepo
+
+ℹ️ Checking dependency status...
+
+  📦 yektayar (.)
+    ✅ Up to date: up to date
+  📦 @yektayar/admin-panel (packages/admin-panel)
+    ✅ Up to date: workspace dependencies via root
+  📦 @yektayar/backend (packages/backend)
+    ⚠️ Needs installation: root package-lock.json is newer
+  📦 @yektayar/mobile-app (packages/mobile-app)
+    ✅ Up to date: workspace dependencies via root
+  📦 @yektayar/shared (packages/shared)
+    ✅ Up to date: workspace dependencies via root
+
+============================================================
+
+✅ All packages have up-to-date dependencies!
+```
+
+**Features:**
+- ✅ Workspace-aware detection for npm monorepos
+- ✅ Timestamp-based change detection
+- ✅ Single command installation for all packages
+- ✅ Colorful and informative output
+- ✅ Handles both root and workspace packages
+
+**When to run:**
+- After pulling changes from the repository
+- When you see "module not found" errors
+- After adding new dependencies to any package
+- As part of your development workflow setup
+
 ## Android Development Setup
 
 ### `setup-android.sh` (Ubuntu/Linux)

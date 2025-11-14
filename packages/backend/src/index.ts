@@ -136,6 +136,20 @@ if (isBun) {
   console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
   console.log(`🔒 Documentation protected with Basic Auth`)
   console.log(`✅ Socket.IO enabled on same port (${port})`)
+
+  // TODO: complete custom startup logs
+  // console.log(`⚠️ WARNING: `)
+  // console.log(`💡 Tip: `)
+
+  // check if development mode
+  if (Bun.env.NODE_ENV === 'development') {
+    console.log(`🔧 Running in development mode`)
+  }
+
+  // check if production mode
+  if (Bun.env.NODE_ENV === 'production') {
+    console.log(`🚀 Running in production mode`)
+  }
   
 } else if (isNode) {
   // Node.js runtime: Use traditional HTTP server with Socket.IO
@@ -193,6 +207,7 @@ if (isBun) {
     console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
     console.log(`🔒 Documentation protected with Basic Auth`)
     console.log(`✅ Socket.IO enabled on same port (${port})`)
+    // TODO: complete custom startup logs
   })
 }
 
