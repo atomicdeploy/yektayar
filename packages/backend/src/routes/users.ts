@@ -1,4 +1,9 @@
 import { Elysia } from 'elysia'
+import { 
+  getUserPreferences, 
+  updateUserPreferences 
+} from '../services/preferencesService'
+import { extractToken } from '../middleware/tokenExtractor'
 
 export const userRoutes = new Elysia({ prefix: '/api/users' })
   .get('/', async () => {
@@ -30,5 +35,55 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
       success: true,
       data: null,
       message: `Get user ${id} profile endpoint - to be implemented`
+    }
+  })
+  .get('/preferences', async ({ headers, query, cookie }) => {
+    try {
+      const token = extractToken({ headers, query, cookie })
+      
+      if (!token) {
+        return {
+          success: false,
+          error: 'No token provided'
+        }
+      }
+
+      const preferences = await getUserPreferences(token)
+      
+      return {
+        success: true,
+        data: preferences
+      }
+    } catch (error) {
+      console.error('Error fetching user preferences:', error)
+      return {
+        success: false,
+        error: 'Failed to fetch preferences'
+      }
+    }
+  })
+  .post('/preferences', async ({ headers, query, cookie, body }) => {
+    try {
+      const token = extractToken({ headers, query, cookie })
+      
+      if (!token) {
+        return {
+          success: false,
+          error: 'No token provided'
+        }
+      }
+
+      const preferences = await updateUserPreferences(token, body as Record<string, any>)
+      
+      return {
+        success: true,
+        data: preferences
+      }
+    } catch (error) {
+      console.error('Error updating user preferences:', error)
+      return {
+        success: false,
+        error: 'Failed to update preferences'
+      }
     }
   })
