@@ -478,4 +478,9 @@ onMounted(() => {
   font-size: 0.75rem;
   color: var(--ion-color-medium);
 }
+
+/* RTL Support - Flip chevron arrow direction for right-to-left languages */
+[dir="rtl"] .action-card > ion-icon {
+  transform: scaleX(-1);
+}
 </style>

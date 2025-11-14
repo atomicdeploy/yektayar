@@ -346,6 +346,11 @@ const navigateToProfile = () => router.push('/tabs/profile')
   color: var(--text-tertiary);
 }
 
+/* RTL Support - Flip arrow direction for right-to-left languages */
+[dir="rtl"] .action-arrow {
+  transform: scaleX(-1);
+}
+
 /* Features Grid */
 .features-grid {
   display: grid;
