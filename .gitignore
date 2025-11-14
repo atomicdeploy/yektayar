@@ -122,3 +122,6 @@ tmp/
 **/ios/App/*.xcworkspace
 !**/ios/App/*.xcworkspace/contents.xcworkspacedata
 
+# Generated image files
+*.webp
+
