@@ -190,8 +190,8 @@ const progressPercent = computed(() => {
 
 // Web Speech API - Production-grade implementation
 let recognition: any = null
-// Store ALL finalized transcripts separately from display
-let allFinalizedText = ''
+// Store the base text before starting recording
+let baseText = ''
 
 // Computed properties for RTL support
 const continueArrowIcon = computed(() => {
@@ -235,29 +235,45 @@ function initializeSpeechRecognition() {
     isRecording.value = true
     isProcessing.value = false
     errorMessage.value = ''
-    // Store current text as base for this session
-    allFinalizedText = transcriptText.value
+    // Store current text as base for this recording session
+    baseText = transcriptText.value
   }
 
   recognition.onresult = (event: any) => {
-    // CRITICAL: Build the complete state, never append in handler
+    // Rebuild the complete transcript from scratch each time
+    // This prevents duplicates because we're not accumulating
+    let finalText = ''
     let interimText = ''
 
-    // Process ONLY new results from resultIndex onwards
-    for (let i = event.resultIndex; i < event.results.length; i++) {
+    // Debug logging (can be removed in production)
+    console.log('[Speech Recognition] onresult fired', {
+      resultIndex: event.resultIndex,
+      totalResults: event.results.length,
+      baseText: baseText.substring(0, 50) + '...'
+    })
+
+    // Process ALL results to build complete state
+    for (let i = 0; i < event.results.length; i++) {
       const transcript = event.results[i][0].transcript
+      const isFinal = event.results[i].isFinal
       
-      if (event.results[i].isFinal) {
-        // Add to finalized storage
-        allFinalizedText += transcript + ' '
+      console.log(`  [${i}] ${isFinal ? 'FINAL' : 'interim'}: "${transcript}"`)
+      
+      if (isFinal) {
+        // Add to final text (rebuilding from all final results)
+        finalText += transcript + ' '
       } else {
-        // Accumulate interim for live preview
+        // Accumulate only non-final (interim) results for live preview
         interimText += transcript
       }
     }
 
-    // SET (not append) the display to show finalized + interim
-    transcriptText.value = allFinalizedText + interimText
+    console.log('  Final:', finalText)
+    console.log('  Interim:', interimText)
+    console.log('  Display will be:', (baseText + finalText + interimText).substring(0, 100) + '...')
+
+    // SET display to base + final + interim (never append!)
+    transcriptText.value = baseText + finalText + interimText
   }
 
   recognition.onerror = (event: any) => {
@@ -280,8 +296,8 @@ function initializeSpeechRecognition() {
   }
 
   recognition.onend = () => {
-    // Clean up: remove interim text, keep only finalized
-    transcriptText.value = allFinalizedText
+    // When recording ends, keep the final text (interim already removed by last onresult)
+    // No need to update transcriptText here as it's already set correctly
     
     if (isRecording.value) {
       // Restart if still recording (for continuous recording)
@@ -323,14 +339,13 @@ function stopRecording() {
   if (recognition) {
     isRecording.value = false
     recognition.stop()
-    // Ensure only finalized text is shown
-    transcriptText.value = allFinalizedText
+    // Text is already correctly set by last onresult
   }
 }
 
 function clearTranscript() {
   transcriptText.value = ''
-  allFinalizedText = ''
+  baseText = ''
   errorMessage.value = ''
 }
 
