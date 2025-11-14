@@ -61,7 +61,7 @@ The `WelcomeScreen.vue` component uses:
 ```vue
 <picture>
   <source srcset="/welcome-hero.webp" type="image/webp" />
-  <img src="/welcome-hero.jpg" alt="خانواده شاد - یکتاکر" />
+  <img src="/welcome-hero.jpg" alt="خانواده شاد - یکتایار" />
 </picture>
 ```
 
