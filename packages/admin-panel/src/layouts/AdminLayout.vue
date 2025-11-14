@@ -27,24 +27,30 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin">
-          <ul class="space-y-2">
-            <li v-for="item in visibleNavItems" :key="item.to">
-              <router-link
-                :to="item.to"
-                :class="[
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                  isActive(item.to)
-                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
-                ]"
-              >
-                <component :is="item.icon" class="w-5 h-5" />
-                <span class="font-medium">{{ t(item.label) }}</span>
-              </router-link>
-            </li>
-          </ul>
-        </nav>
+        <OverlayScrollbarsComponent
+          class="flex-1 px-4 py-6"
+          :options="{ scrollbars: { theme: 'os-theme-yektayar', visibility: 'auto', autoHide: 'leave', autoHideDelay: 800 } }"
+          defer
+        >
+          <nav>
+            <ul class="space-y-2">
+              <li v-for="item in visibleNavItems" :key="item.to">
+                <router-link
+                  :to="item.to"
+                  :class="[
+                    'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                    isActive(item.to)
+                      ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
+                  ]"
+                >
+                  <component :is="item.icon" class="w-5 h-5" />
+                  <span class="font-medium">{{ t(item.label) }}</span>
+                </router-link>
+              </li>
+            </ul>
+          </nav>
+        </OverlayScrollbarsComponent>
 
         <!-- User section -->
         <div class="border-t border-gray-200 dark:border-gray-700 p-4">
