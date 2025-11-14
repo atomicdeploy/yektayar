@@ -285,17 +285,11 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         }
       }
 
-      // In production, generate and send OTP via SMS/email
-      // For now, just return success
-      const mockOtp = Math.floor(100000 + Math.random() * 900000).toString()
-      console.log(`📱 Mock OTP for ${identifier}: ${mockOtp}`)
+      // Use the real OTP service
+      const { generateAndSendOTP } = await import('../services/otpService')
+      const result = await generateAndSendOTP(identifier)
 
-      return {
-        success: true,
-        message: 'OTP sent successfully',
-        // In development, return OTP for testing
-        ...(process.env.NODE_ENV === 'development' && { otp: mockOtp })
-      }
+      return result
     } catch (error) {
       console.error('Error sending OTP:', error)
       return {
@@ -324,13 +318,15 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         }
       }
 
-      // In production, verify OTP from database/cache
-      // For now, accept any 6-digit OTP for testing
-      if (otp.length !== 6) {
+      // Verify OTP using the real OTP service
+      const { verifyOTP } = await import('../services/otpService')
+      const verification = await verifyOTP(identifier, otp)
+
+      if (!verification.valid) {
         return {
           success: false,
           error: 'Invalid OTP',
-          message: 'OTP must be 6 digits'
+          message: verification.message
         }
       }
 

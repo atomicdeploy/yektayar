@@ -249,6 +249,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { UserType } from '@yektayar/shared'
+import { apiClient } from '@/api'
 
 const { locale } = useI18n()
 const router = useRouter()
@@ -281,25 +282,74 @@ const originalData = ref<FormData>({
 const errors = ref<Record<string, string>>({})
 const isSaving = ref(false)
 const focusedField = ref<string | null>(null)
+const currentUserId = ref<string | null>(null)
 
 // Load user data
 onMounted(() => {
   loadUserData()
 })
 
-function loadUserData() {
-  // TODO: Load from API when available
-  // For now, use mock data
-  const userData: FormData = {
-    name: locale.value === 'fa' ? 'کاربر یکتایار' : 'YektaYar User',
-    email: 'user@yektayar.com',
-    phone: locale.value === 'fa' ? '۰۹۱۲۳۴۵۶۷۸۹' : '+98 912 345 6789',
-    type: UserType.PATIENT,
-    avatar: undefined,
+async function loadUserData() {
+  try {
+    // Get session to find current user
+    const sessionResponse = await apiClient.get('/api/auth/session')
+    
+    if (sessionResponse.success && sessionResponse.data?.userId) {
+      currentUserId.value = sessionResponse.data.userId
+      
+      // Fetch user profile
+      const userResponse = await apiClient.get(`/api/users/${currentUserId.value}/profile`)
+      
+      if (userResponse.success && userResponse.data) {
+        const user = userResponse.data
+        const userData: FormData = {
+          name: user.name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          type: mapTypeToUserType(user.type),
+          avatar: user.avatar,
+        }
+        
+        formData.value = { ...userData }
+        originalData.value = { ...userData }
+      }
+    } else {
+      // Not logged in, use default values
+      const userData: FormData = {
+        name: locale.value === 'fa' ? 'کاربر یکتایار' : 'YektaYar User',
+        email: '',
+        phone: '',
+        type: UserType.PATIENT,
+        avatar: undefined,
+      }
+      
+      formData.value = { ...userData }
+      originalData.value = { ...userData }
+    }
+  } catch (error) {
+    console.error('Error loading user data:', error)
+    // Use default values on error
+    const userData: FormData = {
+      name: locale.value === 'fa' ? 'کاربر یکتایار' : 'YektaYar User',
+      email: '',
+      phone: '',
+      type: UserType.PATIENT,
+      avatar: undefined,
+    }
+    
+    formData.value = { ...userData }
+    originalData.value = { ...userData }
   }
-  
-  formData.value = { ...userData }
-  originalData.value = { ...userData }
+}
+
+// Map backend user type to frontend UserType enum
+function mapTypeToUserType(type: string): UserType {
+  const mapping: Record<string, UserType> = {
+    'admin': UserType.ADMIN,
+    'psychologist': UserType.PSYCHOLOGIST,
+    'patient': UserType.PATIENT,
+  }
+  return mapping[type] || UserType.PATIENT
 }
 
 // Handle blur event
@@ -396,32 +446,41 @@ async function handleSave() {
   isSaving.value = true
   
   try {
-    // TODO: Call API to save user data
-    // await apiClient.put(`/api/users/${userId}`, formData.value)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    // Update original data to reflect saved state
-    originalData.value = { ...formData.value }
-    
+    if (currentUserId.value) {
+      // Update existing user
+      const response = await apiClient.put(`/api/users/${currentUserId.value}`, {
+        name: formData.value.name,
+        email: formData.value.email,
+        phone: formData.value.phone,
+      })
+      
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to update user')
+      }
+      
+      // Update original data to reflect saved state
+      originalData.value = { ...formData.value }
+      
+      const toast = await toastController.create({
+        message: locale.value === 'fa' ? 'تغییرات با موفقیت ذخیره شد' : 'Changes saved successfully',
+        duration: 2000,
+        position: 'bottom',
+        color: 'success',
+        icon: checkmarkCircle,
+      })
+      await toast.present()
+      
+      // Navigate back after a short delay
+      setTimeout(() => {
+        router.back()
+      }, 500)
+    } else {
+      throw new Error('User not logged in')
+    }
+  } catch (error: any) {
+    console.error('Error saving user data:', error)
     const toast = await toastController.create({
-      message: locale.value === 'fa' ? 'تغییرات با موفقیت ذخیره شد' : 'Changes saved successfully',
-      duration: 2000,
-      position: 'bottom',
-      color: 'success',
-      icon: checkmarkCircle,
-    })
-    await toast.present()
-    
-    // Navigate back after a short delay
-    setTimeout(() => {
-      router.back()
-    }, 500)
-    
-  } catch (error) {
-    const toast = await toastController.create({
-      message: locale.value === 'fa' ? 'خطا در ذخیره تغییرات' : 'Error saving changes',
+      message: error.message || (locale.value === 'fa' ? 'خطا در ذخیره تغییرات' : 'Error saving changes'),
       duration: 3000,
       position: 'bottom',
       color: 'danger',

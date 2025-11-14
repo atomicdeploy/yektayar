@@ -54,16 +54,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
       
       if (response.success && response.data) {
         stats.value = response.data
+      } else {
+        throw new Error('Failed to fetch stats')
       }
     } catch (error) {
       logger.error('Error fetching dashboard stats:', error)
-      // Set mock data for development
-      stats.value = {
-        totalUsers: 1234,
-        activeSessions: 42,
-        totalAppointments: 567,
-        pendingAppointments: 23,
-      }
+      throw error
     } finally {
       isLoading.value = false
     }
@@ -75,14 +71,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
       
       if (response.success && response.data) {
         userGrowthData.value = response.data
+      } else {
+        throw new Error('Failed to fetch user growth data')
       }
     } catch (error) {
       logger.error('Error fetching user growth data:', error)
-      // Set mock data for development
-      userGrowthData.value = {
-        labels: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور'],
-        data: [120, 190, 300, 500, 800, 1234],
-      }
+      throw error
     }
   }
 
@@ -92,14 +86,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
       
       if (response.success && response.data) {
         appointmentStatsData.value = response.data
+      } else {
+        throw new Error('Failed to fetch appointment stats')
       }
     } catch (error) {
       logger.error('Error fetching appointment stats:', error)
-      // Set mock data for development
-      appointmentStatsData.value = {
-        labels: ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'],
-        data: [12, 19, 15, 25, 22, 18, 8],
-      }
+      throw error
     }
   }
 
@@ -112,30 +104,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
           ...item,
           timestamp: new Date(item.timestamp),
         }))
+      } else {
+        throw new Error('Failed to fetch recent activities')
       }
     } catch (error) {
       logger.error('Error fetching recent activities:', error)
-      // Set mock data for development
-      recentActivities.value = [
-        {
-          id: '1',
-          type: 'user_registered',
-          description: 'کاربر جدید ثبت‌نام کرد',
-          timestamp: new Date(Date.now() - 5 * 60000),
-        },
-        {
-          id: '2',
-          type: 'appointment_created',
-          description: 'نوبت جدید ایجاد شد',
-          timestamp: new Date(Date.now() - 15 * 60000),
-        },
-        {
-          id: '3',
-          type: 'appointment_completed',
-          description: 'نوبت تکمیل شد',
-          timestamp: new Date(Date.now() - 30 * 60000),
-        },
-      ]
+      throw error
     }
   }
 
