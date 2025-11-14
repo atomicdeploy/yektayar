@@ -1,48 +1,84 @@
 # Welcome Screen Hero Image
 
 ## Current State
-The welcome screen currently uses a placeholder image (`welcome-hero.jpg` - an SVG file).
+The welcome screen uses a placeholder image saved as `welcome-hero.jpg` (SVG content).
 
 ## ⚠️ ACTION REQUIRED: Replace with Actual Image
 
-The actual family photo needs to be manually added to this directory.
+The actual family photo is now available since the repository is public.
 
 ### Steps to Replace:
 
-1. **Obtain the actual photo**: The family photo is shown in the GitHub issue but the asset URL is not publicly accessible:
-   - Issue URL: https://github.com/atomicdeploy/yektayar/issues/70
-   - Asset URL: https://github.com/user-attachments/assets/9f7f4ee5-ac27-4415-9fe4-7f7e45588f92
-   - The image shows a warm family scene with parents and children on a couch with plants in the background
+1. **Download the hero image**:
+   ```bash
+   cd packages/mobile-app/public
+   curl -L -o welcome-hero.jpg "https://github.com/user-attachments/assets/9f7f4ee5-ac27-4415-9fe4-7f7e45588f92"
+   ```
 
-2. **Download the image**:
-   - You'll need to be logged into GitHub and have access to the repository
-   - Navigate to the issue and save the image directly from there
-   - Or use the GH_PAT token with curl:
-     ```bash
-     curl -L -H "Authorization: token $GH_PAT" -o welcome-hero.jpg \
-       "https://github.com/user-attachments/assets/9f7f4ee5-ac27-4415-9fe4-7f7e45588f92"
-     ```
+   Or manually:
+   - Navigate to: https://github.com/atomicdeploy/yektayar/issues/70
+   - Right-click the family photo and save as `welcome-hero.jpg`
 
-3. **Replace the placeholder**:
-   - Save the actual photo as `welcome-hero.jpg` in this directory (`packages/mobile-app/public/`)
-   - The placeholder will be automatically overwritten
+2. **Verify the image**:
+   ```bash
+   file welcome-hero.jpg  # Should show: JPEG image data
+   ```
 
-4. **Verify**:
-   - The `WelcomeScreen.vue` component is already configured to use `/welcome-hero.jpg`
-   - Test the app to ensure the image displays correctly
+3. **Build the app** (WebP will be auto-generated):
+   ```bash
+   npm run build
+   # Or just optimize images:
+   npm run optimize-images
+   ```
+
+## Automatic WebP Generation
+
+The build process automatically:
+- ✅ Converts JPG to WebP format (85% quality)
+- ✅ Optimizes JPG files (90% quality, progressive)
+- ✅ Shows size savings
+
+The `<picture>` element in `WelcomeScreen.vue` serves WebP to modern browsers and falls back to JPG for older browsers.
 
 ## Image Specifications
 
-- **Current placeholder**: SVG illustration with family silhouettes
-- **Required format**: JPG (preferred) or PNG
-- **Recommended size**: 1200x800 pixels (or similar 3:2 aspect ratio)
-- **Max file size**: Keep under 500KB for optimal mobile performance
-- **Content**: The specific family photo from the GitHub issue showing warmth, care, and togetherness
+- **Format**: JPG (source), WebP (auto-generated)
+- **Recommended size**: 1200x800 pixels (3:2 aspect ratio)
+- **Max file size**: Keep source under 500KB
+- **Content**: Professional family photo showing warmth and care
+- **WebP savings**: Typically 25-35% smaller than JPG
 
 ## Technical Details
 
-The image is referenced in:
-- `src/views/WelcomeScreen.vue` as `/welcome-hero.jpg`
-- Displays with rounded corners and shadow
-- Max height of 400px on mobile devices
-- Responsive and works in both light and dark modes
+### Build Integration
+The image optimization runs automatically during:
+- `npm run build` - Full build with WebP generation
+- `npm run build:production` - Production build
+- `npm run optimize-images` - Manual optimization only
+
+### Component Usage
+The `WelcomeScreen.vue` component uses:
+```vue
+<picture>
+  <source srcset="/welcome-hero.webp" type="image/webp" />
+  <img src="/welcome-hero.jpg" alt="خانواده شاد - یکتاکر" />
+</picture>
+```
+
+This ensures:
+- Modern browsers load lightweight WebP
+- Older browsers fall back to optimized JPG
+- Lazy loading for better performance
+- Graceful error handling
+
+## Troubleshooting
+
+If the image doesn't display:
+1. Check file exists: `ls -lh public/welcome-hero.jpg`
+2. Verify file type: `file public/welcome-hero.jpg`
+3. Check console for loading errors
+4. Ensure file is not corrupt
+
+## Development
+
+For local development, the placeholder will work. The actual photo should be added before deployment.
