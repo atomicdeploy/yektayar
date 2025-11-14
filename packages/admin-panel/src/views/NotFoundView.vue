@@ -48,11 +48,21 @@
 
       <!-- Request Information Card -->
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <div class="flex items-center mb-4">
-          <InformationCircleIcon class="w-6 h-6 text-primary-600 dark:text-primary-400 ml-2" />
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-            {{ t('not_found.request_info') }}
-          </h2>
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center">
+            <InformationCircleIcon class="w-6 h-6 text-primary-600 dark:text-primary-400 ml-2" />
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+              {{ t('not_found.request_info') }}
+            </h2>
+          </div>
+          <button
+            @click="copyDebugInfo"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+            :title="t('not_found.copy_debug_info')"
+          >
+            <DocumentDuplicateIcon class="w-4 h-4" />
+            {{ t('not_found.copy_debug_info') }}
+          </button>
         </div>
         
         <div class="space-y-4">
@@ -84,6 +94,88 @@
             <span class="text-sm text-gray-600 dark:text-gray-400">
               {{ timestamp }}
             </span>
+          </div>
+
+          <!-- User Agent -->
+          <div class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {{ t('not_found.user_agent') }}:
+            </span>
+            <code class="px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-lg text-xs text-gray-800 dark:text-gray-200 font-mono break-all border border-gray-200 dark:border-gray-700">
+              {{ userAgent }}
+            </code>
+          </div>
+
+          <!-- Referrer -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 min-w-[140px]">
+              {{ t('not_found.referrer') }}:
+            </span>
+            <code class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-lg text-sm text-gray-800 dark:text-gray-200 font-mono break-all border border-gray-200 dark:border-gray-700">
+              {{ referrer || t('not_found.direct_access') }}
+            </code>
+          </div>
+
+          <!-- Query Parameters -->
+          <div class="flex flex-col gap-2">
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {{ t('not_found.query_params') }}:
+            </span>
+            <code class="px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-lg text-sm text-gray-800 dark:text-gray-200 font-mono break-all border border-gray-200 dark:border-gray-700">
+              {{ queryParams }}
+            </code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Debug Information Card -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <div class="flex items-center mb-4">
+          <CodeBracketIcon class="w-6 h-6 text-purple-600 dark:text-purple-400 ml-2" />
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+            {{ t('not_found.debug_info') }}
+          </h2>
+        </div>
+        
+        <div class="space-y-4">
+          <!-- Route Name -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 min-w-[140px]">
+              {{ t('not_found.route_name') }}:
+            </span>
+            <code class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-lg text-sm text-gray-800 dark:text-gray-200 font-mono break-all border border-gray-200 dark:border-gray-700">
+              {{ String(route.name) || 'N/A' }}
+            </code>
+          </div>
+
+          <!-- Matched Pattern -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 min-w-[140px]">
+              {{ t('not_found.matched_pattern') }}:
+            </span>
+            <code class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-lg text-sm text-gray-800 dark:text-gray-200 font-mono break-all border border-gray-200 dark:border-gray-700">
+              :pathMatch(.*)*
+            </code>
+          </div>
+
+          <!-- Full Path -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 min-w-[140px]">
+              {{ t('not_found.full_path') }}:
+            </span>
+            <code class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-lg text-sm text-gray-800 dark:text-gray-200 font-mono break-all border border-gray-200 dark:border-gray-700">
+              {{ route.fullPath }}
+            </code>
+          </div>
+
+          <!-- Hash -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 min-w-[140px]">
+              {{ t('not_found.hash') }}:
+            </span>
+            <code class="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-lg text-sm text-gray-800 dark:text-gray-200 font-mono break-all border border-gray-200 dark:border-gray-700">
+              {{ route.hash || 'N/A' }}
+            </code>
           </div>
         </div>
       </div>
@@ -173,7 +265,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -184,6 +276,8 @@ import {
   LightBulbIcon,
   CheckCircleIcon,
   LinkIcon,
+  DocumentDuplicateIcon,
+  CodeBracketIcon,
 } from '@heroicons/vue/24/outline'
 import {
   Squares2X2Icon,
@@ -198,6 +292,9 @@ const route = useRoute()
 const { t, locale } = useI18n()
 
 const searchQuery = ref('')
+const userAgent = ref('')
+const referrer = ref('')
+
 const currentPath = computed(() => route.fullPath)
 const timestamp = computed(() => {
   const date = new Date()
@@ -209,6 +306,18 @@ const timestamp = computed(() => {
     minute: '2-digit',
     second: '2-digit'
   })
+})
+
+const queryParams = computed(() => {
+  if (Object.keys(route.query).length === 0) {
+    return t('not_found.none')
+  }
+  return JSON.stringify(route.query, null, 2)
+})
+
+onMounted(() => {
+  userAgent.value = navigator.userAgent
+  referrer.value = document.referrer
 })
 
 const quickLinks = [
@@ -233,6 +342,32 @@ const performSearch = () => {
     console.log('Searching for:', searchQuery.value)
     // For now, just redirect to dashboard
     goToDashboard()
+  }
+}
+
+const copyDebugInfo = async () => {
+  const debugInfo = `
+404 Error Debug Information
+===========================
+Requested URL: ${currentPath.value}
+Method: GET
+Timestamp: ${timestamp.value}
+User Agent: ${userAgent.value}
+Referrer: ${referrer.value || t('not_found.direct_access')}
+Query Parameters: ${queryParams.value}
+
+Debug Information:
+Route Name: ${String(route.name) || 'N/A'}
+Matched Pattern: :pathMatch(.*)*
+Full Path: ${route.fullPath}
+Hash: ${route.hash || 'N/A'}
+  `.trim()
+  
+  try {
+    await navigator.clipboard.writeText(debugInfo)
+    alert(t('not_found.debug_info_copied'))
+  } catch (err) {
+    console.error('Failed to copy debug info:', err)
   }
 }
 </script>
