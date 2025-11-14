@@ -320,7 +320,7 @@ print_summary() {
     echo -e "${SUCCESS} ${GREEN}${BOLD}Sync completed successfully!${RESET}"
     echo -e "${CYAN}${BOLD}================================${RESET}"
     echo ""
-    echo -e "${INFO} ${CYAN}Repository: ${BOLD}$(basename $REPO_ROOT)${RESET}"
+    echo -e "${INFO} ${CYAN}Repository: ${BOLD}$(basename "$REPO_ROOT")${RESET}"
     echo -e "${INFO} ${CYAN}Branch: ${BOLD}$CURRENT_BRANCH${RESET}"
     echo -e "${INFO} ${CYAN}Status: ${GREEN}${BOLD}Up to date${RESET}"
     echo ""
