@@ -3,21 +3,41 @@ import { Elysia } from 'elysia'
 /**
  * Basic Authentication middleware for Swagger documentation
  * Protects API documentation endpoints with username/password authentication
+ * Only enabled in development environment - disabled in production
  */
 export const swaggerAuth = new Elysia()
-  .derive(({ headers, path }) => {
+  .onRequest(({ request, path, set }) => {
     // Only protect swagger/api-docs routes
     if (!path.startsWith('/api-docs')) {
-      return {}
+      return
     }
 
-    const authHeader = headers['authorization']
+    // Skip authentication in production environment
+    const isProduction = process.env.NODE_ENV === 'production'
+    if (isProduction) {
+      return
+    }
+
+    // Get authorization header
+    const authHeader = request.headers.get('authorization')
     
     // Check if authorization header exists
     if (!authHeader || !authHeader.startsWith('Basic ')) {
-      return {
-        isSwaggerAuthorized: false
-      }
+      set.status = 401
+      set.headers['WWW-Authenticate'] = 'Basic realm="Swagger Documentation"'
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'Authentication required to access API documentation'
+        }),
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+            'WWW-Authenticate': 'Basic realm="Swagger Documentation"'
+          }
+        }
+      )
     }
 
     try {
@@ -33,27 +53,38 @@ export const swaggerAuth = new Elysia()
       // Verify credentials
       const isValid = username === expectedUsername && password === expectedPassword
 
-      return {
-        isSwaggerAuthorized: isValid
+      if (!isValid) {
+        set.status = 401
+        set.headers['WWW-Authenticate'] = 'Basic realm="Swagger Documentation"'
+        return new Response(
+          JSON.stringify({
+            error: 'Unauthorized',
+            message: 'Invalid credentials'
+          }),
+          {
+            status: 401,
+            headers: {
+              'Content-Type': 'application/json',
+              'WWW-Authenticate': 'Basic realm="Swagger Documentation"'
+            }
+          }
+        )
       }
     } catch (error) {
-      return {
-        isSwaggerAuthorized: false
-      }
-    }
-  })
-  .onBeforeHandle(({ path, isSwaggerAuthorized, set }) => {
-    // Only check authorization for swagger/api-docs routes
-    if (!path.startsWith('/api-docs')) {
-      return
-    }
-
-    if (isSwaggerAuthorized === false) {
       set.status = 401
       set.headers['WWW-Authenticate'] = 'Basic realm="Swagger Documentation"'
-      return {
-        error: 'Unauthorized',
-        message: 'Authentication required to access API documentation'
-      }
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'Invalid authorization format'
+        }),
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+            'WWW-Authenticate': 'Basic realm="Swagger Documentation"'
+          }
+        }
+      )
     }
   })
