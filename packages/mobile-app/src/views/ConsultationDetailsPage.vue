@@ -145,17 +145,36 @@ import {
   alertCircle,
 } from 'ionicons/icons'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
+
+// Consultation flow configuration
+const TOTAL_STEPS = 10 // Total steps in consultation flow
+const DEFAULT_STEP = 4 // Default to step 4 if not specified
+
+// Get current step from route query param or use default
+const currentStep = computed(() => {
+  const stepParam = route.query.step
+  if (stepParam) {
+    const step = parseInt(stepParam as string, 10)
+    return !isNaN(step) && step > 0 && step <= TOTAL_STEPS ? step : DEFAULT_STEP
+  }
+  return DEFAULT_STEP
+})
 
 // State
-const progressPercent = ref(40) // As specified in the requirements
 const isRecording = ref(false)
 const isProcessing = ref(false)
 const isSaving = ref(false)
 const transcriptText = ref('')
 const errorMessage = ref('')
+
+// Computed progress based on current step
+const progressPercent = computed(() => {
+  return Math.round((currentStep.value / TOTAL_STEPS) * 100)
+})
 
 // Web Speech API
 let recognition: any = null
@@ -296,7 +315,7 @@ async function handleContinue() {
     // TODO: Send to backend API
     // await apiClient.post('/api/consultations', {
     //   description: transcriptText.value.trim(),
-    //   step: 4
+    //   step: currentStep.value
     // })
 
     // Simulate API call
