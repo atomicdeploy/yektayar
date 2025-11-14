@@ -2,15 +2,23 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.png" />
+    <!-- Light mode icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" media="(prefers-color-scheme: light)" />
+    <!-- Dark mode icons (default) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32-dark.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16-dark.png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/icon-dark.svg" media="(prefers-color-scheme: dark)" />
+    <!-- Default fallback (dark variant) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32-dark.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192-dark.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
-    <meta name="theme-color" content="#d4a43e" />
+    <meta name="theme-color" content="#d4a43e" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#01183a" media="(prefers-color-scheme: dark)" />
 
     <title>یکتایار - پلتفرم مراقبت سلامت روان</title>
 
