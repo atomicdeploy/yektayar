@@ -30,7 +30,7 @@
           </ion-list-header>
           
           <ion-radio-group :value="selectedScheme" @ionChange="onSchemeChange">
-            <ion-item v-for="(scheme, index) in colorSchemes" :key="index" lines="none">
+            <ion-item v-for="(scheme, index) in colorSchemes" :key="index" lines="none" :button="true" @click="selectedScheme = index">
               <ion-radio :value="index" slot="start"></ion-radio>
               <ion-label>
                 <h3>Scheme {{ index + 1 }} (Key: {{ index + 1 }})</h3>
