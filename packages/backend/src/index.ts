@@ -133,8 +133,16 @@ if (isBun) {
   })
   
   console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
-  console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
-  console.log(`🔒 Documentation protected with Basic Auth`)
+  
+  // Show authentication status based on environment
+  const isProduction = Bun.env.NODE_ENV === 'production'
+  if (isProduction) {
+    console.log(`🚫 API Documentation is disabled in production mode`)
+  } else {
+    console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
+    console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
+  }
+  
   console.log(`✅ Socket.IO enabled on same port (${port})`)
 
   // TODO: complete custom startup logs
@@ -204,8 +212,16 @@ if (isBun) {
   // Start the server
   httpServer.listen(port, hostname, () => {
     console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
-    console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
-    console.log(`🔒 Documentation protected with Basic Auth`)
+    
+    // Show authentication status based on environment
+    const isProduction = process.env.NODE_ENV === 'production'
+    if (isProduction) {
+      console.log(`🚫 API Documentation is disabled in production mode`)
+    } else {
+      console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
+      console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
+    }
+    
     console.log(`✅ Socket.IO enabled on same port (${port})`)
     // TODO: complete custom startup logs
   })

@@ -10,7 +10,7 @@
     "build": "tsc",
     "start": "bun run dist/index.js",
     "lint": "eslint src --ext .ts",
-    "test": "echo \"Tests not yet implemented\" && exit 0"
+    "test": "npx tsx src/__tests__/swaggerAuth.manual.test.js"
   },
   "dependencies": {
     "@elysiajs/cookie": "^0.8.0",
