@@ -60,7 +60,7 @@ const checkFontsLoaded = async () => {
 // Preload the welcome screen hero image
 const preloadHeroImage = async () => {
   try {
-    // Preload the base hero image (or thumbnail)
+    // Preload the hero image (prefer WebP for better performance)
     const img = new Image()
     
     // Use a promise to track when the image loads
@@ -78,8 +78,16 @@ const preloadHeroImage = async () => {
       }
     })
     
-    // Start loading the image
-    img.src = '/welcome-hero.jpg'
+    // Check if browser supports WebP format
+    const supportsWebP = await new Promise<boolean>((resolve) => {
+      const webpImg = new Image()
+      webpImg.onload = () => resolve(true)
+      webpImg.onerror = () => resolve(false)
+      webpImg.src = 'data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
+    })
+    
+    // Start loading the image (prefer WebP for smaller size)
+    img.src = supportsWebP ? '/welcome-hero.webp' : '/welcome-hero.jpg'
     
     // Wait for the image to load or timeout after 1.5 seconds
     await Promise.race([
