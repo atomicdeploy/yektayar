@@ -28,7 +28,7 @@
         </div>
 
         <!-- Voice Recording Button -->
-        <div class="recording-section">
+        <div v-if="speechRecognitionSupported" class="recording-section">
           <button 
             class="mic-button" 
             :class="{ 
@@ -61,15 +61,21 @@
             </template>
           </p>
 
-          <!-- Error Message -->
+          <!-- Error Message with Type Instead option -->
           <div v-if="errorMessage" class="error-message">
-            <ion-icon :icon="alertCircle"></ion-icon>
-            <span>{{ errorMessage }}</span>
+            <div class="error-content">
+              <ion-icon :icon="alertCircle"></ion-icon>
+              <span>{{ errorMessage }}</span>
+            </div>
+            <button class="type-instead-button" @click="typeInstead">
+              <ion-icon :icon="create"></ion-icon>
+              بجای آن تایپ کنید
+            </button>
           </div>
         </div>
 
         <!-- Transcribed Text Display/Edit -->
-        <div v-if="transcriptText || isRecording" class="transcript-section">
+        <div v-if="transcriptText || isRecording || !speechRecognitionSupported" class="transcript-section">
           <div class="transcript-card">
             <ion-textarea
               v-model="transcriptText"
@@ -88,6 +94,7 @@
                 پاک کردن
               </button>
               <button 
+                v-if="speechRecognitionSupported"
                 class="action-button primary" 
                 @click="toggleRecording"
                 :disabled="isProcessing"
@@ -107,7 +114,7 @@
             :disabled="!canContinue || isSaving"
             class="continue-button"
           >
-            <ion-icon v-if="!isSaving" slot="start" :icon="arrowForward"></ion-icon>
+            <ion-icon v-if="!isSaving" slot="start" :icon="continueArrowIcon"></ion-icon>
             <ion-spinner v-if="isSaving" slot="start" name="crescent"></ion-spinner>
             {{ isSaving ? 'در حال ارسال...' : 'ادامه بده' }}
           </ion-button>
@@ -140,15 +147,19 @@ import {
   mic,
   stop,
   arrowForward,
+  arrowBack,
   lockClosed,
   trash,
   alertCircle,
+  create,
 } from 'ionicons/icons'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
 const route = useRoute()
+const { locale } = useI18n()
 
 // Consultation flow configuration
 const TOTAL_STEPS = 10 // Total steps in consultation flow
@@ -170,6 +181,7 @@ const isProcessing = ref(false)
 const isSaving = ref(false)
 const transcriptText = ref('')
 const errorMessage = ref('')
+const speechRecognitionSupported = ref(true)
 
 // Computed progress based on current step
 const progressPercent = computed(() => {
@@ -178,7 +190,12 @@ const progressPercent = computed(() => {
 
 // Web Speech API
 let recognition: any = null
-let interimTranscript = ''
+let lastProcessedIndex = 0
+
+// Computed property for arrow icon based on locale
+const continueArrowIcon = computed(() => {
+  return locale.value === 'fa' ? arrowBack : arrowForward
+})
 
 // Initialize Speech Recognition
 onMounted(() => {
@@ -196,36 +213,42 @@ function initializeSpeechRecognition() {
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
   
   if (!SpeechRecognition) {
+    speechRecognitionSupported.value = false
     errorMessage.value = 'مرورگر شما از قابلیت تشخیص گفتار پشتیبانی نمی‌کند'
     return
   }
 
+  speechRecognitionSupported.value = true
   recognition = new SpeechRecognition()
   recognition.continuous = true
   recognition.interimResults = true
-  recognition.lang = 'fa-IR' // Persian (Farsi) language
+  
+  // Set language based on current locale
+  const langCode = locale.value === 'fa' ? 'fa-IR' : 'en-US'
+  recognition.lang = langCode
 
   recognition.onstart = () => {
     isRecording.value = true
     isProcessing.value = false
     errorMessage.value = ''
+    lastProcessedIndex = 0
   }
 
   recognition.onresult = (event: any) => {
-    interimTranscript = ''
-    let finalTranscript = ''
+    // Build transcript from only the new results
+    let newTranscript = ''
 
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript
-      if (event.results[i].isFinal) {
-        finalTranscript += transcript + ' '
-      } else {
-        interimTranscript += transcript
+    for (let i = lastProcessedIndex; i < event.results.length; i++) {
+      const result = event.results[i]
+      if (result.isFinal) {
+        newTranscript += result[0].transcript + ' '
+        lastProcessedIndex = i + 1
       }
     }
 
-    if (finalTranscript) {
-      transcriptText.value += finalTranscript
+    // Only append new final transcript
+    if (newTranscript) {
+      transcriptText.value += newTranscript
     }
   }
 
@@ -279,7 +302,7 @@ async function toggleRecording() {
 function startRecording() {
   try {
     errorMessage.value = ''
-    interimTranscript = ''
+    lastProcessedIndex = 0
     recognition.start()
   } catch (error) {
     errorMessage.value = 'خطا در شروع ضبط. لطفا دوباره تلاش کنید'
@@ -295,8 +318,14 @@ function stopRecording() {
 
 function clearTranscript() {
   transcriptText.value = ''
-  interimTranscript = ''
+  lastProcessedIndex = 0
   errorMessage.value = ''
+}
+
+function typeInstead() {
+  errorMessage.value = ''
+  // Show the text area by setting some initial text or just clearing error
+  // The textarea will be shown when errorMessage is cleared
 }
 
 const canContinue = computed(() => {
@@ -570,8 +599,8 @@ async function showAlert(header: string, message: string) {
 
 .error-message {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.75rem;
   padding: 0.75rem 1rem;
   background: rgba(235, 68, 90, 0.1);
   border: 1px solid var(--ion-color-danger);
@@ -581,9 +610,41 @@ async function showAlert(header: string, message: string) {
   direction: rtl;
 }
 
+.error-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .error-message ion-icon {
   font-size: 20px;
   flex-shrink: 0;
+}
+
+.type-instead-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid var(--ion-color-danger);
+  border-radius: 8px;
+  color: var(--ion-color-danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--ion-font-family);
+}
+
+.type-instead-button:active {
+  transform: translateY(1px);
+  background: rgba(235, 68, 90, 0.05);
+}
+
+.type-instead-button ion-icon {
+  font-size: 18px;
 }
 
 /* Transcript Section */
