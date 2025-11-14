@@ -1,3 +1,42 @@
+name: Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+
 jobs:
   copilot-setup-steps:
-    runs-on: yektayar-runners
+    runs-on: [self-hosted, linux, yektayar-runners]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Display runner information
+        run: |
+          echo "Runner name: $RUNNER_NAME"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner arch: $RUNNER_ARCH"
+          echo "Node version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          
+      - name: Verify Java installation
+        run: |
+          java -version
+          echo "JAVA_HOME: $JAVA_HOME"
+      
+      - name: Verify Android SDK
+        run: |
+          if [ -d "$ANDROID_HOME" ]; then
+            echo "Android SDK found at: $ANDROID_HOME"
+            ls -la "$ANDROID_HOME"
+          else
+            echo "Warning: ANDROID_HOME not set or Android SDK not found"
+          fi
+      
+      - name: Test npm install
+        run: |
+          npm ci --legacy-peer-deps
+      
+      - name: Setup complete
+        run: |
+          echo "✅ Self-hosted runner setup verification complete!"

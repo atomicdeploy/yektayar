@@ -302,6 +302,30 @@ sudo ./scripts/install-caddy.sh    # For Caddy (automatic HTTPS)
 
 ---
 
+## 🔧 CI/CD and Self-Hosted Runners
+
+The project uses GitHub Actions with self-hosted runners for builds and deployments.
+
+### Self-Hosted Runner Setup
+
+For setting up self-hosted runners on your VPS:
+- **[Self-Hosted Runners Guide](.github/SELF-HOSTED-RUNNERS.md)** - Complete setup instructions
+- **Quick Setup Script**: `.github/scripts/setup-runner.sh` - Automated installation
+
+### Workflows
+
+- **Build Android APK** (`build-android-apk.yml`) - Builds debug/release APKs on self-hosted runners
+- **Copilot Setup** (`copilot-setup-steps.yml`) - Verifies runner environment
+
+To manually trigger workflows:
+```bash
+# Go to Actions tab → Select workflow → Run workflow
+# Or use GitHub CLI:
+gh workflow run build-android-apk.yml
+```
+
+---
+
 ## 🤝 Contributing
 
 This is a proprietary project in prototype phase. Team members only.
