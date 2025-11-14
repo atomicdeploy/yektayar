@@ -27,6 +27,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 #### Architecture & Design
 - **[Architecture Overview](ARCHITECTURE.md)** - Complete system architecture including prototype/production phases and alternative approaches
 - **[Requirements Review](REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
+- **[OverlayScrollbars Guide](OVERLAYSCROLLBARS.md)** - Custom scrollbar implementation and usage
 
 #### Planning & Roadmap
 - **[Implementation Roadmap](../ROADMAP.md)** - Production implementation roadmap with prototype sprint reference
@@ -64,6 +65,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - [Getting Started Guide](GETTING-STARTED.md) - Onboarding guide
 - [Quick Reference](QUICK-REFERENCE.md) - Code snippets & patterns
 - [Socket.IO Guide](SOCKETIO-GUIDE.md) - Real-time WebSocket communication setup and usage
+- [OverlayScrollbars Guide](OVERLAYSCROLLBARS.md) - Custom scrollbar implementation and usage
 
 ### Setup & Deployment
 - [Setup Guide](SETUP.md) - Complete setup instructions
@@ -155,6 +157,7 @@ yektayar/
 - **Deployment**: [Setup Guide](SETUP.md), [Ubuntu Deployment](UBUNTU-24-DEPLOYMENT.md)
 - **API**: [Architecture](ARCHITECTURE.md), [Development Guide](../DEVELOPMENT.md)
 - **WebSocket**: [Architecture](ARCHITECTURE.md), [Setup Guide](SETUP.md)
+- **Scrollbars/UI**: [OverlayScrollbars Guide](OVERLAYSCROLLBARS.md)
 - **Prototype Sprint**: [Development Guide](../DEVELOPMENT.md), [Roadmap](../ROADMAP.md)
 
 ---

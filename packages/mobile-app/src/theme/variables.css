@@ -260,23 +260,36 @@
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Beautiful scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* OverlayScrollbars Custom Styling - Light Theme */
+.os-theme-yektayar-mobile.os-scrollbar-horizontal,
+.os-theme-yektayar-mobile.os-scrollbar-vertical {
+  --os-size: 8px;
+  --os-padding-perpendicular: 0px;
+  --os-padding-axis: 0px;
+  --os-track-border-radius: 4px;
+  --os-track-bg: transparent;
+  --os-handle-border-radius: 4px;
+  --os-handle-bg: var(--ion-color-primary);
+  --os-handle-bg-hover: var(--ion-color-primary-shade);
+  --os-handle-bg-active: var(--ion-color-primary-shade);
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* OverlayScrollbars Custom Styling - Dark Theme */
+.ion-palette-dark .os-theme-yektayar-mobile.os-scrollbar-horizontal,
+.ion-palette-dark .os-theme-yektayar-mobile.os-scrollbar-vertical {
+  --os-handle-bg: var(--ion-color-primary);
+  --os-handle-bg-hover: var(--ion-color-primary-tint);
+  --os-handle-bg-active: var(--ion-color-primary-tint);
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--ion-color-primary);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--ion-color-primary-shade);
+/* Apply dark theme scrollbar styles when system prefers dark mode AND not in forced mode */
+@media (prefers-color-scheme: dark) {
+  html:not(.theme-forced) .os-theme-yektayar-mobile.os-scrollbar-horizontal,
+  html:not(.theme-forced) .os-theme-yektayar-mobile.os-scrollbar-vertical {
+    --os-handle-bg: var(--ion-color-primary);
+    --os-handle-bg-hover: var(--ion-color-primary-tint);
+    --os-handle-bg-active: var(--ion-color-primary-tint);
+  }
 }
 
 /* Smooth animations */

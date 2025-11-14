@@ -9,6 +9,8 @@ import { ErrorScreenMobile } from '@yektayar/shared'
 import { parseSolutionsMarkdown, findSolutionForError, validateApi } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { logger } from '@yektayar/shared'
+import 'overlayscrollbars/overlayscrollbars.css'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -191,6 +193,9 @@ async function initializeApp() {
   app.use(createPinia())
   app.use(router)
   app.use(i18n)
+  
+  // Register OverlayScrollbars component globally
+  app.component('OverlayScrollbarsComponent', OverlayScrollbarsComponent)
 
   router.isReady().then(() => {
     app.mount('#app')
