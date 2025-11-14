@@ -106,11 +106,13 @@ onMounted(() => {
 
 <style scoped>
 .lazy-image-wrapper {
+  display: flex;
   position: relative;
   overflow: hidden;
   background: var(--ion-color-light);
   width: 100%;
   height: 100%;
+  min-height: inherit;
 }
 
 /* Image placeholder with blur effect */
