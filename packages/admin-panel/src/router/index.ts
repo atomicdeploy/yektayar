@@ -69,4 +69,17 @@ const router = createRouter({
   routes,
 })
 
+// Update document title on route change
+router.afterEach((to) => {
+  const baseTitle = document.documentElement.lang === 'fa' ? 'یکتایار' : 'YektaYar'
+  const tagline = document.documentElement.lang === 'fa' ? 'پلتفرم مراقبت سلامت روان' : 'Mental Health Care Platform'
+  const pageTitle = to.meta.title as string | undefined
+  
+  if (pageTitle) {
+    document.title = `${pageTitle} - ${baseTitle} - ${tagline}`
+  } else {
+    document.title = `${baseTitle} - ${tagline}`
+  }
+})
+
 export default router
