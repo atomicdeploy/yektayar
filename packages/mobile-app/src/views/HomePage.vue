@@ -60,7 +60,7 @@
           </div>
 
           <div class="action-card" @click="navigateToChat">
-            <div class="action-icon-wrapper primary">
+            <div class="action-icon-wrapper secondary">
               <ion-icon :icon="chatbubbles" class="action-icon"></ion-icon>
             </div>
             <div class="action-content">
@@ -292,7 +292,20 @@ const navigateToProfile = () => router.push('/tabs/profile')
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 1rem 0.5rem;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--secondary-gradient);
+  border-radius: 2px;
 }
 
 /* Quick Actions */
@@ -310,8 +323,14 @@ const navigateToProfile = () => router.push('/tabs/profile')
   align-items: center;
   gap: 1rem;
   box-shadow: var(--card-shadow);
+  border-left: 3px solid var(--secondary-accent-light);
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  border-left-color: var(--secondary-accent);
+  box-shadow: var(--card-shadow-hover), var(--secondary-glow);
 }
 
 .action-card:active {
@@ -330,6 +349,11 @@ const navigateToProfile = () => router.push('/tabs/profile')
 
 .action-icon-wrapper.primary {
   background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-tint) 100%);
+}
+
+.action-icon-wrapper.secondary {
+  background: var(--secondary-gradient);
+  box-shadow: var(--secondary-glow);
 }
 
 .action-icon-wrapper.success {
