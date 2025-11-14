@@ -1,5 +1,7 @@
 export default {
   // Common
+  app_title: 'YektaYar',
+  tagline: 'Mental Health Care Platform',
   welcome: 'Welcome to YektaYar',
   admin_panel: 'Admin Panel',
   dashboard: 'Dashboard',

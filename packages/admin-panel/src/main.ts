@@ -13,7 +13,7 @@ import { messages } from './locales'
 import { logger } from '@yektayar/shared'
 
 // Log startup information
-logger.startup('YektaYar Admin Panel', {
+logger.startup('YektaYar Admin Panel - Mental Health Care Platform', {
   'API URL': config.apiBaseUrl,
   'Environment': import.meta.env.MODE || 'development',
   'Version': '0.1.0'
@@ -29,7 +29,7 @@ const i18n = createI18n({
 
 // Validate API configuration and reachability before mounting the app
 async function initializeApp() {
-  logger.info('=== YektaYar Admin Panel Initialization ===')
+  logger.info('=== YektaYar Admin Panel Initialization - Mental Health Care Platform ===')
   logger.info(`Environment: ${config.environment}`)
   
   const validationResult = await validateApi(config.apiBaseUrl)
