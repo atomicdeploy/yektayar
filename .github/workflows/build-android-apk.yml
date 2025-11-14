@@ -29,6 +29,9 @@ on:
 jobs:
   build-android:
     runs-on: [self-hosted, linux, yektayar-runners]
+    permissions:
+      contents: read
+      pull-requests: write
     
     steps:
       - name: Checkout code
