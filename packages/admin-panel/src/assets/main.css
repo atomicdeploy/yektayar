@@ -53,7 +53,9 @@
     background-color: rgb(243 244 246);
     
     @media (prefers-color-scheme: dark) {
-      background-color: rgb(31 41 55);
+      :root:not(.theme-forced) & {
+        background-color: rgb(31 41 55);
+      }
     }
   }
   
@@ -62,7 +64,9 @@
     border-radius: 9999px;
     
     @media (prefers-color-scheme: dark) {
-      background-color: rgb(75 85 99);
+      :root:not(.theme-forced) & {
+        background-color: rgb(75 85 99);
+      }
     }
   }
   
@@ -70,7 +74,9 @@
     background-color: rgb(156 163 175);
     
     @media (prefers-color-scheme: dark) {
-      background-color: rgb(107 114 128);
+      :root:not(.theme-forced) & {
+        background-color: rgb(107 114 128);
+      }
     }
   }
 }

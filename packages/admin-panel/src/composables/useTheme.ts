@@ -19,8 +19,12 @@ export function useTheme() {
   const applyTheme = (theme: Theme) => {
     if (theme === 'auto') {
       isDark.value = checkSystemTheme()
+      // Remove forced mode marker when in auto mode
+      document.documentElement.classList.remove('theme-forced')
     } else {
       isDark.value = theme === 'dark'
+      // Add forced mode marker to prevent media query from overriding
+      document.documentElement.classList.add('theme-forced')
     }
 
     // Update document class

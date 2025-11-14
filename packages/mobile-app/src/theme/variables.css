@@ -119,8 +119,75 @@
    DARK THEME - Premium, Professional
    Based on Navy Seal + Gold Branding
    ======================================== */
+/* Apply dark theme when .ion-palette-dark class is present (forced dark mode) */
+.ion-palette-dark {
+  /* Background - Rich Navy gradients */
+  --ion-background-color: #0a0f1a;
+  --ion-background-color-rgb: 10, 15, 26;
+
+  /* Text Colors - Warm and readable */
+  --ion-text-color: #e8e9ed;
+  --ion-text-color-rgb: 232, 233, 237;
+
+  /* Toolbar & Header - Elevated dark surface */
+  --ion-toolbar-background: #101826;
+  --ion-toolbar-border-color: #1a2436;
+  --ion-toolbar-color: #e8e9ed;
+
+  /* Card & Surface - Layered depth */
+  --ion-card-background: #121a2b;
+  --ion-item-background: #121a2b;
+
+  /* Borders & Dividers - Subtle separation */
+  --ion-border-color: #1e2a3f;
+
+  /* Tab Bar - Premium feel */
+  --ion-tab-bar-background: #0d1421;
+  --ion-tab-bar-border-color: #1a2436;
+
+  /* Custom Dark Theme Variables */
+  --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #f0ca6f 100%);
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --glass-background: rgba(18, 26, 43, 0.75);
+  --glass-border: rgba(212, 164, 62, 0.2);
+  --overlay-background: rgba(0, 0, 0, 0.7);
+
+  /* Dark theme specific colors */
+  --surface-1: #121a2b;
+  --surface-2: #162033;
+  --surface-3: #1a2436;
+  --text-primary: #e8e9ed;
+  --text-secondary: #b4b8c5;
+  --text-tertiary: #7a7f8f;
+  --accent-soft: #2a2416;
+  --accent-light: #1f1d15;
+
+  /* Adjust Ionic component colors for dark mode */
+  --ion-color-step-50: #14202f;
+  --ion-color-step-100: #182638;
+  --ion-color-step-150: #1c2c41;
+  --ion-color-step-200: #20324a;
+  --ion-color-step-250: #243853;
+  --ion-color-step-300: #283e5c;
+  --ion-color-step-350: #2c4465;
+  --ion-color-step-400: #304a6e;
+  --ion-color-step-450: #345077;
+  --ion-color-step-500: #385680;
+  --ion-color-step-550: #3c5c89;
+  --ion-color-step-600: #406292;
+  --ion-color-step-650: #44689b;
+  --ion-color-step-700: #486ea4;
+  --ion-color-step-750: #4c74ad;
+  --ion-color-step-800: #507ab6;
+  --ion-color-step-850: #5480bf;
+  --ion-color-step-900: #5886c8;
+  --ion-color-step-950: #5c8cd1;
+}
+
+/* Apply dark theme when system prefers dark mode AND not in forced mode */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.theme-forced) {
     /* Background - Rich Navy gradients */
     --ion-background-color: #0a0f1a;
     --ion-background-color-rgb: 10, 15, 26;
