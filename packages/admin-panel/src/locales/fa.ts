@@ -1,5 +1,7 @@
 export default {
   // Common
+  app_title: 'یکتایار',
+  tagline: 'پلتفرم مراقبت سلامت روان',
   welcome: 'خوش آمدید به یکتایار',
   admin_panel: 'پنل مدیریت',
   dashboard: 'داشبورد',

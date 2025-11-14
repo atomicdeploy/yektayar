@@ -2,6 +2,7 @@
   "fa": {
     "common": {
       "app_name": "یکتایار",
+      "tagline": "پلتفرم مراقبت سلامت روان",
       "welcome": "خوش آمدید",
       "login": "ورود",
       "register": "ثبت‌نام",
@@ -51,6 +52,7 @@
   "en": {
     "common": {
       "app_name": "YektaYar",
+      "tagline": "Mental Health Care Platform",
       "welcome": "Welcome",
       "login": "Login",
       "register": "Register",
