@@ -114,8 +114,8 @@
             :disabled="!canContinue || isSaving"
             class="continue-button"
           >
-            <ion-icon v-if="!isSaving" slot="start" :icon="continueArrowIcon"></ion-icon>
-            <ion-spinner v-if="isSaving" slot="start" name="crescent"></ion-spinner>
+            <ion-icon v-if="!isSaving" :slot="iconSlot" :icon="continueArrowIcon"></ion-icon>
+            <ion-spinner v-if="isSaving" :slot="iconSlot" name="crescent"></ion-spinner>
             {{ isSaving ? 'در حال ارسال...' : 'ادامه بده' }}
           </ion-button>
         </div>
@@ -190,11 +190,15 @@ const progressPercent = computed(() => {
 
 // Web Speech API
 let recognition: any = null
-let lastProcessedIndex = 0
 
 // Computed property for arrow icon based on locale
 const continueArrowIcon = computed(() => {
   return locale.value === 'fa' ? arrowBack : arrowForward
+})
+
+// Computed property for icon slot position based on locale
+const iconSlot = computed(() => {
+  return locale.value === 'fa' ? 'end' : 'start'
 })
 
 // Initialize Speech Recognition
@@ -231,24 +235,26 @@ function initializeSpeechRecognition() {
     isRecording.value = true
     isProcessing.value = false
     errorMessage.value = ''
-    lastProcessedIndex = 0
   }
 
   recognition.onresult = (event: any) => {
-    // Build transcript from only the new results
-    let newTranscript = ''
+    // The Web Speech API provides event.resultIndex to tell us where NEW results start
+    // We should only process results from resultIndex onwards to avoid duplicates
+    let finalTranscript = ''
 
-    for (let i = lastProcessedIndex; i < event.results.length; i++) {
-      const result = event.results[i]
-      if (result.isFinal) {
-        newTranscript += result[0].transcript + ' '
-        lastProcessedIndex = i + 1
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript
+      
+      // Only add final results to the permanent transcript
+      // Interim results are ignored to prevent duplicates
+      if (event.results[i].isFinal) {
+        finalTranscript += transcript + ' '
       }
     }
 
-    // Only append new final transcript
-    if (newTranscript) {
-      transcriptText.value += newTranscript
+    // Append only the final transcript
+    if (finalTranscript) {
+      transcriptText.value += finalTranscript
     }
   }
 
@@ -302,7 +308,6 @@ async function toggleRecording() {
 function startRecording() {
   try {
     errorMessage.value = ''
-    lastProcessedIndex = 0
     recognition.start()
   } catch (error) {
     errorMessage.value = 'خطا در شروع ضبط. لطفا دوباره تلاش کنید'
@@ -318,7 +323,6 @@ function stopRecording() {
 
 function clearTranscript() {
   transcriptText.value = ''
-  lastProcessedIndex = 0
   errorMessage.value = ''
 }
 
@@ -475,6 +479,7 @@ async function showAlert(header: string, message: string) {
 .question-section {
   text-align: center;
   animation: fadeIn 0.6s ease-out;
+  padding: 1rem 0;
 }
 
 .question-text {
@@ -485,6 +490,7 @@ async function showAlert(header: string, message: string) {
   margin: 0;
   direction: rtl;
   font-family: var(--ion-font-family);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Recording Section */
@@ -505,13 +511,21 @@ async function showAlert(header: string, message: string) {
   color: white;
   cursor: pointer;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 
     0 8px 24px rgba(212, 164, 62, 0.4),
     0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: scale(1);
+}
+
+.mic-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 
+    0 12px 32px rgba(212, 164, 62, 0.5),
+    0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .mic-button:active:not(:disabled) {
@@ -595,6 +609,8 @@ async function showAlert(header: string, message: string) {
   direction: rtl;
   max-width: 350px;
   line-height: 1.5;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .error-message {
@@ -658,7 +674,8 @@ async function showAlert(header: string, message: string) {
   padding: 1.5rem;
   box-shadow: var(--card-shadow);
   border: 2px solid var(--glass-border);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
 }
 
 .transcript-card:focus-within {
@@ -666,6 +683,7 @@ async function showAlert(header: string, message: string) {
   box-shadow: 
     var(--card-shadow-hover),
     0 0 0 4px rgba(212, 164, 62, 0.1);
+  transform: translateY(-2px);
 }
 
 .transcript-textarea {
@@ -703,12 +721,17 @@ async function showAlert(header: string, message: string) {
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: var(--ion-font-family);
+  transform: scale(1);
+}
+
+.action-button:hover:not(:disabled) {
+  transform: scale(1.02);
 }
 
 .action-button:active:not(:disabled) {
-  transform: translateY(2px);
+  transform: scale(0.98);
 }
 
 .action-button:disabled {
@@ -751,11 +774,17 @@ async function showAlert(header: string, message: string) {
   font-size: 1.1rem;
   direction: rtl;
   font-family: var(--ion-font-family);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.continue-button:hover:not([disabled]) {
+  --box-shadow: 0 8px 24px rgba(45, 211, 111, 0.5);
+  transform: translateY(-2px);
 }
 
 .continue-button:not([disabled]):active {
-  transform: translateY(2px);
-  --box-shadow: 0 3px 12px rgba(45, 211, 111, 0.3);
+  transform: translateY(0);
+  --box-shadow: 0 4px 16px rgba(45, 211, 111, 0.3);
 }
 
 .continue-button ion-icon,
