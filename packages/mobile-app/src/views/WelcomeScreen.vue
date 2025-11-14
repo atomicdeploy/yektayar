@@ -15,6 +15,20 @@
           <div class="title-underline"></div>
         </div>
 
+        <!-- Hero Image with Lazy Loading (ABOVE text as requested) -->
+        <div class="hero-image-container">
+          <LazyImage
+            src="/welcome-hero.jpg"
+            :srcset="`/welcome-hero.jpg 1x, /welcome-hero@2x.jpg 2x, /welcome-hero@3x.jpg 3x`"
+            :webp-srcset="`/welcome-hero.webp 1x, /welcome-hero@2x.webp 2x, /welcome-hero@3x.webp 3x`"
+            alt="خانواده شاد - یکتاکر"
+            image-class="hero-image"
+            loading="eager"
+            @error="onImageError"
+          />
+          <div class="image-overlay"></div>
+        </div>
+
         <!-- Welcome Text Content with Card Style -->
         <div class="welcome-text">
           <p class="welcome-paragraph highlight-first">
@@ -29,24 +43,6 @@
           <p class="welcome-paragraph">
             با یکتاکر، انتخاب درست همیشه دم دستته؛ فقط کافیه شروع کنی و ببینی چطور همهچیز یکییکی سر جاش قرار میگیره.
           </p>
-        </div>
-
-        <!-- Hero Image with WebP support -->
-        <div class="hero-image-container">
-          <picture>
-            <source 
-              srcset="/welcome-hero.webp" 
-              type="image/webp"
-            />
-            <img 
-              src="/welcome-hero.jpg" 
-              alt="خانواده شاد - یکتاکر"
-              class="hero-image"
-              loading="lazy"
-              @error="onImageError"
-            />
-          </picture>
-          <div class="image-overlay"></div>
         </div>
 
         <!-- CTA Button with Enhanced Design -->
@@ -81,6 +77,7 @@ import { heartOutline, lockClosedOutline } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
+import LazyImage from '@/components/LazyImage.vue'
 
 const router = useRouter()
 
@@ -106,14 +103,8 @@ const startApp = async () => {
   router.replace('/tabs/home')
 }
 
-const onImageError = (event: Event) => {
-  // If image fails to load, hide it gracefully
+const onImageError = () => {
   logger.warn('Welcome hero image failed to load')
-  const target = event.target as HTMLImageElement
-  const container = target.closest('.hero-image-container') as HTMLElement
-  if (container) {
-    container.style.display = 'none'
-  }
 }
 </script>
 
@@ -215,6 +206,44 @@ const onImageError = (event: Event) => {
   animation: expandWidth 0.8s ease-out 0.3s both;
 }
 
+/* Hero image styling */
+.hero-image-container {
+  width: 100%;
+  margin: 2rem 0;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+  position: relative;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 280px;
+}
+
+.hero-image-container :deep(.lazy-image) {
+  border-radius: 28px;
+}
+
+.hero-image-container:hover :deep(.lazy-image) {
+  transform: scale(1.02);
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(1, 24, 58, 0) 0%,
+    rgba(1, 24, 58, 0.02) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* Text content styling */
 .welcome-text {
   text-align: right;
@@ -226,7 +255,7 @@ const onImageError = (event: Event) => {
   border-radius: 24px;
   border: 1px solid rgba(212, 164, 62, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  animation: fadeIn 0.8s ease-out 0.2s both;
+  animation: fadeIn 0.8s ease-out 0.5s both;
 }
 
 .welcome-paragraph {
@@ -245,47 +274,6 @@ const onImageError = (event: Event) => {
   font-size: 1.1rem;
   font-weight: 500;
   color: #01183a;
-}
-
-/* Hero image styling */
-.hero-image-container {
-  width: 100%;
-  margin: 2rem 0;
-  border-radius: 28px;
-  overflow: hidden;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.5);
-  animation: fadeInUp 0.8s ease-out 0.4s both;
-  position: relative;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-}
-
-.hero-image {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
-  max-height: 420px;
-  transition: transform 0.3s ease;
-}
-
-.hero-image-container:hover .hero-image {
-  transform: scale(1.02);
-}
-
-.image-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(1, 24, 58, 0) 0%,
-    rgba(1, 24, 58, 0.02) 100%
-  );
-  pointer-events: none;
 }
 
 /* CTA Button styling */

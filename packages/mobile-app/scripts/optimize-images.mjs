@@ -13,6 +13,31 @@ const IMAGE_FILES = ['welcome-hero.jpg'];
 const WEBP_QUALITY = 85;
 const JPEG_QUALITY = 90;
 
+// Responsive image sizes for different pixel densities
+const IMAGE_SIZES = {
+  '1x': { width: 640, suffix: '' },
+  '2x': { width: 1280, suffix: '@2x' },
+  '3x': { width: 1920, suffix: '@3x' }
+};
+
+/**
+ * Generate thumbnail for blur placeholder (LQIP - Low Quality Image Placeholder)
+ */
+async function generateThumbnail(inputPath) {
+  const outputPath = inputPath.replace(/\.(jpg|jpeg|png)$/i, '-thumb.jpg');
+  
+  try {
+    await sharp(inputPath)
+      .resize(20, null, { fit: 'inside' })
+      .jpeg({ quality: 20 })
+      .toFile(outputPath);
+    
+    console.log(`   📐 Thumbnail: ${outputPath.split('/').pop()}`);
+  } catch (error) {
+    console.error(`   ❌ Error generating thumbnail:`, error.message);
+  }
+}
+
 /**
  * Convert images to WebP format for better performance
  */
@@ -21,7 +46,7 @@ async function convertToWebP() {
 
   for (const imageFile of IMAGE_FILES) {
     const inputPath = join(PUBLIC_DIR, imageFile);
-    const outputPath = join(PUBLIC_DIR, imageFile.replace(/\.(jpg|jpeg|png)$/i, '.webp'));
+    const baseName = imageFile.replace(/\.(jpg|jpeg|png)$/i, '');
 
     try {
       // Check if source file exists
@@ -31,76 +56,43 @@ async function convertToWebP() {
       const inputStats = await fs.stat(inputPath);
       const inputSizeKB = (inputStats.size / 1024).toFixed(2);
 
-      // Convert to WebP
-      await sharp(inputPath)
-        .webp({ quality: WEBP_QUALITY })
-        .toFile(outputPath);
+      console.log(`✅ ${imageFile} (${inputSizeKB} KB)`);
 
-      // Get output file stats
-      const outputStats = await fs.stat(outputPath);
-      const outputSizeKB = (outputStats.size / 1024).toFixed(2);
-      const savings = ((1 - outputStats.size / inputStats.size) * 100).toFixed(1);
+      // Generate multiple sizes for each format
+      for (const [density, config] of Object.entries(IMAGE_SIZES)) {
+        const webpPath = join(PUBLIC_DIR, `${baseName}${config.suffix}.webp`);
+        const jpegPath = join(PUBLIC_DIR, `${baseName}${config.suffix}.jpg`);
 
-      console.log(`✅ ${imageFile}`);
-      console.log(`   Original: ${inputSizeKB} KB`);
-      console.log(`   WebP: ${outputSizeKB} KB (${savings}% smaller)\n`);
+        // Convert to WebP
+        await sharp(inputPath)
+          .resize(config.width, null, { fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: WEBP_QUALITY })
+          .toFile(webpPath);
+
+        // Optimize JPEG
+        await sharp(inputPath)
+          .resize(config.width, null, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: JPEG_QUALITY, progressive: true })
+          .toFile(jpegPath);
+
+        const webpStats = await fs.stat(webpPath);
+        const jpegStats = await fs.stat(jpegPath);
+        
+        console.log(`   ${density} (${config.width}px):`);
+        console.log(`      JPG: ${(jpegStats.size / 1024).toFixed(2)} KB`);
+        console.log(`      WebP: ${(webpStats.size / 1024).toFixed(2)} KB (${((1 - webpStats.size / jpegStats.size) * 100).toFixed(1)}% smaller)`);
+      }
+
+      // Generate thumbnail for blur placeholder
+      await generateThumbnail(inputPath);
+
+      console.log('');
     } catch (error) {
       if (error.code === 'ENOENT') {
         console.warn(`⚠️  ${imageFile} not found - skipping WebP conversion`);
         console.warn(`   Please add the hero image to ${PUBLIC_DIR}\n`);
       } else {
         console.error(`❌ Error converting ${imageFile}:`, error.message, '\n');
-      }
-    }
-  }
-}
-
-/**
- * Optimize JPG images
- */
-async function optimizeJPEG() {
-  console.log('📦 Optimizing JPEG images...\n');
-
-  for (const imageFile of IMAGE_FILES) {
-    if (!imageFile.match(/\.jpe?g$/i)) continue;
-
-    const inputPath = join(PUBLIC_DIR, imageFile);
-    const tempPath = join(PUBLIC_DIR, `${imageFile}.tmp`);
-
-    try {
-      // Check if source file exists
-      await fs.access(inputPath);
-
-      // Get input file stats
-      const inputStats = await fs.stat(inputPath);
-      const inputSizeKB = (inputStats.size / 1024).toFixed(2);
-
-      // Optimize JPEG
-      await sharp(inputPath)
-        .jpeg({ quality: JPEG_QUALITY, progressive: true })
-        .toFile(tempPath);
-
-      // Replace original with optimized version
-      await fs.rename(tempPath, inputPath);
-
-      // Get output file stats
-      const outputStats = await fs.stat(inputPath);
-      const outputSizeKB = (outputStats.size / 1024).toFixed(2);
-      const savings = ((1 - outputStats.size / inputStats.size) * 100).toFixed(1);
-
-      console.log(`✅ ${imageFile} optimized`);
-      console.log(`   Before: ${inputSizeKB} KB`);
-      console.log(`   After: ${outputSizeKB} KB (${savings}% smaller)\n`);
-    } catch (error) {
-      // Clean up temp file if it exists
-      try {
-        await fs.unlink(tempPath);
-      } catch {}
-
-      if (error.code === 'ENOENT') {
-        console.warn(`⚠️  ${imageFile} not found - skipping optimization\n`);
-      } else {
-        console.error(`❌ Error optimizing ${imageFile}:`, error.message, '\n');
       }
     }
   }
@@ -115,7 +107,6 @@ async function main() {
 
   try {
     await convertToWebP();
-    await optimizeJPEG();
 
     console.log('=' .repeat(50));
     console.log('✨ Image optimization complete!\n');
