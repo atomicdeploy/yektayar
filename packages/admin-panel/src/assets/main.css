@@ -21,6 +21,9 @@
   --font-family-sans: Vazirmatn, system-ui, -apple-system, sans-serif;
 }
 
+/* Configure dark mode to use class selector instead of media query */
+@variant dark (.dark &);
+
 /* CSS Reset in base layer - Tailwind utilities will override these */
 @layer base {
   * {
