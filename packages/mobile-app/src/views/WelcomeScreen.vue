@@ -100,7 +100,15 @@ const startApp = async () => {
     logger.warn('Failed to save welcome preference to backend:', error)
   }
   
-  router.replace('/tabs/home')
+  // Check if there was an intended route stored
+  const intendedRoute = sessionStorage.getItem('intended_route')
+  if (intendedRoute) {
+    sessionStorage.removeItem('intended_route')
+    logger.info(`Navigating to intended route: ${intendedRoute}`)
+    router.replace(intendedRoute)
+  } else {
+    router.replace('/tabs/home')
+  }
 }
 
 const onImageError = () => {
