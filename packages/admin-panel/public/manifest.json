@@ -3,10 +3,56 @@
   "short_name": "یکتایار",
   "description": "پلتفرم مراقبت سلامت روان یکتایار - پنل مدیریت",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "background_color": "#01183a",
   "theme_color": "#d4a43e",
   "orientation": "portrait-primary",
+  "dir": "rtl",
+  "lang": "fa",
+  "categories": ["health", "medical", "productivity", "business"],
+  "shortcuts": [
+    {
+      "name": "کاربران",
+      "short_name": "کاربران",
+      "description": "مدیریت کاربران",
+      "url": "/users",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "روانشناسان",
+      "short_name": "روانشناسان",
+      "description": "مدیریت روانشناسان",
+      "url": "/psychologists",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "نوبت‌ها",
+      "short_name": "نوبت‌ها",
+      "description": "مدیریت نوبت‌ها",
+      "url": "/appointments",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "/favicon-16x16.png",
