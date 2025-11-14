@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia'
 import { createAnonymousSession, validateSessionToken, invalidateSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
+import { io } from '../index'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request }) => {
@@ -117,7 +118,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         }
       }
 
-      await invalidateSession(token)
+      await invalidateSession(token, io)
 
       return {
         success: true,

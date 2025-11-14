@@ -75,6 +75,7 @@ const router = createRouter({
 })
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
+const SESSION_TOKEN_KEY = 'yektayar_session_token'
 
 // Navigation guard to check session and welcome screen status
 router.beforeEach(async (to, _from, next) => {
@@ -88,8 +89,9 @@ router.beforeEach(async (to, _from, next) => {
   if (to.path.startsWith('/tabs/')) {
     const sessionStore = useSessionStore()
     
-    // Check if session exists and is valid
-    if (!sessionStore.hasSession) {
+    // Check if session exists (either in store or localStorage)
+    const hasStoredToken = !!localStorage.getItem(SESSION_TOKEN_KEY)
+    if (!sessionStore.hasSession && !hasStoredToken) {
       logger.warn('No valid session found, redirecting to splash')
       next('/splash')
       return
