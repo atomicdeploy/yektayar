@@ -31,19 +31,29 @@ This document provides detailed information for developers working on the YektaY
    cd yektayar
    ```
 
-2. **Install dependencies**
+2. **Quick setup with git sync (recommended)**
+   ```bash
+   npm run sync
+   # This installs dependencies, builds packages, and verifies requirements
+   
+   # Optional: Enable git sync alias for convenience
+   ./scripts/setup-git-sync.sh
+   # Now you can use: git sync
+   ```
+
+3. **Or manual setup**
    ```bash
    npm install
    ```
 
-3. **Setup environment variables**
+4. **Setup environment variables**
    ```bash
    # Backend
    cp packages/backend/.env.example packages/backend/.env
    # Edit packages/backend/.env with your configuration
    ```
 
-4. **Setup database**
+5. **Setup database**
    ```bash
    # Install PostgreSQL if not already installed
    # Create database
@@ -52,7 +62,7 @@ This document provides detailed information for developers working on the YektaY
    # TODO: Run migrations when available
    ```
 
-5. **Start development servers**
+6. **Start development servers**
    ```bash
    # All services
    npm run dev
@@ -62,6 +72,28 @@ This document provides detailed information for developers working on the YektaY
    npm run dev:admin
    npm run dev:mobile
    ```
+
+### Daily Development Workflow
+
+```bash
+# Start your day - sync with remote and update everything
+git sync              # (or npm run sync)
+
+# Create a feature branch
+git checkout -b feature/my-feature
+
+# Make changes, commit
+git add .
+git commit -m "Add: my feature"
+
+# Share your changes and sync
+git sync              # Pushes commits and syncs with remote
+
+# Start development
+npm run dev
+```
+
+See the [Git Sync Guide](docs/GIT-SYNC.md) for more details on the automated sync workflow.
 
 ---
 
