@@ -11,13 +11,26 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ t('app_title') }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
+        <div class="content-wrapper">
       <!-- Hero Section -->
       <div class="hero-section">
         <div class="hero-content">
@@ -35,6 +48,17 @@
       <div class="section">
         <h2 class="section-title">{{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}</h2>
         <div class="quick-actions">
+          <div class="action-card" @click="navigateToAIChat">
+            <div class="action-icon-wrapper ai">
+              <ion-icon :icon="sparkles" class="action-icon"></ion-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</h3>
+              <p>{{ locale === 'fa' ? 'گفتگو با هوش مصنوعی' : 'Chat with AI assistant' }}</p>
+            </div>
+            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+          </div>
+
           <div class="action-card" @click="navigateToChat">
             <div class="action-icon-wrapper primary">
               <ion-icon :icon="chatbubbles" class="action-icon"></ion-icon>
@@ -135,6 +159,8 @@
             : '"Mental health is the foundation of a happy and meaningful life"' }}
         </p>
       </div>
+        </div>
+      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -176,12 +202,23 @@ const { t, locale } = useI18n()
 const router = useRouter()
 const { isDark, toggleTheme } = useTheme()
 
+const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')
 const navigateToAppointments = () => router.push('/tabs/appointments')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
 <style scoped>
+/* OverlayScrollbars container */
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
+.content-wrapper {
+  min-height: 100%;
+}
+
 /* Hero Section */
 .hero-section {
   background: var(--accent-gradient);
@@ -303,6 +340,10 @@ const navigateToProfile = () => router.push('/tabs/profile')
   background: linear-gradient(135deg, #ff9500 0%, #ffb038 100%);
 }
 
+.action-icon-wrapper.ai {
+  background: var(--accent-gradient);
+}
+
 .action-icon {
   font-size: 28px;
   color: white;
@@ -328,6 +369,11 @@ const navigateToProfile = () => router.push('/tabs/profile')
 .action-arrow {
   font-size: 20px;
   color: var(--text-tertiary);
+}
+
+/* RTL Support - Flip arrow direction for right-to-left languages */
+[dir="rtl"] .action-arrow {
+  transform: scaleX(-1);
 }
 
 /* Features Grid */

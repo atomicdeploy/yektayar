@@ -207,6 +207,7 @@ import {
 import { usePermissionsStore } from '@/stores/permissions'
 import { logger } from '@yektayar/shared'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import apiClient from '@/api'
 
 const { t } = useI18n()
 const permissionsStore = usePermissionsStore()
@@ -228,9 +229,6 @@ const filterRole = ref('')
 const filterStatus = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
-
-// API base URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 const filteredUsers = computed(() => {
   let result = users.value
@@ -333,19 +331,21 @@ function deleteUser(id: string) {
 async function fetchUsers() {
   isLoading.value = true
   try {
-    // Fetch users from API
-    const response = await fetch(`${API_BASE_URL}/api/users`)
-    const result = await response.json()
+    const response = await apiClient.get<any[]>('/api/users')
     
-    if (result.success && result.data) {
-      // Convert createdAt strings to Date objects
-      users.value = result.data.map((user: any) => ({
-        ...user,
-        createdAt: new Date(user.createdAt)
+    if (response.success && response.data) {
+      // Map backend data to frontend User interface
+      users.value = response.data.map((user: any) => ({
+        id: user.id.toString(),
+        name: user.name,
+        email: user.email || '',
+        phone: user.phone || '',
+        role: mapTypeToRole(user.type),
+        status: user.is_active ? 'active' : 'inactive',
+        createdAt: new Date(user.created_at),
       }))
     } else {
-      logger.error('Failed to fetch users:', result.error || result.message)
-      users.value = []
+      throw new Error('Failed to fetch users')
     }
   } catch (error) {
     logger.error('Error fetching users:', error)
@@ -353,6 +353,17 @@ async function fetchUsers() {
   } finally {
     isLoading.value = false
   }
+}
+
+// Map backend user type to frontend role
+function mapTypeToRole(type: string): 'admin' | 'psychologist' | 'user' | 'moderator' {
+  const mapping: Record<string, 'admin' | 'psychologist' | 'user' | 'moderator'> = {
+    'admin': 'admin',
+    'psychologist': 'psychologist',
+    'patient': 'user',
+    'moderator': 'moderator',
+  }
+  return mapping[type] || 'user'
 }
 
 onMounted(() => {

@@ -7,7 +7,9 @@ This guide explains how to build an Android APK from the YektaYar mobile app usi
 - Node.js >= 18.0.0
 - npm >= 9.0.0
 - Java JDK 17 (for Android builds)
-- Android SDK (recommended: Android Studio)
+- Android SDK API Level 35 (recommended: Android Studio)
+- Gradle 8.11.1 or higher (included in wrapper)
+- Android Gradle Plugin 8.7.3 (configured in build.gradle)
 
 ## Environment Configuration
 
@@ -172,6 +174,23 @@ public void onCreate(Bundle savedInstanceState) {
 }
 ```
 
+## Version Compatibility
+
+This project uses the following versions that are tested to work together:
+
+| Component | Version | Notes |
+|-----------|---------|-------|
+| Capacitor | 7.4.4 | Requires Android API 35 features |
+| Android Gradle Plugin | 8.7.3 | Supports compileSdk 35 |
+| Gradle | 8.11.1 | Required by AGP 8.7.3 |
+| compileSdkVersion | 35 | Android 15 (VanillaIceCream) |
+| targetSdkVersion | 35 | Android 15 (VanillaIceCream) |
+| minSdkVersion | 22 | Android 5.1 (Lollipop) |
+| Java | 17 | Build and runtime compatibility |
+| Node.js | >= 18.0.0 | For building web assets |
+
+**Important:** Capacitor 7.4.4+ requires Android API 35 features. Using older versions of Android Gradle Plugin (8.0.0) or compileSdk (34) will result in compilation errors about missing `VANILLA_ICE_CREAM` constant.
+
 ## Capacitor Configuration
 
 The Capacitor configuration is in `capacitor.config.ts`:
@@ -197,6 +216,22 @@ export default config;
 
 Make sure you have a stable internet connection and the Android SDK is properly installed.
 
+### Compilation Errors about VANILLA_ICE_CREAM or Android API 35
+
+This error occurs when Capacitor 7.4.4+ is used with an older Android Gradle Plugin version. The fix has been applied:
+- Android Gradle Plugin upgraded to 8.7.3 (from 8.0.0)
+- Gradle wrapper updated to 8.11.1 (from 8.0.2)
+- compileSdkVersion and targetSdkVersion set to 35 (from 34)
+
+If you still encounter this issue after pulling the latest changes:
+```bash
+cd packages/mobile-app/android
+./gradlew clean
+cd ..
+npm run cap:sync
+npm run android:build:debug
+```
+
 ### Gradle Build Fails
 
 Try cleaning the build:
@@ -220,6 +255,14 @@ Make sure the plugin is registered in `MainActivity.java` and the app is rebuilt
 npm run cap:sync
 npm run android:build:debug
 ```
+
+### Android SDK Platform Not Found
+
+Ensure Android SDK API Level 35 is installed:
+- Open Android Studio
+- Go to Tools > SDK Manager
+- In the SDK Platforms tab, check "Android 15.0 (VanillaIceCream)" (API Level 35)
+- Click Apply to install
 
 ## Development Workflow
 

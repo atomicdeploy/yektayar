@@ -56,8 +56,10 @@ YektaYar is a comprehensive mental health care platform that connects users with
 
 - **Node.js** >= 18.0.0
 - **npm** >= 9.0.0
-- **Bun** >= 1.0.0 (for backend)
+- **Bun** >= 1.0.0 (optional for backend, both Bun and Node.js fully supported)
 - **PostgreSQL** 15+ (for database)
+
+> **Note:** The backend supports both Bun and Node.js runtimes with full Socket.IO support. Bun uses the native `@socket.io/bun-engine` for Socket.IO. The backend automatically detects the runtime and configures itself accordingly.
 
 ### Installation
 
@@ -68,6 +70,9 @@ cd yektayar
 
 # Install all dependencies
 npm install
+
+# If you need to ensure all packages have up-to-date dependencies:
+npm run install:deps
 
 # Setup environment variables (unified .env for all packages)
 ./scripts/manage-env.sh init
@@ -91,6 +96,7 @@ npm run dev:mobile     # Mobile App (port 8100)
 
 - **Backend API**: http://localhost:3000
 - **API Documentation**: http://localhost:3000/api-docs (protected with Basic Auth - see `.env` for credentials)
+- **Socket.IO WebSocket**: ws://localhost:3000 (same port as HTTP, requires session token - see [Socket.IO Guide](docs/SOCKETIO-GUIDE.md))
 - **Admin Panel**: http://localhost:5173
 - **Mobile App**: http://localhost:8100
 
@@ -122,10 +128,10 @@ yektayar/
 ## 🛠️ Tech Stack
 
 ### Backend
-- **Framework**: Elysia.js (TypeScript, Bun runtime)
+- **Framework**: Elysia.js (TypeScript, Bun/Node.js runtime)
 - **Database**: PostgreSQL 15+
 - **Validation**: Zod
-- **Real-time**: Socket.IO
+- **Real-time**: Socket.IO (supported on both Bun and Node.js)
 - **API Docs**: Swagger
 
 ### Frontend (Admin Panel)
@@ -206,10 +212,17 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Bun vs NPM](docs/BUN-VS-NPM.md)** - Runtime comparison guide
 
 #### Additional Resources
+- **[Socket.IO Connection Guide](docs/SOCKETIO-GUIDE.md)** - Real-time WebSocket communication setup and usage
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
 - **[CORS Fix Documentation](CORS-FIX.md)** - CORS OPTIONS verb support implementation
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
+
+#### Testing
+- **[Socket.IO Test Script](scripts/test-socketio.sh)** - Interactive TUI for testing Socket.IO functionality
+  ```bash
+  ./scripts/test-socketio.sh
+  ```
 
 ---
 
