@@ -343,7 +343,7 @@ export function setupBunSocketIO() {
       const connections = io.sockets.sockets.size
       socket.emit('info_response', {
         server: {
-          name: 'YektaYar',
+          name: 'YektaYar API',
           version: '0.1.0',
           description: 'Backend API with Socket.IO real-time communication',
           features: {
