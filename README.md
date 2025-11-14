@@ -71,6 +71,9 @@ cd yektayar
 # Install all dependencies
 npm install
 
+# If you need to ensure all packages have up-to-date dependencies:
+npm run install:deps
+
 # Setup environment variables (unified .env for all packages)
 ./scripts/manage-env.sh init
 # Then edit .env with your configuration, or use interactive mode:
