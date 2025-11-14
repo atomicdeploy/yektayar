@@ -46,7 +46,7 @@ const app = new Elysia()
       path: '/api-docs',
       documentation: {
         info: {
-          title: 'YektaYar API - Mental Health Care Platform',
+          title: 'YektaYar API',
           version: '0.1.0',
           description: 'Mental Health Care Platform API'
         },
@@ -66,7 +66,7 @@ const app = new Elysia()
     })
   )
   .get('/', () => ({
-    message: 'YektaYar API Server - Mental Health Care Platform',
+    message: 'YektaYar API Server',
     version: '0.1.0',
     status: 'running',
     features: {
@@ -132,10 +132,24 @@ if (isBun) {
     websocket: handler.websocket
   })
   
-  console.log(`🚀 YektaYar API Server - Mental Health Care Platform running at http://${hostname}:${port}`)
+  console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
   console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
   console.log(`🔒 Documentation protected with Basic Auth`)
   console.log(`✅ Socket.IO enabled on same port (${port})`)
+
+  // TODO: complete custom startup logs
+  // console.log(`⚠️ WARNING: `)
+  // console.log(`💡 Tip: `)
+
+  // check if development mode
+  if (Bun.env.NODE_ENV === 'development') {
+    console.log(`🔧 Running in development mode`)
+  }
+
+  // check if production mode
+  if (Bun.env.NODE_ENV === 'production') {
+    console.log(`🚀 Running in production mode`)
+  }
   
 } else if (isNode) {
   // Node.js runtime: Use traditional HTTP server with Socket.IO
@@ -189,10 +203,11 @@ if (isBun) {
   
   // Start the server
   httpServer.listen(port, hostname, () => {
-    console.log(`🚀 YektaYar API Server - Mental Health Care Platform running at http://${hostname}:${port}`)
+    console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
     console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
     console.log(`🔒 Documentation protected with Basic Auth`)
     console.log(`✅ Socket.IO enabled on same port (${port})`)
+    // TODO: complete custom startup logs
   })
 }
 

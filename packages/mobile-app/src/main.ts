@@ -33,7 +33,7 @@ import './theme/fonts.css'
 import './theme/variables.css'
 
 // Log startup information
-logger.startup('YektaYar Mobile App - Mental Health Care Platform', {
+logger.startup('YektaYar Mobile App', {
   'API URL': config.apiBaseUrl,
   'Environment': import.meta.env.MODE || 'development',
   'Version': '0.1.0',
@@ -141,7 +141,7 @@ const i18n = createI18n({
 
 // Validate API configuration and reachability before mounting the app
 async function initializeApp() {
-  logger.info('=== YektaYar Mobile App Initialization - Mental Health Care Platform ===')
+  logger.info('=== YektaYar Mobile App Initialization ===')
   logger.info(`Environment: ${config.environment}`)
   
   const validationResult = await validateApi(config.apiBaseUrl)

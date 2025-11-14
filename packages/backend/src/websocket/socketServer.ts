@@ -76,7 +76,7 @@ export function setupSocketIO(httpServer: HTTPServer) {
 
     // Send welcome message
     socket.emit('connected', {
-      message: 'Connected to YektaYar server - Mental Health Care Platform',
+      message: 'Connected to YektaYar server',
       socketId: socket.id,
       isLoggedIn: socketData.isLoggedIn
     })
@@ -90,7 +90,7 @@ export function setupSocketIO(httpServer: HTTPServer) {
     socket.on('status', () => {
       socket.emit('status_response', {
         server: {
-          name: 'YektaYar API Server - Mental Health Care Platform',
+          name: 'YektaYar API Server',
           version: '0.1.0',
           status: 'running',
           timestamp: new Date().toISOString()
@@ -119,7 +119,7 @@ export function setupSocketIO(httpServer: HTTPServer) {
       const connections = io.sockets.sockets.size
       socket.emit('info_response', {
         server: {
-          name: 'YektaYar - Mental Health Care Platform API',
+          name: 'YektaYar API',
           version: '0.1.0',
           description: 'Backend API with Socket.IO real-time communication',
           features: {
@@ -300,7 +300,7 @@ export function setupBunSocketIO() {
 
     // Send welcome message
     socket.emit('connected', {
-      message: 'Connected to YektaYar server - Mental Health Care Platform',
+      message: 'Connected to YektaYar server',
       socketId: socket.id,
       isLoggedIn: socketData.isLoggedIn
     })
@@ -314,7 +314,7 @@ export function setupBunSocketIO() {
     socket.on('status', () => {
       socket.emit('status_response', {
         server: {
-          name: 'YektaYar API Server - Mental Health Care Platform',
+          name: 'YektaYar API Server',
           version: '0.1.0',
           status: 'running',
           timestamp: new Date().toISOString()
@@ -343,7 +343,7 @@ export function setupBunSocketIO() {
       const connections = io.sockets.sockets.size
       socket.emit('info_response', {
         server: {
-          name: 'YektaYar - Mental Health Care Platform API',
+          name: 'YektaYar',
           version: '0.1.0',
           description: 'Backend API with Socket.IO real-time communication',
           features: {
