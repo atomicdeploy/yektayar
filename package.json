@@ -23,6 +23,7 @@
     "test": "npm run test --workspaces --if-present",
     "test:deps": "node scripts/test-dependencies.js",
     "socketio:test": "node scripts/socketio-tui.js",
+    "ai:test": "node scripts/pollination-ai-tui.js",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
