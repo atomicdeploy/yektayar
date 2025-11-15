@@ -206,6 +206,9 @@ function displayRoutes(appName) {
   
   const fullPath = resolve(__dirname, '..', routerPath);
   
+  // Notify user about what's being parsed
+  console.log(`\n🔍 Extracting routes from: ${routerPath}`);
+  
   try {
     const content = readFileSync(fullPath, 'utf-8');
     const routes = parseRoutes(content);
@@ -264,11 +267,22 @@ Examples:
   npm run list-routes mobile-app
   npm run list-routes admin-panel
   npm run list-routes all
+
+Note:
+  This script parses the TypeScript router configuration files statically.
+  It extracts routes by analyzing the source code in packages/*/src/router/index.ts
 `);
     process.exit(0);
   }
   
   const app = args[0] || 'all';
+  
+  // Notify user about the extraction method
+  console.log('\n📦 YektaYar Route Extractor');
+  console.log('─'.repeat(80));
+  console.log('Method: Static analysis of router configuration files');
+  console.log('Source: TypeScript router files (packages/*/src/router/index.ts)');
+  console.log('─'.repeat(80));
   
   if (app === 'all') {
     Object.keys(APPS).forEach(appName => {
