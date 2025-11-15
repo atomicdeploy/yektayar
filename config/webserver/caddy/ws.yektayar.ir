@@ -1,0 +1,47 @@
+# Caddy configuration for ws.yektayar.ir
+# Automatic HTTPS with Let's Encrypt
+# Dedicated domain for WebSocket and Socket.IO connections
+
+ws.yektayar.ir {
+    # Reverse proxy to dedicated WebSocket server
+    reverse_proxy localhost:3500 {
+        # WebSocket support (essential for both Socket.IO and native WebSocket)
+        header_up Upgrade {http.request.header.Upgrade}
+        header_up Connection {http.request.header.Connection}
+        
+        # Forward real client IP
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        
+        # Disable buffering for WebSocket
+        flush_interval -1
+    }
+    
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        
+        # CORS headers for WebSocket
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+        Access-Control-Max-Age "86400"
+    }
+    
+    # Handle OPTIONS requests for CORS preflight
+    @options {
+        method OPTIONS
+    }
+    respond @options 204
+    
+    # Logging
+    log {
+        output file /var/log/caddy/ws.yektayar.ir_access.log
+    }
+}

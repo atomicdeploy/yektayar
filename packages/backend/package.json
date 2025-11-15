@@ -7,8 +7,10 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
+    "dev:ws": "bun run --watch src/websocketServer.ts",
     "build": "tsc",
     "start": "bun run dist/index.js",
+    "start:ws": "bun run dist/websocketServer.js",
     "lint": "eslint src --ext .ts",
     "test": "npx tsx src/__tests__/swaggerAuth.manual.test.js"
   },
