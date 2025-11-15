@@ -64,6 +64,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AIChatPage.vue')
       }
     ]
+  },
+  {
+    path: '/consultation/details',
+    name: 'ConsultationDetails',
+    component: () => import('@/views/ConsultationDetailsPage.vue')
   }
 ]
 
