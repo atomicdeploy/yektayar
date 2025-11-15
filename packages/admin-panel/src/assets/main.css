@@ -30,6 +30,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* Remove tap highlights on mobile devices */
+    -webkit-tap-highlight-color: transparent;
+    tap-highlight-color: transparent;
   }
 
   body {
@@ -42,6 +45,18 @@
 
   #app {
     min-height: 100vh;
+  }
+
+  /* Prevent text selection and callouts on interactive elements */
+  button,
+  a,
+  [role="button"],
+  [onclick] {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 }
 
