@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صفحه یافت نشد - YektaYar</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +14,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Vazir', 'Tahoma', sans-serif;
+            font-family: 'Sahel', 'Vazir', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Tahoma', sans-serif;
             background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
             color: #fff;
             display: flex;
@@ -123,18 +125,71 @@
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
-            background: #fff;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
             color: #330867;
             display: inline-block;
             transition: all 0.3s ease;
             margin: 0 10px;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 100%);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .debug-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 11px;
+            text-align: left;
+            direction: ltr;
+            font-family: 'Courier New', monospace;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .debug-info summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #30cfd0;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+
+        .debug-info summary:hover {
+            color: #fff;
+        }
+
+        .debug-info code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #4caf50;
+        }
+
+        .debug-info .label {
+            color: rgba(255, 255, 255, 0.5);
+            display: inline-block;
+            min-width: 120px;
         }
 
         @media (max-width: 600px) {
@@ -162,8 +217,20 @@
         
         <div>
             <a href="/" class="btn">صفحه اصلی</a>
-            <a href="javascript:history.back()" class="btn">بازگشت</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">بازگشت</a>
         </div>
+
+        <details class="debug-info">
+            <summary>🔍 Technical Debug Information</summary>
+            <div>
+                <div><span class="label">Time:</span> <code><!--#echo var="DATE_LOCAL" --></code></div>
+                <div><span class="label">Server:</span> <code><!--#echo var="SERVER_NAME" -->:<!--#echo var="SERVER_PORT" --></code></div>
+                <div><span class="label">Request URI:</span> <code><!--#echo var="REQUEST_URI" --></code></div>
+                <div><span class="label">Request Method:</span> <code><!--#echo var="REQUEST_METHOD" --></code></div>
+                <div><span class="label">Remote Address:</span> <code><!--#echo var="REMOTE_ADDR" --></code></div>
+                <div><span class="label">Referer:</span> <code><!--#echo var="HTTP_REFERER" --></code></div>
+            </div>
+        </details>
     </div>
 
     <script>
