@@ -1203,13 +1203,43 @@ For more details, see [APK-BUILD-SUMMARY.md](../APK-BUILD-SUMMARY.md)
 
 ## Shell Configuration Enhancement
 
+### Development Tools Installation
+
+#### `install-dev-tools.sh`
+
+Automated installation script for all YektaYar development tools.
+
+**Usage:**
+```bash
+# Install all development tools (interactive)
+./scripts/install-dev-tools.sh
+```
+
+**What it installs:**
+- **Core Tools**: git, curl, wget, jq, build-essential
+- **Node.js Ecosystem**: Node.js 18.x, npm, Bun 1.x
+- **Database**: PostgreSQL client, libpq-dev, pgcli
+- **Optional**: GitHub CLI (gh), Docker, Docker Compose
+
+**Features:**
+- ✅ Checks current installation status
+- ✅ Shows installation plan before proceeding
+- ✅ Interactive confirmation
+- ✅ Verifies installations after completion
+- ✅ Provides next steps guidance
+
+**Documentation:**
+See [DEV-TOOLS-GUIDE.md](DEV-TOOLS-GUIDE.md) for detailed information about installed tools and usage.
+
+---
+
 ### Bashrc Feature Enhancement Scripts
 
 Scripts to enable useful bash features based on custom configurations compared to vanilla Ubuntu defaults.
 
 #### `enable-user-bashrc-features.sh`
 
-Enhances user's `~/.bashrc` with productivity features.
+Enhances user's `~/.bashrc` with productivity features and YektaYar-specific development aliases.
 
 **Usage:**
 ```bash
@@ -1227,6 +1257,24 @@ source ~/.bashrc
 - 🛠️ Utility aliases (diskspace, folders, ip -c)
 - 🌐 UTF-8 less charset
 - 📜 History improvements (ignoredups, ignorespace)
+- 💻 **YektaYar Development Aliases**:
+  - Project navigation: `yekta`, `yb`, `ya`, `ym`
+  - Dev commands: `ydev`, `ydev-backend`, `ybuild`, `ylint`
+  - Git shortcuts: `gs`, `gp`, `gc`, `gd`, `gl`, `gco`
+  - Database: `ydb`, `ydbcli`
+  - JSON tools: `json`, `jsonc`
+  - Docker: `dps`, `dpa`, `di`, `dex`, `dlogs`
+  - npm shortcuts: `ni`, `nid`, `nr`, `nt`
+
+**Fallback Behavior:**
+All aliases include `command -v` checks - bashrc **never breaks** if tools are missing.
+
+```bash
+# Example: Only creates alias if bun is installed
+if command -v bun >/dev/null 2>&1; then
+    alias ydev-backend="..."
+fi
+```
 
 #### `enable-system-bashrc-features.sh`
 
@@ -1242,15 +1290,18 @@ source /etc/bash.bashrc
 ```
 
 **Features Added:**
-- 📦 Nala wrapper for apt commands (requires nala)
+- 📦 Nala wrapper for apt commands (with fallback to apt if nala not installed)
 - 🔧 settitle() - Set terminal window title
 - 📂 take() - Create directory and cd into it
 - 🛠️ Global aliases (ports, df -h, du -h, incognito)
-- ⬇️ a2c - Optimized aria2c downloads (requires aria2)
-- 🚀 thefuck integration (requires thefuck)
+- ⬇️ a2c - Optimized aria2c downloads (with fallback check)
+- 🚀 thefuck integration (with fallback check)
 - 🎼 Composer superuser permission
 - 📖 Bash completion enablement
 - 🔗 PATH enhancement (/root/.local/bin)
+
+**Fallback Behavior:**
+All optional tools wrapped in `command -v` checks for safe fallback.
 
 **Optional Dependencies:**
 ```bash
@@ -1272,7 +1323,7 @@ Automated test suite for bashrc enhancement scripts.
 - ✓ Script files exist and are executable
 - ✓ Root requirement check
 - ✓ Functionality in isolated environment
-- ✓ All features added correctly
+- ✓ All features added correctly (including fallback checks)
 - ✓ Idempotency (no duplicates on re-run)
 - ✓ Backup creation
 - ✓ User-friendly output

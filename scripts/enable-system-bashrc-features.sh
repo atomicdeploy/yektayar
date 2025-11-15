@@ -72,12 +72,11 @@ else
 fi
 
 echo ""
-echo "📦 Enabling nala wrapper for apt..."
-echo "  ℹ️  Note: This requires 'nala' to be installed (apt install nala)"
+echo "📦 Enabling nala wrapper for apt (with fallback)..."
 if ! pattern_exists "# use nala instead of apt"; then
-    # Add after command_not_found_handle function
-    insert_after "^fi$" '\n# use nala instead of apt\napt() {\n  command nala "$@"\n}\n\nsudo() {\n  if [ "$1" = "apt" ]; then\n    shift\n      command sudo nala "$@"\n    else\n        command sudo "$@"\n  fi\n}'
-    echo "  ✅ Nala wrapper enabled"
+    # Add after command_not_found_handle function with fallback
+    insert_after "^fi$" '\n# use nala instead of apt (fallback to apt if nala not installed)\napt() {\n  if command -v nala >/dev/null 2>&1; then\n    command nala "$@"\n  else\n    command apt "$@"\n  fi\n}\n\nsudo() {\n  if [ "$1" = "apt" ]; then\n    shift\n    if command -v nala >/dev/null 2>&1; then\n      command sudo nala "$@"\n    else\n      command sudo apt "$@"\n    fi\n  else\n    command sudo "$@"\n  fi\n}'
+    echo "  ✅ Nala wrapper enabled with fallback to apt"
 else
     echo "  ⏭️  Already configured"
 fi
@@ -138,11 +137,10 @@ else
 fi
 
 echo ""
-echo "⬇️  Enabling aria2c download alias..."
-echo "  ℹ️  Note: This requires 'aria2' to be installed (apt install aria2)"
-if ! pattern_exists "alias a2c="; then
-    insert_after "function take ()" '\n\nalias a2c="aria2c -R -c -s 16 -x 16 -k 1M -j 1 --no-file-allocation-limit=128M --check-certificate=true"'
-    echo "  ✅ aria2c alias (a2c) enabled"
+echo "⬇️  Enabling aria2c download alias (with fallback)..."
+if ! pattern_exists "# aria2c download alias"; then
+    insert_after "function take ()" '\n\n# aria2c download alias (only if aria2 is installed)\nif command -v aria2c >/dev/null 2>&1; then\n    alias a2c="aria2c -R -c -s 16 -x 16 -k 1M -j 1 --no-file-allocation-limit=128M --check-certificate=true"\nfi'
+    echo "  ✅ aria2c alias (a2c) enabled with fallback"
 else
     echo "  ⏭️  Already configured"
 fi
@@ -150,18 +148,17 @@ fi
 echo ""
 echo "🔗 Adding /root/.local/bin to PATH..."
 if ! pattern_exists 'export PATH=.*:/root/.local/bin'; then
-    insert_after "alias a2c=" '\n\nexport PATH="$PATH:/root/.local/bin"'
+    insert_after "# aria2c download alias" '\n\nexport PATH="$PATH:/root/.local/bin"'
     echo "  ✅ PATH updated with /root/.local/bin"
 else
     echo "  ⏭️  Already configured"
 fi
 
 echo ""
-echo "🚀 Enabling thefuck integration..."
-echo "  ℹ️  Note: This requires 'thefuck' to be installed (apt install thefuck)"
-if ! pattern_exists "eval.*thefuck.*--alias"; then
-    insert_after 'export PATH=.*:/root/.local/bin' '\n\neval $(thefuck --alias fuck)'
-    echo "  ✅ thefuck integration enabled"
+echo "🚀 Enabling thefuck integration (with fallback)..."
+if ! pattern_exists "# thefuck integration"; then
+    insert_after 'export PATH=.*:/root/.local/bin' '\n\n# thefuck integration (only if installed)\nif command -v thefuck >/dev/null 2>&1; then\n    eval $(thefuck --alias fuck)\nfi'
+    echo "  ✅ thefuck integration enabled with fallback"
 else
     echo "  ⏭️  Already configured"
 fi
@@ -169,7 +166,7 @@ fi
 echo ""
 echo "🎼 Enabling Composer superuser permission..."
 if ! pattern_exists "COMPOSER_ALLOW_SUPERUSER"; then
-    insert_after "eval.*thefuck" '\n\nexport COMPOSER_ALLOW_SUPERUSER=1'
+    insert_after "# thefuck integration" '\n\nexport COMPOSER_ALLOW_SUPERUSER=1'
     echo "  ✅ Composer superuser permission enabled"
 else
     echo "  ⏭️  Already configured"

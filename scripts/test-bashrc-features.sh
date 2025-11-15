@@ -99,6 +99,12 @@ FEATURES_TO_CHECK=(
     "alias folders="
     "alias ip='ip -c'"
     "export LESSCHARSET"
+    "# YektaYar Development Aliases"
+    "command -v bun"
+    "command -v npm"
+    "command -v psql"
+    "command -v jq"
+    "command -v docker"
 )
 
 FEATURE_NAMES=(
@@ -113,6 +119,12 @@ FEATURE_NAMES=(
     "folders alias"
     "ip color alias"
     "LESSCHARSET"
+    "YektaYar development aliases"
+    "Bun fallback check"
+    "npm fallback check"
+    "psql fallback check"
+    "jq fallback check"
+    "docker fallback check"
 )
 
 for i in "${!FEATURES_TO_CHECK[@]}"; do
