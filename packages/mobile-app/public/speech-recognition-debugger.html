@@ -78,7 +78,6 @@
     }
     .control:hover{
       border-color:#475569;
-      transform:scale(1.02);
       box-shadow:0 0 15px rgba(124,58,237,0.2);
     }
     label{font-size:12px;color:var(--muted)}
@@ -94,7 +93,6 @@
     select:focus,input[type="text"]:focus{
       border-color:#7c3aed;
       box-shadow:0 0 0 4px rgba(124,58,237,0.15), 0 0 20px rgba(124,58,237,0.3);
-      transform:scale(1.01);
     }
     .tog{
       display:inline-flex;gap:8px;align-items:center;background:#0b1324;border:1px solid var(--border);padding:6px 10px;border-radius:10px;
@@ -102,7 +100,6 @@
     }
     .tog:hover{
       border-color:#475569;
-      transform:scale(1.03);
       box-shadow:0 0 15px rgba(124,58,237,0.2);
     }
     .tog input{
@@ -114,7 +111,6 @@
       background:linear-gradient(135deg, #22d3ee, #7c3aed);
       border-color:#7c3aed;
       box-shadow:0 0 15px rgba(124,58,237,0.6), 0 0 30px rgba(124,58,237,0.3);
-      transform:scale(1.1);
     }
     .btnbar{display:flex;gap:10px;flex-wrap:wrap}
     .btn{
@@ -122,7 +118,6 @@
       padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer;
       position:relative;overflow:hidden;
       transition:all .4s cubic-bezier(0.4, 0, 0.2, 1);
-      transform:scale(1);
     }
     .btn::before{
       content:'';position:absolute;top:50%;left:50%;
@@ -133,14 +128,12 @@
     }
     .btn:hover{
       border-color:#475569;background:#1a1f2e;
-      transform:scale(1.05);
       box-shadow:0 0 30px rgba(124,58,237,0.3), 0 10px 40px rgba(0,0,0,0.4);
     }
     .btn:hover::before{
       width:300px;height:300px;
     }
     .btn:active{
-      transform:scale(0.98);
       transition:all .1s ease;
     }
     .btn.primary{
@@ -163,7 +156,7 @@
       background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);
     }
     .status{
-      display:flex;gap:8px;align-items:center;justify-content:center;font-size:14px;
+      display:flex;gap:8px;align-items:center;justify-content:flex-start;font-size:14px;
       color:var(--muted);padding:12px;margin-top:12px;
       background:rgba(17,24,39,0.5);border:1px solid var(--border);
       border-radius:12px;transition:all .3s ease;
@@ -244,14 +237,12 @@
     .copy:hover{
       border-color:#60a5fa;
       background:#111827;
-      transform:scale(1.05);
       box-shadow:0 0 20px rgba(147,197,253,0.3);
     }
     .copy:hover::before{
       width:200px;height:200px;
     }
     .copy:active{
-      transform:scale(0.98);
     }
     .grow{flex:1}
   </style>
@@ -282,7 +273,7 @@
                 <option value="de-DE">Deutsch (DE)</option>
                 <option value="it-IT">Italiano (IT)</option>
                 <option value="pt-BR">Português (BR)</option>
-                <option value="fa-IR">Persian (FA)</option>
+                <option value="fa-IR">فارسی (FA)</option>
                 <option value="ja-JP">日本語 (JP)</option>
                 <option value="ko-KR">한국어 (KR)</option>
                 <option value="zh-CN">中文 (简体)</option>
