@@ -72,11 +72,11 @@ else
 fi
 
 echo ""
-echo "📦 Enabling nala wrapper for apt (with fallback)..."
+echo "📦 Enabling nala wrapper for apt..."
 if ! pattern_exists "# use nala instead of apt"; then
-    # Add after command_not_found_handle function with fallback
-    insert_after "^fi$" '\n# use nala instead of apt (fallback to apt if nala not installed)\napt() {\n  if command -v nala >/dev/null 2>&1; then\n    command nala "$@"\n  else\n    command apt "$@"\n  fi\n}\n\nsudo() {\n  if [ "$1" = "apt" ]; then\n    shift\n    if command -v nala >/dev/null 2>&1; then\n      command sudo nala "$@"\n    else\n      command sudo apt "$@"\n    fi\n  else\n    command sudo "$@"\n  fi\n}'
-    echo "  ✅ Nala wrapper enabled with fallback to apt"
+    # Add after command_not_found_handle function
+    insert_after "^fi$" '\n# use nala instead of apt\napt() {\n  if command -v nala >/dev/null 2>&1; then\n    command nala "$@"\n  else\n    command apt "$@"\n  fi\n}\n\nsudo() {\n  if [ "$1" = "apt" ]; then\n    shift\n    if command -v nala >/dev/null 2>&1; then\n      command sudo nala "$@"\n    else\n      command sudo apt "$@"\n    fi\n  else\n    command sudo "$@"\n  fi\n}'
+    echo "  ✅ Nala wrapper enabled"
 else
     echo "  ⏭️  Already configured"
 fi
@@ -137,10 +137,10 @@ else
 fi
 
 echo ""
-echo "⬇️  Enabling aria2c download alias (with fallback)..."
+echo "⬇️  Enabling aria2c download alias..."
 if ! pattern_exists "# aria2c download alias"; then
-    insert_after "function take ()" '\n\n# aria2c download alias (only if aria2 is installed)\nif command -v aria2c >/dev/null 2>&1; then\n    alias a2c="aria2c -R -c -s 16 -x 16 -k 1M -j 1 --no-file-allocation-limit=128M --check-certificate=true"\nfi'
-    echo "  ✅ aria2c alias (a2c) enabled with fallback"
+    insert_after "function take ()" '\n\n# aria2c download alias\nif command -v aria2c >/dev/null 2>&1; then\n    alias a2c="aria2c -R -c -s 16 -x 16 -k 1M -j 1 --no-file-allocation-limit=128M --check-certificate=true"\nfi'
+    echo "  ✅ aria2c alias (a2c) enabled"
 else
     echo "  ⏭️  Already configured"
 fi
@@ -155,10 +155,10 @@ else
 fi
 
 echo ""
-echo "🚀 Enabling thefuck integration (with fallback)..."
+echo "🚀 Enabling thefuck integration..."
 if ! pattern_exists "# thefuck integration"; then
-    insert_after 'export PATH=.*:/root/.local/bin' '\n\n# thefuck integration (only if installed)\nif command -v thefuck >/dev/null 2>&1; then\n    eval $(thefuck --alias fuck)\nfi'
-    echo "  ✅ thefuck integration enabled with fallback"
+    insert_after 'export PATH=.*:/root/.local/bin' '\n\n# thefuck integration\nif command -v thefuck >/dev/null 2>&1; then\n    eval $(thefuck --alias fuck)\nfi'
+    echo "  ✅ thefuck integration enabled"
 else
     echo "  ⏭️  Already configured"
 fi

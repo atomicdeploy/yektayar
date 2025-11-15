@@ -18,6 +18,22 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Parse command line arguments
+INSTALL_ALL_NO_PROMPT=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --yes|-y)
+            INSTALL_ALL_NO_PROMPT=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [--yes|-y]"
+            exit 1
+            ;;
+    esac
+done
+
 # Check if running on Ubuntu/Debian
 if [ ! -f /etc/os-release ]; then
     echo -e "${RED}❌ Cannot detect OS. This script is designed for Ubuntu/Debian.${NC}"
@@ -53,6 +69,17 @@ check_version() {
     fi
 }
 
+# Function to ask user interactively
+ask_install() {
+    local tool_name="$1"
+    if [ "$INSTALL_ALL_NO_PROMPT" = true ]; then
+        return 0
+    fi
+    read -p "Install $tool_name? (Y/n) " -n 1 -r
+    echo
+    [[ ! $REPLY =~ ^[Nn]$ ]]
+}
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "📋 Checking current installation status..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -74,58 +101,119 @@ check_version "npm" || INSTALL_NPM=1
 check_version "bun" || INSTALL_BUN=1
 echo ""
 
+# Vue/Vite CLI
+echo "Frontend Tools:"
+check_version "vue" || INSTALL_VUE=1
+check_version "vite" || INSTALL_VITE=1
+echo ""
+
 # Database
 echo "Database Tools:"
 check_version "psql" || INSTALL_PSQL=1
 check_version "pg_config" || INSTALL_PSQL_DEV=1
 echo ""
 
-# Optional but recommended
-echo "Optional Development Tools:"
-check_version "gh" || INSTALL_GH=1
-check_version "docker" || INSTALL_DOCKER=1
-check_version "docker-compose" "version" || INSTALL_DOCKER_COMPOSE=1
-check_version "pgcli" || INSTALL_PGCLI=1
+# Optional tools
+echo "Optional Tools:"
+check_version "nala" || CHECK_NALA=1
+check_version "aria2c" || CHECK_ARIA2=1
+check_version "gh" || CHECK_GH=1
+check_version "pgcli" || CHECK_PGCLI=1
+check_version "aptitude" || CHECK_APTITUDE=1
+check_version "tasksel" || CHECK_TASKSEL=1
+check_version "pipx" || CHECK_PIPX=1
+check_version "thefuck" || CHECK_THEFUCK=1
 echo ""
 
-# Ask for confirmation
+# Decide on package manager
+USE_NALA=false
+if command_exists "nala"; then
+    echo -e "${GREEN}✓ nala is already installed, will use it for package installation${NC}"
+    USE_NALA=true
+elif [[ -n "$CHECK_NALA" ]]; then
+    if ask_install "nala (better apt frontend)"; then
+        INSTALL_NALA=1
+        USE_NALA=true
+    fi
+fi
+
+# Set package manager command
+if [ "$USE_NALA" = true ]; then
+    PKG_MGR="nala"
+else
+    PKG_MGR="apt-get"
+fi
+
+echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "📦 Installation Plan"
+echo "📦 Installation Configuration"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
+echo "Package manager: $PKG_MGR"
+echo ""
 
-WILL_INSTALL=""
-[[ -n "$INSTALL_GIT" ]] && WILL_INSTALL="$WILL_INSTALL git"
-[[ -n "$INSTALL_CURL" ]] && WILL_INSTALL="$WILL_INSTALL curl"
-[[ -n "$INSTALL_WGET" ]] && WILL_INSTALL="$WILL_INSTALL wget"
-[[ -n "$INSTALL_JQ" ]] && WILL_INSTALL="$WILL_INSTALL jq"
-[[ -n "$INSTALL_BUILD" ]] && WILL_INSTALL="$WILL_INSTALL build-essential"
-[[ -n "$INSTALL_NODE" ]] && WILL_INSTALL="$WILL_INSTALL node"
-[[ -n "$INSTALL_BUN" ]] && WILL_INSTALL="$WILL_INSTALL bun"
-[[ -n "$INSTALL_PSQL" ]] && WILL_INSTALL="$WILL_INSTALL postgresql-client"
-[[ -n "$INSTALL_PSQL_DEV" ]] && WILL_INSTALL="$WILL_INSTALL postgresql-dev"
-[[ -n "$INSTALL_GH" ]] && WILL_INSTALL="$WILL_INSTALL gh"
-[[ -n "$INSTALL_DOCKER" ]] && WILL_INSTALL="$WILL_INSTALL docker"
-[[ -n "$INSTALL_DOCKER_COMPOSE" ]] && WILL_INSTALL="$WILL_INSTALL docker-compose"
-[[ -n "$INSTALL_PGCLI" ]] && WILL_INSTALL="$WILL_INSTALL pgcli"
+# Build installation plan
+INSTALL_PKGS=""
+[[ -n "$INSTALL_GIT" ]] && INSTALL_PKGS="$INSTALL_PKGS git"
+[[ -n "$INSTALL_CURL" ]] && INSTALL_PKGS="$INSTALL_PKGS curl"
+[[ -n "$INSTALL_WGET" ]] && INSTALL_PKGS="$INSTALL_WGET wget"
+[[ -n "$INSTALL_JQ" ]] && INSTALL_PKGS="$INSTALL_PKGS jq"
+[[ -n "$INSTALL_BUILD" ]] && INSTALL_PKGS="$INSTALL_PKGS build-essential"
+[[ -n "$INSTALL_PSQL" ]] && INSTALL_PKGS="$INSTALL_PKGS postgresql-client"
+[[ -n "$INSTALL_PSQL_DEV" ]] && INSTALL_PKGS="$INSTALL_PKGS libpq-dev"
 
-if [ -z "$WILL_INSTALL" ]; then
-    echo -e "${GREEN}✓ All tools are already installed!${NC}"
+# Ask for optional tools
+if [[ -n "$CHECK_ARIA2" ]]; then
+    if ask_install "aria2c (fast download tool)"; then
+        INSTALL_PKGS="$INSTALL_PKGS aria2"
+    fi
+fi
+
+if [[ -n "$CHECK_GH" ]]; then
+    if ask_install "GitHub CLI (gh)"; then
+        INSTALL_GH=1
+    fi
+fi
+
+if [[ -n "$CHECK_APTITUDE" ]]; then
+    if ask_install "aptitude (text-based package manager)"; then
+        INSTALL_PKGS="$INSTALL_PKGS aptitude"
+    fi
+fi
+
+if [[ -n "$CHECK_TASKSEL" ]]; then
+    if ask_install "tasksel (task selection tool)"; then
+        INSTALL_PKGS="$INSTALL_PKGS tasksel"
+    fi
+fi
+
+if [[ -n "$CHECK_PIPX" ]]; then
+    if ask_install "pipx (Python app installer)"; then
+        INSTALL_PIPX=1
+    fi
+fi
+
+if [[ -n "$CHECK_PGCLI" ]]; then
+    if ask_install "pgcli (PostgreSQL CLI with auto-completion)"; then
+        INSTALL_PGCLI=1
+    fi
+fi
+
+if [[ -n "$CHECK_THEFUCK" ]]; then
+    if ask_install "thefuck (command corrector)"; then
+        INSTALL_THEFUCK=1
+    fi
+fi
+
+# Check if there's anything to install
+if [ -z "$INSTALL_PKGS" ] && [ -z "$INSTALL_NALA" ] && [ -z "$INSTALL_NODE" ] && [ -z "$INSTALL_BUN" ] && \
+   [ -z "$INSTALL_VUE" ] && [ -z "$INSTALL_VITE" ] && [ -z "$INSTALL_GH" ] && [ -z "$INSTALL_PIPX" ] && \
+   [ -z "$INSTALL_PGCLI" ] && [ -z "$INSTALL_THEFUCK" ]; then
+    echo -e "${GREEN}✓ All selected tools are already installed!${NC}"
     echo ""
     exit 0
 fi
 
-echo "The following tools will be installed:"
-echo -e "${BLUE}$WILL_INSTALL${NC}"
-echo ""
-read -p "Continue with installation? (y/N) " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "Installation cancelled."
-    exit 0
-fi
-
-echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🚀 Starting installation..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -135,57 +223,44 @@ echo ""
 echo "📦 Updating package list..."
 sudo apt-get update -qq
 
-# Install core tools
-if [[ -n "$INSTALL_GIT" ]]; then
-    echo "📥 Installing Git..."
-    sudo apt-get install -y git
+# Install nala first if requested
+if [[ -n "$INSTALL_NALA" ]]; then
+    echo "📥 Installing nala..."
+    sudo apt-get install -y nala
+    PKG_MGR="nala"
 fi
 
-if [[ -n "$INSTALL_CURL" ]]; then
-    echo "📥 Installing curl..."
-    sudo apt-get install -y curl
-fi
-
-if [[ -n "$INSTALL_WGET" ]]; then
-    echo "📥 Installing wget..."
-    sudo apt-get install -y wget
-fi
-
-if [[ -n "$INSTALL_JQ" ]]; then
-    echo "📥 Installing jq..."
-    sudo apt-get install -y jq
-fi
-
-if [[ -n "$INSTALL_BUILD" ]]; then
-    echo "📥 Installing build tools..."
-    sudo apt-get install -y build-essential
+# Install core packages
+if [[ -n "$INSTALL_PKGS" ]]; then
+    echo "📥 Installing packages: $INSTALL_PKGS"
+    sudo $PKG_MGR install -y $INSTALL_PKGS
 fi
 
 # Install Node.js
 if [[ -n "$INSTALL_NODE" ]]; then
     echo "📥 Installing Node.js 18.x..."
     curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-    sudo apt-get install -y nodejs
+    sudo $PKG_MGR install -y nodejs
 fi
 
 # Install Bun
 if [[ -n "$INSTALL_BUN" ]]; then
     echo "📥 Installing Bun..."
     curl -fsSL https://bun.sh/install | bash
-    # Add to PATH for current session
     export BUN_INSTALL="$HOME/.bun"
     export PATH="$BUN_INSTALL/bin:$PATH"
 fi
 
-# Install PostgreSQL client
-if [[ -n "$INSTALL_PSQL" ]]; then
-    echo "📥 Installing PostgreSQL client..."
-    sudo apt-get install -y postgresql-client
+# Install Vue CLI globally
+if [[ -n "$INSTALL_VUE" ]] && command_exists npm; then
+    echo "📥 Installing Vue CLI globally..."
+    npm install -g @vue/cli
 fi
 
-if [[ -n "$INSTALL_PSQL_DEV" ]]; then
-    echo "📥 Installing PostgreSQL development files..."
-    sudo apt-get install -y libpq-dev
+# Install Vite globally (optional, usually used per-project)
+if [[ -n "$INSTALL_VITE" ]] && command_exists npm; then
+    echo "📥 Installing Vite globally..."
+    npm install -g vite
 fi
 
 # Install GitHub CLI
@@ -194,35 +269,58 @@ if [[ -n "$INSTALL_GH" ]]; then
     curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
     sudo apt-get update -qq
-    sudo apt-get install -y gh
+    sudo $PKG_MGR install -y gh
 fi
 
-# Install Docker
-if [[ -n "$INSTALL_DOCKER" ]]; then
-    echo "📥 Installing Docker..."
-    curl -fsSL https://get.docker.com | sudo sh
-    sudo usermod -aG docker "$USER"
-    echo -e "${YELLOW}⚠️  Note: You need to log out and back in for Docker group membership to take effect${NC}"
+# Install pipx
+if [[ -n "$INSTALL_PIPX" ]]; then
+    echo "📥 Installing pipx..."
+    sudo $PKG_MGR install -y python3-pip python3-venv
+    python3 -m pip install --user pipx
+    python3 -m pipx ensurepath
+    export PATH="$HOME/.local/bin:$PATH"
 fi
 
-# Install Docker Compose
-if [[ -n "$INSTALL_DOCKER_COMPOSE" ]]; then
-    echo "📥 Installing Docker Compose..."
-    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
-fi
-
-# Install pgcli (requires Python)
+# Install pgcli
 if [[ -n "$INSTALL_PGCLI" ]]; then
     echo "📥 Installing pgcli..."
-    if command_exists pip3; then
+    if command_exists pipx; then
+        pipx install pgcli
+    elif command_exists pip3; then
         pip3 install --user pgcli
     elif command_exists pip; then
         pip install --user pgcli
     else
         echo -e "${YELLOW}⚠️  pip not found. Installing python3-pip...${NC}"
-        sudo apt-get install -y python3-pip
+        sudo $PKG_MGR install -y python3-pip
         pip3 install --user pgcli
+    fi
+fi
+
+# Install thefuck with special treatment
+if [[ -n "$INSTALL_THEFUCK" ]]; then
+    echo "📥 Installing thefuck (with special setup)..."
+    if ! command_exists pipx; then
+        echo "Installing pipx first..."
+        sudo $PKG_MGR install -y python3-pip python3-venv
+        python3 -m pip install --user pipx
+        python3 -m pipx ensurepath
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+    
+    echo "Installing thefuck via pipx..."
+    pipx install thefuck
+    
+    echo "Injecting required dependencies..."
+    pipx inject thefuck "setuptools>=80"
+    pipx inject thefuck imp2importlib
+fi
+
+# Setup bash completion for npm
+if command_exists npm; then
+    echo "🔧 Setting up bash completion for npm..."
+    if [ ! -d "$HOME/.npm-completion" ]; then
+        npm completion > "$HOME/.npm-completion/npm-completion.sh" 2>/dev/null || true
     fi
 fi
 
@@ -233,16 +331,20 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Verify installations
-echo "📋 Verification:"
-check_version "git"
-check_version "curl"
-check_version "jq"
-check_version "node"
-check_version "npm"
+echo "�� Verification:"
+check_version "git" || true
+check_version "curl" || true
+check_version "jq" || true
+check_version "node" || true
+check_version "npm" || true
 check_version "bun" || echo -e "${YELLOW}   Note: Bun may need a new shell session${NC}"
-check_version "psql"
+check_version "psql" || true
+check_version "nala" || true
+check_version "aria2c" || true
 check_version "gh" || true
-check_version "docker" || true
+check_version "pipx" || true
+check_version "pgcli" || true
+check_version "thefuck" || true
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -255,7 +357,7 @@ echo "3. Run bashrc enhancement: ./scripts/enable-user-bashrc-features.sh"
 echo "4. Install project dependencies: npm install"
 echo ""
 
-if [[ -n "$INSTALL_DOCKER" ]]; then
-    echo -e "${YELLOW}⚠️  Docker: Log out and back in to use Docker without sudo${NC}"
+if [[ -n "$INSTALL_BUN" ]] || [[ -n "$INSTALL_PIPX" ]] || [[ -n "$INSTALL_THEFUCK" ]]; then
+    echo -e "${YELLOW}⚠️  Note: Some tools may require restarting your terminal to work properly${NC}"
     echo ""
 fi
