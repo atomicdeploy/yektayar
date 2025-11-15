@@ -252,6 +252,7 @@ This mono repo addresses all requirements from the issue:
 - `npm run lint` - Lint all packages
 - `npm run test` - Test all packages
 - `npm run clean` - Clean all build artifacts
+- `npm run db:cli` - Connect to database using pgcli or psql
 
 ### Package-specific Scripts
 - `npm run dev:backend` - Backend only
