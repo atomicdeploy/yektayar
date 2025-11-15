@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <title>SpeechRecognition Debugger — Continuous + Interim</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0b1220" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -69,71 +73,94 @@
     .control{
       background:var(--chip);border:1px solid var(--border);
       border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;
-      transition:all .3s ease;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      position:relative;
     }
     .control:hover{
-      border-color:#334155;transform:translateY(-1px);
+      border-color:#475569;
+      transform:scale(1.02);
+      box-shadow:0 0 15px rgba(124,58,237,0.2);
     }
     label{font-size:12px;color:var(--muted)}
     select,input[type="text"]{
       background:#0b1324;border:1px solid var(--border);color:var(--text);
       padding:8px 10px;border-radius:10px;outline:none;min-width:160px;
-      transition:all .3s ease;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     select:hover,input[type="text"]:hover{
-      border-color:#334155;
+      border-color:#475569;
+      box-shadow:0 0 10px rgba(124,58,237,0.15);
     }
     select:focus,input[type="text"]:focus{
       border-color:#7c3aed;
-      box-shadow:0 0 0 3px rgba(124,58,237,0.1);
+      box-shadow:0 0 0 4px rgba(124,58,237,0.15), 0 0 20px rgba(124,58,237,0.3);
+      transform:scale(1.01);
     }
     .tog{
       display:inline-flex;gap:8px;align-items:center;background:#0b1324;border:1px solid var(--border);padding:6px 10px;border-radius:10px;
-      cursor:pointer;user-select:none;transition:all .3s ease;
+      cursor:pointer;user-select:none;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tog:hover{
-      border-color:#334155;transform:translateY(-1px);
+      border-color:#475569;
+      transform:scale(1.03);
+      box-shadow:0 0 15px rgba(124,58,237,0.2);
     }
     .tog input{
       appearance:none;width:16px;height:16px;border-radius:4px;border:1px solid #475569;background:#0b1324;
-      display:inline-block;vertical-align:middle;position:relative;transition:all .3s ease;
+      display:inline-block;vertical-align:middle;position:relative;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tog input:checked{
-      background:linear-gradient(180deg, #22d3ee, #7c3aed);border-color:#7c3aed;
-      box-shadow:0 0 8px rgba(124,58,237,0.5);
+      background:linear-gradient(135deg, #22d3ee, #7c3aed);
+      border-color:#7c3aed;
+      box-shadow:0 0 15px rgba(124,58,237,0.6), 0 0 30px rgba(124,58,237,0.3);
+      transform:scale(1.1);
     }
     .btnbar{display:flex;gap:10px;flex-wrap:wrap}
     .btn{
       background:#111827;border:1px solid var(--border);color:var(--text);
       padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer;
-      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
-      transform:translateY(0);
+      position:relative;overflow:hidden;
+      transition:all .4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform:scale(1);
+    }
+    .btn::before{
+      content:'';position:absolute;top:50%;left:50%;
+      width:0;height:0;border-radius:50%;
+      background:rgba(255,255,255,0.1);
+      transform:translate(-50%,-50%);
+      transition:width .6s ease, height .6s ease;
     }
     .btn:hover{
-      border-color:#334155;background:#0b1324;
-      transform:translateY(-2px);
-      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+      border-color:#475569;background:#1a1f2e;
+      transform:scale(1.05);
+      box-shadow:0 0 30px rgba(124,58,237,0.3), 0 10px 40px rgba(0,0,0,0.4);
+    }
+    .btn:hover::before{
+      width:300px;height:300px;
     }
     .btn:active{
-      transform:translateY(0);
+      transform:scale(0.98);
       transition:all .1s ease;
     }
     .btn.primary{
-      background:linear-gradient(180deg,#7c3aed,#6d28d9);
+      background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
       border-color:#8b5cf6;
-      box-shadow:0 8px 20px #7c3aed50 inset, 0 10px 30px #7c3aed30;
+      box-shadow:0 0 20px rgba(124,58,237,0.4), 0 8px 20px rgba(124,58,237,0.3) inset;
     }
     .btn.primary:hover{
-      box-shadow:0 8px 20px #7c3aed50 inset, 0 10px 30px #7c3aed30, 0 8px 16px rgba(124,58,237,0.5);
+      box-shadow:0 0 40px rgba(124,58,237,0.8), 0 0 60px rgba(124,58,237,0.4), 0 8px 20px rgba(124,58,237,0.3) inset;
+      background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);
     }
     .btn.danger{
-      background:linear-gradient(180deg,#dc2626,#b91c1c);
+      background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%);
       border-color:#ef4444;
       color:#fecaca;
-      box-shadow:0 8px 20px #dc262650 inset, 0 10px 30px #dc262630;
+      box-shadow:0 0 20px rgba(220,38,38,0.4), 0 8px 20px rgba(220,38,38,0.3) inset;
     }
     .btn.danger:hover{
-      box-shadow:0 8px 20px #dc262650 inset, 0 10px 30px #dc262630, 0 8px 16px rgba(220,38,38,0.5);
+      box-shadow:0 0 40px rgba(220,38,38,0.8), 0 0 60px rgba(220,38,38,0.4), 0 8px 20px rgba(220,38,38,0.3) inset;
+      background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);
     }
     .status{
       display:flex;gap:8px;align-items:center;justify-content:center;font-size:14px;
@@ -141,22 +168,38 @@
       background:rgba(17,24,39,0.5);border:1px solid var(--border);
       border-radius:12px;transition:all .3s ease;
     }
-    .status-emoji{
-      font-size:16px;
-      transition:all .3s ease;
-      display:inline-block;
+    .dot{
+      width:12px;height:12px;border-radius:50%;background:#64748b;
+      border:2px solid #334155;
+      box-shadow:0 0 0 3px rgba(100,116,139,0.2);
+      transition:all .4s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .status-emoji.pulse{
-      animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    .dot.live{
+      background:#10b981;
+      border-color:#10b981;
+      box-shadow:0 0 20px rgba(16,185,129,0.8), 0 0 40px rgba(16,185,129,0.4);
+      animation:pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: .8; transform: scale(1.1); }
+    .dot.talking{
+      background:#22d3ee;
+      border-color:#22d3ee;
+      box-shadow:0 0 20px rgba(34,211,238,0.8), 0 0 40px rgba(34,211,238,0.4);
     }
-    .dot{width:10px;height:10px;border-radius:50%;background:#64748b;border:1px solid #334155;box-shadow:0 0 0 2px #0003 inset}
-    .dot.live{background:var(--ok);box-shadow:0 0 16px #10b981a0}
-    .dot.talking{background:#22d3ee;box-shadow:0 0 16px #22d3eea0}
-    .dot.err{background:var(--err)}
+    .dot.err{
+      background:#ef4444;
+      border-color:#ef4444;
+      box-shadow:0 0 20px rgba(239,68,68,0.8), 0 0 40px rgba(239,68,68,0.4);
+    }
+    @keyframes pulse-glow {
+      0%, 100% { 
+        transform: scale(1); 
+        box-shadow:0 0 20px rgba(16,185,129,0.8), 0 0 40px rgba(16,185,129,0.4);
+      }
+      50% { 
+        transform: scale(1.2); 
+        box-shadow:0 0 30px rgba(16,185,129,1), 0 0 60px rgba(16,185,129,0.6);
+      }
+    }
     .transcript{
       background:#0b1324;border:1px dashed #334155;border-radius:12px;padding:12px;min-height:80px;
       line-height:1.6;transition:all .3s ease;
@@ -188,13 +231,27 @@
     .success{color:#a7f3d0}
     .copy{
       background:#0b1324;border:1px solid var(--border);color:#93c5fd;font-size:12px;padding:8px 10px;border-radius:8px;cursor:pointer;
-      transition:all .3s ease;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      position:relative;overflow:hidden;
+    }
+    .copy::before{
+      content:'';position:absolute;top:50%;left:50%;
+      width:0;height:0;border-radius:50%;
+      background:rgba(147,197,253,0.1);
+      transform:translate(-50%,-50%);
+      transition:width .5s ease, height .5s ease;
     }
     .copy:hover{
-      border-color:#334155;background:#111827;transform:translateY(-1px);
+      border-color:#60a5fa;
+      background:#111827;
+      transform:scale(1.05);
+      box-shadow:0 0 20px rgba(147,197,253,0.3);
+    }
+    .copy:hover::before{
+      width:200px;height:200px;
     }
     .copy:active{
-      transform:translateY(0);
+      transform:scale(0.98);
     }
     .grow{flex:1}
   </style>
@@ -255,7 +312,7 @@
 
           <div class="status" id="status">
             <span>Status:</span>
-            <span class="status-emoji" id="statusEmoji">⚪</span>
+            <span class="dot" id="dot"></span>
             <span id="stateText">Idle</span>
           </div>
 
@@ -304,8 +361,8 @@
     (function(){
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const ui = {
+        dot: document.getElementById('dot'),
         stateText: document.getElementById('stateText'),
-        statusEmoji: document.getElementById('statusEmoji'),
         engine: document.getElementById('engine'),
         state: document.getElementById('state'),
         speechState: document.getElementById('speechState'),
@@ -351,7 +408,7 @@
       if (!SpeechRecognition) {
         ui.supportMsg.innerHTML = '<span class="warn">Your browser does not support the Web Speech API SpeechRecognition. Try Chrome or Edge.</span>';
         ui.stateText.textContent = 'Unsupported';
-        ui.statusEmoji.textContent = '🔴';
+        ui.dot.classList.add('err');
         return;
       }
       ui.engine.textContent = (window.SpeechRecognition ? 'SpeechRecognition' : 'webkitSpeechRecognition') + ' (client-side)';
@@ -383,24 +440,23 @@
         ui.state.textContent = state;
         switch (state) {
           case 'listening':
-            ui.statusEmoji.textContent = '🟢';
-            ui.statusEmoji.classList.add('pulse');
+            ui.dot.classList.remove('err','talking');
+            ui.dot.classList.add('live');
             ui.stateText.textContent = 'Listening...';
             ui.startBtn.textContent = 'Stop Listening';
             ui.startBtn.classList.remove('primary');
             ui.startBtn.classList.add('danger');
             break;
           case 'idle':
-            ui.statusEmoji.textContent = '⚪';
-            ui.statusEmoji.classList.remove('pulse');
+            ui.dot.classList.remove('live','talking','err');
             ui.stateText.textContent = 'Idle';
             ui.startBtn.textContent = 'Start Listening';
             ui.startBtn.classList.remove('danger');
             ui.startBtn.classList.add('primary');
             break;
           case 'error':
-            ui.statusEmoji.textContent = '🔴';
-            ui.statusEmoji.classList.remove('pulse');
+            ui.dot.classList.remove('live','talking');
+            ui.dot.classList.add('err');
             ui.stateText.textContent = 'Error';
             ui.startBtn.textContent = 'Start Listening';
             ui.startBtn.classList.remove('danger');
@@ -412,10 +468,10 @@
       const setSpeechState = (s) => {
         ui.speechState.textContent = s;
         if (s === 'speechstart') {
-          ui.statusEmoji.textContent = '🎤';
+          ui.dot.classList.add('talking');
         }
         if (s === 'speechend' && isRecognizing) {
-          ui.statusEmoji.textContent = '🟢';
+          ui.dot.classList.remove('talking');
         }
       };
 
