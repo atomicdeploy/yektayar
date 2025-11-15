@@ -3,4 +3,3 @@
 // The backend should NOT import from this file
 
 export { default as ErrorScreen } from './components/ErrorScreen.vue'
-export { default as ErrorScreenMobile } from './components/ErrorScreenMobile.vue'

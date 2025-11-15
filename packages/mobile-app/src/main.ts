@@ -5,7 +5,7 @@ import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
 import config from './config'
-import { ErrorScreenMobile } from '@yektayar/shared/components'
+import { ErrorScreen } from '@yektayar/shared/components'
 import { parseSolutionsMarkdown, findSolutionForError, validateApi } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { logger } from '@yektayar/shared'
@@ -167,7 +167,7 @@ async function initializeApp() {
       }
       
     // Create and mount error screen
-      const errorApp = createApp(ErrorScreenMobile, {
+      const errorApp = createApp(ErrorScreen, {
         title: 'API Configuration Error',
         message: 'Cannot start the application due to API configuration issues.',
         details: validationResult.error,

@@ -1,40 +1,50 @@
 <template>
-  <div class="error-screen" :class="{ 'dark-mode': isDarkMode }" :dir="direction">
-    <div class="error-container">
-      <div class="error-icon">❌</div>
-      <h1 class="error-title">{{ t('error_screen.api_config_error') }}</h1>
-      <p class="error-message">{{ t('error_screen.cannot_start') }}</p>
-      
-      <div v-if="isDevelopment && details" class="error-section">
-        <h3 class="section-title">{{ t('error_screen.details') }}</h3>
-        <div class="error-details">
-          <p>{{ translatedDetails }}</p>
-        </div>
-      </div>
-
-      <div v-if="isDevelopment && showSolution" class="error-section">
-        <button @click="toggleSolution" class="solution-toggle">
-          {{ solutionExpanded ? t('error_screen.hide_solution') : t('error_screen.show_solution') }}
-          <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
-        </button>
+  <component :is="isMobile ? 'ion-page' : 'div'" :class="isMobile ? '' : 'error-screen'">
+    <component 
+      :is="isMobile ? 'ion-content' : 'div'" 
+      :class="[isMobile ? 'error-content' : '', { 'dark-mode': isDarkMode }]"
+    >
+      <div class="error-container" :dir="direction">
+        <div class="error-icon">❌</div>
+        <h1 class="error-title">{{ t('error_screen.api_config_error') }}</h1>
+        <p class="error-message">{{ t('error_screen.cannot_start') }}</p>
         
-        <div v-if="solutionExpanded" class="solution-content">
-          <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
-
-          <p v-if="currentSolution && currentSolution?.solution" class="solution-text">{{ currentSolution.solution }}</p>
-
-          <div v-for="(step, index) in (currentSolution?.steps || [])" :key="index" class="code-block">
-            <code>{{ step }}</code>
+        <div v-if="isDevelopment && details" class="error-section">
+          <h3 class="section-title">{{ t('error_screen.details') }}</h3>
+          <div class="error-details">
+            <p>{{ translatedDetails }}</p>
           </div>
+        </div>
 
-          <p v-if="currentSolution && currentSolution?.note" class="solution-note">
-            <span class="info-icon">ℹ️</span>
-            <span class="note-text">{{ currentSolution.note }}</span>
-          </p>
+        <div v-if="isDevelopment && showSolution" class="error-section">
+          <component 
+            :is="isMobile ? 'ion-button' : 'button'"
+            :expand="isMobile ? 'block' : undefined"
+            @click="toggleSolution" 
+            class="solution-toggle"
+          >
+            {{ solutionExpanded ? t('error_screen.hide_solution') : t('error_screen.show_solution') }}
+            <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
+          </component>
+          
+          <div v-if="solutionExpanded" class="solution-content">
+            <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
+
+            <p v-if="currentSolution && currentSolution?.solution" class="solution-text">{{ currentSolution.solution }}</p>
+
+            <div v-for="(step, index) in (currentSolution?.steps || [])" :key="index" class="code-block">
+              <code>{{ step }}</code>
+            </div>
+
+            <p v-if="currentSolution && currentSolution?.note" class="solution-note">
+              <span class="info-icon">ℹ️</span>
+              <span class="note-text">{{ currentSolution.note }}</span>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+    </component>
+  </component>
 </template>
 
 <script setup lang="ts">
@@ -60,6 +70,14 @@ const { t, locale } = useI18n()
 
 const solutionExpanded = ref(false)
 const isDarkMode = ref(false)
+
+// Detect if running in mobile (Ionic) context
+const isMobile = computed(() => {
+  // Check if Ionic components are available globally
+  return typeof window !== 'undefined' && 
+         'customElements' in window && 
+         customElements.get('ion-app') !== undefined
+})
 
 const isDevelopment = computed(() => {
   return import.meta.env.MODE === 'development' || import.meta.env.DEV
@@ -104,6 +122,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* Web (non-mobile) styles */
 .error-screen {
   position: fixed;
   top: 0;
@@ -122,6 +141,15 @@ onMounted(() => {
   background: #1a1a1a;
 }
 
+/* Mobile (Ionic) styles */
+.error-content {
+  --background: #f8f9fa;
+}
+
+.error-content.dark-mode {
+  --background: #1a1a1a;
+}
+
 .error-container {
   display: flex;
   flex-direction: column;
@@ -130,6 +158,12 @@ onMounted(() => {
   padding: 2rem;
   max-width: 700px;
   width: 100%;
+}
+
+/* Mobile-specific: add centering */
+ion-content .error-container {
+  justify-content: center;
+  min-height: 100vh;
 }
 
 .error-icon {
@@ -155,6 +189,11 @@ onMounted(() => {
   line-height: 1.6;
 }
 
+/* Mobile-specific: max-width for message */
+ion-content .error-message {
+  max-width: 600px;
+}
+
 .dark-mode .error-message {
   color: #d0d0d0;
 }
@@ -162,6 +201,11 @@ onMounted(() => {
 .error-section {
   width: 100%;
   margin-top: 1.5rem;
+}
+
+/* Mobile-specific: max-width for sections */
+ion-content .error-section {
+  max-width: 600px;
 }
 
 .section-title {
@@ -202,7 +246,8 @@ onMounted(() => {
   color: #b0b0b0;
 }
 
-.solution-toggle {
+/* Web button styles */
+button.solution-toggle {
   width: 100%;
   padding: 0.75rem 1rem;
   background: #007bff;
@@ -219,20 +264,30 @@ onMounted(() => {
   margin-bottom: 1rem;
 }
 
-.solution-toggle:hover {
+button.solution-toggle:hover {
   background: #0056b3;
 }
 
-.dark-mode .solution-toggle {
+.dark-mode button.solution-toggle {
   background: #0d6efd;
 }
 
-.dark-mode .solution-toggle:hover {
+.dark-mode button.solution-toggle:hover {
   background: #0a58ca;
+}
+
+/* Mobile button styles */
+ion-button.solution-toggle {
+  margin-bottom: 1rem;
 }
 
 .toggle-icon {
   font-size: 0.875rem;
+}
+
+/* Mobile-specific: add margin for icon */
+ion-button .toggle-icon {
+  margin-inline-start: 0.5rem;
 }
 
 .solution-content {
