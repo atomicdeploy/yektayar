@@ -4,7 +4,7 @@ This guide helps you quickly test the session acquisition functionality.
 
 ## Prerequisites
 
-- Node.js >= 18.0.0
+- Node.js >= 20.19.0
 - npm >= 9.0.0
 - Bun >= 1.0.0 (for backend, or use Node.js)
 
