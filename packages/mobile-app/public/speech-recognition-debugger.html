@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SpeechRecognition Debugger — Continuous + Interim</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b1220;
+      --card: #111827cc;
+      --card-strong: #0f172acc;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --brand: #7c3aed;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --border: #27324a;
+      --chip: #1f2937;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #1e293b 0%, transparent 55%),
+        radial-gradient(1200px 800px at 110% 0%, #0ea5e980 0%, transparent 40%),
+        linear-gradient(180deg, #0b1220 0%, #0b1220 100%);
+      background-color:var(--bg);
+    }
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:32px 20px 56px;
+    }
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:12px;
+      background: conic-gradient(from 160deg, #8b5cf6, #06b6d4, #22d3ee, #8b5cf6);
+      box-shadow:0 0 0 2px #a78bfa30, 0 10px 30px #7c3aed40 inset;
+    }
+    h1{font-size:20px;margin:0;font-weight:700;letter-spacing:0.2px}
+    .sub{font-size:12px;color:var(--muted)}
+    .card{
+      background:linear-gradient(180deg, var(--card) 0%, var(--card-strong) 100%);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 10px 30px #0006;
+      overflow:hidden;
+    }
+    .grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr;}}
+    .section{padding:16px;}
+    .section + .section{border-top:1px solid var(--border)}
+    .controls{display:flex;flex-wrap:wrap;gap:12px}
+    .control{
+      background:var(--chip);border:1px solid var(--border);
+      border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;
+    }
+    label{font-size:12px;color:var(--muted)}
+    select,input[type="text"]{
+      background:#0b1324;border:1px solid var(--border);color:var(--text);
+      padding:8px 10px;border-radius:10px;outline:none;min-width:160px;
+    }
+    .tog{
+      display:inline-flex;gap:8px;align-items:center;background:#0b1324;border:1px solid var(--border);padding:6px 10px;border-radius:10px;
+      cursor:pointer;user-select:none;
+    }
+    .tog input{appearance:none;width:16px;height:16px;border-radius:4px;border:1px solid #475569;background:#0b1324;display:inline-block;vertical-align:middle;position:relative}
+    .tog input:checked{background:linear-gradient(180deg, #22d3ee, #7c3aed);border-color:#7c3aed}
+    .btnbar{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{
+      background:#111827;border:1px solid var(--border);color:var(--text);
+      padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer;
+      transition:transform .05s ease, border-color .2s ease, background .2s ease;
+    }
+    .btn:hover{border-color:#334155;background:#0b1324}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{
+      background:linear-gradient(180deg,#7c3aed,#6d28d9);
+      border-color:#8b5cf6;
+      box-shadow:0 8px 20px #7c3aed50 inset, 0 10px 30px #7c3aed30;
+    }
+    .btn.danger{background:#1f2937;border-color:#7f1d1d;color:#fecaca}
+    .status{
+      display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)
+    }
+    .dot{width:10px;height:10px;border-radius:50%;background:#64748b;border:1px solid #334155;box-shadow:0 0 0 2px #0003 inset}
+    .dot.live{background:var(--ok);box-shadow:0 0 16px #10b981a0}
+    .dot.talking{background:#22d3ee;box-shadow:0 0 16px #22d3eea0}
+    .dot.err{background:var(--err)}
+    .transcript{
+      background:#0b1324;border:1px dashed #334155;border-radius:12px;padding:12px;min-height:80px;
+      line-height:1.6
+    }
+    .interim{color:#9ca3af}
+    .final{color:#e5e7eb}
+    .panel-title{font-size:13px;color:#a5b4fc;margin:0 0 8px;font-weight:700;letter-spacing:.3px}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;font-size:12px;
+      padding:6px 10px;border-radius:999px;background:#0b1324;border:1px solid var(--border);color:var(--muted)
+    }
+    .kv{display:grid;grid-template-columns:100px 1fr;gap:8px;font-size:12px;color:var(--muted)}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12px}
+    .log{
+      background:#070d1a;border:1px solid var(--border);border-radius:12px;padding:8px;max-height:240px;overflow:auto
+    }
+    .log .row{display:flex;gap:8px;padding:6px 6px;border-bottom:1px dashed #1f2937}
+    .log .row:last-child{border-bottom:none}
+    .log .t{color:#6ee7b7}
+    .log .k{color:#60a5fa}
+    .log .v{color:#e5e7eb}
+    .small{font-size:12px;color:var(--muted)}
+    footer{margin-top:16px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .warn{color:#fbbf24}
+    .errtxt{color:#fecaca}
+    .success{color:#a7f3d0}
+    .copy{
+      background:#0b1324;border:1px solid var(--border);color:#93c5fd;font-size:12px;padding:8px 10px;border-radius:8px;cursor:pointer
+    }
+    .grow{flex:1}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>SpeechRecognition Debugger</h1>
+          <div class="sub">Test continuous and interim results in the Web Speech API (Mobile-Optimized)</div>
+        </div>
+      </div>
+      <div class="status" id="status">
+        <span class="dot" id="dot"></span>
+        <span id="stateText">Idle</span>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="section grid">
+        <div class="left">
+          <div class="controls" aria-label="Recognition controls">
+            <div class="control">
+              <label for="lang">Language</label>
+              <select id="lang" title="Recognition language">
+                <option value="en-US">English (US)</option>
+                <option value="en-GB">English (UK)</option>
+                <option value="es-ES">Español (ES)</option>
+                <option value="fr-FR">Français (FR)</option>
+                <option value="de-DE">Deutsch (DE)</option>
+                <option value="it-IT">Italiano (IT)</option>
+                <option value="pt-BR">Português (BR)</option>
+                <option value="fa-IR">Persian (FA)</option>
+                <option value="ja-JP">日本語 (JP)</option>
+                <option value="ko-KR">한국어 (KR)</option>
+                <option value="zh-CN">中文 (简体)</option>
+              </select>
+            </div>
+            <label class="tog"><input type="checkbox" id="interim" checked /> interimResults</label>
+            <label class="tog"><input type="checkbox" id="continuous" checked /> continuous</label>
+            <label class="tog"><input type="checkbox" id="autorestart" checked /> Auto-restart on end</label>
+            <div class="control">
+              <label for="alt">Alternatives</label>
+              <select id="alt">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+          <div class="btnbar">
+            <button class="btn primary" id="startBtn">Start Listening</button>
+            <button class="btn" id="stopBtn">Stop</button>
+            <button class="btn" id="clearBtn">Clear</button>
+            <button class="copy" id="copyBtn" title="Copy final transcript">Copy Transcript</button>
+            <span class="pill" id="permPill">Permission: <strong style="margin-left:6px" id="permLabel">unknown</strong></span>
+            <span class="pill" id="devicePill">Device: <strong style="margin-left:6px" id="deviceLabel">detecting...</strong></span>
+          </div>
+
+          <div style="height:16px"></div>
+          <div>
+            <p class="panel-title">Live Transcript</p>
+            <div class="transcript" aria-live="polite">
+              <span class="final" id="finalText"></span>
+              <span class="interim" id="interimText"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="kv">
+            <div>Engine</div><div id="engine" class="mono"></div>
+            <div>State</div><div id="state" class="mono">idle</div>
+            <div>Speech</div><div id="speechState" class="mono">none</div>
+            <div>Results</div><div class="mono"><span id="finalCount">0</span> final, <span id="interimCount">0</span> interim updates</div>
+          </div>
+          <div style="height:12px"></div>
+          <p class="panel-title">Event Log</p>
+          <div class="log mono" id="log" role="log" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="section small">
+        Notes:
+        <ul>
+          <li>interimResults=true streams partial (non-final) text; finalize when result.isFinal is true.</li>
+          <li>continuous=true attempts to keep listening beyond the first utterance. Browsers may still end sessions; Auto-restart can help.</li>
+          <li><strong>Mobile Fix:</strong> Results with confidence=0 are treated as interim, not final. On mobile, final/interim handling resets per result.</li>
+          <li>Works best in Chromium-based browsers. Safari/Firefox support is limited.</li>
+          <li>Must be started from a user gesture (e.g., Start button).</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      <div>Built for testing and debugging the Web Speech API (Mobile-Optimized).</div>
+      <div id="supportMsg"></div>
+    </footer>
+  </div>
+
+  <script>
+    (function(){
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const ui = {
+        dot: document.getElementById('dot'),
+        stateText: document.getElementById('stateText'),
+        engine: document.getElementById('engine'),
+        state: document.getElementById('state'),
+        speechState: document.getElementById('speechState'),
+        finalText: document.getElementById('finalText'),
+        interimText: document.getElementById('interimText'),
+        finalCount: document.getElementById('finalCount'),
+        interimCount: document.getElementById('interimCount'),
+        log: document.getElementById('log'),
+        permPill: document.getElementById('permPill'),
+        permLabel: document.getElementById('permLabel'),
+        devicePill: document.getElementById('devicePill'),
+        deviceLabel: document.getElementById('deviceLabel'),
+        supportMsg: document.getElementById('supportMsg'),
+        startBtn: document.getElementById('startBtn'),
+        stopBtn: document.getElementById('stopBtn'),
+        clearBtn: document.getElementById('clearBtn'),
+        copyBtn: document.getElementById('copyBtn'),
+        lang: document.getElementById('lang'),
+        interim: document.getElementById('interim'),
+        continuous: document.getElementById('continuous'),
+        autorestart: document.getElementById('autorestart'),
+        alt: document.getElementById('alt'),
+      };
+
+      // Mobile/Tablet detection
+      const isMobileOrTablet = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+      
+      ui.deviceLabel.textContent = isMobileOrTablet ? 'Mobile/Tablet' : 'Desktop';
+
+      // Feature detection
+      if (!SpeechRecognition) {
+        ui.supportMsg.innerHTML = '<span class="warn">Your browser does not support the Web Speech API SpeechRecognition. Try Chrome or Edge.</span>';
+        ui.stateText.textContent = 'Unsupported';
+        ui.dot.classList.add('err');
+        return;
+      }
+      ui.engine.textContent = (window.SpeechRecognition ? 'SpeechRecognition' : 'webkitSpeechRecognition') + ' (client-side)';
+      ui.supportMsg.innerHTML = '<span class="success">API detected.</span>';
+
+      let recognition = null;
+      let isRecognizing = false;
+      let userWantsListening = false; // tracks user's intent
+      let interimUpdates = 0;
+      let finalSegments = 0;
+      let pendingRestartTimer = null;
+
+      const log = (type, data) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const t = document.createElement('div');
+        t.className = 't';
+        t.textContent = '[' + new Date().toLocaleTimeString() + '] ' + type;
+        const v = document.createElement('div');
+        v.className = 'v';
+        v.textContent = data || '';
+        row.appendChild(t);
+        row.appendChild(v);
+        ui.log.appendChild(row);
+        ui.log.scrollTop = ui.log.scrollHeight;
+      };
+
+      const setState = (state) => {
+        ui.state.textContent = state;
+        switch (state) {
+          case 'listening':
+            ui.dot.classList.remove('err'); ui.dot.classList.add('live'); ui.stateText.textContent = 'Listening...';
+            break;
+          case 'idle':
+            ui.dot.classList.remove('live','talking','err'); ui.stateText.textContent = 'Idle';
+            break;
+          case 'error':
+            ui.dot.classList.remove('live','talking'); ui.dot.classList.add('err'); ui.stateText.textContent = 'Error';
+            break;
+        }
+      };
+
+      const setSpeechState = (s) => {
+        ui.speechState.textContent = s;
+        if (s === 'speechstart') ui.dot.classList.add('talking');
+        if (s === 'speechend') ui.dot.classList.remove('talking');
+      };
+
+      const updateCounts = () => {
+        ui.finalCount.textContent = finalSegments;
+        ui.interimCount.textContent = interimUpdates;
+      };
+
+      const resetTranscript = () => {
+        ui.finalText.textContent = '';
+        ui.interimText.textContent = '';
+        interimUpdates = 0;
+        finalSegments = 0;
+        updateCounts();
+      };
+
+      const applySettings = (rec) => {
+        rec.lang = ui.lang.value;
+        rec.interimResults = ui.interim.checked;
+        rec.continuous = ui.continuous.checked;
+        rec.maxAlternatives = parseInt(ui.alt.value, 10) || 1;
+      };
+
+      const ensureRecognition = () => {
+        if (recognition) return recognition;
+        recognition = new SpeechRecognition();
+        applySettings(recognition);
+
+        recognition.onstart = () => {
+          isRecognizing = true;
+          setState('listening');
+          setSpeechState('ready');
+          log('onstart');
+        };
+        recognition.onend = () => {
+          isRecognizing = false;
+          setState(userWantsListening ? 'idle' : 'idle');
+          setSpeechState('none');
+          log('onend');
+          // Auto-restart if enabled and user still wants it
+          if (userWantsListening && ui.autorestart.checked) {
+            clearTimeout(pendingRestartTimer);
+            pendingRestartTimer = setTimeout(() => {
+              if (!isRecognizing && userWantsListening) {
+                safeStart();
+              }
+            }, 250);
+          }
+        };
+        recognition.onaudiostart = () => log('onaudiostart');
+        recognition.onaudioend = () => log('onaudioend');
+        recognition.onsoundstart = () => log('onsoundstart');
+        recognition.onsoundend = () => log('onsoundend');
+        recognition.onspeechstart = () => { setSpeechState('speechstart'); log('onspeechstart'); };
+        recognition.onspeechend = () => { setSpeechState('speechend'); log('onspeechend'); };
+        recognition.onresult = (event) => {
+          let interim = '';
+          
+          // Mobile-optimized result handling
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const res = event.results[i];
+            const transcript = res[0].transcript;
+            const confidence = res[0].confidence;
+            
+            // On mobile: treat confidence=0 as interim, and handle final/interim differently
+            const isTrulyFinal = res.isFinal && confidence !== 0;
+            
+            if (isTrulyFinal) {
+              finalSegments++;
+              // On mobile: replace instead of append for final results
+              if (isMobileOrTablet) {
+                ui.finalText.textContent = transcript;
+              } else {
+                ui.finalText.textContent += (ui.finalText.textContent ? ' ' : '') + transcript;
+              }
+              log('result:final', `confidence=${confidence.toFixed(2)} text="${transcript}"`);
+            } else {
+              // On mobile: replace instead of append for interim results
+              if (isMobileOrTablet) {
+                interim = transcript;
+              } else {
+                interim += transcript;
+              }
+              if (!res.isFinal || confidence === 0) {
+                log('result:interim', `confidence=${confidence.toFixed(2)} text="${transcript}"`);
+              }
+            }
+          }
+          
+          if (interim) {
+            interimUpdates++;
+            ui.interimText.textContent = ' ' + interim;
+          } else {
+            ui.interimText.textContent = '';
+          }
+          updateCounts();
+        };
+        recognition.onnomatch = (e) => { log('onnomatch', 'No recognition match.'); };
+        recognition.onerror = (e) => {
+          const msg = e && e.error ? e.error : 'unknown';
+          log('onerror', msg);
+          ui.stateText.textContent = 'Error: ' + msg;
+          if (msg === 'not-allowed' || msg === 'service-not-allowed') {
+            ui.permLabel.textContent = 'blocked';
+            ui.permPill.style.color = '#fecaca';
+          }
+          setState('error');
+          // For transient errors, optionally retry
+          const transient = ['no-speech','aborted','network'];
+          if (userWantsListening && ui.autorestart.checked && transient.includes(msg)) {
+            clearTimeout(pendingRestartTimer);
+            pendingRestartTimer = setTimeout(() => {
+              if (!isRecognizing && userWantsListening) safeStart();
+            }, 600);
+          }
+        };
+
+        return recognition;
+      };
+
+      const safeStart = () => {
+        const rec = ensureRecognition();
+        applySettings(rec);
+        if (isRecognizing) {
+          log('start:skipped', 'Already recognizing');
+          return;
+        }
+        try {
+          rec.start();
+          log('start', `lang=${rec.lang} interim=${rec.interimResults} continuous=${rec.continuous} mobile=${isMobileOrTablet}`);
+        } catch (err) {
+          log('start:error', err && err.message ? err.message : String(err));
+        }
+      };
+
+      const safeStop = () => {
+        clearTimeout(pendingRestartTimer);
+        if (recognition && isRecognizing) {
+          try { recognition.stop(); log('stop'); } catch(e){ log('stop:error', String(e)); }
+        } else {
+          log('stop:noop', 'Not recognizing');
+        }
+      };
+
+      // Permissions hint (optional): try to probe mic permission state if supported
+      const updatePermission = async () => {
+        if (!navigator.permissions || !navigator.permissions.query) return;
+        try {
+          const p = await navigator.permissions.query({ name: 'microphone' });
+          const label = p.state;
+          ui.permLabel.textContent = label;
+          p.onchange = () => { ui.permLabel.textContent = p.state; };
+        } catch(_) {}
+      };
+      updatePermission();
+
+      // Wire controls
+      ui.startBtn.addEventListener('click', () => {
+        userWantsListening = true;
+        safeStart();
+      });
+      ui.stopBtn.addEventListener('click', () => {
+        userWantsListening = false;
+        safeStop();
+      });
+      ui.clearBtn.addEventListener('click', () => {
+        resetTranscript();
+        ui.log.innerHTML = '';
+      });
+      ui.copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(ui.finalText.textContent.trim());
+          log('clipboard', 'Final transcript copied');
+        } catch(e) {
+          log('clipboard:error', String(e));
+        }
+      });
+      ui.lang.addEventListener('change', () => {
+        if (recognition) recognition.lang = ui.lang.value;
+        log('config', 'lang=' + ui.lang.value);
+      });
+      ui.interim.addEventListener('change', () => {
+        if (recognition) recognition.interimResults = ui.interim.checked;
+        log('config', 'interimResults=' + ui.interim.checked);
+      });
+      ui.continuous.addEventListener('change', () => {
+        if (recognition) recognition.continuous = ui.continuous.checked;
+        log('config', 'continuous=' + ui.continuous.checked);
+      });
+      ui.alt.addEventListener('change', () => {
+        if (recognition) recognition.maxAlternatives = parseInt(ui.alt.value, 10) || 1;
+        log('config', 'maxAlternatives=' + ui.alt.value);
+      });
+
+      // Initialize
+      resetTranscript();
+      setState('idle');
+    })();
+  </script>
+</body>
+</html>
