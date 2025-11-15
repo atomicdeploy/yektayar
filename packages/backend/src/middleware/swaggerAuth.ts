@@ -6,7 +6,11 @@ import { Elysia } from 'elysia'
  * Only enabled in development environment - completely disabled in production
  */
 export const swaggerAuth = new Elysia()
-  .onRequest(({ request, path, set }) => {
+  .onRequest(({ request, set }) => {
+    // Get path from request URL
+    const url = new URL(request.url)
+    const path = url.pathname
+
     // Only protect swagger/api-docs routes
     if (!path.startsWith('/api-docs')) {
       return
