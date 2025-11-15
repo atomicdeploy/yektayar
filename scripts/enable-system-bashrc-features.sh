@@ -72,104 +72,50 @@ else
 fi
 
 echo ""
-echo "📦 Enabling nala wrapper for apt..."
+echo "📦 Enabling nala wrapper for apt and adding development section..."
 if ! pattern_exists "# use nala instead of apt"; then
-    # Add after command_not_found_handle function
-    insert_after "^fi$" '\n# use nala instead of apt\napt() {\n  if command -v nala >/dev/null 2>&1; then\n    command nala "$@"\n  else\n    command apt "$@"\n  fi\n}\n\nsudo() {\n  if [ "$1" = "apt" ]; then\n    shift\n    if command -v nala >/dev/null 2>&1; then\n      command sudo nala "$@"\n    else\n      command sudo apt "$@"\n    fi\n  else\n    command sudo "$@"\n  fi\n}'
-    echo "  ✅ Nala wrapper enabled"
+    # Add after command_not_found_handle function - insert everything at once in correct order
+    insert_after "^fi$" '\n# use nala instead of apt\napt() {\n  command nala "$@"\n}\n\nsudo() {\n  if [ "$1" = "apt" ]; then\n    shift\n      command sudo nala "$@"\n    else\n        command sudo "$@"\n  fi\n}\n\n###\n### Place global development bashrc\n###'
+    echo "  ✅ Nala wrapper and development section enabled"
 else
     echo "  ⏭️  Already configured"
 fi
 
 echo ""
-echo "📝 Adding global development section header..."
-if ! pattern_exists "### Place global development bashrc"; then
-    # Add section header
-    insert_after "^sudo()" '\n###\n### Place global development bashrc\n###'
-    echo "  ✅ Section header added"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🛠️  Enabling global utility aliases..."
+echo "🛠️  Adding global development features..."
 if ! pattern_exists "alias ports="; then
-    insert_after "### Place global development bashrc" '\n# aliases\nalias ports='"'"'netstat -tulnap'"'"' # show open ports'
-    echo "  ✅ Ports alias enabled"
+    # Insert all development features at once after the section header to avoid ordering issues
+    insert_after "### Place global development bashrc" '\n\n# aliases\nalias ports='"'"'netstat -tulnap'"'"' # show open ports\n\nsettitle ()\n{\n        echo -ne "\\e]2;$@\\a\\e]1;$@\\a";\n}\n\nalias incognito="unset HISTFILE; truncate -s 0 /var/log/lastlog"\n\n# human readable sizes\nalias df='"'"'df -h'"'"'\nalias du='"'"'du -h'"'"'\n\n# Create and then enter a directory\nfunction take () {\n        case "$1" in /*) :;; *) set -- "./$1";; esac\n        mkdir -p "$1"; cd "$1";\n}\n\nalias a2c="aria2c -R -c -s 16 -x 16 -k 1M -j 1 --no-file-allocation-limit=128M --check-certificate=true"\n\nexport PATH="$PATH:$HOME/.local/bin"\n\neval $(thefuck --alias fuck)\n\nexport COMPOSER_ALLOW_SUPERUSER=1'
+    echo "  ✅ All development features enabled"
 else
     echo "  ⏭️  Already configured"
 fi
 
 echo ""
-echo "🔧 Enabling settitle function..."
-if ! pattern_exists "settitle ()"; then
-    insert_after "alias ports=" '\n\nsettitle ()\n{\n        echo -ne "\\e]2;$@\\a\\e]1;$@\\a";\n}'
-    echo "  ✅ settitle() function enabled"
-else
-    echo "  ⏭️  Already configured"
+echo "⌨️  Configuring system-wide inputrc..."
+# Check if /etc/inputrc exists and configure it
+if [ ! -f /etc/inputrc ]; then
+    echo "# System-wide readline configuration" > /etc/inputrc
+    echo "  ✅ Created /etc/inputrc"
 fi
 
-echo ""
-echo "🕵️  Enabling incognito mode alias..."
-if ! pattern_exists "alias incognito="; then
-    insert_after "settitle ()" '\n\nalias incognito="unset HISTFILE; truncate -s 0 /var/log/lastlog"'
-    echo "  ✅ Incognito alias enabled"
+# Add Ctrl-Delete and Ctrl-Backspace if not already present
+if ! grep -q "shell-kill-word" /etc/inputrc 2>/dev/null; then
+    echo "" >> /etc/inputrc
+    echo "# Ctrl-Delete: delete next word" >> /etc/inputrc
+    echo '"\e[3;5~": shell-kill-word' >> /etc/inputrc
+    echo "  ✅ Added Ctrl-Delete binding to /etc/inputrc"
 else
-    echo "  ⏭️  Already configured"
+    echo "  ⏭️  Ctrl-Delete already configured"
 fi
 
-echo ""
-echo "📊 Enabling human-readable df/du..."
-if ! pattern_exists "# human readable sizes"; then
-    insert_after "alias incognito=" '\n\n# human readable sizes\nalias df='"'"'df -h'"'"'\nalias du='"'"'du -h'"'"
-    echo "  ✅ Human-readable df/du enabled"
+if ! grep -q "shell-backward-kill-word" /etc/inputrc 2>/dev/null; then
+    echo "" >> /etc/inputrc
+    echo "# Ctrl-Backspace: delete previous word" >> /etc/inputrc
+    echo '"\C-H": shell-backward-kill-word' >> /etc/inputrc
+    echo "  ✅ Added Ctrl-Backspace binding to /etc/inputrc"
 else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "📂 Enabling take() function (mkdir + cd)..."
-if ! pattern_exists "function take ()"; then
-    insert_after "alias du=" '\n\n# Create and then enter a directory\nfunction take () {\n        case "$1" in /*) :;; *) set -- "./$1";; esac\n        mkdir -p "$1"; cd "$1";\n}'
-    echo "  ✅ take() function enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "⬇️  Enabling aria2c download alias..."
-if ! pattern_exists "# aria2c download alias"; then
-    insert_after "function take ()" '\n\n# aria2c download alias\nif command -v aria2c >/dev/null 2>&1; then\n    alias a2c="aria2c -R -c -s 16 -x 16 -k 1M -j 1 --no-file-allocation-limit=128M --check-certificate=true"\nfi'
-    echo "  ✅ aria2c alias (a2c) enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🔗 Adding /root/.local/bin to PATH..."
-if ! pattern_exists 'export PATH=.*:/root/.local/bin'; then
-    insert_after "# aria2c download alias" '\n\nexport PATH="$PATH:/root/.local/bin"'
-    echo "  ✅ PATH updated with /root/.local/bin"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🚀 Enabling thefuck integration..."
-if ! pattern_exists "# thefuck integration"; then
-    insert_after 'export PATH=.*:/root/.local/bin' '\n\n# thefuck integration\nif command -v thefuck >/dev/null 2>&1; then\n    eval $(thefuck --alias fuck)\nfi'
-    echo "  ✅ thefuck integration enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🎼 Enabling Composer superuser permission..."
-if ! pattern_exists "COMPOSER_ALLOW_SUPERUSER"; then
-    insert_after "# thefuck integration" '\n\nexport COMPOSER_ALLOW_SUPERUSER=1'
-    echo "  ✅ Composer superuser permission enabled"
-else
-    echo "  ⏭️  Already configured"
+    echo "  ⏭️  Ctrl-Backspace already configured"
 fi
 
 echo ""

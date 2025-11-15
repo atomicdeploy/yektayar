@@ -68,7 +68,11 @@ YektaYar is a comprehensive mental health care platform that connects users with
 git clone https://github.com/atomicdeploy/yektayar.git
 cd yektayar
 
-# Install all dependencies
+# Run post-clone setup (recommended for first-time setup)
+# This will guide you through installing tools and configuring your environment
+bash ./scripts/post-clone-setup.sh
+
+# Or install dependencies manually:
 npm install
 
 # If you need to ensure all packages have up-to-date dependencies:
