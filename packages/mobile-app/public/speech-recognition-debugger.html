@@ -69,34 +69,89 @@
     .control{
       background:var(--chip);border:1px solid var(--border);
       border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;
+      transition:all .3s ease;
+    }
+    .control:hover{
+      border-color:#334155;transform:translateY(-1px);
     }
     label{font-size:12px;color:var(--muted)}
     select,input[type="text"]{
       background:#0b1324;border:1px solid var(--border);color:var(--text);
       padding:8px 10px;border-radius:10px;outline:none;min-width:160px;
+      transition:all .3s ease;
+    }
+    select:hover,input[type="text"]:hover{
+      border-color:#334155;
+    }
+    select:focus,input[type="text"]:focus{
+      border-color:#7c3aed;
+      box-shadow:0 0 0 3px rgba(124,58,237,0.1);
     }
     .tog{
       display:inline-flex;gap:8px;align-items:center;background:#0b1324;border:1px solid var(--border);padding:6px 10px;border-radius:10px;
-      cursor:pointer;user-select:none;
+      cursor:pointer;user-select:none;transition:all .3s ease;
     }
-    .tog input{appearance:none;width:16px;height:16px;border-radius:4px;border:1px solid #475569;background:#0b1324;display:inline-block;vertical-align:middle;position:relative}
-    .tog input:checked{background:linear-gradient(180deg, #22d3ee, #7c3aed);border-color:#7c3aed}
+    .tog:hover{
+      border-color:#334155;transform:translateY(-1px);
+    }
+    .tog input{
+      appearance:none;width:16px;height:16px;border-radius:4px;border:1px solid #475569;background:#0b1324;
+      display:inline-block;vertical-align:middle;position:relative;transition:all .3s ease;
+    }
+    .tog input:checked{
+      background:linear-gradient(180deg, #22d3ee, #7c3aed);border-color:#7c3aed;
+      box-shadow:0 0 8px rgba(124,58,237,0.5);
+    }
     .btnbar{display:flex;gap:10px;flex-wrap:wrap}
     .btn{
       background:#111827;border:1px solid var(--border);color:var(--text);
       padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer;
-      transition:transform .05s ease, border-color .2s ease, background .2s ease;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform:translateY(0);
     }
-    .btn:hover{border-color:#334155;background:#0b1324}
-    .btn:active{transform:translateY(1px)}
+    .btn:hover{
+      border-color:#334155;background:#0b1324;
+      transform:translateY(-2px);
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    }
+    .btn:active{
+      transform:translateY(0);
+      transition:all .1s ease;
+    }
     .btn.primary{
       background:linear-gradient(180deg,#7c3aed,#6d28d9);
       border-color:#8b5cf6;
       box-shadow:0 8px 20px #7c3aed50 inset, 0 10px 30px #7c3aed30;
     }
-    .btn.danger{background:#1f2937;border-color:#7f1d1d;color:#fecaca}
+    .btn.primary:hover{
+      box-shadow:0 8px 20px #7c3aed50 inset, 0 10px 30px #7c3aed30, 0 8px 16px rgba(124,58,237,0.5);
+    }
+    .btn.danger{
+      background:linear-gradient(180deg,#dc2626,#b91c1c);
+      border-color:#ef4444;
+      color:#fecaca;
+      box-shadow:0 8px 20px #dc262650 inset, 0 10px 30px #dc262630;
+    }
+    .btn.danger:hover{
+      box-shadow:0 8px 20px #dc262650 inset, 0 10px 30px #dc262630, 0 8px 16px rgba(220,38,38,0.5);
+    }
     .status{
-      display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)
+      display:flex;gap:8px;align-items:center;justify-content:center;font-size:14px;
+      color:var(--muted);padding:12px;margin-top:12px;
+      background:rgba(17,24,39,0.5);border:1px solid var(--border);
+      border-radius:12px;transition:all .3s ease;
+    }
+    .status-emoji{
+      font-size:16px;
+      transition:all .3s ease;
+      display:inline-block;
+    }
+    .status-emoji.pulse{
+      animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .8; transform: scale(1.1); }
     }
     .dot{width:10px;height:10px;border-radius:50%;background:#64748b;border:1px solid #334155;box-shadow:0 0 0 2px #0003 inset}
     .dot.live{background:var(--ok);box-shadow:0 0 16px #10b981a0}
@@ -104,7 +159,10 @@
     .dot.err{background:var(--err)}
     .transcript{
       background:#0b1324;border:1px dashed #334155;border-radius:12px;padding:12px;min-height:80px;
-      line-height:1.6
+      line-height:1.6;transition:all .3s ease;
+    }
+    .transcript.rtl{
+      direction:rtl;text-align:right;
     }
     .interim{color:#9ca3af}
     .final{color:#e5e7eb}
@@ -129,7 +187,14 @@
     .errtxt{color:#fecaca}
     .success{color:#a7f3d0}
     .copy{
-      background:#0b1324;border:1px solid var(--border);color:#93c5fd;font-size:12px;padding:8px 10px;border-radius:8px;cursor:pointer
+      background:#0b1324;border:1px solid var(--border);color:#93c5fd;font-size:12px;padding:8px 10px;border-radius:8px;cursor:pointer;
+      transition:all .3s ease;
+    }
+    .copy:hover{
+      border-color:#334155;background:#111827;transform:translateY(-1px);
+    }
+    .copy:active{
+      transform:translateY(0);
     }
     .grow{flex:1}
   </style>
@@ -143,10 +208,6 @@
           <h1>SpeechRecognition Debugger</h1>
           <div class="sub">Test continuous and interim results in the Web Speech API (Mobile-Optimized)</div>
         </div>
-      </div>
-      <div class="status" id="status">
-        <span class="dot" id="dot"></span>
-        <span id="stateText">Idle</span>
       </div>
     </header>
 
@@ -186,11 +247,16 @@
           <div style="height:12px"></div>
           <div class="btnbar">
             <button class="btn primary" id="startBtn">Start Listening</button>
-            <button class="btn" id="stopBtn">Stop</button>
             <button class="btn" id="clearBtn">Clear</button>
             <button class="copy" id="copyBtn" title="Copy final transcript">Copy Transcript</button>
             <span class="pill" id="permPill">Permission: <strong style="margin-left:6px" id="permLabel">unknown</strong></span>
             <span class="pill" id="devicePill">Device: <strong style="margin-left:6px" id="deviceLabel">detecting...</strong></span>
+          </div>
+
+          <div class="status" id="status">
+            <span>Status:</span>
+            <span class="status-emoji" id="statusEmoji">⚪</span>
+            <span id="stateText">Idle</span>
           </div>
 
           <div style="height:16px"></div>
@@ -238,8 +304,8 @@
     (function(){
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       const ui = {
-        dot: document.getElementById('dot'),
         stateText: document.getElementById('stateText'),
+        statusEmoji: document.getElementById('statusEmoji'),
         engine: document.getElementById('engine'),
         state: document.getElementById('state'),
         speechState: document.getElementById('speechState'),
@@ -254,7 +320,6 @@
         deviceLabel: document.getElementById('deviceLabel'),
         supportMsg: document.getElementById('supportMsg'),
         startBtn: document.getElementById('startBtn'),
-        stopBtn: document.getElementById('stopBtn'),
         clearBtn: document.getElementById('clearBtn'),
         copyBtn: document.getElementById('copyBtn'),
         lang: document.getElementById('lang'),
@@ -262,6 +327,18 @@
         continuous: document.getElementById('continuous'),
         autorestart: document.getElementById('autorestart'),
         alt: document.getElementById('alt'),
+        transcriptDiv: document.querySelector('.transcript'),
+      };
+
+      // RTL language detection
+      const rtlLanguages = ['fa-IR', 'ar-SA', 'he-IL', 'ur-PK'];
+      const updateTranscriptDirection = () => {
+        const isRTL = rtlLanguages.includes(ui.lang.value);
+        if (isRTL) {
+          ui.transcriptDiv.classList.add('rtl');
+        } else {
+          ui.transcriptDiv.classList.remove('rtl');
+        }
       };
 
       // Mobile/Tablet detection
@@ -274,7 +351,7 @@
       if (!SpeechRecognition) {
         ui.supportMsg.innerHTML = '<span class="warn">Your browser does not support the Web Speech API SpeechRecognition. Try Chrome or Edge.</span>';
         ui.stateText.textContent = 'Unsupported';
-        ui.dot.classList.add('err');
+        ui.statusEmoji.textContent = '🔴';
         return;
       }
       ui.engine.textContent = (window.SpeechRecognition ? 'SpeechRecognition' : 'webkitSpeechRecognition') + ' (client-side)';
@@ -306,21 +383,40 @@
         ui.state.textContent = state;
         switch (state) {
           case 'listening':
-            ui.dot.classList.remove('err'); ui.dot.classList.add('live'); ui.stateText.textContent = 'Listening...';
+            ui.statusEmoji.textContent = '🟢';
+            ui.statusEmoji.classList.add('pulse');
+            ui.stateText.textContent = 'Listening...';
+            ui.startBtn.textContent = 'Stop Listening';
+            ui.startBtn.classList.remove('primary');
+            ui.startBtn.classList.add('danger');
             break;
           case 'idle':
-            ui.dot.classList.remove('live','talking','err'); ui.stateText.textContent = 'Idle';
+            ui.statusEmoji.textContent = '⚪';
+            ui.statusEmoji.classList.remove('pulse');
+            ui.stateText.textContent = 'Idle';
+            ui.startBtn.textContent = 'Start Listening';
+            ui.startBtn.classList.remove('danger');
+            ui.startBtn.classList.add('primary');
             break;
           case 'error':
-            ui.dot.classList.remove('live','talking'); ui.dot.classList.add('err'); ui.stateText.textContent = 'Error';
+            ui.statusEmoji.textContent = '🔴';
+            ui.statusEmoji.classList.remove('pulse');
+            ui.stateText.textContent = 'Error';
+            ui.startBtn.textContent = 'Start Listening';
+            ui.startBtn.classList.remove('danger');
+            ui.startBtn.classList.add('primary');
             break;
         }
       };
 
       const setSpeechState = (s) => {
         ui.speechState.textContent = s;
-        if (s === 'speechstart') ui.dot.classList.add('talking');
-        if (s === 'speechend') ui.dot.classList.remove('talking');
+        if (s === 'speechstart') {
+          ui.statusEmoji.textContent = '🎤';
+        }
+        if (s === 'speechend' && isRecognizing) {
+          ui.statusEmoji.textContent = '🟢';
+        }
       };
 
       const updateCounts = () => {
@@ -478,12 +574,15 @@
 
       // Wire controls
       ui.startBtn.addEventListener('click', () => {
-        userWantsListening = true;
-        safeStart();
-      });
-      ui.stopBtn.addEventListener('click', () => {
-        userWantsListening = false;
-        safeStop();
+        if (isRecognizing) {
+          // Currently listening, so stop
+          userWantsListening = false;
+          safeStop();
+        } else {
+          // Currently idle, so start
+          userWantsListening = true;
+          safeStart();
+        }
       });
       ui.clearBtn.addEventListener('click', () => {
         resetTranscript();
@@ -499,6 +598,7 @@
       });
       ui.lang.addEventListener('change', () => {
         if (recognition) recognition.lang = ui.lang.value;
+        updateTranscriptDirection();
         log('config', 'lang=' + ui.lang.value);
       });
       ui.interim.addEventListener('change', () => {
@@ -515,6 +615,7 @@
       });
 
       // Initialize
+      updateTranscriptDirection();
       resetTranscript();
       setState('idle');
     })();
