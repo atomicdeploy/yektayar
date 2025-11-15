@@ -155,6 +155,8 @@ packages/backend/
 │   │   └── courses.ts
 │   ├── middleware/      # Custom middleware
 │   ├── services/        # Business logic
+│   ├── cli/             # CLI tools and TUI scripts
+│   │   └── admin-tui.ts # Backend administration TUI
 │   ├── types/           # TypeScript types
 │   ├── utils/           # Utility functions
 │   └── index.ts         # Main entry point
@@ -176,7 +178,26 @@ npm run build
 
 # Start production server
 npm start
+
+# Run administration TUI
+npm run admin:tui
 ```
+
+### CLI Tools
+
+The backend includes command-line tools for administration:
+
+**Administration TUI** (`npm run admin:tui`):
+- Direct database access (no REST API required)
+- Session management (list, view, delete, cleanup)
+- User management (list, view details)
+- System health and statistics
+- Interactive menu interface
+
+See [Backend Administration TUI Guide](BACKEND-ADMIN-TUI.md) for more details.
+
+**Note on Elysia.js and CLI:**
+Elysia.js is a web framework and does not natively support CLI commands like some frameworks (e.g., Laravel Artisan, Django management commands). The CLI tools are implemented as standalone TypeScript scripts that share code with the main application (database services, etc.) but run independently without starting the web server.
 
 ### Adding New Routes
 
@@ -514,6 +535,39 @@ npm test -w @yektayar/backend
 ### Manual Testing
 
 Use the Swagger UI or tools like Postman to test API endpoints.
+
+### Backend Administration TUI
+
+The backend includes an interactive Text User Interface (TUI) for administration tasks without requiring the web API:
+
+```bash
+# Run from root directory
+npm run admin:tui
+
+# Or from backend directory
+cd packages/backend
+npm run admin:tui
+```
+
+**Features:**
+- Session management (list, view, delete, cleanup)
+- User management (list, view details)
+- Database health checks
+- System statistics
+
+See [Backend Administration TUI Guide](BACKEND-ADMIN-TUI.md) for detailed documentation.
+
+### Testing TUI Scripts
+
+Additional TUI scripts for testing specific features:
+
+```bash
+# Test Socket.IO connectivity and real-time features
+npm run socketio:test
+
+# Test AI integration (Pollination AI)
+npm run ai:test
+```
 
 ---
 

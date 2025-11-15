@@ -218,7 +218,11 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 
-#### Testing
+#### Testing & Administration
+- **[Backend Administration TUI](BACKEND-ADMIN-TUI.md)** - Interactive CLI for session and user management
+  ```bash
+  npm run admin:tui
+  ```
 - **[Socket.IO Test Script](scripts/test-socketio.sh)** - Interactive TUI for testing Socket.IO functionality
   ```bash
   ./scripts/test-socketio.sh
@@ -252,6 +256,9 @@ This mono repo addresses all requirements from the issue:
 - `npm run lint` - Lint all packages
 - `npm run test` - Test all packages
 - `npm run clean` - Clean all build artifacts
+- `npm run admin:tui` - Backend administration TUI (session/user management)
+- `npm run socketio:test` - Socket.IO testing TUI
+- `npm run ai:test` - AI integration testing TUI
 
 ### Package-specific Scripts
 - `npm run dev:backend` - Backend only
