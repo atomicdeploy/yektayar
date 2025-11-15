@@ -67,15 +67,15 @@
               <ion-icon :icon="alertCircle"></ion-icon>
               <span>{{ errorMessage }}</span>
             </div>
-            <button class="type-instead-button" @click="typeInstead">
+            <a class="type-instead-link" @click="typeInstead">
               <ion-icon :icon="create"></ion-icon>
               بجای آن تایپ کنید
-            </button>
+            </a>
           </div>
         </div>
 
         <!-- Transcribed Text Display/Edit -->
-        <div v-if="transcriptText || isRecording || !speechRecognitionSupported" class="transcript-section">
+        <div v-if="shouldShowTextarea" class="transcript-section">
           <div class="transcript-card">
             <ion-textarea
               v-model="transcriptText"
@@ -182,10 +182,16 @@ const isSaving = ref(false)
 const transcriptText = ref('')
 const errorMessage = ref('')
 const speechRecognitionSupported = ref(true)
+const showTextarea = ref(false)
 
 // Computed progress based on current step
 const progressPercent = computed(() => {
   return Math.round((currentStep.value / TOTAL_STEPS) * 100)
+})
+
+// Watch for changes that should show the textarea
+const shouldShowTextarea = computed(() => {
+  return transcriptText.value || isRecording.value || !speechRecognitionSupported.value || showTextarea.value
 })
 
 // Web Speech API
@@ -339,8 +345,14 @@ function clearTranscript() {
 
 function typeInstead() {
   errorMessage.value = ''
-  // Show the text area by setting some initial text or just clearing error
-  // The textarea will be shown when errorMessage is cleared
+  showTextarea.value = true
+  // Focus on the textarea after a short delay to ensure it's rendered
+  setTimeout(() => {
+    const textarea = document.querySelector('.transcript-textarea')
+    if (textarea) {
+      (textarea as HTMLElement).focus()
+    }
+  }, 100)
 }
 
 const canContinue = computed(() => {
@@ -648,29 +660,35 @@ async function showAlert(header: string, message: string) {
   flex-shrink: 0;
 }
 
-.type-instead-button {
-  display: flex;
+.type-instead-link {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: white;
-  border: 1px solid var(--ion-color-danger);
-  border-radius: 8px;
-  color: var(--ion-color-danger);
+  gap: 0.4rem;
+  padding: 0.5rem 0;
+  background: transparent;
+  border: none;
+  color: var(--ion-color-primary);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-family: var(--ion-font-family);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-.type-instead-button:active {
-  transform: translateY(1px);
-  background: rgba(235, 68, 90, 0.05);
+.type-instead-link:hover {
+  color: var(--ion-color-primary-shade);
+  text-decoration-thickness: 2px;
 }
 
-.type-instead-button ion-icon {
+.type-instead-link:active {
+  transform: scale(0.98);
+  color: var(--ion-color-primary-tint);
+}
+
+.type-instead-link ion-icon {
   font-size: 18px;
 }
 
