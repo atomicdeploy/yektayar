@@ -10,7 +10,8 @@
     "build": "tsc",
     "start": "bun run dist/index.js",
     "lint": "eslint src --ext .ts",
-    "test": "npx tsx src/__tests__/swaggerAuth.manual.test.js"
+    "test": "npx tsx src/__tests__/swaggerAuth.manual.test.js",
+    "admin:tui": "npx tsx src/cli/admin-tui.ts"
   },
   "dependencies": {
     "@elysiajs/cookie": "^0.8.0",
