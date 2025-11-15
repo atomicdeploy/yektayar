@@ -18,7 +18,7 @@
           <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
         </button>
         
-        <div v-if="solutionExpanded" class="solution-content">
+        <div v-if="solutionExpanded && currentSolution" class="solution-content">
           <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
           
           <p v-if="currentSolution.solution" class="solution-text">{{ currentSolution.solution }}</p>
