@@ -2,6 +2,7 @@ import { Server as SocketIOServer } from 'socket.io'
 import type { Server as HTTPServer } from 'http'
 import type { Socket } from 'socket.io'
 import { validateSessionToken } from '../services/sessionService'
+import { SOCKET_IO_PATH } from '@yektayar/shared'
 
 // Conditionally import Bun engine only when running on Bun
 let BunEngine: any
@@ -256,7 +257,7 @@ export function setupBunSocketIO() {
   const io = new SocketIOServer()
 
   const engine = new BunEngine({
-    path: '/socket.io/',
+    path: SOCKET_IO_PATH,
     cors: {
       origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST'],
