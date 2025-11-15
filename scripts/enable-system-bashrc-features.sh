@@ -3,6 +3,8 @@
 # enable-system-bashrc-features.sh
 # Script to enable interesting features from the custom /etc/bash.bashrc
 # This script modifies the system-wide /etc/bash.bashrc (requires root)
+# Features are inserted in the appropriate locations to match the organization
+# of the original custom bashrc file.
 
 set -e
 
@@ -24,131 +26,32 @@ if [ -f /etc/bash.bashrc ]; then
     cp /etc/bash.bashrc "$BACKUP_NAME"
 fi
 
-# Function to add configuration if not already present
-add_if_missing() {
-    local marker="$1"
+# Function to check if a pattern exists in bashrc
+pattern_exists() {
+    grep -q "$1" /etc/bash.bashrc 2>/dev/null
+}
+
+# Function to insert content after a specific pattern
+insert_after() {
+    local pattern="$1"
     local content="$2"
+    local temp_file
+    temp_file=$(mktemp)
     
-    if ! grep -q "$marker" /etc/bash.bashrc 2>/dev/null; then
-        echo "$content" >> /etc/bash.bashrc
-        return 0
-    else
-        return 1
-    fi
+    awk -v pat="$pattern" -v cont="$content" '
+        {print}
+        $0 ~ pat && !found {print cont; found=1}
+    ' /etc/bash.bashrc > "$temp_file"
+    
+    mv "$temp_file" /etc/bash.bashrc
 }
 
 echo ""
 echo "⌨️  Enabling Ctrl-Backspace word deletion..."
-if add_if_missing "# Bind Ctrl-Backspace" "
-# Bind Ctrl-Backspace to remove a word
-stty werase '^H'"; then
+if ! pattern_exists "stty werase"; then
+    # Add after checkwinsize
+    insert_after "shopt -s checkwinsize" "\n# Bind Ctrl-Backspace to remove a word\nstty werase '^H'"
     echo "  ✅ Ctrl-Backspace binding enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "📦 Enabling nala wrapper for apt..."
-echo "  ℹ️  Note: This requires 'nala' to be installed (apt install nala)"
-if add_if_missing "# use nala instead of apt" "
-# use nala instead of apt
-apt() {
-  command nala \"\$@\"
-}
-
-sudo() {
-  if [ \"\$1\" = \"apt\" ]; then
-    shift
-      command sudo nala \"\$@\"
-    else
-        command sudo \"\$@\"
-  fi
-}"; then
-    echo "  ✅ Nala wrapper enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🛠️  Enabling global utility aliases..."
-if add_if_missing "# aliases - ports" "
-# aliases
-alias ports='netstat -tulnap' # show open ports"; then
-    echo "  ✅ Ports alias enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🔧 Enabling settitle function..."
-if add_if_missing "settitle ()" "
-settitle ()
-{
-        echo -ne \"\e]2;\$@\a\e]1;\$@\a\";
-}"; then
-    echo "  ✅ settitle() function enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🕵️  Enabling incognito mode alias..."
-if add_if_missing "alias incognito=" "
-alias incognito=\"unset HISTFILE; truncate -s 0 /var/log/lastlog\""; then
-    echo "  ✅ Incognito alias enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "📊 Enabling human-readable df/du..."
-if add_if_missing "# human readable sizes" "
-# human readable sizes
-alias df='df -h'
-alias du='du -h'"; then
-    echo "  ✅ Human-readable df/du enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "📂 Enabling take() function (mkdir + cd)..."
-if add_if_missing "function take ()" "
-# Create and then enter a directory
-function take () {
-        case \"\$1\" in /*) :;; *) set -- \"./\$1\";; esac
-        mkdir -p \"\$1\"; cd \"\$1\";
-}"; then
-    echo "  ✅ take() function enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "⬇️  Enabling aria2c download alias..."
-echo "  ℹ️  Note: This requires 'aria2' to be installed (apt install aria2)"
-if add_if_missing "alias a2c=" "
-alias a2c=\"aria2c -R -c -s 16 -x 16 -k 1M -j 1 --no-file-allocation-limit=128M --check-certificate=true\""; then
-    echo "  ✅ aria2c alias (a2c) enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🚀 Enabling thefuck integration..."
-echo "  ℹ️  Note: This requires 'thefuck' to be installed (apt install thefuck)"
-if add_if_missing "eval \$(thefuck --alias" "
-eval \$(thefuck --alias fuck)"; then
-    echo "  ✅ thefuck integration enabled"
-else
-    echo "  ⏭️  Already configured"
-fi
-
-echo ""
-echo "🎼 Enabling Composer superuser permission..."
-if add_if_missing "COMPOSER_ALLOW_SUPERUSER" "
-export COMPOSER_ALLOW_SUPERUSER=1"; then
-    echo "  ✅ Composer superuser permission enabled"
 else
     echo "  ⏭️  Already configured"
 fi
@@ -169,10 +72,105 @@ else
 fi
 
 echo ""
+echo "📦 Enabling nala wrapper for apt..."
+echo "  ℹ️  Note: This requires 'nala' to be installed (apt install nala)"
+if ! pattern_exists "# use nala instead of apt"; then
+    # Add after command_not_found_handle function
+    insert_after "^fi$" '\n# use nala instead of apt\napt() {\n  command nala "$@"\n}\n\nsudo() {\n  if [ "$1" = "apt" ]; then\n    shift\n      command sudo nala "$@"\n    else\n        command sudo "$@"\n  fi\n}'
+    echo "  ✅ Nala wrapper enabled"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "📝 Adding global development section header..."
+if ! pattern_exists "### Place global development bashrc"; then
+    # Add section header
+    insert_after "^sudo()" '\n###\n### Place global development bashrc\n###'
+    echo "  ✅ Section header added"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "🛠️  Enabling global utility aliases..."
+if ! pattern_exists "alias ports="; then
+    insert_after "### Place global development bashrc" '\n# aliases\nalias ports='"'"'netstat -tulnap'"'"' # show open ports'
+    echo "  ✅ Ports alias enabled"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "🔧 Enabling settitle function..."
+if ! pattern_exists "settitle ()"; then
+    insert_after "alias ports=" '\n\nsettitle ()\n{\n        echo -ne "\\e]2;$@\\a\\e]1;$@\\a";\n}'
+    echo "  ✅ settitle() function enabled"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "🕵️  Enabling incognito mode alias..."
+if ! pattern_exists "alias incognito="; then
+    insert_after "settitle ()" '\n\nalias incognito="unset HISTFILE; truncate -s 0 /var/log/lastlog"'
+    echo "  ✅ Incognito alias enabled"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "📊 Enabling human-readable df/du..."
+if ! pattern_exists "# human readable sizes"; then
+    insert_after "alias incognito=" '\n\n# human readable sizes\nalias df='"'"'df -h'"'"'\nalias du='"'"'du -h'"'"
+    echo "  ✅ Human-readable df/du enabled"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "📂 Enabling take() function (mkdir + cd)..."
+if ! pattern_exists "function take ()"; then
+    insert_after "alias du=" '\n\n# Create and then enter a directory\nfunction take () {\n        case "$1" in /*) :;; *) set -- "./$1";; esac\n        mkdir -p "$1"; cd "$1";\n}'
+    echo "  ✅ take() function enabled"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "⬇️  Enabling aria2c download alias..."
+echo "  ℹ️  Note: This requires 'aria2' to be installed (apt install aria2)"
+if ! pattern_exists "alias a2c="; then
+    insert_after "function take ()" '\n\nalias a2c="aria2c -R -c -s 16 -x 16 -k 1M -j 1 --no-file-allocation-limit=128M --check-certificate=true"'
+    echo "  ✅ aria2c alias (a2c) enabled"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
 echo "🔗 Adding /root/.local/bin to PATH..."
-if add_if_missing "export PATH=\"\$PATH:/root/.local/bin\"" "
-export PATH=\"\$PATH:/root/.local/bin\""; then
+if ! pattern_exists 'export PATH=.*:/root/.local/bin'; then
+    insert_after "alias a2c=" '\n\nexport PATH="$PATH:/root/.local/bin"'
     echo "  ✅ PATH updated with /root/.local/bin"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "🚀 Enabling thefuck integration..."
+echo "  ℹ️  Note: This requires 'thefuck' to be installed (apt install thefuck)"
+if ! pattern_exists "eval.*thefuck.*--alias"; then
+    insert_after 'export PATH=.*:/root/.local/bin' '\n\neval $(thefuck --alias fuck)'
+    echo "  ✅ thefuck integration enabled"
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "🎼 Enabling Composer superuser permission..."
+if ! pattern_exists "COMPOSER_ALLOW_SUPERUSER"; then
+    insert_after "eval.*thefuck" '\n\nexport COMPOSER_ALLOW_SUPERUSER=1'
+    echo "  ✅ Composer superuser permission enabled"
 else
     echo "  ⏭️  Already configured"
 fi

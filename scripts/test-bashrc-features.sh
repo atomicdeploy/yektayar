@@ -44,11 +44,36 @@ echo "Test 3: Testing user script functionality..."
 TEST_HOME=$(mktemp -d)
 export HOME="${TEST_HOME}"
 
-# Create a minimal bashrc
-cat > "${TEST_HOME}/.bashrc" << 'EOF'
-# Test bashrc
-[ -z "$PS1" ] && return
+# Create a bashrc from the system template (vanilla Ubuntu)
+if [ -f /etc/skel/.bashrc ]; then
+    cp /etc/skel/.bashrc "${TEST_HOME}/.bashrc"
+else
+    # Fallback to minimal bashrc if /etc/skel doesn't exist
+    cat > "${TEST_HOME}/.bashrc" << 'EOF'
+# ~/.bashrc: executed by bash(1) for non-login shells.
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+HISTCONTROL=ignoreboth
+shopt -s histappend
+HISTSIZE=1000
+HISTFILESIZE=2000
+shopt -s checkwinsize
+
+if [ -x /usr/bin/dircolors ]; then
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+fi
+
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
 EOF
+fi
 
 # Run the script
 if bash "${USER_SCRIPT}" > /dev/null 2>&1; then
@@ -63,19 +88,39 @@ fi
 echo ""
 echo "Test 4: Verifying features were added to bashrc..."
 FEATURES_TO_CHECK=(
-    "Custom colorful prompt"
-    "Enhanced ls aliases"
-    "Ctrl-Backspace"
-    "diskspace"
-    "LESSCHARSET"
-    "HISTCONTROL"
+    "HISTCONTROL=ignoredups:ignorespace"
+    "stty werase"
+    "force_color_prompt=yes"
+    'export PS1=.*01;31m.*@.*01;34m'
+    "alias ls='ls -GNhp --color=auto'"
+    "alias ll='ls -alh'"
+    "alias l\.=.*ls -d"
+    "alias diskspace="
+    "alias folders="
+    "alias ip='ip -c'"
+    "export LESSCHARSET"
 )
 
-for feature in "${FEATURES_TO_CHECK[@]}"; do
-    if grep -q "${feature}" "${TEST_HOME}/.bashrc"; then
-        echo "✓ Found: ${feature}"
+FEATURE_NAMES=(
+    "History control (ignoredups:ignorespace)"
+    "Ctrl-Backspace binding"
+    "force_color_prompt"
+    "Colorful PS1 prompt"
+    "Enhanced ls with -GNhp"
+    "ll alias"
+    "l. alias (hidden files)"
+    "diskspace alias"
+    "folders alias"
+    "ip color alias"
+    "LESSCHARSET"
+)
+
+for i in "${!FEATURES_TO_CHECK[@]}"; do
+    if grep -qE "${FEATURES_TO_CHECK[$i]}" "${TEST_HOME}/.bashrc"; then
+        echo "✓ Found: ${FEATURE_NAMES[$i]}"
     else
-        echo "❌ FAILED: Missing feature: ${feature}"
+        echo "❌ FAILED: Missing feature: ${FEATURE_NAMES[$i]}"
+        echo "   Pattern: ${FEATURES_TO_CHECK[$i]}"
         rm -rf "${TEST_HOME}"
         exit 1
     fi
@@ -86,7 +131,7 @@ echo ""
 echo "Test 5: Testing idempotency (running script twice)..."
 bash "${USER_SCRIPT}" > /tmp/test_output_2.txt 2>&1
 
-if grep -q "Already configured" /tmp/test_output_2.txt; then
+if grep -qE "Already configured|⏭️" /tmp/test_output_2.txt; then
     echo "✓ PASSED: Script is idempotent (detects existing features)"
 else
     echo "❌ FAILED: Script should detect already configured features"
@@ -110,11 +155,11 @@ fi
 # Test 7: Verify no duplicate entries after multiple runs
 echo ""
 echo "Test 7: Verifying no duplicate entries..."
-PROMPT_COUNT=$(grep -c "Custom colorful prompt" "${TEST_HOME}/.bashrc")
-if [ "${PROMPT_COUNT}" -eq 1 ]; then
-    echo "✓ PASSED: No duplicate entries (prompt marker appears once)"
+PS1_COUNT=$(grep -c 'export PS1=.*01;31m.*@.*01;34m' "${TEST_HOME}/.bashrc")
+if [ "${PS1_COUNT}" -eq 1 ]; then
+    echo "✓ PASSED: No duplicate entries (colorful PS1 appears once)"
 else
-    echo "❌ FAILED: Found ${PROMPT_COUNT} instances of prompt marker (should be 1)"
+    echo "❌ FAILED: Found ${PS1_COUNT} instances of colorful PS1 (should be 1)"
     rm -rf "${TEST_HOME}"
     exit 1
 fi
