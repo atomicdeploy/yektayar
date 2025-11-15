@@ -166,7 +166,8 @@ if (isBun) {
     console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
   }
   
-  console.log(`✅ Socket.IO enabled on same port (${port})`)
+  // TODO: these are also duplicated below, refactor later
+  console.log(`✅ Socket.IO enabled`)
 
   // TODO: complete custom startup logs
   // console.log(`⚠️ WARNING: `)
@@ -245,7 +246,8 @@ if (isBun) {
       console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
     }
     
-    console.log(`✅ Socket.IO enabled on same port (${port})`)
+    // TODO: these are duplicate logs from above, refactor later
+    console.log(`✅ Socket.IO enabled`)
     // TODO: complete custom startup logs
   })
 }
