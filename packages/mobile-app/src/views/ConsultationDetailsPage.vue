@@ -67,15 +67,15 @@
               <ion-icon :icon="alertCircle"></ion-icon>
               <span>{{ errorMessage }}</span>
             </div>
-            <a class="type-instead-link" @click="typeInstead">
+            <button class="type-instead-button" @click="typeInstead">
               <ion-icon :icon="create"></ion-icon>
               بجای آن تایپ کنید
-            </a>
+            </button>
           </div>
         </div>
 
         <!-- Transcribed Text Display/Edit -->
-        <div v-if="shouldShowTextarea" class="transcript-section">
+        <div v-if="transcriptText || isRecording || !speechRecognitionSupported" class="transcript-section">
           <div class="transcript-card">
             <ion-textarea
               v-model="transcriptText"
@@ -182,28 +182,23 @@ const isSaving = ref(false)
 const transcriptText = ref('')
 const errorMessage = ref('')
 const speechRecognitionSupported = ref(true)
-const showTextarea = ref(false)
 
 // Computed progress based on current step
 const progressPercent = computed(() => {
   return Math.round((currentStep.value / TOTAL_STEPS) * 100)
 })
 
-// Watch for changes that should show the textarea
-const shouldShowTextarea = computed(() => {
-  return transcriptText.value || isRecording.value || !speechRecognitionSupported.value || showTextarea.value
-})
-
-// Web Speech API - Not working correctly
+// Web Speech API
 let recognition: any = null
-// Store the base text before starting recording
-let baseText = ''
+// Store finalized transcript separately from what's displayed
+let finalizedTranscript = ''
 
-// Computed properties for RTL support based on locale
+// Computed property for arrow icon based on locale
 const continueArrowIcon = computed(() => {
   return locale.value === 'fa' ? arrowBack : arrowForward
 })
 
+// Computed property for icon slot position based on locale
 const iconSlot = computed(() => {
   return locale.value === 'fa' ? 'end' : 'start'
 })
@@ -234,52 +229,38 @@ function initializeSpeechRecognition() {
   recognition.continuous = true
   recognition.interimResults = true
   
-  // Set language dynamically based on current locale
-  recognition.lang = locale.value === 'fa' ? 'fa-IR' : 'en-US'
+  // Set language based on current locale
+  const langCode = locale.value === 'fa' ? 'fa-IR' : 'en-US'
+  recognition.lang = langCode
 
   recognition.onstart = () => {
     isRecording.value = true
     isProcessing.value = false
     errorMessage.value = ''
-    // Store current text as base for this recording session
-    baseText = transcriptText.value
+    // Store the current text as the starting point for this recording session
+    finalizedTranscript = transcriptText.value
   }
 
   recognition.onresult = (event: any) => {
-    // Rebuild the complete transcript from scratch each time
-    // This prevents duplicates because we're not accumulating
-    let finalText = ''
-    let interimText = ''
+    // Build transcript from results
+    let interimTranscript = ''
 
-    // Debug logging (can be removed in production)
-    console.log('[Speech Recognition] onresult fired', {
-      resultIndex: event.resultIndex,
-      totalResults: event.results.length,
-      baseText: baseText.substring(0, 50) + '...'
-    })
-
-    // Process ALL results to build complete state
-    for (let i = 0; i < event.results.length; i++) {
+    // Process only new results starting from resultIndex
+    for (let i = event.resultIndex; i < event.results.length; i++) {
       const transcript = event.results[i][0].transcript
-      const isFinal = event.results[i].isFinal
       
-      console.log(`  [${i}] ${isFinal ? 'FINAL' : 'interim'}: "${transcript}"`)
-      
-      if (isFinal) {
-        // Add to final text (rebuilding from all final results)
-        finalText += transcript + ' '
+      if (event.results[i].isFinal) {
+        // Add final results to the finalized storage
+        finalizedTranscript += transcript + ' '
       } else {
-        // Accumulate only non-final (interim) results for live preview
-        interimText += transcript
+        // Accumulate interim results to show live feedback
+        interimTranscript += transcript
       }
     }
 
-    console.log('  Final:', finalText)
-    console.log('  Interim:', interimText)
-    console.log('  Display will be:', (baseText + finalText + interimText).substring(0, 100) + '...')
-
-    // SET display to base + final + interim 
-    transcriptText.value = baseText + finalText + interimText
+    // IMPORTANT: SET the display value (don't append!)
+    // This shows finalized text + current interim text for live feedback
+    transcriptText.value = finalizedTranscript + interimTranscript
   }
 
   recognition.onerror = (event: any) => {
@@ -302,8 +283,8 @@ function initializeSpeechRecognition() {
   }
 
   recognition.onend = () => {
-    // When recording ends, keep the final text (interim already removed by last onresult)
-    // No need to update transcriptText here as it's already set correctly
+    // When recording ends, ensure we only keep finalized text
+    transcriptText.value = finalizedTranscript
     
     if (isRecording.value) {
       // Restart if still recording (for continuous recording)
@@ -345,26 +326,21 @@ function stopRecording() {
   if (recognition) {
     isRecording.value = false
     recognition.stop()
-    // Text is already correctly set by last onresult
+    // Ensure we only show finalized text when stopped
+    transcriptText.value = finalizedTranscript
   }
 }
 
 function clearTranscript() {
   transcriptText.value = ''
-  baseText = ''
+  finalizedTranscript = ''
   errorMessage.value = ''
 }
 
 function typeInstead() {
   errorMessage.value = ''
-  showTextarea.value = true
-  // Focus on the textarea after a short delay to ensure it's rendered
-  setTimeout(() => {
-    const textarea = document.querySelector('.transcript-textarea')
-    if (textarea) {
-      (textarea as HTMLElement).focus()
-    }
-  }, 100)
+  // Show the text area by setting some initial text or just clearing error
+  // The textarea will be shown when errorMessage is cleared
 }
 
 const canContinue = computed(() => {
@@ -514,6 +490,7 @@ async function showAlert(header: string, message: string) {
 .question-section {
   text-align: center;
   animation: fadeIn 0.6s ease-out;
+  padding: 1rem 0;
 }
 
 .question-text {
@@ -524,6 +501,7 @@ async function showAlert(header: string, message: string) {
   margin: 0;
   direction: rtl;
   font-family: var(--ion-font-family);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Recording Section */
@@ -544,13 +522,21 @@ async function showAlert(header: string, message: string) {
   color: white;
   cursor: pointer;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 
     0 8px 24px rgba(212, 164, 62, 0.4),
     0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+  transform: scale(1);
+}
+
+.mic-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 
+    0 12px 32px rgba(212, 164, 62, 0.5),
+    0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 .mic-button:active:not(:disabled) {
@@ -634,6 +620,8 @@ async function showAlert(header: string, message: string) {
   direction: rtl;
   max-width: 350px;
   line-height: 1.5;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .error-message {
@@ -660,35 +648,29 @@ async function showAlert(header: string, message: string) {
   flex-shrink: 0;
 }
 
-.type-instead-link {
-  display: inline-flex;
+.type-instead-button {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0;
-  background: transparent;
-  border: none;
-  color: var(--ion-color-primary);
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid var(--ion-color-danger);
+  border-radius: 8px;
+  color: var(--ion-color-danger);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   font-family: var(--ion-font-family);
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
-.type-instead-link:hover {
-  color: var(--ion-color-primary-shade);
-  text-decoration-thickness: 2px;
+.type-instead-button:active {
+  transform: translateY(1px);
+  background: rgba(235, 68, 90, 0.05);
 }
 
-.type-instead-link:active {
-  transform: scale(0.98);
-  color: var(--ion-color-primary-tint);
-}
-
-.type-instead-link ion-icon {
+.type-instead-button ion-icon {
   font-size: 18px;
 }
 
@@ -703,7 +685,8 @@ async function showAlert(header: string, message: string) {
   padding: 1.5rem;
   box-shadow: var(--card-shadow);
   border: 2px solid var(--glass-border);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
 }
 
 .transcript-card:focus-within {
@@ -711,6 +694,7 @@ async function showAlert(header: string, message: string) {
   box-shadow: 
     var(--card-shadow-hover),
     0 0 0 4px rgba(212, 164, 62, 0.1);
+  transform: translateY(-2px);
 }
 
 .transcript-textarea {
@@ -748,12 +732,17 @@ async function showAlert(header: string, message: string) {
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: var(--ion-font-family);
+  transform: scale(1);
+}
+
+.action-button:hover:not(:disabled) {
+  transform: scale(1.02);
 }
 
 .action-button:active:not(:disabled) {
-  transform: translateY(2px);
+  transform: scale(0.98);
 }
 
 .action-button:disabled {
@@ -796,11 +785,17 @@ async function showAlert(header: string, message: string) {
   font-size: 1.1rem;
   direction: rtl;
   font-family: var(--ion-font-family);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.continue-button:hover:not([disabled]) {
+  --box-shadow: 0 8px 24px rgba(45, 211, 111, 0.5);
+  transform: translateY(-2px);
 }
 
 .continue-button:not([disabled]):active {
-  transform: translateY(2px);
-  --box-shadow: 0 3px 12px rgba(45, 211, 111, 0.3);
+  transform: translateY(0);
+  --box-shadow: 0 4px 16px rgba(45, 211, 111, 0.3);
 }
 
 .continue-button ion-icon,
