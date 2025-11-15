@@ -10,7 +10,7 @@ export const swaggerAuth = new Elysia()
     // Get path from request URL
     const url = new URL(request.url)
     const path = url.pathname
-    
+
     // Only protect swagger/api-docs routes
     if (!path.startsWith('/api-docs')) {
       return
