@@ -78,6 +78,7 @@ echo ""
 if command -v pgcli &> /dev/null; then
     print_success "Launching pgcli..."
     echo ""
+    export PGPASSWORD="$DB_PASSWORD"
     exec pgcli -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME"
 elif command -v psql &> /dev/null; then
     print_warning "pgcli not found, using psql as fallback"
