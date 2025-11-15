@@ -4,10 +4,9 @@ export * from './validation'
 
 /**
  * Format date for Persian (Jalali) calendar
- * Note: This is a placeholder - full Jalali implementation needed
+ * Uses the browser's built-in Intl.DateTimeFormat with fa-IR locale
  */
 export function formatPersianDate(date: Date): string {
-  // TODO: Implement proper Jalali conversion
   return date.toLocaleDateString('fa-IR')
 }
 

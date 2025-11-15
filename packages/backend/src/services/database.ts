@@ -222,6 +222,26 @@ export async function initializeDatabase() {
       )
     `
 
+    // Create OTP codes table
+    await db`
+      CREATE TABLE IF NOT EXISTS otp_codes (
+        id SERIAL PRIMARY KEY,
+        identifier VARCHAR(255) NOT NULL,
+        otp VARCHAR(10) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        attempts INTEGER DEFAULT 0,
+        is_used BOOLEAN DEFAULT false,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        used_at TIMESTAMP
+      )
+    `
+    
+    // Create index for faster OTP lookups
+    await db`
+      CREATE INDEX IF NOT EXISTS idx_otp_identifier 
+      ON otp_codes(identifier, expires_at, is_used)
+    `
+
     console.log('✅ Database tables initialized successfully')
 
     // Insert default data
