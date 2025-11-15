@@ -61,7 +61,7 @@
             </template>
           </p>
 
-          <!-- Error Message with Type Instead Button -->
+          <!-- Error Message with Type Instead option -->
           <div v-if="errorMessage" class="error-message">
             <div class="error-content">
               <ion-icon :icon="alertCircle"></ion-icon>
@@ -188,12 +188,12 @@ const progressPercent = computed(() => {
   return Math.round((currentStep.value / TOTAL_STEPS) * 100)
 })
 
-// Web Speech API - Production-grade implementation
+// Web Speech API - Not working correctly
 let recognition: any = null
 // Store the base text before starting recording
 let baseText = ''
 
-// Computed properties for RTL support
+// Computed properties for RTL support based on locale
 const continueArrowIcon = computed(() => {
   return locale.value === 'fa' ? arrowBack : arrowForward
 })
@@ -272,7 +272,7 @@ function initializeSpeechRecognition() {
     console.log('  Interim:', interimText)
     console.log('  Display will be:', (baseText + finalText + interimText).substring(0, 100) + '...')
 
-    // SET display to base + final + interim (never append!)
+    // SET display to base + final + interim 
     transcriptText.value = baseText + finalText + interimText
   }
 
