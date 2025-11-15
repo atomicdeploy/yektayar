@@ -1,0 +1,231 @@
+name: Runner Advanced Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_github_api:
+        description: 'Test GitHub API access with GH_PAT'
+        required: false
+        default: true
+        type: boolean
+      test_builds:
+        description: 'Test actual build processes'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  test-github-api:
+    if: inputs.test_github_api
+    runs-on: [self-hosted, linux, yektayar-runners]
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Test GitHub API Access
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          echo "=========================================="
+          echo "GITHUB API ACCESS TEST"
+          echo "=========================================="
+          
+          if [ -z "$GH_TOKEN" ]; then
+            echo "❌ GH_PAT secret is not configured"
+            exit 1
+          fi
+          
+          echo "✓ GH_PAT secret is available"
+          echo ""
+          
+          echo "Testing GitHub API access..."
+          RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            https://api.github.com/user)
+          
+          if echo "$RESPONSE" | grep -q "login"; then
+            echo "✓ GitHub API authentication successful"
+            echo "Authenticated as: $(echo "$RESPONSE" | grep -o '"login":"[^"]*"' | cut -d'"' -f4)"
+          else
+            echo "❌ GitHub API authentication failed"
+            echo "Response: $RESPONSE"
+            exit 1
+          fi
+          echo ""
+          
+          echo "Testing repository access..."
+          REPO_RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY")
+          
+          if echo "$REPO_RESPONSE" | grep -q "full_name"; then
+            echo "✓ Repository access successful"
+            echo "Repository: $(echo "$REPO_RESPONSE" | grep -o '"full_name":"[^"]*"' | cut -d'"' -f4)"
+          else
+            echo "❌ Repository access failed"
+            exit 1
+          fi
+          echo ""
+          
+          echo "Testing Actions API..."
+          ACTIONS_RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/runs?per_page=5")
+          
+          if echo "$ACTIONS_RESPONSE" | grep -q "workflow_runs"; then
+            echo "✓ Actions API access successful"
+            echo "Recent workflow runs:"
+            echo "$ACTIONS_RESPONSE" | grep -o '"name":"[^"]*"' | head -5 | cut -d'"' -f4
+          else
+            echo "⚠ Actions API access may be limited"
+          fi
+          echo ""
+          
+          echo "✅ All GitHub API tests passed!"
+      
+      - name: Test GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          echo "=========================================="
+          echo "GITHUB CLI TEST"
+          echo "=========================================="
+          
+          if ! command -v gh &> /dev/null; then
+            echo "⚠ GitHub CLI (gh) is not installed"
+            echo "Installing GitHub CLI..."
+            
+            # Install GitHub CLI
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install -y gh
+            
+            echo "✓ GitHub CLI installed"
+          else
+            echo "✓ GitHub CLI is already installed: $(gh --version | head -1)"
+          fi
+          echo ""
+          
+          echo "Testing GitHub CLI authentication..."
+          if gh auth status; then
+            echo "✓ GitHub CLI authenticated successfully"
+          else
+            echo "⚠ GitHub CLI authentication may need setup"
+          fi
+          echo ""
+          
+          echo "Testing repository information via gh..."
+          gh repo view "$GITHUB_REPOSITORY" --json name,description,isPrivate,defaultBranchRef || echo "Could not fetch repo info"
+          echo ""
+
+  test-build-android:
+    if: inputs.test_builds
+    runs-on: [self-hosted, linux, yektayar-runners]
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+      
+      - name: Test Dependencies Installation
+        run: |
+          echo "=========================================="
+          echo "TESTING DEPENDENCY INSTALLATION"
+          echo "=========================================="
+          npm ci --legacy-peer-deps
+          echo "✓ Dependencies installed successfully"
+          echo ""
+      
+      - name: Test Mobile App Build (Debug)
+        run: |
+          echo "=========================================="
+          echo "TESTING MOBILE APP BUILD"
+          echo "=========================================="
+          cd packages/mobile-app
+          
+          echo "Building web assets..."
+          npm run build:production
+          echo "✓ Web assets built"
+          echo ""
+          
+          echo "Syncing Capacitor..."
+          npm run cap:sync
+          echo "✓ Capacitor synced"
+          echo ""
+          
+          echo "Making gradlew executable..."
+          chmod +x android/gradlew
+          
+          echo "Testing Gradle build (this may take several minutes)..."
+          cd android
+          ./gradlew assembleDebug --info
+          
+          if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo ""
+            echo "✅ APK build successful!"
+            ls -lh app/build/outputs/apk/debug/app-debug.apk
+          else
+            echo "❌ APK build failed"
+            exit 1
+          fi
+
+  test-runner-performance:
+    runs-on: [self-hosted, linux, yektayar-runners]
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Performance Metrics
+        run: |
+          echo "=========================================="
+          echo "RUNNER PERFORMANCE METRICS"
+          echo "=========================================="
+          
+          echo "CPU Load:"
+          uptime
+          echo ""
+          
+          echo "CPU Usage:"
+          top -bn1 | head -20
+          echo ""
+          
+          echo "Memory Usage:"
+          free -h
+          echo ""
+          
+          echo "Disk I/O:"
+          iostat -x 1 2 2>/dev/null || echo "iostat not available (install sysstat package)"
+          echo ""
+          
+          echo "Network Stats:"
+          netstat -s 2>/dev/null | head -30 || ss -s
+          echo ""
+          
+          echo "Running a CPU-intensive task for 10 seconds..."
+          time dd if=/dev/zero bs=1M count=1000 | md5sum
+          echo ""
+          
+          echo "Running a disk I/O test..."
+          time dd if=/dev/zero of=/tmp/test-file bs=1M count=100 conv=fdatasync
+          rm -f /tmp/test-file
+          echo ""
+          
+          echo "✓ Performance test complete"
