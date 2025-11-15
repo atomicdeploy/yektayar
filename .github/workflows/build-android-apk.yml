@@ -1,20 +1,8 @@
 name: Build Android APK
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-    paths:
-      - 'packages/mobile-app/**'
-      - '.github/workflows/build-android-apk.yml'
-  pull_request:
-    branches:
-      - main
-      - develop
-    paths:
-      - 'packages/mobile-app/**'
-      - '.github/workflows/build-android-apk.yml'
+  # Only run on manual trigger by default to save resources
+  # Android builds are resource-intensive and should be triggered deliberately
   workflow_dispatch:
     inputs:
       build_type:
@@ -25,11 +13,30 @@ on:
         options:
           - debug
           - release
+  # Auto-run only on pushes to main/develop that modify mobile-app
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'packages/mobile-app/**'
+      - '.github/workflows/build-android-apk.yml'
+  # For PRs, only run when explicitly requested via workflow_dispatch
+  # to avoid running expensive builds on every PR update
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
 
 jobs:
   build-android:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -135,18 +142,18 @@ jobs:
           script: |
             const fs = require('fs');
             const analysis = fs.readFileSync('apk-analysis.txt', 'utf8');
-            
+
             const body = `## ✅ Android APK Built Successfully!
-            
+
             Download the artifact from the [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
-            
+
             ### APK Analysis
-            
+
             \`\`\`
             ${analysis}
             \`\`\`
             `;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
