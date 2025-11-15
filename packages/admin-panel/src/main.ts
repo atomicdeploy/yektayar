@@ -123,4 +123,14 @@ async function initializeApp() {
 // Start initialization
 initializeApp().catch((error) => {
   logger.error('Failed to initialize app:', error)
+  
+  // Show error screen if app failed to initialize
+  const errorApp = createApp(ErrorScreen, {
+    title: 'Initialization Error',
+    message: 'Failed to start the admin panel.',
+    details: error?.message || String(error)
+  })
+  
+  errorApp.use(i18n)
+  errorApp.mount('#app')
 })
