@@ -114,8 +114,8 @@
             :disabled="!canContinue || isSaving"
             class="continue-button"
           >
-            <ion-icon v-if="!isSaving" slot="start" :icon="continueArrowIcon"></ion-icon>
-            <ion-spinner v-if="isSaving" slot="start" name="crescent"></ion-spinner>
+            <ion-icon v-if="!isSaving" :slot="iconSlot" :icon="continueArrowIcon"></ion-icon>
+            <ion-spinner v-if="isSaving" :slot="iconSlot" name="crescent"></ion-spinner>
             {{ isSaving ? 'در حال ارسال...' : 'ادامه بده' }}
           </ion-button>
         </div>
@@ -188,13 +188,18 @@ const progressPercent = computed(() => {
   return Math.round((currentStep.value / TOTAL_STEPS) * 100)
 })
 
-// Web Speech API
+// Web Speech API - Not working correctly
 let recognition: any = null
-let lastProcessedIndex = 0
+// Store the base text before starting recording
+let baseText = ''
 
-// Computed property for arrow icon based on locale
+// Computed properties for RTL support based on locale
 const continueArrowIcon = computed(() => {
   return locale.value === 'fa' ? arrowBack : arrowForward
+})
+
+const iconSlot = computed(() => {
+  return locale.value === 'fa' ? 'end' : 'start'
 })
 
 // Initialize Speech Recognition
@@ -223,33 +228,52 @@ function initializeSpeechRecognition() {
   recognition.continuous = true
   recognition.interimResults = true
   
-  // Set language based on current locale
-  const langCode = locale.value === 'fa' ? 'fa-IR' : 'en-US'
-  recognition.lang = langCode
+  // Set language dynamically based on current locale
+  recognition.lang = locale.value === 'fa' ? 'fa-IR' : 'en-US'
 
   recognition.onstart = () => {
     isRecording.value = true
     isProcessing.value = false
     errorMessage.value = ''
-    lastProcessedIndex = 0
+    // Store current text as base for this recording session
+    baseText = transcriptText.value
   }
 
   recognition.onresult = (event: any) => {
-    // Build transcript from only the new results
-    let newTranscript = ''
+    // Rebuild the complete transcript from scratch each time
+    // This prevents duplicates because we're not accumulating
+    let finalText = ''
+    let interimText = ''
 
-    for (let i = lastProcessedIndex; i < event.results.length; i++) {
-      const result = event.results[i]
-      if (result.isFinal) {
-        newTranscript += result[0].transcript + ' '
-        lastProcessedIndex = i + 1
+    // Debug logging (can be removed in production)
+    console.log('[Speech Recognition] onresult fired', {
+      resultIndex: event.resultIndex,
+      totalResults: event.results.length,
+      baseText: baseText.substring(0, 50) + '...'
+    })
+
+    // Process ALL results to build complete state
+    for (let i = 0; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript
+      const isFinal = event.results[i].isFinal
+      
+      console.log(`  [${i}] ${isFinal ? 'FINAL' : 'interim'}: "${transcript}"`)
+      
+      if (isFinal) {
+        // Add to final text (rebuilding from all final results)
+        finalText += transcript + ' '
+      } else {
+        // Accumulate only non-final (interim) results for live preview
+        interimText += transcript
       }
     }
 
-    // Only append new final transcript
-    if (newTranscript) {
-      transcriptText.value += newTranscript
-    }
+    console.log('  Final:', finalText)
+    console.log('  Interim:', interimText)
+    console.log('  Display will be:', (baseText + finalText + interimText).substring(0, 100) + '...')
+
+    // SET display to base + final + interim 
+    transcriptText.value = baseText + finalText + interimText
   }
 
   recognition.onerror = (event: any) => {
@@ -272,6 +296,9 @@ function initializeSpeechRecognition() {
   }
 
   recognition.onend = () => {
+    // When recording ends, keep the final text (interim already removed by last onresult)
+    // No need to update transcriptText here as it's already set correctly
+    
     if (isRecording.value) {
       // Restart if still recording (for continuous recording)
       try {
@@ -302,7 +329,6 @@ async function toggleRecording() {
 function startRecording() {
   try {
     errorMessage.value = ''
-    lastProcessedIndex = 0
     recognition.start()
   } catch (error) {
     errorMessage.value = 'خطا در شروع ضبط. لطفا دوباره تلاش کنید'
@@ -313,19 +339,19 @@ function stopRecording() {
   if (recognition) {
     isRecording.value = false
     recognition.stop()
+    // Text is already correctly set by last onresult
   }
 }
 
 function clearTranscript() {
   transcriptText.value = ''
-  lastProcessedIndex = 0
+  baseText = ''
   errorMessage.value = ''
 }
 
 function typeInstead() {
   errorMessage.value = ''
-  // Show the text area by setting some initial text or just clearing error
-  // The textarea will be shown when errorMessage is cleared
+  // This will show the textarea for manual input
 }
 
 const canContinue = computed(() => {
