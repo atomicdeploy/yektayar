@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحه یافت نشد - YektaYar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Vazir', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 700px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-icon {
+            font-size: 120px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #30cfd0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .search-box {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .search-input {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            width: 300px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            background: #fff;
+            color: #330867;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 40px 20px; }
+            .error-code { font-size: 80px; }
+            h1 { font-size: 24px; }
+            .search-box { flex-direction: column; align-items: center; }
+            .search-input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    
+    <div class="container">
+        <div class="error-icon">🔍</div>
+        <div class="error-code">404</div>
+        <h1>صفحه یافت نشد</h1>
+        <p>متأسفانه صفحه‌ای که به دنبال آن هستید وجود ندارد یا جابجا شده است.</p>
+        
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="جستجوی صفحه..." id="searchInput">
+            <button class="btn" onclick="searchPage()">جستجو</button>
+        </div>
+        
+        <div>
+            <a href="/" class="btn">صفحه اصلی</a>
+            <a href="javascript:history.back()" class="btn">بازگشت</a>
+        </div>
+    </div>
+
+    <script>
+        // Create stars
+        const starsContainer = document.querySelector('.stars');
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.width = Math.random() * 3 + 'px';
+            star.style.height = star.style.width;
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        function searchPage() {
+            const query = document.getElementById('searchInput').value;
+            if (query) {
+                window.location.href = '/?search=' + encodeURIComponent(query);
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchPage();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطای داخلی سرور - YektaYar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Vazir', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .error-code {
+            font-size: 100px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            background: #fff;
+            color: #f5576c;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 40px 20px; }
+            .error-code { font-size: 80px; }
+            h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon">⚠️</div>
+        <div class="error-code">500</div>
+        <h1>خطای داخلی سرور</h1>
+        <p>متأسفیم، مشکلی در سرور رخ داده است. لطفاً چند لحظه دیگر دوباره تلاش کنید.</p>
+        <a href="javascript:location.reload()" class="btn">تلاش مجدد</a>
+        <a href="/" class="btn">صفحه اصلی</a>
+    </div>
+</body>
+</html>
