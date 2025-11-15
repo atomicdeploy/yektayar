@@ -4,6 +4,52 @@ This directory contains scripts and service configurations for deploying and man
 
 ## Contents
 
+### Route Management
+
+#### `list-routes.mjs`
+
+Lists all page URLs/routes for the mobile-app and admin-panel applications dynamically.
+
+**Usage:**
+```bash
+npm run list-routes [app]
+```
+
+**Options:**
+- `mobile-app` - List routes for the mobile app only
+- `admin-panel` - List routes for the admin panel only
+- `all` - List routes for all apps (default)
+- `--help` or `-h` - Show help message
+
+**Examples:**
+```bash
+# Show all routes for both applications
+npm run list-routes
+
+# Show routes for mobile app only
+npm run list-routes mobile-app
+
+# Show routes for admin panel only
+npm run list-routes admin-panel
+
+# Show help
+npm run list-routes -- --help
+```
+
+**Features:**
+- ✅ Dynamically parses TypeScript router configuration files
+- ✅ Handles nested routes and children correctly
+- ✅ Shows route path, name, title (meta), and redirects
+- ✅ Filters out layout-only routes
+- ✅ No hardcoded values - completely dynamic
+
+**Output includes:**
+- Route path
+- Route name (if defined)
+- Page title from meta (if defined)
+- Redirect target (if it's a redirect route)
+- Total count of routes per application
+
 ### Environment Management
 
 #### `manage-env.sh`
