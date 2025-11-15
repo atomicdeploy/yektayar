@@ -31,7 +31,8 @@
     "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android",
     "android:build": "npm run build:mobile && cd packages/mobile-app && npm run cap:sync && npm run android:build:debug",
     "android:analyze": "bash scripts/analyze-apk.sh",
-    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs"
+    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs",
+    "list-routes": "node scripts/list-routes.mjs"
   },
   "keywords": [
     "mental-health",
