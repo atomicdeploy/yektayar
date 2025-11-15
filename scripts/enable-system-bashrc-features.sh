@@ -95,27 +95,36 @@ echo ""
 echo "⌨️  Configuring system-wide inputrc..."
 # Check if /etc/inputrc exists and configure it
 if [ ! -f /etc/inputrc ]; then
-    echo "# System-wide readline configuration" > /etc/inputrc
-    echo "  ✅ Created /etc/inputrc"
+    if touch /etc/inputrc 2>/dev/null; then
+        echo "# System-wide readline configuration" > /etc/inputrc
+        echo "  ✅ Created /etc/inputrc"
+    else
+        echo "  ⚠️  Cannot create /etc/inputrc (permission denied), skipping"
+    fi
 fi
 
 # Add Ctrl-Delete and Ctrl-Backspace if not already present
-if ! grep -q "shell-kill-word" /etc/inputrc 2>/dev/null; then
-    echo "" >> /etc/inputrc
-    echo "# Ctrl-Delete: delete next word" >> /etc/inputrc
-    echo '"\e[3;5~": shell-kill-word' >> /etc/inputrc
-    echo "  ✅ Added Ctrl-Delete binding to /etc/inputrc"
-else
-    echo "  ⏭️  Ctrl-Delete already configured"
-fi
+if [ -f /etc/inputrc ] && [ -w /etc/inputrc ]; then
+    if ! grep -q "shell-kill-word" /etc/inputrc 2>/dev/null; then
+        echo "" >> /etc/inputrc
+        echo "# Ctrl-Delete: delete next word" >> /etc/inputrc
+        echo '"\e[3;5~": shell-kill-word' >> /etc/inputrc
+        echo "  ✅ Added Ctrl-Delete binding to /etc/inputrc"
+    else
+        echo "  ⏭️  Ctrl-Delete already configured"
+    fi
 
-if ! grep -q "shell-backward-kill-word" /etc/inputrc 2>/dev/null; then
-    echo "" >> /etc/inputrc
-    echo "# Ctrl-Backspace: delete previous word" >> /etc/inputrc
-    echo '"\C-H": shell-backward-kill-word' >> /etc/inputrc
-    echo "  ✅ Added Ctrl-Backspace binding to /etc/inputrc"
+    if ! grep -q "shell-backward-kill-word" /etc/inputrc 2>/dev/null; then
+        echo "" >> /etc/inputrc
+        echo "# Ctrl-Backspace: delete previous word" >> /etc/inputrc
+        echo '"\C-H": shell-backward-kill-word' >> /etc/inputrc
+        echo "  ✅ Added Ctrl-Backspace binding to /etc/inputrc"
+    else
+        echo "  ⏭️  Ctrl-Backspace already configured"
+    fi
 else
-    echo "  ⏭️  Ctrl-Backspace already configured"
+    echo "  ⚠️  /etc/inputrc not writable, skipping keyboard shortcuts configuration"
+    echo "  💡 You can configure ~/.inputrc instead by running enable-user-bashrc-features.sh"
 fi
 
 echo ""
