@@ -38,31 +38,31 @@ export function getVersionFromPackageJson(
 }
 
 /**
- * Gets version for frontend apps from Vite environment variables
- * The version should be injected at build time via Vite's define config
+ * Gets version from environment variables
+ * The version should be injected at build time via bundler's define config
  * 
- * Add to vite.config.ts:
+ * For Vite, add to vite.config.ts:
  * ```typescript
  * import packageJson from './package.json'
  * 
  * export default defineConfig({
  *   define: {
- *     'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version)
+ *     'import.meta.env.APP_VERSION': JSON.stringify(packageJson.version)
  *   }
  * })
  * ```
  * 
  * @returns The package version string
- * @throws Error if VITE_APP_VERSION is not set in environment
+ * @throws Error if APP_VERSION is not set in environment
  */
-export function getVitePackageVersion(): string {
-  // Type guard for Vite environment
+export function getPackageVersion(): string {
+  // Type guard for bundler environment
   const meta = import.meta as any
   if (typeof meta !== 'undefined' && 
       meta.env && 
-      'VITE_APP_VERSION' in meta.env) {
-    return meta.env.VITE_APP_VERSION as string
+      'APP_VERSION' in meta.env) {
+    return meta.env.APP_VERSION as string
   }
-  throw new Error('VITE_APP_VERSION not found in import.meta.env. Ensure vite.config.ts defines it.')
+  throw new Error('APP_VERSION not found in import.meta.env. Ensure build config defines it.')
 }
 

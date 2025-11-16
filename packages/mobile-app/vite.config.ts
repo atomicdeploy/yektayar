@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL || ''),
       'import.meta.env.SOLUTIONS_MD': JSON.stringify(solutionsContent),
-      'import.meta.env.VITE_APP_VERSION': JSON.stringify(packageJson.version)
+      'import.meta.env.APP_VERSION': JSON.stringify(packageJson.version)
     },
     server: {
       port: 8100,

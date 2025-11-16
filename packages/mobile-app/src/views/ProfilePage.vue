@@ -250,14 +250,14 @@ import {
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
-import { getVitePackageVersion } from '@yektayar/shared'
+import { getPackageVersion } from '@yektayar/shared'
 import { computed } from 'vue'
 
 const { locale } = useI18n()
 const { currentTheme, toggleTheme } = useTheme()
 
-// Get version from Vite environment variable
-const APP_VERSION = getVitePackageVersion()
+// Get version from environment variable
+const APP_VERSION = getPackageVersion()
 
 // Computed property for version display based on locale
 const versionText = computed(() => {

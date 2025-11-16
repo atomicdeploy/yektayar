@@ -6,7 +6,7 @@ import router from './router'
 import './assets/main.css'
 import config from './config'
 import { ErrorScreen } from '@yektayar/shared/components'
-import { parseSolutionsMarkdown, findSolutionForError, validateApi, getVitePackageVersion } from '@yektayar/shared'
+import { parseSolutionsMarkdown, findSolutionForError, validateApi, getPackageVersion } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
 import { messages } from './locales'
@@ -14,8 +14,8 @@ import { logger } from '@yektayar/shared'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 
-// Get version from Vite environment variable
-const APP_VERSION = getVitePackageVersion()
+// Get version from environment variable
+const APP_VERSION = getPackageVersion()
 
 // Log startup information
 logger.startup('YektaYar Admin Panel', {
