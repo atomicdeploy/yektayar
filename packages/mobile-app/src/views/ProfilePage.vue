@@ -192,7 +192,7 @@
             <ion-icon :icon="informationCircle" slot="start" color="tertiary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'درباره برنامه' : 'About App' }}</h3>
-              <p>{{ locale === 'fa' ? 'نسخه ۰.۱.۰' : 'Version 0.1.0' }}</p>
+              <p>{{ locale === 'fa' ? `نسخه ${APP_VERSION}` : `Version ${APP_VERSION}` }}</p>
             </ion-label>
           </ion-item>
 
@@ -250,6 +250,7 @@ import {
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
+import { APP_VERSION } from '@yektayar/shared'
 
 const { locale } = useI18n()
 const { currentTheme, toggleTheme } = useTheme()

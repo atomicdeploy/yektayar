@@ -6,7 +6,7 @@ import router from './router'
 import './assets/main.css'
 import config from './config'
 import { ErrorScreen } from '@yektayar/shared/components'
-import { parseSolutionsMarkdown, findSolutionForError, validateApi } from '@yektayar/shared'
+import { parseSolutionsMarkdown, findSolutionForError, validateApi, APP_VERSION } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
 import { messages } from './locales'
@@ -18,7 +18,7 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 logger.startup('YektaYar Admin Panel', {
   'API URL': config.apiBaseUrl,
   'Environment': import.meta.env.MODE || 'development',
-  'Version': '0.1.0'
+  'Version': APP_VERSION
 })
 
 // i18n configuration
