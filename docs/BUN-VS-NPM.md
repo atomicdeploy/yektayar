@@ -40,7 +40,7 @@ NPM comes with Node.js:
 # Check if npm is installed
 npm --version
 
-# If not installed, install Node.js 18+ which includes npm
+# If not installed, install Node.js 20.19+ which includes npm
 # Visit: https://nodejs.org/
 ```
 
@@ -360,7 +360,7 @@ steps:
   - name: Setup Node.js
     uses: actions/setup-node@v3
     with:
-      node-version: '18'
+      node-version: '20.19'
   
   - name: Setup Bun
     uses: oven-sh/setup-bun@v1

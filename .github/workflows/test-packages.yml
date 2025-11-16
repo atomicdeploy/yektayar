@@ -54,6 +54,7 @@ jobs:
               - 'packages/mobile-app/**'
               - 'packages/shared/**'
 
+  # Backend startup build check
   test-backend:
     name: Test Backend Startup
     runs-on: ubuntu-latest
@@ -61,7 +62,6 @@ jobs:
     if: needs.detect-changes.outputs.backend == 'true' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -69,7 +69,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20.19'
           cache: 'npm'
 
       - name: Install dependencies
@@ -114,6 +114,7 @@ jobs:
             exit 1
           fi
 
+  # Admin panel build check (main branch version)
   test-admin-panel:
     name: Test Admin Panel Build
     runs-on: ubuntu-latest
@@ -121,15 +122,14 @@ jobs:
     if: needs.detect-changes.outputs.admin-panel == 'true' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (Admin Panel)
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20.19'
           cache: 'npm'
 
       - name: Install dependencies
@@ -142,7 +142,6 @@ jobs:
           VITE_API_BASE_URL=http://localhost:3000
           VITE_ENVIRONMENT=development
           EOF
-
           npm run build:admin
 
       - name: Verify build output
@@ -157,6 +156,7 @@ jobs:
             exit 1
           fi
 
+  # Mobile app build check
   test-mobile-app:
     name: Test Mobile App Build
     runs-on: ubuntu-latest
@@ -164,15 +164,14 @@ jobs:
     if: needs.detect-changes.outputs.mobile-app == 'true' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (Mobile App)
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20.19'
           cache: 'npm'
 
       - name: Install dependencies
@@ -185,7 +184,6 @@ jobs:
           VITE_API_BASE_URL=http://localhost:3000
           VITE_ENVIRONMENT=development
           EOF
-
           npm run build:mobile
 
       - name: Verify build output
@@ -199,3 +197,34 @@ jobs:
             echo "❌ Mobile app build failed - dist directory not found"
             exit 1
           fi
+
+  # Aggregated build/lint/test job
+  test-packages:
+    name: Full Build, Lint & Test (All Packages)
+    runs-on: ubuntu-latest
+    # Optionally run always on workflow_dispatch; otherwise can run whenever any package changed.
+    needs: detect-changes
+    if: github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.backend == 'true' || needs.detect-changes.outputs.admin-panel == 'true' || needs.detect-changes.outputs.mobile-app == 'true'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (Aggregate)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Lint packages
+        run: npm run lint
+
+      - name: Test packages
+        run: npm run test

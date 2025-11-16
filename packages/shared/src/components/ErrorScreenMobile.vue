@@ -1,9 +1,6 @@
 <template>
-  <component :is="isMobile ? 'ion-page' : 'div'" :class="isMobile ? '' : 'error-screen'">
-    <component 
-      :is="isMobile ? 'ion-content' : 'div'" 
-      :class="[isMobile ? 'error-content' : '', { 'dark-mode': isDarkMode }]"
-    >
+  <ion-page>
+    <ion-content :class="['error-content', { 'dark-mode': isDarkMode }]">
       <div class="error-container" :dir="direction">
         <div class="error-icon">❌</div>
         <h1 class="error-title">{{ t('error_screen.api_config_error') }}</h1>
@@ -17,15 +14,10 @@
         </div>
 
         <div v-if="isDevelopment && showSolution" class="error-section">
-          <component 
-            :is="isMobile ? 'ion-button' : 'button'"
-            :expand="isMobile ? 'block' : undefined"
-            @click="toggleSolution" 
-            class="solution-toggle"
-          >
+          <ion-button expand="block" @click="toggleSolution" class="solution-toggle">
             {{ solutionExpanded ? t('error_screen.hide_solution') : t('error_screen.show_solution') }}
             <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
-          </component>
+          </ion-button>
           
           <div v-if="solutionExpanded && currentSolution" class="solution-content">
             <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
@@ -43,12 +35,13 @@
           </div>
         </div>
       </div>
-    </component>
-  </component>
+    </ion-content>
+  </ion-page>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { IonPage, IonContent, IonButton } from '@ionic/vue'
 import { useI18n } from 'vue-i18n'
 import type { Solution } from '../utils/solutions'
 
@@ -70,14 +63,6 @@ const { t, locale } = useI18n()
 
 const solutionExpanded = ref(false)
 const isDarkMode = ref(false)
-
-// Detect if running in mobile (Ionic) context
-const isMobile = computed(() => {
-  // Check if Ionic components are available globally
-  return typeof window !== 'undefined' && 
-         'customElements' in window && 
-         customElements.get('ion-app') !== undefined
-})
 
 const isDevelopment = computed(() => {
   return import.meta.env.MODE === 'development' || import.meta.env.DEV
@@ -122,26 +107,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Web (non-mobile) styles */
-.error-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #f8f9fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  transition: background 0.3s ease;
-}
-
-.error-screen.dark-mode {
-  background: #1a1a1a;
-}
-
-/* Mobile (Ionic) styles */
 .error-content {
   --background: #f8f9fa;
 }
@@ -154,16 +119,10 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 2rem;
-  max-width: 700px;
-  width: 100%;
-}
-
-/* Mobile-specific: add centering */
-ion-content .error-container {
   justify-content: center;
   min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
 }
 
 .error-icon {
@@ -186,12 +145,8 @@ ion-content .error-container {
   font-size: 1.125rem;
   color: #495057;
   margin-bottom: 1.5rem;
-  line-height: 1.6;
-}
-
-/* Mobile-specific: max-width for message */
-ion-content .error-message {
   max-width: 600px;
+  line-height: 1.6;
 }
 
 .dark-mode .error-message {
@@ -200,12 +155,8 @@ ion-content .error-message {
 
 .error-section {
   width: 100%;
-  margin-top: 1.5rem;
-}
-
-/* Mobile-specific: max-width for sections */
-ion-content .error-section {
   max-width: 600px;
+  margin-top: 1.5rem;
 }
 
 .section-title {
@@ -246,48 +197,13 @@ ion-content .error-section {
   color: #b0b0b0;
 }
 
-/* Web button styles */
-button.solution-toggle {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: background 0.2s ease;
-  margin-bottom: 1rem;
-}
-
-button.solution-toggle:hover {
-  background: #0056b3;
-}
-
-.dark-mode button.solution-toggle {
-  background: #0d6efd;
-}
-
-.dark-mode button.solution-toggle:hover {
-  background: #0a58ca;
-}
-
-/* Mobile button styles */
-ion-button.solution-toggle {
+.solution-toggle {
   margin-bottom: 1rem;
 }
 
 .toggle-icon {
-  font-size: 0.875rem;
-}
-
-/* Mobile-specific: add margin for icon */
-ion-button .toggle-icon {
   margin-inline-start: 0.5rem;
+  font-size: 0.875rem;
 }
 
 .solution-content {
