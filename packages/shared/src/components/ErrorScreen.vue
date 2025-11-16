@@ -87,19 +87,26 @@ const direction = computed(() => {
   return locale.value === 'fa' ? 'rtl' : 'ltr'
 })
 
+const isTranslatedError = computed(() => {
+  if (!props.details) return false
+  // Check if this error will be translated
+  return props.details.includes('API_BASE_URL') || props.details.includes('VITE_API_BASE_URL')
+})
+
 const translatedDetails = computed(() => {
   if (!props.details) return ''
-  // Translate the error message if it contains VITE_API_BASE_URL or API_BASE_URL
-  if (props.details.includes('API_BASE_URL') || props.details.includes('VITE_API_BASE_URL')) {
+  // Translate the error message if it's a translatable error
+  if (isTranslatedError.value) {
     return t('error_screen.api_url_missing')
   }
+  // Otherwise return raw error message
   return props.details
 })
 
 const errorDetailsDirection = computed(() => {
-  // If the error message is translated (contains API_BASE_URL), use the app's direction
-  if (props.details && (props.details.includes('API_BASE_URL') || props.details.includes('VITE_API_BASE_URL'))) {
-    return locale.value === 'fa' ? 'rtl' : 'ltr'
+  // If using a translated error message, use the app's direction
+  if (isTranslatedError.value) {
+    return direction.value
   }
   // Otherwise, raw error messages are in English, so always use LTR
   return 'ltr'
