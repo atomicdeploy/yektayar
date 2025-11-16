@@ -26,22 +26,24 @@ import { SOCKET_IO_PATH } from '@yektayar/shared'
 const corsEnabled = process.env.DISABLE_CORS !== 'true'
 const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:8100']
 
+// Create base app
 const app = new Elysia()
   .use(cookie())
-  .use(corsEnabled ? cors({
+
+// Conditionally add CORS middleware
+if (corsEnabled) {
+  app.use(cors({
     origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     exposeHeaders: ['Content-Length', 'Content-Type'],
     maxAge: 86400 // 24 hours
-  }) : (app) => app)
-  // Even when CORS is disabled at app level, we need to handle OPTIONS for reverse proxy
-  .options('/*', ({ set }) => {
-    set.status = 204
-    return ''
-  })
-  .use(swaggerAuth)
+  }))
+}
+
+// Continue with the rest of the middleware
+app
   .use(
     swagger({
       path: '/api-docs',
@@ -71,6 +73,12 @@ const app = new Elysia()
       }
     })
   )
+  .use(swaggerAuth)
+  // Even when CORS is disabled at app level, handle OPTIONS for reverse proxy
+  .options('/*', ({ set }) => {
+    set.status = 204
+    return ''
+  })
   .get('/', () => ({
     message: 'YektaYar API Server',
     version: '0.1.0',
