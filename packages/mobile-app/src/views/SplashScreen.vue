@@ -1,25 +1,57 @@
 <template>
   <ion-page>
-    <ion-content class="splash-content" :fullscreen="true">
+    <ion-content
+      class="splash-content"
+      :fullscreen="true"
+    >
       <div class="splash-container">
         <!-- Logo -->
-        <div class="logo-container" :class="{ 'fade-in': fontsLoaded }">
+        <div
+          class="logo-container"
+          :class="{ 'fade-in': fontsLoaded }"
+        >
           <div class="logo-circle">
-            <img src="/logo-simple.svg" alt="YektaYar Logo" class="logo-svg" />
+            <img
+              src="/logo-simple.svg"
+              alt="YektaYar Logo"
+              class="logo-svg"
+            >
           </div>
-          <h1 class="app-title">یکتایار</h1>
-          <p class="app-subtitle">همراه شما در مسیر سلامت روان</p>
-          <p class="app-tagline">«تا خانواده با عشق و آرامش پابرجا بماند»</p>
+          <h1 class="app-title">
+            یکتایار
+          </h1>
+          <p class="app-subtitle">
+            همراه شما در مسیر سلامت روان
+          </p>
+          <p class="app-tagline">
+            «تا خانواده با عشق و آرامش پابرجا بماند»
+          </p>
           <p class="app-version">
             YektaYar v{{ appVersion }}{{ apiVersion ? ` – API v${apiVersion}` : '' }}
           </p>
         </div>
 
         <!-- Loading indicator -->
-        <div class="loading-container" :class="{ 'fade-in': fontsLoaded }">
-          <ion-spinner name="crescent" color="primary"></ion-spinner>
-          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-          <p v-else class="loading-text">در حال آماده‌سازی...</p>
+        <div
+          class="loading-container"
+          :class="{ 'fade-in': fontsLoaded }"
+        >
+          <ion-spinner
+            name="crescent"
+            color="primary"
+          />
+          <p
+            v-if="errorMessage"
+            class="error-message"
+          >
+            {{ errorMessage }}
+          </p>
+          <p
+            v-else
+            class="loading-text"
+          >
+            در حال آماده‌سازی...
+          </p>
         </div>
       </div>
     </ion-content>

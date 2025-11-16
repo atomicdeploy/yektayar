@@ -1,18 +1,27 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
+    <ion-content
+      :fullscreen="true"
+      class="welcome-content"
+      :scroll-y="true"
+    >
       <div class="welcome-container">
         <!-- Decorative background elements -->
-        <div class="bg-decoration bg-decoration-1"></div>
-        <div class="bg-decoration bg-decoration-2"></div>
+        <div class="bg-decoration bg-decoration-1" />
+        <div class="bg-decoration bg-decoration-2" />
         
         <!-- Header with Title and Logo -->
         <div class="welcome-header">
           <div class="logo-accent">
-            <ion-icon :icon="heartOutline" class="heart-icon"></ion-icon>
+            <ion-icon
+              :icon="heartOutline"
+              class="heart-icon"
+            />
           </div>
-          <h1 class="welcome-title">خوش آمدید!</h1>
-          <div class="title-underline"></div>
+          <h1 class="welcome-title">
+            خوش آمدید!
+          </h1>
+          <div class="title-underline" />
         </div>
 
         <!-- Hero Image with Lazy Loading (ABOVE text as requested) -->
@@ -26,7 +35,7 @@
             loading="eager"
             @error="onImageError"
           />
-          <div class="image-overlay"></div>
+          <div class="image-overlay" />
         </div>
 
         <!-- Welcome Text Content with Card Style -->
@@ -62,7 +71,10 @@
 
         <!-- Disclaimer with Icon -->
         <div class="disclaimer-container">
-          <ion-icon :icon="lockClosedOutline" class="disclaimer-icon"></ion-icon>
+          <ion-icon
+            :icon="lockClosedOutline"
+            class="disclaimer-icon"
+          />
           <p class="disclaimer-text">
             اطلاعات شما محرمّانه است، و تنها برای کمک به شما استفاده میشود.
           </p>

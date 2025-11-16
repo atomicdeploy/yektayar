@@ -2,11 +2,24 @@
   <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
     <div class="flex items-center justify-between">
       <div>
-        <p class="text-sm text-gray-500 dark:text-gray-400">{{ label }}</p>
-        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ formattedValue }}</p>
-        <div v-if="change !== undefined" class="flex items-center gap-1 mt-2">
-          <ArrowTrendingUpIcon v-if="change > 0" class="w-4 h-4 text-green-500" />
-          <ArrowTrendingDownIcon v-else-if="change < 0" class="w-4 h-4 text-red-500" />
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ label }}
+        </p>
+        <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          {{ formattedValue }}
+        </p>
+        <div
+          v-if="change !== undefined"
+          class="flex items-center gap-1 mt-2"
+        >
+          <ArrowTrendingUpIcon
+            v-if="change > 0"
+            class="w-4 h-4 text-green-500"
+          />
+          <ArrowTrendingDownIcon
+            v-else-if="change < 0"
+            class="w-4 h-4 text-red-500"
+          />
           <span
             :class="[
               'text-sm font-medium',
@@ -23,11 +36,20 @@
           bgColor,
         ]"
       >
-        <component :is="icon" :class="['w-8 h-8', iconColor]" />
+        <component
+          :is="icon"
+          :class="['w-8 h-8', iconColor]"
+        />
       </div>
     </div>
-    <div v-if="loading" class="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 flex items-center justify-center rounded-lg">
-      <LoadingSpinner size="32px" class="text-primary-500" />
+    <div
+      v-if="loading"
+      class="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-75 flex items-center justify-center rounded-lg"
+    >
+      <LoadingSpinner
+        size="32px"
+        class="text-primary-500"
+      />
     </div>
   </div>
 </template>

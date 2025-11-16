@@ -3,18 +3,27 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>{{ locale === 'fa' ? 'پروفایل' : 'Profile' }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button>
-            <ion-icon :icon="settings" slot="icon-only"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+        <template #end>
+          <ion-buttons>
+            <ion-button>
+              <template #icon-only>
+                <ion-icon :icon="settings" />
+              </template>
+            </ion-button>
+          </ion-buttons>
+        </template>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true" :scroll-y="false">
+    <ion-content
+      :fullscreen="true"
+      :scroll-y="false"
+    >
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">{{ locale === 'fa' ? 'پروفایل' : 'Profile' }}</ion-title>
+          <ion-title size="large">
+            {{ locale === 'fa' ? 'پروفایل' : 'Profile' }}
+          </ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -31,182 +40,301 @@
         defer
       >
         <div class="content-wrapper">
-      <!-- Profile Header -->
-      <div class="profile-header">
-        <div class="profile-avatar">
-          <ion-icon :icon="person"></ion-icon>
-          <div class="avatar-badge">
-            <ion-icon :icon="camera"></ion-icon>
-          </div>
-        </div>
-        <h2 class="profile-name">{{ locale === 'fa' ? 'کاربر یکتایار' : 'YektaYar User' }}</h2>
-        <p class="profile-email">user@yektayar.com</p>
-        <div class="profile-stats">
-          <div class="stat-item">
-            <div class="stat-value">12</div>
-            <div class="stat-label">{{ locale === 'fa' ? 'جلسات' : 'Sessions' }}</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-value">45</div>
-            <div class="stat-label">{{ locale === 'fa' ? 'روز' : 'Days' }}</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-value">8</div>
-            <div class="stat-label">{{ locale === 'fa' ? 'پیام' : 'Messages' }}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="section">
-        <h3 class="section-title">{{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}</h3>
-        <div class="action-grid">
-          <div class="grid-action">
-            <div class="grid-action-icon secondary">
-              <ion-icon :icon="document"></ion-icon>
+          <!-- Profile Header -->
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <ion-icon :icon="person" />
+              <div class="avatar-badge">
+                <ion-icon :icon="camera" />
+              </div>
             </div>
-            <span>{{ locale === 'fa' ? 'سوابق' : 'Records' }}</span>
-          </div>
-          <div class="grid-action">
-            <div class="grid-action-icon success">
-              <ion-icon :icon="statsChart"></ion-icon>
+            <h2 class="profile-name">
+              {{ locale === 'fa' ? 'کاربر یکتایار' : 'YektaYar User' }}
+            </h2>
+            <p class="profile-email">
+              user@yektayar.com
+            </p>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <div class="stat-value">
+                  12
+                </div>
+                <div class="stat-label">
+                  {{ locale === 'fa' ? 'جلسات' : 'Sessions' }}
+                </div>
+              </div>
+              <div class="stat-divider" />
+              <div class="stat-item">
+                <div class="stat-value">
+                  45
+                </div>
+                <div class="stat-label">
+                  {{ locale === 'fa' ? 'روز' : 'Days' }}
+                </div>
+              </div>
+              <div class="stat-divider" />
+              <div class="stat-item">
+                <div class="stat-value">
+                  8
+                </div>
+                <div class="stat-label">
+                  {{ locale === 'fa' ? 'پیام' : 'Messages' }}
+                </div>
+              </div>
             </div>
-            <span>{{ locale === 'fa' ? 'پیشرفت' : 'Progress' }}</span>
           </div>
-          <div class="grid-action">
-            <div class="grid-action-icon warning">
-              <ion-icon :icon="heart"></ion-icon>
+
+          <!-- Quick Actions -->
+          <div class="section">
+            <h3 class="section-title">
+              {{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}
+            </h3>
+            <div class="action-grid">
+              <div class="grid-action">
+                <div class="grid-action-icon secondary">
+                  <ion-icon :icon="document" />
+                </div>
+                <span>{{ locale === 'fa' ? 'سوابق' : 'Records' }}</span>
+              </div>
+              <div class="grid-action">
+                <div class="grid-action-icon success">
+                  <ion-icon :icon="statsChart" />
+                </div>
+                <span>{{ locale === 'fa' ? 'پیشرفت' : 'Progress' }}</span>
+              </div>
+              <div class="grid-action">
+                <div class="grid-action-icon warning">
+                  <ion-icon :icon="heart" />
+                </div>
+                <span>{{ locale === 'fa' ? 'سلامت' : 'Wellness' }}</span>
+              </div>
+              <div class="grid-action">
+                <div class="grid-action-icon danger">
+                  <ion-icon :icon="notifications" />
+                </div>
+                <span>{{ locale === 'fa' ? 'اعلان‌ها' : 'Alerts' }}</span>
+              </div>
             </div>
-            <span>{{ locale === 'fa' ? 'سلامت' : 'Wellness' }}</span>
           </div>
-          <div class="grid-action">
-            <div class="grid-action-icon danger">
-              <ion-icon :icon="notifications"></ion-icon>
-            </div>
-            <span>{{ locale === 'fa' ? 'اعلان‌ها' : 'Alerts' }}</span>
+
+          <!-- Settings List -->
+          <div class="section">
+            <h3 class="section-title">
+              {{ locale === 'fa' ? 'تنظیمات حساب' : 'Account Settings' }}
+            </h3>
+            <ion-list
+              class="settings-list"
+              :inset="true"
+            >
+              <ion-item
+                button
+                detail
+                @click="navigateToPersonalInfo"
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="personCircle"
+                    color="secondary"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'اطلاعات شخصی' : 'Personal Information' }}</h3>
+                  <p>{{ locale === 'fa' ? 'ویرایش نام، شماره تماس و ...' : 'Edit name, phone, etc.' }}</p>
+                </ion-label>
+              </ion-item>
+
+              <ion-item
+                button
+                detail
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="shield"
+                    color="secondary"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'حریم خصوصی و امنیت' : 'Privacy & Security' }}</h3>
+                  <p>{{ locale === 'fa' ? 'تنظیمات امنیتی حساب' : 'Account security settings' }}</p>
+                </ion-label>
+              </ion-item>
+
+              <ion-item
+                button
+                detail
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="notifications"
+                    color="warning"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'اعلان‌ها' : 'Notifications' }}</h3>
+                  <p>{{ locale === 'fa' ? 'مدیریت اعلان‌ها' : 'Manage notifications' }}</p>
+                </ion-label>
+              </ion-item>
+
+              <ion-item
+                button
+                detail
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="card"
+                    color="tertiary"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'اطلاعات پرداخت' : 'Payment Information' }}</h3>
+                  <p>{{ locale === 'fa' ? 'کارت‌ها و روش‌های پرداخت' : 'Cards and payment methods' }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
           </div>
-        </div>
-      </div>
 
-      <!-- Settings List -->
-      <div class="section">
-        <h3 class="section-title">{{ locale === 'fa' ? 'تنظیمات حساب' : 'Account Settings' }}</h3>
-        <ion-list class="settings-list" :inset="true">
-          <ion-item button detail @click="navigateToPersonalInfo">
-            <ion-icon :icon="personCircle" slot="start" color="secondary"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'اطلاعات شخصی' : 'Personal Information' }}</h3>
-              <p>{{ locale === 'fa' ? 'ویرایش نام، شماره تماس و ...' : 'Edit name, phone, etc.' }}</p>
-            </ion-label>
-          </ion-item>
+          <!-- Preferences -->
+          <div class="section">
+            <h3 class="section-title">
+              {{ locale === 'fa' ? 'تنظیمات برنامه' : 'App Preferences' }}
+            </h3>
+            <ion-list
+              class="settings-list"
+              :inset="true"
+            >
+              <ion-item
+                button
+                @click="toggleTheme"
+              >
+                <template #start>
+                  <ion-icon 
+                    :icon="currentTheme === 'auto' ? desktop : currentTheme === 'dark' ? moon : sunny" 
+                   
+                    :color="currentTheme === 'light' ? 'warning' : 'primary'"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'حالت نمایش' : 'Display Mode' }}</h3>
+                  <p>
+                    {{ 
+                      currentTheme === 'auto' 
+                        ? (locale === 'fa' ? 'سیستم (پیش‌فرض)' : 'System (Default)')
+                        : currentTheme === 'dark'
+                          ? (locale === 'fa' ? 'تاریک' : 'Dark')
+                          : (locale === 'fa' ? 'روشن' : 'Light')
+                    }}
+                  </p>
+                </ion-label>
+              </ion-item>
 
-          <ion-item button detail>
-            <ion-icon :icon="shield" slot="start" color="secondary"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'حریم خصوصی و امنیت' : 'Privacy & Security' }}</h3>
-              <p>{{ locale === 'fa' ? 'تنظیمات امنیتی حساب' : 'Account security settings' }}</p>
-            </ion-label>
-          </ion-item>
+              <ion-item
+                button
+                detail
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="language"
+                    color="secondary"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'زبان' : 'Language' }}</h3>
+                  <p>{{ locale === 'fa' ? 'فارسی' : 'English' }}</p>
+                </ion-label>
+              </ion-item>
 
-          <ion-item button detail>
-            <ion-icon :icon="notifications" slot="start" color="warning"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'اعلان‌ها' : 'Notifications' }}</h3>
-              <p>{{ locale === 'fa' ? 'مدیریت اعلان‌ها' : 'Manage notifications' }}</p>
-            </ion-label>
-          </ion-item>
+              <ion-item
+                button
+                detail
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="volumeMedium"
+                    color="success"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'صدا و لرزش' : 'Sound & Haptics' }}</h3>
+                  <p>{{ locale === 'fa' ? 'تنظیمات صدا' : 'Sound settings' }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </div>
 
-          <ion-item button detail>
-            <ion-icon :icon="card" slot="start" color="tertiary"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'اطلاعات پرداخت' : 'Payment Information' }}</h3>
-              <p>{{ locale === 'fa' ? 'کارت‌ها و روش‌های پرداخت' : 'Cards and payment methods' }}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </div>
+          <!-- Support -->
+          <div class="section">
+            <h3 class="section-title">
+              {{ locale === 'fa' ? 'پشتیبانی' : 'Support' }}
+            </h3>
+            <ion-list
+              class="settings-list"
+              :inset="true"
+            >
+              <ion-item
+                button
+                detail
+                @click="navigateToSupport"
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="help"
+                    color="primary"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'راهنما و پشتیبانی' : 'Help & Support' }}</h3>
+                </ion-label>
+              </ion-item>
 
-      <!-- Preferences -->
-      <div class="section">
-        <h3 class="section-title">{{ locale === 'fa' ? 'تنظیمات برنامه' : 'App Preferences' }}</h3>
-        <ion-list class="settings-list" :inset="true">
-          <ion-item button @click="toggleTheme">
-            <ion-icon 
-              :icon="currentTheme === 'auto' ? desktop : currentTheme === 'dark' ? moon : sunny" 
-              slot="start" 
-              :color="currentTheme === 'light' ? 'warning' : 'primary'"
-            ></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'حالت نمایش' : 'Display Mode' }}</h3>
-              <p>
-                {{ 
-                  currentTheme === 'auto' 
-                    ? (locale === 'fa' ? 'سیستم (پیش‌فرض)' : 'System (Default)')
-                    : currentTheme === 'dark'
-                    ? (locale === 'fa' ? 'تاریک' : 'Dark')
-                    : (locale === 'fa' ? 'روشن' : 'Light')
-                }}
-              </p>
-            </ion-label>
-          </ion-item>
+              <ion-item
+                button
+                detail
+                @click="navigateToContact"
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="call"
+                    color="success"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}</h3>
+                </ion-label>
+              </ion-item>
 
-          <ion-item button detail>
-            <ion-icon :icon="language" slot="start" color="secondary"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'زبان' : 'Language' }}</h3>
-              <p>{{ locale === 'fa' ? 'فارسی' : 'English' }}</p>
-            </ion-label>
-          </ion-item>
+              <ion-item
+                button
+                detail
+                @click="navigateToAbout"
+              >
+                <template #start>
+                  <ion-icon
+                    :icon="informationCircle"
+                    color="tertiary"
+                  />
+                </template>
+                <ion-label>
+                  <h3>{{ locale === 'fa' ? 'درباره برنامه' : 'About App' }}</h3>
+                  <p>{{ locale === 'fa' ? 'نسخه ۰.۱.۰' : 'Version 0.1.0' }}</p>
+                </ion-label>
+              </ion-item>
 
-          <ion-item button detail>
-            <ion-icon :icon="volumeMedium" slot="start" color="success"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'صدا و لرزش' : 'Sound & Haptics' }}</h3>
-              <p>{{ locale === 'fa' ? 'تنظیمات صدا' : 'Sound settings' }}</p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </div>
+              <ion-item button>
+                <template #start>
+                  <ion-icon
+                    :icon="logOut"
+                    color="danger"
+                  />
+                </template>
+                <ion-label color="danger">
+                  <h3>{{ locale === 'fa' ? 'خروج از حساب' : 'Sign Out' }}</h3>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </div>
 
-      <!-- Support -->
-      <div class="section">
-        <h3 class="section-title">{{ locale === 'fa' ? 'پشتیبانی' : 'Support' }}</h3>
-        <ion-list class="settings-list" :inset="true">
-          <ion-item button detail @click="navigateToSupport">
-            <ion-icon :icon="help" slot="start" color="primary"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'راهنما و پشتیبانی' : 'Help & Support' }}</h3>
-            </ion-label>
-          </ion-item>
-
-          <ion-item button detail @click="navigateToContact">
-            <ion-icon :icon="call" slot="start" color="success"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}</h3>
-            </ion-label>
-          </ion-item>
-
-          <ion-item button detail @click="navigateToAbout">
-            <ion-icon :icon="informationCircle" slot="start" color="tertiary"></ion-icon>
-            <ion-label>
-              <h3>{{ locale === 'fa' ? 'درباره برنامه' : 'About App' }}</h3>
-              <p>{{ locale === 'fa' ? 'نسخه ۰.۱.۰' : 'Version 0.1.0' }}</p>
-            </ion-label>
-          </ion-item>
-
-          <ion-item button>
-            <ion-icon :icon="logOut" slot="start" color="danger"></ion-icon>
-            <ion-label color="danger">
-              <h3>{{ locale === 'fa' ? 'خروج از حساب' : 'Sign Out' }}</h3>
-            </ion-label>
-          </ion-item>
-        </ion-list>
-      </div>
-
-      <!-- Bottom Spacing -->
-      <div style="height: 2rem;"></div>
+          <!-- Bottom Spacing -->
+          <div style="height: 2rem;" />
         </div>
       </OverlayScrollbarsComponent>
     </ion-content>

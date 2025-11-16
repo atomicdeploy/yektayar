@@ -6,10 +6,15 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true" :scroll-y="false">
+    <ion-content
+      :fullscreen="true"
+      :scroll-y="false"
+    >
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">{{ locale === 'fa' ? 'گفتگو' : 'Chat' }}</ion-title>
+          <ion-title size="large">
+            {{ locale === 'fa' ? 'گفتگو' : 'Chat' }}
+          </ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -26,134 +31,165 @@
         defer
       >
         <div class="content-wrapper">
-      <!-- Chat List Header -->
-      <div class="chat-header">
-        <div class="search-wrapper">
-          <ion-searchbar
-            :placeholder="locale === 'fa' ? 'جستجوی مکالمات...' : 'Search conversations...'"
-            animated
-            show-clear-button="focus"
-          ></ion-searchbar>
-        </div>
-      </div>
-
-      <!-- Active Conversations -->
-      <div class="section">
-        <h2 class="section-title">{{ locale === 'fa' ? 'مکالمات فعال' : 'Active Conversations' }}</h2>
-        <div class="conversations-list">
-          <div class="conversation-card active">
-            <div class="avatar-wrapper">
-              <div class="avatar primary">
-                <ion-icon :icon="person"></ion-icon>
-              </div>
-              <div class="status-indicator online"></div>
-            </div>
-            <div class="conversation-content">
-              <div class="conversation-header">
-                <h3 class="conversation-name">{{ locale === 'fa' ? 'دکتر احمدی' : 'Dr. Ahmadi' }}</h3>
-                <span class="conversation-time">{{ locale === 'fa' ? '۱۰ دقیقه' : '10 min' }}</span>
-              </div>
-              <div class="conversation-preview">
-                <ion-icon :icon="checkmarkDone" class="read-indicator"></ion-icon>
-                <p class="last-message">{{ locale === 'fa' ? 'سلام، چطور می‌توانم کمکتان کنم؟' : 'Hello, how can I help you?' }}</p>
-              </div>
-            </div>
-            <div class="unread-badge">3</div>
-          </div>
-
-          <div class="conversation-card" @click="navigateToAIChat">
-            <div class="avatar-wrapper">
-              <div class="avatar success">
-                <ion-icon :icon="chatbubbles"></ion-icon>
-              </div>
-              <div class="status-indicator busy"></div>
-            </div>
-            <div class="conversation-content">
-              <div class="conversation-header">
-                <h3 class="conversation-name">{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
-                <span class="conversation-time">{{ locale === 'fa' ? '۲ ساعت' : '2 hours' }}</span>
-              </div>
-              <div class="conversation-preview">
-                <p class="last-message">{{ locale === 'fa' ? 'چگونه می‌توانم امروز به شما کمک کنم؟' : 'How can I assist you today?' }}</p>
-              </div>
+          <!-- Chat List Header -->
+          <div class="chat-header">
+            <div class="search-wrapper">
+              <ion-searchbar
+                :placeholder="locale === 'fa' ? 'جستجوی مکالمات...' : 'Search conversations...'"
+                animated
+                show-clear-button="focus"
+              />
             </div>
           </div>
 
-          <div class="conversation-card">
-            <div class="avatar-wrapper">
-              <div class="avatar warning">
-                <ion-icon :icon="people"></ion-icon>
+          <!-- Active Conversations -->
+          <div class="section">
+            <h2 class="section-title">
+              {{ locale === 'fa' ? 'مکالمات فعال' : 'Active Conversations' }}
+            </h2>
+            <div class="conversations-list">
+              <div class="conversation-card active">
+                <div class="avatar-wrapper">
+                  <div class="avatar primary">
+                    <ion-icon :icon="person" />
+                  </div>
+                  <div class="status-indicator online" />
+                </div>
+                <div class="conversation-content">
+                  <div class="conversation-header">
+                    <h3 class="conversation-name">
+                      {{ locale === 'fa' ? 'دکتر احمدی' : 'Dr. Ahmadi' }}
+                    </h3>
+                    <span class="conversation-time">{{ locale === 'fa' ? '۱۰ دقیقه' : '10 min' }}</span>
+                  </div>
+                  <div class="conversation-preview">
+                    <ion-icon
+                      :icon="checkmarkDone"
+                      class="read-indicator"
+                    />
+                    <p class="last-message">
+                      {{ locale === 'fa' ? 'سلام، چطور می‌توانم کمکتان کنم؟' : 'Hello, how can I help you?' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="unread-badge">
+                  3
+                </div>
               </div>
-              <div class="status-indicator offline"></div>
+
+              <div
+                class="conversation-card"
+                @click="navigateToAIChat"
+              >
+                <div class="avatar-wrapper">
+                  <div class="avatar success">
+                    <ion-icon :icon="chatbubbles" />
+                  </div>
+                  <div class="status-indicator busy" />
+                </div>
+                <div class="conversation-content">
+                  <div class="conversation-header">
+                    <h3 class="conversation-name">
+                      {{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}
+                    </h3>
+                    <span class="conversation-time">{{ locale === 'fa' ? '۲ ساعت' : '2 hours' }}</span>
+                  </div>
+                  <div class="conversation-preview">
+                    <p class="last-message">
+                      {{ locale === 'fa' ? 'چگونه می‌توانم امروز به شما کمک کنم؟' : 'How can I assist you today?' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="conversation-card">
+                <div class="avatar-wrapper">
+                  <div class="avatar warning">
+                    <ion-icon :icon="people" />
+                  </div>
+                  <div class="status-indicator offline" />
+                </div>
+                <div class="conversation-content">
+                  <div class="conversation-header">
+                    <h3 class="conversation-name">
+                      {{ locale === 'fa' ? 'گروه پشتیبانی' : 'Support Group' }}
+                    </h3>
+                    <span class="conversation-time">{{ locale === 'fa' ? 'دیروز' : 'Yesterday' }}</span>
+                  </div>
+                  <div class="conversation-preview">
+                    <p class="last-message">
+                      {{ locale === 'fa' ? 'جلسه بعدی فردا ساعت ۱۶' : 'Next session tomorrow at 4 PM' }}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="conversation-content">
-              <div class="conversation-header">
-                <h3 class="conversation-name">{{ locale === 'fa' ? 'گروه پشتیبانی' : 'Support Group' }}</h3>
-                <span class="conversation-time">{{ locale === 'fa' ? 'دیروز' : 'Yesterday' }}</span>
-              </div>
-              <div class="conversation-preview">
-                <p class="last-message">{{ locale === 'fa' ? 'جلسه بعدی فردا ساعت ۱۶' : 'Next session tomorrow at 4 PM' }}</p>
-              </div>
+          </div>
+
+          <!-- Quick Responses -->
+          <div class="section">
+            <h2 class="section-title">
+              {{ locale === 'fa' ? 'شروع سریع' : 'Quick Start' }}
+            </h2>
+            <div class="quick-responses">
+              <ion-chip class="quick-chip">
+                <ion-icon :icon="help" />
+                <ion-label>{{ locale === 'fa' ? 'احتیاج به کمک دارم' : 'I need help' }}</ion-label>
+              </ion-chip>
+              <ion-chip class="quick-chip">
+                <ion-icon :icon="calendar" />
+                <ion-label>{{ locale === 'fa' ? 'رزرو نوبت' : 'Book appointment' }}</ion-label>
+              </ion-chip>
+              <ion-chip class="quick-chip">
+                <ion-icon :icon="document" />
+                <ion-label>{{ locale === 'fa' ? 'سوابق من' : 'My records' }}</ion-label>
+              </ion-chip>
+              <ion-chip class="quick-chip">
+                <ion-icon :icon="call" />
+                <ion-label>{{ locale === 'fa' ? 'تماس اضطراری' : 'Emergency call' }}</ion-label>
+              </ion-chip>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Quick Responses -->
-      <div class="section">
-        <h2 class="section-title">{{ locale === 'fa' ? 'شروع سریع' : 'Quick Start' }}</h2>
-        <div class="quick-responses">
-          <ion-chip class="quick-chip">
-            <ion-icon :icon="help"></ion-icon>
-            <ion-label>{{ locale === 'fa' ? 'احتیاج به کمک دارم' : 'I need help' }}</ion-label>
-          </ion-chip>
-          <ion-chip class="quick-chip">
-            <ion-icon :icon="calendar"></ion-icon>
-            <ion-label>{{ locale === 'fa' ? 'رزرو نوبت' : 'Book appointment' }}</ion-label>
-          </ion-chip>
-          <ion-chip class="quick-chip">
-            <ion-icon :icon="document"></ion-icon>
-            <ion-label>{{ locale === 'fa' ? 'سوابق من' : 'My records' }}</ion-label>
-          </ion-chip>
-          <ion-chip class="quick-chip">
-            <ion-icon :icon="call"></ion-icon>
-            <ion-label>{{ locale === 'fa' ? 'تماس اضطراری' : 'Emergency call' }}</ion-label>
-          </ion-chip>
-        </div>
-      </div>
+          <!-- Support Resources -->
+          <div class="section">
+            <h2 class="section-title">
+              {{ locale === 'fa' ? 'منابع پشتیبانی' : 'Support Resources' }}
+            </h2>
+            <ion-card class="resource-card">
+              <div class="resource-icon-wrapper">
+                <ion-icon :icon="book" />
+              </div>
+              <ion-card-content>
+                <h3>{{ locale === 'fa' ? 'مقالات آموزشی' : 'Educational Articles' }}</h3>
+                <p>{{ locale === 'fa' ? 'مطالب مفید برای سلامت روان' : 'Helpful content for mental wellness' }}</p>
+              </ion-card-content>
+            </ion-card>
 
-      <!-- Support Resources -->
-      <div class="section">
-        <h2 class="section-title">{{ locale === 'fa' ? 'منابع پشتیبانی' : 'Support Resources' }}</h2>
-        <ion-card class="resource-card">
-          <div class="resource-icon-wrapper">
-            <ion-icon :icon="book"></ion-icon>
+            <ion-card class="resource-card">
+              <div class="resource-icon-wrapper">
+                <ion-icon :icon="videocam" />
+              </div>
+              <ion-card-content>
+                <h3>{{ locale === 'fa' ? 'ویدیوهای آموزشی' : 'Tutorial Videos' }}</h3>
+                <p>{{ locale === 'fa' ? 'راهنمای تمرینات آرامش‌بخش' : 'Guide to relaxation exercises' }}</p>
+              </ion-card-content>
+            </ion-card>
           </div>
-          <ion-card-content>
-            <h3>{{ locale === 'fa' ? 'مقالات آموزشی' : 'Educational Articles' }}</h3>
-            <p>{{ locale === 'fa' ? 'مطالب مفید برای سلامت روان' : 'Helpful content for mental wellness' }}</p>
-          </ion-card-content>
-        </ion-card>
-
-        <ion-card class="resource-card">
-          <div class="resource-icon-wrapper">
-            <ion-icon :icon="videocam"></ion-icon>
-          </div>
-          <ion-card-content>
-            <h3>{{ locale === 'fa' ? 'ویدیوهای آموزشی' : 'Tutorial Videos' }}</h3>
-            <p>{{ locale === 'fa' ? 'راهنمای تمرینات آرامش‌بخش' : 'Guide to relaxation exercises' }}</p>
-          </ion-card-content>
-        </ion-card>
-      </div>
         </div>
       </OverlayScrollbarsComponent>
 
       <!-- New Chat FAB -->
-      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-        <ion-fab-button color="primary">
-          <ion-icon :icon="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
+      <template #fixed>
+        <ion-fab
+          vertical="bottom"
+          horizontal="end"
+        >
+          <ion-fab-button color="primary">
+            <ion-icon :icon="add" />
+          </ion-fab-button>
+        </ion-fab>
+      </template>
     </ion-content>
   </ion-page>
 </template>

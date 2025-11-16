@@ -2,17 +2,24 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'"></ion-back-button>
-        </ion-buttons>
+        <template #start>
+          <ion-buttons>
+            <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'" />
+          </ion-buttons>
+        </template>
         <ion-title>{{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}</ion-title>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true" :scroll-y="false">
+    <ion-content
+      :fullscreen="true"
+      :scroll-y="false"
+    >
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">{{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}</ion-title>
+          <ion-title size="large">
+            {{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}
+          </ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -29,132 +36,178 @@
         defer
       >
         <div class="content-wrapper">
-      <!-- Hero Section -->
-      <div class="contact-hero">
-        <div class="hero-icon">
-          <ion-icon :icon="call"></ion-icon>
-        </div>
-        <h2>{{ locale === 'fa' ? 'ما همیشه در دسترس هستیم' : 'We\'re Always Here' }}</h2>
-        <p>{{ locale === 'fa' ? 'از طریق راه‌های زیر می‌توانید با ما در تماس باشید' : 'Get in touch with us through the following channels' }}</p>
-      </div>
-
-      <!-- Loading State -->
-      <div v-if="loading" class="loading-container">
-        <ion-spinner name="crescent" color="primary"></ion-spinner>
-      </div>
-
-      <!-- Contact Methods -->
-      <div v-else class="section">
-        <!-- Phone -->
-        <ion-card class="contact-card" button @click="callPhone">
-          <div class="contact-icon phone">
-            <ion-icon :icon="call"></ion-icon>
-          </div>
-          <div class="contact-content">
-            <h3>{{ locale === 'fa' ? 'تماس تلفنی' : 'Phone Call' }}</h3>
-            <p class="contact-value">{{ contactInfo.phone || '+98 21 1234 5678' }}</p>
-            <p class="contact-description">{{ locale === 'fa' ? 'تماس مستقیم با تیم پشتیبانی' : 'Direct call to support team' }}</p>
-          </div>
-        </ion-card>
-
-        <!-- Email -->
-        <ion-card class="contact-card" button @click="sendEmail">
-          <div class="contact-icon email">
-            <ion-icon :icon="mail"></ion-icon>
-          </div>
-          <div class="contact-content">
-            <h3>{{ locale === 'fa' ? 'ایمیل' : 'Email' }}</h3>
-            <p class="contact-value">{{ contactInfo.email || 'info@yektayar.com' }}</p>
-            <p class="contact-description">{{ locale === 'fa' ? 'ارسال ایمیل به تیم پشتیبانی' : 'Send email to support team' }}</p>
-          </div>
-        </ion-card>
-
-        <!-- Address -->
-        <ion-card class="contact-card">
-          <div class="contact-icon address">
-            <ion-icon :icon="location"></ion-icon>
-          </div>
-          <div class="contact-content">
-            <h3>{{ locale === 'fa' ? 'آدرس دفتر' : 'Office Address' }}</h3>
-            <p class="contact-value">{{ locale === 'fa' ? (contactInfo.address || 'تهران، خیابان ولیعصر') : (contactInfo.address_en || 'Tehran, Vali Asr Street') }}</p>
-            <p class="contact-description">{{ locale === 'fa' ? 'مراجعه حضوری به دفتر' : 'Visit our office' }}</p>
-          </div>
-        </ion-card>
-      </div>
-
-      <!-- Map Section -->
-      <div class="section">
-        <h3 class="section-title">{{ locale === 'fa' ? 'موقعیت ما روی نقشه' : 'Our Location' }}</h3>
-        <ion-card class="map-card">
-          <div class="map-container" @click="openInMaps">
-            <div class="map-placeholder">
-              <ion-icon :icon="mapOutline"></ion-icon>
-              <p>{{ locale === 'fa' ? 'مشاهده در نقشه' : 'View on Map' }}</p>
+          <!-- Hero Section -->
+          <div class="contact-hero">
+            <div class="hero-icon">
+              <ion-icon :icon="call" />
             </div>
+            <h2>{{ locale === 'fa' ? 'ما همیشه در دسترس هستیم' : 'We\'re Always Here' }}</h2>
+            <p>{{ locale === 'fa' ? 'از طریق راه‌های زیر می‌توانید با ما در تماس باشید' : 'Get in touch with us through the following channels' }}</p>
           </div>
-        </ion-card>
-      </div>
 
-      <!-- Quick Actions -->
-      <div class="section">
-        <h3 class="section-title">{{ locale === 'fa' ? 'خدمات پشتیبانی' : 'Support Services' }}</h3>
+          <!-- Loading State -->
+          <div
+            v-if="loading"
+            class="loading-container"
+          >
+            <ion-spinner
+              name="crescent"
+              color="primary"
+            />
+          </div>
+
+          <!-- Contact Methods -->
+          <div
+            v-else
+            class="section"
+          >
+            <!-- Phone -->
+            <ion-card
+              class="contact-card"
+              button
+              @click="callPhone"
+            >
+              <div class="contact-icon phone">
+                <ion-icon :icon="call" />
+              </div>
+              <div class="contact-content">
+                <h3>{{ locale === 'fa' ? 'تماس تلفنی' : 'Phone Call' }}</h3>
+                <p class="contact-value">
+                  {{ contactInfo.phone || '+98 21 1234 5678' }}
+                </p>
+                <p class="contact-description">
+                  {{ locale === 'fa' ? 'تماس مستقیم با تیم پشتیبانی' : 'Direct call to support team' }}
+                </p>
+              </div>
+            </ion-card>
+
+            <!-- Email -->
+            <ion-card
+              class="contact-card"
+              button
+              @click="sendEmail"
+            >
+              <div class="contact-icon email">
+                <ion-icon :icon="mail" />
+              </div>
+              <div class="contact-content">
+                <h3>{{ locale === 'fa' ? 'ایمیل' : 'Email' }}</h3>
+                <p class="contact-value">
+                  {{ contactInfo.email || 'info@yektayar.com' }}
+                </p>
+                <p class="contact-description">
+                  {{ locale === 'fa' ? 'ارسال ایمیل به تیم پشتیبانی' : 'Send email to support team' }}
+                </p>
+              </div>
+            </ion-card>
+
+            <!-- Address -->
+            <ion-card class="contact-card">
+              <div class="contact-icon address">
+                <ion-icon :icon="location" />
+              </div>
+              <div class="contact-content">
+                <h3>{{ locale === 'fa' ? 'آدرس دفتر' : 'Office Address' }}</h3>
+                <p class="contact-value">
+                  {{ locale === 'fa' ? (contactInfo.address || 'تهران، خیابان ولیعصر') : (contactInfo.address_en || 'Tehran, Vali Asr Street') }}
+                </p>
+                <p class="contact-description">
+                  {{ locale === 'fa' ? 'مراجعه حضوری به دفتر' : 'Visit our office' }}
+                </p>
+              </div>
+            </ion-card>
+          </div>
+
+          <!-- Map Section -->
+          <div class="section">
+            <h3 class="section-title">
+              {{ locale === 'fa' ? 'موقعیت ما روی نقشه' : 'Our Location' }}
+            </h3>
+            <ion-card class="map-card">
+              <div
+                class="map-container"
+                @click="openInMaps"
+              >
+                <div class="map-placeholder">
+                  <ion-icon :icon="mapOutline" />
+                  <p>{{ locale === 'fa' ? 'مشاهده در نقشه' : 'View on Map' }}</p>
+                </div>
+              </div>
+            </ion-card>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="section">
+            <h3 class="section-title">
+              {{ locale === 'fa' ? 'خدمات پشتیبانی' : 'Support Services' }}
+            </h3>
         
-        <ion-card button @click="navigateToSupport" class="action-card">
-          <div class="action-icon">
-            <ion-icon :icon="chatbubbles"></ion-icon>
-          </div>
-          <div class="action-content">
-            <h4>{{ locale === 'fa' ? 'پشتیبانی آنلاین' : 'Online Support' }}</h4>
-            <p>{{ locale === 'fa' ? 'ارسال تیکت و چت با پشتیبانی' : 'Send tickets and chat with support' }}</p>
-          </div>
-          <ion-icon :icon="chevronForward"></ion-icon>
-        </ion-card>
+            <ion-card
+              button
+              class="action-card"
+              @click="navigateToSupport"
+            >
+              <div class="action-icon">
+                <ion-icon :icon="chatbubbles" />
+              </div>
+              <div class="action-content">
+                <h4>{{ locale === 'fa' ? 'پشتیبانی آنلاین' : 'Online Support' }}</h4>
+                <p>{{ locale === 'fa' ? 'ارسال تیکت و چت با پشتیبانی' : 'Send tickets and chat with support' }}</p>
+              </div>
+              <ion-icon :icon="chevronForward" />
+            </ion-card>
 
-        <ion-card button @click="navigateToAbout" class="action-card">
-          <div class="action-icon">
-            <ion-icon :icon="informationCircle"></ion-icon>
+            <ion-card
+              button
+              class="action-card"
+              @click="navigateToAbout"
+            >
+              <div class="action-icon">
+                <ion-icon :icon="informationCircle" />
+              </div>
+              <div class="action-content">
+                <h4>{{ locale === 'fa' ? 'درباره ما' : 'About Us' }}</h4>
+                <p>{{ locale === 'fa' ? 'بیشتر درباره یکتایار بدانید' : 'Learn more about YektaYar' }}</p>
+              </div>
+              <ion-icon :icon="chevronForward" />
+            </ion-card>
           </div>
-          <div class="action-content">
-            <h4>{{ locale === 'fa' ? 'درباره ما' : 'About Us' }}</h4>
-            <p>{{ locale === 'fa' ? 'بیشتر درباره یکتایار بدانید' : 'Learn more about YektaYar' }}</p>
-          </div>
-          <ion-icon :icon="chevronForward"></ion-icon>
-        </ion-card>
-      </div>
 
-      <!-- Social Media (placeholder for future) -->
-      <div class="section">
-        <h3 class="section-title">{{ locale === 'fa' ? 'شبکه‌های اجتماعی' : 'Social Media' }}</h3>
-        <div class="social-grid">
-          <div class="social-item">
-            <div class="social-icon">
-              <ion-icon :icon="logoInstagram"></ion-icon>
+          <!-- Social Media (placeholder for future) -->
+          <div class="section">
+            <h3 class="section-title">
+              {{ locale === 'fa' ? 'شبکه‌های اجتماعی' : 'Social Media' }}
+            </h3>
+            <div class="social-grid">
+              <div class="social-item">
+                <div class="social-icon">
+                  <ion-icon :icon="logoInstagram" />
+                </div>
+                <span>Instagram</span>
+              </div>
+              <div class="social-item">
+                <div class="social-icon">
+                  <ion-icon :icon="logoTwitter" />
+                </div>
+                <span>Twitter</span>
+              </div>
+              <div class="social-item">
+                <div class="social-icon">
+                  <ion-icon :icon="logoLinkedin" />
+                </div>
+                <span>LinkedIn</span>
+              </div>
+              <div class="social-item">
+                <div class="social-icon">
+                  <ion-icon :icon="globeOutline" />
+                </div>
+                <span>Website</span>
+              </div>
             </div>
-            <span>Instagram</span>
           </div>
-          <div class="social-item">
-            <div class="social-icon">
-              <ion-icon :icon="logoTwitter"></ion-icon>
-            </div>
-            <span>Twitter</span>
-          </div>
-          <div class="social-item">
-            <div class="social-icon">
-              <ion-icon :icon="logoLinkedin"></ion-icon>
-            </div>
-            <span>LinkedIn</span>
-          </div>
-          <div class="social-item">
-            <div class="social-icon">
-              <ion-icon :icon="globeOutline"></ion-icon>
-            </div>
-            <span>Website</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- Bottom Spacing -->
-      <div style="height: 2rem;"></div>
+          <!-- Bottom Spacing -->
+          <div style="height: 2rem;" />
         </div>
       </OverlayScrollbarsComponent>
     </ion-content>

@@ -7,26 +7,43 @@
   >
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-3">
-        <component :is="icon" class="w-6 h-6 text-primary-500" />
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ title }}</h3>
+        <component
+          :is="icon"
+          class="w-6 h-6 text-primary-500"
+        />
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+          {{ title }}
+        </h3>
       </div>
       <div class="flex items-center gap-2">
         <button
-          @click="$emit('toggle-expand')"
           class="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
           :title="isExpanded ? 'Collapse' : 'Expand'"
+          @click="$emit('toggle-expand')"
         >
-          <PlusIcon v-if="!isExpanded" class="w-5 h-5" />
-          <MinusIcon v-else class="w-5 h-5" />
+          <PlusIcon
+            v-if="!isExpanded"
+            class="w-5 h-5"
+          />
+          <MinusIcon
+            v-else
+            class="w-5 h-5"
+          />
         </button>
         <button
           v-if="collapsible"
-          @click="$emit('toggle-collapse')"
           class="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
           :title="isCollapsed ? 'Show' : 'Hide'"
+          @click="$emit('toggle-collapse')"
         >
-          <ChevronUpIcon v-if="!isCollapsed" class="w-5 h-5" />
-          <ChevronDownIcon v-else class="w-5 h-5" />
+          <ChevronUpIcon
+            v-if="!isCollapsed"
+            class="w-5 h-5"
+          />
+          <ChevronDownIcon
+            v-else
+            class="w-5 h-5"
+          />
         </button>
         <button
           class="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-move"
@@ -39,7 +56,10 @@
       </div>
     </div>
     
-    <div v-show="!isCollapsed" class="mt-4">
+    <div
+      v-show="!isCollapsed"
+      class="mt-4"
+    >
       <slot />
     </div>
   </div>

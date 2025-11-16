@@ -3,18 +3,27 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>{{ t('app_title') }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="toggleTheme">
-            <ion-icon :icon="isDark ? sunny : moon" slot="icon-only"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+        <template #end>
+          <ion-buttons>
+            <ion-button @click="toggleTheme">
+              <template #icon-only>
+                <ion-icon :icon="isDark ? sunny : moon" />
+              </template>
+            </ion-button>
+          </ion-buttons>
+        </template>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true" :scroll-y="false">
+    <ion-content
+      :fullscreen="true"
+      :scroll-y="false"
+    >
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">{{ t('app_title') }}</ion-title>
+          <ion-title size="large">
+            {{ t('app_title') }}
+          </ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -31,134 +40,181 @@
         defer
       >
         <div class="content-wrapper">
-      <!-- Hero Section -->
-      <div class="hero-section">
-        <div class="hero-content">
-          <div class="logo-container">
-            <div class="logo-circle">
-              <ion-icon :icon="heart" class="hero-icon"></ion-icon>
+          <!-- Hero Section -->
+          <div class="hero-section">
+            <div class="hero-content">
+              <div class="logo-container">
+                <div class="logo-circle">
+                  <ion-icon
+                    :icon="heart"
+                    class="hero-icon"
+                  />
+                </div>
+              </div>
+              <h1 class="hero-title">
+                {{ t('welcome') }}
+              </h1>
+              <p class="hero-subtitle">
+                {{ locale === 'fa' ? 'همراه شما در مسیر سلامت روان' : 'Your companion on the path to mental wellness' }}
+              </p>
             </div>
           </div>
-          <h1 class="hero-title">{{ t('welcome') }}</h1>
-          <p class="hero-subtitle">{{ locale === 'fa' ? 'همراه شما در مسیر سلامت روان' : 'Your companion on the path to mental wellness' }}</p>
-        </div>
-      </div>
 
-      <!-- Quick Actions -->
-      <div class="section">
-        <h2 class="section-title">{{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}</h2>
-        <div class="quick-actions">
-          <div class="action-card" @click="navigateToAIChat">
-            <div class="action-icon-wrapper ai">
-              <ion-icon :icon="sparkles" class="action-icon"></ion-icon>
+          <!-- Quick Actions -->
+          <div class="section">
+            <h2 class="section-title">
+              {{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}
+            </h2>
+            <div class="quick-actions">
+              <div
+                class="action-card"
+                @click="navigateToAIChat"
+              >
+                <div class="action-icon-wrapper ai">
+                  <ion-icon
+                    :icon="sparkles"
+                    class="action-icon"
+                  />
+                </div>
+                <div class="action-content">
+                  <h3>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
+                  <p>{{ locale === 'fa' ? 'گفتگو با هوشمند' : 'Chat with AI assistant' }}</p>
+                </div>
+                <ion-icon
+                  :icon="chevronForward"
+                  class="action-arrow"
+                />
+              </div>
+
+              <div
+                class="action-card"
+                @click="navigateToChat"
+              >
+                <div class="action-icon-wrapper secondary">
+                  <ion-icon
+                    :icon="chatbubbles"
+                    class="action-icon"
+                  />
+                </div>
+                <div class="action-content">
+                  <h3>{{ locale === 'fa' ? 'گفتگو با مشاور' : 'Chat with Counselor' }}</h3>
+                  <p>{{ locale === 'fa' ? 'شروع مکالمه آنی' : 'Start instant conversation' }}</p>
+                </div>
+                <ion-icon
+                  :icon="chevronForward"
+                  class="action-arrow"
+                />
+              </div>
+
+              <div
+                class="action-card"
+                @click="navigateToAppointments"
+              >
+                <div class="action-icon-wrapper success">
+                  <ion-icon
+                    :icon="calendar"
+                    class="action-icon"
+                  />
+                </div>
+                <div class="action-content">
+                  <h3>{{ locale === 'fa' ? 'رزرو نوبت' : 'Book Appointment' }}</h3>
+                  <p>{{ locale === 'fa' ? 'برنامه‌ریزی جلسات' : 'Schedule your sessions' }}</p>
+                </div>
+                <ion-icon
+                  :icon="chevronForward"
+                  class="action-arrow"
+                />
+              </div>
+
+              <div
+                class="action-card"
+                @click="navigateToProfile"
+              >
+                <div class="action-icon-wrapper warning">
+                  <ion-icon
+                    :icon="person"
+                    class="action-icon"
+                  />
+                </div>
+                <div class="action-content">
+                  <h3>{{ locale === 'fa' ? 'پروفایل من' : 'My Profile' }}</h3>
+                  <p>{{ locale === 'fa' ? 'مدیریت اطلاعات شخصی' : 'Manage your information' }}</p>
+                </div>
+                <ion-icon
+                  :icon="chevronForward"
+                  class="action-arrow"
+                />
+              </div>
             </div>
-            <div class="action-content">
-              <h3>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
-              <p>{{ locale === 'fa' ? 'گفتگو با هوشمند' : 'Chat with AI assistant' }}</p>
-            </div>
-            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
 
-          <div class="action-card" @click="navigateToChat">
-            <div class="action-icon-wrapper secondary">
-              <ion-icon :icon="chatbubbles" class="action-icon"></ion-icon>
+          <!-- Features Section -->
+          <div class="section">
+            <h2 class="section-title">
+              {{ locale === 'fa' ? 'خدمات ما' : 'Our Services' }}
+            </h2>
+            <div class="features-grid">
+              <ion-card class="feature-card">
+                <div class="feature-icon">
+                  <ion-icon :icon="notifications" />
+                </div>
+                <ion-card-header>
+                  <ion-card-title>{{ locale === 'fa' ? 'یادآوری‌های هوشمند' : 'Smart Reminders' }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  {{ locale === 'fa' ? 'یادآوری خودکار برای جلسات و مراقبت از خود' : 'Automatic reminders for sessions and self-care' }}
+                </ion-card-content>
+              </ion-card>
+
+              <ion-card class="feature-card">
+                <div class="feature-icon">
+                  <ion-icon :icon="statsChart" />
+                </div>
+                <ion-card-header>
+                  <ion-card-title>{{ locale === 'fa' ? 'پیگیری پیشرفت' : 'Progress Tracking' }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  {{ locale === 'fa' ? 'مشاهده پیشرفت و دستاوردهای خود' : 'View your progress and achievements' }}
+                </ion-card-content>
+              </ion-card>
+
+              <ion-card class="feature-card">
+                <div class="feature-icon">
+                  <ion-icon :icon="shield" />
+                </div>
+                <ion-card-header>
+                  <ion-card-title>{{ locale === 'fa' ? 'محرمانگی کامل' : 'Complete Privacy' }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  {{ locale === 'fa' ? 'اطلاعات شما با امنیت بالا محافظت می‌شود' : 'Your information is protected with high security' }}
+                </ion-card-content>
+              </ion-card>
+
+              <ion-card class="feature-card">
+                <div class="feature-icon">
+                  <ion-icon :icon="people" />
+                </div>
+                <ion-card-header>
+                  <ion-card-title>{{ locale === 'fa' ? 'متخصصین مجرب' : 'Expert Professionals' }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  {{ locale === 'fa' ? 'دسترسی به روانشناسان و مشاوران حرفه‌ای' : 'Access to professional psychologists and counselors' }}
+                </ion-card-content>
+              </ion-card>
             </div>
-            <div class="action-content">
-              <h3>{{ locale === 'fa' ? 'گفتگو با مشاور' : 'Chat with Counselor' }}</h3>
-              <p>{{ locale === 'fa' ? 'شروع مکالمه آنی' : 'Start instant conversation' }}</p>
-            </div>
-            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
 
-          <div class="action-card" @click="navigateToAppointments">
-            <div class="action-icon-wrapper success">
-              <ion-icon :icon="calendar" class="action-icon"></ion-icon>
+          <!-- Wellness Quote -->
+          <div class="wellness-card">
+            <div class="quote-icon">
+              <ion-icon :icon="sparkles" />
             </div>
-            <div class="action-content">
-              <h3>{{ locale === 'fa' ? 'رزرو نوبت' : 'Book Appointment' }}</h3>
-              <p>{{ locale === 'fa' ? 'برنامه‌ریزی جلسات' : 'Schedule your sessions' }}</p>
-            </div>
-            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+            <p class="wellness-quote">
+              {{ locale === 'fa' 
+                ? '«سلامت روان، پایه و اساس زندگی شادی و معنادار است»' 
+                : '"Mental health is the foundation of a happy and meaningful life"' }}
+            </p>
           </div>
-
-          <div class="action-card" @click="navigateToProfile">
-            <div class="action-icon-wrapper warning">
-              <ion-icon :icon="person" class="action-icon"></ion-icon>
-            </div>
-            <div class="action-content">
-              <h3>{{ locale === 'fa' ? 'پروفایل من' : 'My Profile' }}</h3>
-              <p>{{ locale === 'fa' ? 'مدیریت اطلاعات شخصی' : 'Manage your information' }}</p>
-            </div>
-            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
-          </div>
-        </div>
-      </div>
-
-      <!-- Features Section -->
-      <div class="section">
-        <h2 class="section-title">{{ locale === 'fa' ? 'خدمات ما' : 'Our Services' }}</h2>
-        <div class="features-grid">
-          <ion-card class="feature-card">
-            <div class="feature-icon">
-              <ion-icon :icon="notifications"></ion-icon>
-            </div>
-            <ion-card-header>
-              <ion-card-title>{{ locale === 'fa' ? 'یادآوری‌های هوشمند' : 'Smart Reminders' }}</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              {{ locale === 'fa' ? 'یادآوری خودکار برای جلسات و مراقبت از خود' : 'Automatic reminders for sessions and self-care' }}
-            </ion-card-content>
-          </ion-card>
-
-          <ion-card class="feature-card">
-            <div class="feature-icon">
-              <ion-icon :icon="statsChart"></ion-icon>
-            </div>
-            <ion-card-header>
-              <ion-card-title>{{ locale === 'fa' ? 'پیگیری پیشرفت' : 'Progress Tracking' }}</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              {{ locale === 'fa' ? 'مشاهده پیشرفت و دستاوردهای خود' : 'View your progress and achievements' }}
-            </ion-card-content>
-          </ion-card>
-
-          <ion-card class="feature-card">
-            <div class="feature-icon">
-              <ion-icon :icon="shield"></ion-icon>
-            </div>
-            <ion-card-header>
-              <ion-card-title>{{ locale === 'fa' ? 'محرمانگی کامل' : 'Complete Privacy' }}</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              {{ locale === 'fa' ? 'اطلاعات شما با امنیت بالا محافظت می‌شود' : 'Your information is protected with high security' }}
-            </ion-card-content>
-          </ion-card>
-
-          <ion-card class="feature-card">
-            <div class="feature-icon">
-              <ion-icon :icon="people"></ion-icon>
-            </div>
-            <ion-card-header>
-              <ion-card-title>{{ locale === 'fa' ? 'متخصصین مجرب' : 'Expert Professionals' }}</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              {{ locale === 'fa' ? 'دسترسی به روانشناسان و مشاوران حرفه‌ای' : 'Access to professional psychologists and counselors' }}
-            </ion-card-content>
-          </ion-card>
-        </div>
-      </div>
-
-      <!-- Wellness Quote -->
-      <div class="wellness-card">
-        <div class="quote-icon">
-          <ion-icon :icon="sparkles"></ion-icon>
-        </div>
-        <p class="wellness-quote">
-          {{ locale === 'fa' 
-            ? '«سلامت روان، پایه و اساس زندگی شادی و معنادار است»' 
-            : '"Mental health is the foundation of a happy and meaningful life"' }}
-        </p>
-      </div>
         </div>
       </OverlayScrollbarsComponent>
     </ion-content>
