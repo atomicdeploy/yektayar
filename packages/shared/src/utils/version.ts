@@ -25,14 +25,16 @@ interface PackageJson {
  * ```
  * 
  * @param packageJson - The imported package.json object
- * @param fallbackVersion - Fallback version if package.json doesn't have version
  * @returns The package version string
+ * @throws Error if version is not found in package.json
  */
 export function getVersionFromPackageJson(
-  packageJson: PackageJson | { version?: string },
-  fallbackVersion: string = '0.1.0'
+  packageJson: PackageJson | { version?: string }
 ): string {
-  return packageJson?.version || fallbackVersion
+  if (!packageJson?.version) {
+    throw new Error('Version not found in package.json')
+  }
+  return packageJson.version
 }
 
 /**
@@ -50,10 +52,10 @@ export function getVersionFromPackageJson(
  * })
  * ```
  * 
- * @param fallbackVersion - Fallback version if env var is not set
  * @returns The package version string
+ * @throws Error if VITE_APP_VERSION is not set in environment
  */
-export function getVitePackageVersion(fallbackVersion: string = '0.1.0'): string {
+export function getVitePackageVersion(): string {
   // Type guard for Vite environment
   const meta = import.meta as any
   if (typeof meta !== 'undefined' && 
@@ -61,6 +63,6 @@ export function getVitePackageVersion(fallbackVersion: string = '0.1.0'): string
       'VITE_APP_VERSION' in meta.env) {
     return meta.env.VITE_APP_VERSION as string
   }
-  return fallbackVersion
+  throw new Error('VITE_APP_VERSION not found in import.meta.env. Ensure vite.config.ts defines it.')
 }
 
