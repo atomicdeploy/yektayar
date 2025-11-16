@@ -11,7 +11,7 @@
         
         <div v-if="isDevelopment && details" class="error-section">
           <h3 class="section-title">{{ t('error_screen.details') }}</h3>
-          <div class="error-details" :dir="direction">
+          <div class="error-details" :dir="errorDetailsDirection">
             <p>{{ translatedDetails }}</p>
           </div>
         </div>
@@ -94,6 +94,15 @@ const translatedDetails = computed(() => {
     return t('error_screen.api_url_missing')
   }
   return props.details
+})
+
+const errorDetailsDirection = computed(() => {
+  // If the error message is translated (contains API_BASE_URL), use the app's direction
+  if (props.details && (props.details.includes('API_BASE_URL') || props.details.includes('VITE_API_BASE_URL'))) {
+    return locale.value === 'fa' ? 'rtl' : 'ltr'
+  }
+  // Otherwise, raw error messages are in English, so always use LTR
+  return 'ltr'
 })
 
 const currentSolution = computed(() => {
