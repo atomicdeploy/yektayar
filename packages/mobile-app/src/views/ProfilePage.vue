@@ -192,7 +192,7 @@
             <ion-icon :icon="informationCircle" slot="start" color="tertiary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'درباره برنامه' : 'About App' }}</h3>
-              <p>{{ locale === 'fa' ? `نسخه ${APP_VERSION}` : `Version ${APP_VERSION}` }}</p>
+              <p>{{ versionText }}</p>
             </ion-label>
           </ion-item>
 
@@ -250,10 +250,19 @@ import {
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
-import { APP_VERSION } from '@yektayar/shared'
+import { getVitePackageVersion } from '@yektayar/shared'
+import { computed } from 'vue'
 
 const { locale } = useI18n()
 const { currentTheme, toggleTheme } = useTheme()
+
+// Get version from Vite environment variable
+const APP_VERSION = getVitePackageVersion()
+
+// Computed property for version display based on locale
+const versionText = computed(() => {
+  return locale.value === 'fa' ? `نسخه ${APP_VERSION}` : `Version ${APP_VERSION}`
+})
 
 // Import router for navigation
 import { useRouter } from 'vue-router'

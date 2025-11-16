@@ -2,7 +2,11 @@ import { Server as SocketIOServer } from 'socket.io'
 import type { Server as HTTPServer } from 'http'
 import type { Socket } from 'socket.io'
 import { validateSessionToken } from '../services/sessionService'
-import { SOCKET_IO_PATH, APP_VERSION } from '@yektayar/shared'
+import { SOCKET_IO_PATH, getVersionFromPackageJson } from '@yektayar/shared'
+import packageJson from '../../package.json'
+
+// Get version from package.json
+const APP_VERSION = getVersionFromPackageJson(packageJson)
 
 // Conditionally import Bun engine only when running on Bun
 let BunEngine: any

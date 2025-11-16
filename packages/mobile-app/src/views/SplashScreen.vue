@@ -31,14 +31,14 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { IonPage, IonContent, IonSpinner } from '@ionic/vue'
 import { useSessionStore } from '../stores/session'
-import { logger, APP_VERSION } from '@yektayar/shared'
+import { logger, getVitePackageVersion } from '@yektayar/shared'
 import apiClient from '@/api'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
 const errorMessage = ref<string>('')
 const fontsLoaded = ref<boolean>(false)
-const appVersion = ref<string>(APP_VERSION)
+const appVersion = ref<string>(getVitePackageVersion())
 const apiVersion = ref<string>('')
 const heroImageLoaded = ref<boolean>(false)
 
@@ -121,7 +121,7 @@ onMounted(async () => {
     try {
       const response = await apiClient.get<{ version: string }>('/', { skipAuth: true })
       if (response.success && response.data) {
-        apiVersion.value = response.data.version || APP_VERSION
+        apiVersion.value = response.data.version || appVersion.value
       }
     } catch (versionError) {
       logger.warn('Could not fetch API version:', versionError)
