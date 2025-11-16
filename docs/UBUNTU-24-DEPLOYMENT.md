@@ -55,7 +55,7 @@ Complete guide for deploying YektaYar Platform on Ubuntu 24.04 LTS VPS.
 ### Software Stack
 
 - **OS**: Ubuntu 24.04 LTS
-- **Runtime**: Node.js 18+ and Bun 1.0+
+- **Runtime**: Node.js 20.19+ and Bun 1.0+
 - **Database**: PostgreSQL 15+
 - **Web Server**: Apache 2.4+ or Nginx
 - **Process Manager**: PM2
@@ -133,15 +133,15 @@ ssh yektayar@your_server_ip
 
 ## Install Required Software
 
-### 1. Install Node.js 18.x
+### 1. Install Node.js 20.x
 
 ```bash
-# Install Node.js 18.x from NodeSource
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# Install Node.js 20.x from NodeSource
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
 # Verify installation
-node --version   # Should show v18.x.x
+node --version   # Should show v20.x.x
 npm --version    # Should show 9.x.x or higher
 ```
 
@@ -356,6 +356,10 @@ JWT_EXPIRY=7d
 
 # CORS Settings (update with your domain)
 CORS_ORIGIN=https://yourdomain.com,https://www.yourdomain.com
+
+# Disable application-level CORS when behind Apache/Nginx with CORS headers
+# This prevents duplicate CORS headers that cause policy violations
+DISABLE_CORS=true
 
 # WebSocket
 WEBSOCKET_PORT=3001

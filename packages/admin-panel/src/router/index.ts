@@ -27,31 +27,37 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'appointments',
         name: 'appointments',
-        component: () => import('../views/HomeView.vue'),
+        component: () => import('../views/PlaceholderView.vue'),
         meta: { title: 'نوبت‌ها' },
       },
       {
         path: 'messages',
         name: 'messages',
-        component: () => import('../views/HomeView.vue'),
+        component: () => import('../views/PlaceholderView.vue'),
         meta: { title: 'پیام‌ها' },
       },
       {
         path: 'courses',
         name: 'courses',
-        component: () => import('../views/HomeView.vue'),
+        component: () => import('../views/PlaceholderView.vue'),
         meta: { title: 'دوره‌ها' },
       },
       {
         path: 'reports',
         name: 'reports',
-        component: () => import('../views/HomeView.vue'),
+        component: () => import('../views/PlaceholderView.vue'),
         meta: { title: 'گزارش‌ها' },
+      },
+      {
+        path: 'pages',
+        name: 'pages',
+        component: () => import('../views/PagesView.vue'),
+        meta: { title: 'مدیریت صفحات' },
       },
       {
         path: 'settings',
         name: 'settings',
-        component: () => import('../views/HomeView.vue'),
+        component: () => import('../views/SettingsView.vue'),
         meta: { title: 'تنظیمات' },
       },
     ],
@@ -61,6 +67,19 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory((import.meta as any).env?.BASE_URL || '/'),
   routes,
+})
+
+// Update document title on route change
+router.afterEach((to) => {
+  const baseTitle = document.documentElement.lang === 'fa' ? 'یکتایار' : 'YektaYar'
+  const tagline = document.documentElement.lang === 'fa' ? 'پلتفرم مراقبت سلامت روان' : 'Mental Health Care Platform'
+  const pageTitle = to.meta.title as string | undefined
+  
+  if (pageTitle) {
+    document.title = `${pageTitle} - ${baseTitle} - ${tagline}`
+  } else {
+    document.title = `${baseTitle} - ${tagline}`
+  }
 })
 
 export default router
