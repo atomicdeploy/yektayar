@@ -76,20 +76,24 @@ const textDirection = computed(() => {
   return locale.value === 'fa' ? 'rtl' : 'ltr'
 })
 
-const isApiConfigError = computed(() => {
-  return props.details?.includes('API_BASE_URL') || 
-         props.details?.includes('VITE_API_BASE_URL')
+// Check if the error message is one of our built-in translatable errors
+const isBuiltInError = computed(() => {
+  if (!props.details) return false
+  // Built-in errors contain specific markers that indicate they should be translated
+  return props.details.includes('API_BASE_URL')
 })
 
 const displayDetails = computed(() => {
   if (!props.details) return ''
-  return isApiConfigError.value 
+  // Use translated message for built-in errors, raw message otherwise
+  return isBuiltInError.value 
     ? t('error_screen.api_url_missing') 
     : props.details
 })
 
 const detailsDirection = computed(() => {
-  return isApiConfigError.value ? textDirection.value : 'ltr'
+  // Built-in errors use app's text direction, raw errors are always LTR (English)
+  return isBuiltInError.value ? textDirection.value : 'ltr'
 })
 
 const shouldShowDetails = computed(() => {
@@ -221,7 +225,7 @@ onBeforeUnmount(() => {
   font-size: 0.875rem;
   color: var(--error-detail-text);
   margin: 0;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', Courier, monospace;
   word-break: break-word;
 }
 
@@ -279,7 +283,7 @@ onBeforeUnmount(() => {
 }
 
 .code-block code {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', Courier, monospace;
   font-size: 0.875rem;
   color: var(--error-code-text);
   white-space: pre;
