@@ -29,6 +29,21 @@ const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:51
 // Create base app
 const app = new Elysia()
   .use(cookie())
+  // Prettify JSON responses
+  .onAfterHandle(({ response }) => {
+    // Only prettify JSON object responses
+    if (typeof response === 'object' && response !== null && !(response instanceof Response)) {
+      return new Response(
+        JSON.stringify(response, null, 2),
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+    }
+    return response
+  })
 
 // Conditionally add CORS middleware
 if (corsEnabled) {
