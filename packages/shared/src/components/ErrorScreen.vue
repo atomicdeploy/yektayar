@@ -89,8 +89,8 @@ const direction = computed(() => {
 
 const translatedDetails = computed(() => {
   if (!props.details) return ''
-  // Translate the error message if it contains VITE_API_BASE_URL or API_BASE_URL
-  if (props.details.includes('API_BASE_URL') || props.details.includes('VITE_API_BASE_URL')) {
+  // Translate the error message if it contains API_BASE_URL or API_BASE_URL
+  if (props.details.includes('API_BASE_URL') || props.details.includes('API_BASE_URL')) {
     return t('error_screen.api_url_missing')
   }
   return props.details

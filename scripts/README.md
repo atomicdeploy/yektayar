@@ -116,7 +116,7 @@ Unified environment configuration management script for the YektaYar platform.
 - CORS: `CORS_ORIGIN`
 - WebSocket: `WEBSOCKET_PORT`
 - Rate Limiting: `RATE_LIMIT_WINDOW`, `RATE_LIMIT_MAX_REQUESTS`
-- Frontend: `VITE_API_BASE_URL`, `VITE_ENVIRONMENT`
+- Frontend: `API_BASE_URL`, `VITE_ENVIRONMENT`
 
 ### Service Files (`services/`)
 
