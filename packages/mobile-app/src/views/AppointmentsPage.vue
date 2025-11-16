@@ -11,13 +11,26 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true">
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ locale === 'fa' ? 'نوبت‌ها' : 'Appointments' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
+        <div class="content-wrapper">
       <!-- Calendar Summary -->
       <div class="calendar-summary">
         <div class="month-display">
@@ -67,7 +80,7 @@
       <div class="section">
         <div class="section-header">
           <h3 class="section-title">{{ locale === 'fa' ? 'نوبت‌های آینده' : 'Upcoming' }}</h3>
-          <ion-badge color="primary">3</ion-badge>
+          <ion-badge color="secondary">3</ion-badge>
         </div>
 
         <div class="appointments-list">
@@ -197,6 +210,8 @@
           </ion-item>
         </div>
       </div>
+        </div>
+      </OverlayScrollbarsComponent>
 
       <!-- Quick Book -->
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
@@ -243,6 +258,16 @@ const { locale } = useI18n()
 </script>
 
 <style scoped>
+/* OverlayScrollbars container */
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
+.content-wrapper {
+  min-height: 100%;
+}
+
 /* Calendar Summary */
 .calendar-summary {
   background: var(--surface-1);
@@ -338,7 +363,7 @@ const { locale } = useI18n()
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
 }
 
 /* Appointments List */

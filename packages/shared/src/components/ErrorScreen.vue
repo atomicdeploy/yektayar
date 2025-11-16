@@ -18,16 +18,16 @@
           <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
         </button>
         
-        <div v-if="solutionExpanded" class="solution-content">
+        <div v-if="solutionExpanded && currentSolution" class="solution-content">
           <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
-          
-          <p v-if="currentSolution.solution" class="solution-text">{{ currentSolution.solution }}</p>
-          
-          <div v-for="(step, index) in currentSolution.steps" :key="index" class="code-block">
+
+          <p v-if="currentSolution && currentSolution?.solution" class="solution-text">{{ currentSolution.solution }}</p>
+
+          <div v-for="(step, index) in (currentSolution?.steps || [])" :key="index" class="code-block">
             <code>{{ step }}</code>
           </div>
-          
-          <p v-if="currentSolution.note" class="solution-note">
+
+          <p v-if="currentSolution && currentSolution?.note" class="solution-note">
             <span class="info-icon">ℹ️</span>
             <span class="note-text">{{ currentSolution.note }}</span>
           </p>

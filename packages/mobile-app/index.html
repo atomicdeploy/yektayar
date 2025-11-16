@@ -7,10 +7,26 @@
       :root {
         color-scheme: light dark;
       }
+      * {
+        /* Remove tap highlights on mobile devices */
+        -webkit-tap-highlight-color: transparent;
+        tap-highlight-color: transparent;
+      }
       body {
         margin: 0;
         background-color: #fafbfc;
         color: #1a1a1a;
+      }
+      /* Prevent text selection and callouts on interactive elements */
+      button,
+      a,
+      [role="button"],
+      [onclick] {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
       }
       @media (prefers-color-scheme: dark) {
         body {
@@ -19,6 +35,9 @@
         }
       }
     </style>
+    <script>
+      (function(){var t=localStorage.getItem('yektayar-theme');if(t==='dark'){document.body.style.backgroundColor='#0a0f1a';document.body.style.color='#e8e9ed';}else if(t==='light'){document.body.style.backgroundColor='#fafbfc';document.body.style.color='#1a1a1a';}})();
+    </script>
     <!-- Light mode icons -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" media="(prefers-color-scheme: light)" />

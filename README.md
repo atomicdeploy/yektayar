@@ -54,7 +54,7 @@ YektaYar is a comprehensive mental health care platform that connects users with
 
 ### Prerequisites
 
-- **Node.js** >= 18.0.0 (preferably 20.19.5 - see `.nvmrc`)
+- **Node.js** >= 20.19.0 (preferably 20.19.5 - see `.nvmrc`)
 - **npm** >= 9.0.0 (npm 10.8.2 recommended)
 - **Bun** >= 1.0.0 (optional for backend, both Bun and Node.js fully supported)
 - **PostgreSQL** 15+ (for database)
@@ -72,6 +72,9 @@ cd yektayar
 
 # Install all dependencies
 npm install
+
+# If you need to ensure all packages have up-to-date dependencies:
+npm run install:deps
 
 # Setup environment variables (unified .env for all packages)
 ./scripts/manage-env.sh init
@@ -251,6 +254,7 @@ This mono repo addresses all requirements from the issue:
 - `npm run lint` - Lint all packages
 - `npm run test` - Test all packages
 - `npm run clean` - Clean all build artifacts
+- `npm run db:cli` - Connect to database using pgcli or psql
 
 ### Package-specific Scripts
 - `npm run dev:backend` - Backend only

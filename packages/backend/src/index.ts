@@ -18,6 +18,7 @@ import { aiRoutes } from './routes/ai'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
 import { initializeDatabase } from './services/database'
+import { SOCKET_IO_PATH } from '@yektayar/shared'
 
 // Configure CORS based on environment
 // When behind a reverse proxy (like Apache), disable application-level CORS
@@ -60,8 +61,13 @@ const app = new Elysia()
           { name: 'Pages', description: 'Content pages endpoints' },
           { name: 'Settings', description: 'Application settings endpoints' },
           { name: 'Support', description: 'Support tickets and messaging endpoints' },
-          { name: 'AI', description: 'AI counselor chat endpoints' }
-        ]
+          { name: 'AI', description: 'AI counselor chat endpoints' },
+          { name: 'WebSocket', description: 'Real-time communication via Socket.IO' }
+        ],
+        externalDocs: {
+          description: `Socket.IO WebSocket endpoint available at ${SOCKET_IO_PATH}`,
+          url: 'https://socket.io/docs/v4/'
+        }
       }
     })
   )
@@ -79,6 +85,23 @@ const app = new Elysia()
     status: 'healthy',
     timestamp: new Date().toISOString()
   }))
+  .get('/websocket-info', () => ({
+    path: SOCKET_IO_PATH,
+    description: 'Socket.IO WebSocket endpoint for real-time communication',
+    documentation: 'https://socket.io/docs/v4/',
+    authentication: 'Required - Pass session token in auth.token',
+    transports: ['websocket', 'polling'],
+    events: {
+      client: ['ping', 'status', 'echo', 'info', 'message', 'ai:chat'],
+      server: ['connected', 'pong', 'status_response', 'echo_response', 'info_response', 'message_received', 'ai:response:start', 'ai:response:chunk', 'ai:response:complete', 'ai:response:error']
+    }
+  }), {
+    detail: {
+      tags: ['WebSocket'],
+      summary: 'Get Socket.IO WebSocket connection information',
+      description: 'Returns information about the Socket.IO WebSocket endpoint including path, authentication requirements, and available events'
+    }
+  })
   .use(authRoutes)
   .use(userRoutes)
   .use(messageRoutes)
@@ -123,7 +146,7 @@ if (isBun) {
     fetch: async (req, server) => {
       const url = new URL(req.url)
       // Handle Socket.IO requests
-      if (url.pathname.startsWith('/socket.io/')) {
+      if (url.pathname.startsWith(SOCKET_IO_PATH)) {
         return engine.handleRequest(req, server)
       }
       // Handle regular Elysia app requests
@@ -133,9 +156,18 @@ if (isBun) {
   })
   
   console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
-  console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
-  console.log(`🔒 Documentation protected with Basic Auth`)
-  console.log(`✅ Socket.IO enabled on same port (${port})`)
+  
+  // Show authentication status based on environment
+  const isProduction = Bun.env.NODE_ENV === 'production'
+  if (isProduction) {
+    console.log(`🚫 API Documentation is disabled in production mode`)
+  } else {
+    console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
+    console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
+  }
+  
+  // TODO: these are also duplicated below, refactor later
+  console.log(`✅ Socket.IO enabled`)
 
   // TODO: complete custom startup logs
   // console.log(`⚠️ WARNING: `)
@@ -204,9 +236,18 @@ if (isBun) {
   // Start the server
   httpServer.listen(port, hostname, () => {
     console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
-    console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
-    console.log(`🔒 Documentation protected with Basic Auth`)
-    console.log(`✅ Socket.IO enabled on same port (${port})`)
+    
+    // Show authentication status based on environment
+    const isProduction = process.env.NODE_ENV === 'production'
+    if (isProduction) {
+      console.log(`🚫 API Documentation is disabled in production mode`)
+    } else {
+      console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
+      console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
+    }
+    
+    // TODO: these are duplicate logs from above, refactor later
+    console.log(`✅ Socket.IO enabled`)
     // TODO: complete custom startup logs
   })
 }
