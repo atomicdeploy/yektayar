@@ -432,7 +432,7 @@ const navigateToProfile = () => router.push('/tabs/profile')
 ion-card-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
 }
 
 ion-card-content {
