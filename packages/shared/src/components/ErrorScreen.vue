@@ -11,7 +11,7 @@
         
         <div v-if="isDevelopment && details" class="error-section">
           <h3 class="section-title">{{ t('error_screen.details') }}</h3>
-          <div class="error-details">
+          <div class="error-details" dir="ltr">
             <p>{{ translatedDetails }}</p>
           </div>
         </div>
@@ -226,7 +226,8 @@ ion-content .error-section {
   border-radius: 0.5rem;
   padding: 1rem;
   width: 100%;
-  text-align: start;
+  direction: ltr;
+  text-align: left;
 }
 
 .dark-mode .error-details {
