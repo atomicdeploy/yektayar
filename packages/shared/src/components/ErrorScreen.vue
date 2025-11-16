@@ -11,7 +11,7 @@
         
         <div v-if="isDevelopment && details" class="error-section">
           <h3 class="section-title">{{ t('error_screen.details') }}</h3>
-          <div class="error-details">
+          <div class="error-details" :dir="direction">
             <p>{{ translatedDetails }}</p>
           </div>
         </div>
