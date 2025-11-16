@@ -1,12 +1,6 @@
 <template>
-  <div
-    class="loading-spinner"
-    :style="{ width: size, height: size }"
-  >
-    <svg
-      viewBox="0 0 50 50"
-      class="spinner-svg"
-    >
+  <div class="loading-spinner" :style="{ width: size, height: size }">
+    <svg viewBox="0 0 50 50" class="spinner-svg">
       <circle
         cx="25"
         cy="25"

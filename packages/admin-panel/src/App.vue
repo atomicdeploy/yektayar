@@ -1,9 +1,5 @@
 <template>
-  <div
-    id="app"
-    :dir="locale === 'fa' ? 'rtl' : 'ltr'"
-    :class="{ 'dark': isDark }"
-  >
+  <div id="app" :dir="locale === 'fa' ? 'rtl' : 'ltr'" :class="{ 'dark': isDark }">
     <router-view />
     <ErrorNotification />
   </div>

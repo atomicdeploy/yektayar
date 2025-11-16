@@ -2,33 +2,22 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <template #start>
-          <ion-buttons>
-            <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'" />
-          </ion-buttons>
-        </template>
+        <ion-buttons slot="start">
+          <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'"></ion-back-button>
+        </ion-buttons>
         <ion-title>{{ locale === 'fa' ? 'پشتیبانی' : 'Support' }}</ion-title>
-        <template #end>
-          <ion-buttons>
-            <ion-button @click="showNewTicketModal = true">
-              <template #icon-only>
-                <ion-icon :icon="add" />
-              </template>
-            </ion-button>
-          </ion-buttons>
-        </template>
+        <ion-buttons slot="end">
+          <ion-button @click="showNewTicketModal = true">
+            <ion-icon :icon="add" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content
-      :fullscreen="true"
-      :scroll-y="false"
-    >
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">
-            {{ locale === 'fa' ? 'پشتیبانی' : 'Support' }}
-          </ion-title>
+          <ion-title size="large">{{ locale === 'fa' ? 'پشتیبانی' : 'Support' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -45,217 +34,155 @@
         defer
       >
         <div class="content-wrapper">
-          <!-- Hero Section -->
-          <div class="support-hero">
-            <div class="hero-icon">
-              <ion-icon :icon="helpCircle" />
+      <!-- Hero Section -->
+      <div class="support-hero">
+        <div class="hero-icon">
+          <ion-icon :icon="helpCircle"></ion-icon>
+        </div>
+        <h2>{{ locale === 'fa' ? 'چطور می‌توانیم کمکتان کنیم؟' : 'How can we help you?' }}</h2>
+        <p>{{ locale === 'fa' ? 'تیم پشتیبانی ما آماده پاسخگویی به سوالات شماست' : 'Our support team is ready to answer your questions' }}</p>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section">
+        <h3 class="section-title">{{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}</h3>
+        <div class="action-grid">
+          <ion-card button @click="showNewTicketModal = true" class="action-card">
+            <div class="action-icon primary">
+              <ion-icon :icon="chatbubbles"></ion-icon>
             </div>
-            <h2>{{ locale === 'fa' ? 'چطور می‌توانیم کمکتان کنیم؟' : 'How can we help you?' }}</h2>
-            <p>{{ locale === 'fa' ? 'تیم پشتیبانی ما آماده پاسخگویی به سوالات شماست' : 'Our support team is ready to answer your questions' }}</p>
-          </div>
+            <h4>{{ locale === 'fa' ? 'تیکت جدید' : 'New Ticket' }}</h4>
+          </ion-card>
 
-          <!-- Quick Actions -->
-          <div class="section">
-            <h3 class="section-title">
-              {{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}
-            </h3>
-            <div class="action-grid">
-              <ion-card
-                button
-                class="action-card"
-                @click="showNewTicketModal = true"
-              >
-                <div class="action-icon primary">
-                  <ion-icon :icon="chatbubbles" />
-                </div>
-                <h4>{{ locale === 'fa' ? 'تیکت جدید' : 'New Ticket' }}</h4>
-              </ion-card>
-
-              <ion-card
-                button
-                class="action-card"
-                @click="loadTickets"
-              >
-                <div class="action-icon success">
-                  <ion-icon :icon="refresh" />
-                </div>
-                <h4>{{ locale === 'fa' ? 'بروزرسانی' : 'Refresh' }}</h4>
-              </ion-card>
+          <ion-card button @click="loadTickets" class="action-card">
+            <div class="action-icon success">
+              <ion-icon :icon="refresh"></ion-icon>
             </div>
-          </div>
+            <h4>{{ locale === 'fa' ? 'بروزرسانی' : 'Refresh' }}</h4>
+          </ion-card>
+        </div>
+      </div>
 
-          <!-- Tickets List -->
-          <div class="section">
-            <h3 class="section-title">
-              {{ locale === 'fa' ? 'تیکت‌های شما' : 'Your Tickets' }}
-            </h3>
+      <!-- Tickets List -->
+      <div class="section">
+        <h3 class="section-title">{{ locale === 'fa' ? 'تیکت‌های شما' : 'Your Tickets' }}</h3>
         
-            <!-- Loading -->
-            <div
-              v-if="loading"
-              class="loading-container"
-            >
-              <ion-spinner
-                name="crescent"
-                color="primary"
-              />
-            </div>
+        <!-- Loading -->
+        <div v-if="loading" class="loading-container">
+          <ion-spinner name="crescent" color="primary"></ion-spinner>
+        </div>
 
-            <!-- Empty State -->
-            <div
-              v-else-if="tickets.length === 0"
-              class="empty-state"
-            >
-              <ion-icon
-                :icon="documentText"
-                class="empty-icon"
-              />
-              <h4>{{ locale === 'fa' ? 'هیچ تیکتی وجود ندارد' : 'No Tickets Yet' }}</h4>
-              <p>{{ locale === 'fa' ? 'برای شروع، یک تیکت جدید ایجاد کنید' : 'Create a new ticket to get started' }}</p>
-              <ion-button
-                color="primary"
-                @click="showNewTicketModal = true"
-              >
-                <template #start>
-                  <ion-icon :icon="add" />
-                </template>
-                {{ locale === 'fa' ? 'ایجاد تیکت' : 'Create Ticket' }}
-              </ion-button>
-            </div>
+        <!-- Empty State -->
+        <div v-else-if="tickets.length === 0" class="empty-state">
+          <ion-icon :icon="documentText" class="empty-icon"></ion-icon>
+          <h4>{{ locale === 'fa' ? 'هیچ تیکتی وجود ندارد' : 'No Tickets Yet' }}</h4>
+          <p>{{ locale === 'fa' ? 'برای شروع، یک تیکت جدید ایجاد کنید' : 'Create a new ticket to get started' }}</p>
+          <ion-button @click="showNewTicketModal = true" color="primary">
+            <ion-icon :icon="add" slot="start"></ion-icon>
+            {{ locale === 'fa' ? 'ایجاد تیکت' : 'Create Ticket' }}
+          </ion-button>
+        </div>
 
-            <!-- Tickets -->
-            <ion-list
-              v-else
-              :inset="true"
-            >
-              <ion-item 
-                v-for="ticket in tickets" 
-                :key="ticket.id" 
-                button 
-                detail
-                @click="openTicket(ticket)"
-              >
-                <template #start>
-                  <ion-icon 
-                    :icon="getStatusIcon(ticket.status)" 
-                    :color="getStatusColor(ticket.status)"
-                  />
-                </template>
-                <ion-label>
-                  <h3>{{ ticket.subject }}</h3>
-                  <p>{{ ticket.message.substring(0, 60) }}{{ ticket.message.length > 60 ? '...' : '' }}</p>
-                  <p class="ticket-meta">
-                    <ion-badge :color="getPriorityColor(ticket.priority)">
-                      {{ locale === 'fa' ? getPriorityLabelFa(ticket.priority) : ticket.priority }}
-                    </ion-badge>
-                    <span class="ticket-date">{{ formatDate(ticket.created_at) }}</span>
-                  </p>
-                </ion-label>
-              </ion-item>
-            </ion-list>
-          </div>
+        <!-- Tickets -->
+        <ion-list v-else :inset="true">
+          <ion-item 
+            v-for="ticket in tickets" 
+            :key="ticket.id" 
+            button 
+            detail
+            @click="openTicket(ticket)"
+          >
+            <ion-icon 
+              :icon="getStatusIcon(ticket.status)" 
+              :color="getStatusColor(ticket.status)" 
+              slot="start"
+            ></ion-icon>
+            <ion-label>
+              <h3>{{ ticket.subject }}</h3>
+              <p>{{ ticket.message.substring(0, 60) }}{{ ticket.message.length > 60 ? '...' : '' }}</p>
+              <p class="ticket-meta">
+                <ion-badge :color="getPriorityColor(ticket.priority)">
+                  {{ locale === 'fa' ? getPriorityLabelFa(ticket.priority) : ticket.priority }}
+                </ion-badge>
+                <span class="ticket-date">{{ formatDate(ticket.created_at) }}</span>
+              </p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
 
-          <!-- Bottom Spacing -->
-          <div style="height: 2rem;" />
+      <!-- Bottom Spacing -->
+      <div style="height: 2rem;"></div>
         </div>
       </OverlayScrollbarsComponent>
     </ion-content>
 
     <!-- New Ticket Modal -->
-    <ion-modal
-      :is-open="showNewTicketModal"
-      @did-dismiss="showNewTicketModal = false"
-    >
+    <ion-modal :is-open="showNewTicketModal" @did-dismiss="showNewTicketModal = false">
       <ion-header>
         <ion-toolbar>
           <ion-title>{{ locale === 'fa' ? 'تیکت جدید' : 'New Ticket' }}</ion-title>
-          <template #end>
-            <ion-buttons>
-              <ion-button @click="showNewTicketModal = false">
-                {{ locale === 'fa' ? 'بستن' : 'Close' }}
-              </ion-button>
-            </ion-buttons>
-          </template>
+          <ion-buttons slot="end">
+            <ion-button @click="showNewTicketModal = false">
+              {{ locale === 'fa' ? 'بستن' : 'Close' }}
+            </ion-button>
+          </ion-buttons>
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding">
         <ion-item>
-          <ion-label position="stacked">
-            {{ locale === 'fa' ? 'موضوع' : 'Subject' }}
-          </ion-label>
+          <ion-label position="stacked">{{ locale === 'fa' ? 'موضوع' : 'Subject' }}</ion-label>
           <ion-input 
             v-model="newTicket.subject" 
             :placeholder="locale === 'fa' ? 'موضوع تیکت را وارد کنید' : 'Enter ticket subject'"
-          />
+          ></ion-input>
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">
-            {{ locale === 'fa' ? 'اولویت' : 'Priority' }}
-          </ion-label>
+          <ion-label position="stacked">{{ locale === 'fa' ? 'اولویت' : 'Priority' }}</ion-label>
           <ion-select v-model="newTicket.priority">
-            <ion-select-option value="low">
-              {{ locale === 'fa' ? 'کم' : 'Low' }}
-            </ion-select-option>
-            <ion-select-option value="normal">
-              {{ locale === 'fa' ? 'متوسط' : 'Normal' }}
-            </ion-select-option>
-            <ion-select-option value="high">
-              {{ locale === 'fa' ? 'بالا' : 'High' }}
-            </ion-select-option>
-            <ion-select-option value="urgent">
-              {{ locale === 'fa' ? 'فوری' : 'Urgent' }}
-            </ion-select-option>
+            <ion-select-option value="low">{{ locale === 'fa' ? 'کم' : 'Low' }}</ion-select-option>
+            <ion-select-option value="normal">{{ locale === 'fa' ? 'متوسط' : 'Normal' }}</ion-select-option>
+            <ion-select-option value="high">{{ locale === 'fa' ? 'بالا' : 'High' }}</ion-select-option>
+            <ion-select-option value="urgent">{{ locale === 'fa' ? 'فوری' : 'Urgent' }}</ion-select-option>
           </ion-select>
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">
-            {{ locale === 'fa' ? 'پیام' : 'Message' }}
-          </ion-label>
+          <ion-label position="stacked">{{ locale === 'fa' ? 'پیام' : 'Message' }}</ion-label>
           <ion-textarea 
             v-model="newTicket.message" 
             :placeholder="locale === 'fa' ? 'توضیحات تیکت را وارد کنید' : 'Enter ticket description'"
             :rows="6"
             :auto-grow="true"
-          />
+          ></ion-textarea>
         </ion-item>
 
         <ion-button 
           expand="block" 
-          :disabled="!newTicket.subject || !newTicket.message || submitting" 
+          @click="submitTicket" 
+          :disabled="!newTicket.subject || !newTicket.message || submitting"
           style="margin-top: 1rem;"
-          @click="submitTicket"
         >
-          <template #start>
-            <ion-icon :icon="send" />
-          </template>
+          <ion-icon :icon="send" slot="start"></ion-icon>
           {{ submitting ? (locale === 'fa' ? 'در حال ارسال...' : 'Sending...') : (locale === 'fa' ? 'ارسال تیکت' : 'Submit Ticket') }}
         </ion-button>
       </ion-content>
     </ion-modal>
 
     <!-- Ticket Details Modal -->
-    <ion-modal
-      :is-open="showTicketModal"
-      @did-dismiss="showTicketModal = false"
-    >
+    <ion-modal :is-open="showTicketModal" @did-dismiss="showTicketModal = false">
       <ion-header>
         <ion-toolbar>
           <ion-title>{{ selectedTicket?.subject }}</ion-title>
-          <template #end>
-            <ion-buttons>
-              <ion-button @click="showTicketModal = false">
-                {{ locale === 'fa' ? 'بستن' : 'Close' }}
-              </ion-button>
-            </ion-buttons>
-          </template>
+          <ion-buttons slot="end">
+            <ion-button @click="showTicketModal = false">
+              {{ locale === 'fa' ? 'بستن' : 'Close' }}
+            </ion-button>
+          </ion-buttons>
         </ion-toolbar>
       </ion-header>
-      <ion-content
-        v-if="selectedTicket"
-        class="ion-padding"
-      >
+      <ion-content v-if="selectedTicket" class="ion-padding">
         <!-- Ticket Info -->
         <div class="ticket-info">
           <div class="info-row">
@@ -266,9 +193,7 @@
               {{ locale === 'fa' ? getPriorityLabelFa(selectedTicket.priority) : selectedTicket.priority }}
             </ion-badge>
           </div>
-          <p class="ticket-date">
-            {{ formatDate(selectedTicket.created_at) }}
-          </p>
+          <p class="ticket-date">{{ formatDate(selectedTicket.created_at) }}</p>
         </div>
 
         <!-- Messages -->
@@ -282,9 +207,7 @@
               <span class="sender">{{ message.sender_type === 'user' ? (locale === 'fa' ? 'شما' : 'You') : (locale === 'fa' ? 'پشتیبانی' : 'Support') }}</span>
               <span class="time">{{ formatTime(message.created_at) }}</span>
             </div>
-            <div class="message-body">
-              {{ message.message }}
-            </div>
+            <div class="message-body">{{ message.message }}</div>
           </div>
         </div>
 
@@ -295,16 +218,14 @@
               v-model="replyMessage" 
               :placeholder="locale === 'fa' ? 'پاسخ خود را بنویسید...' : 'Type your reply...'"
               :rows="3"
-            />
+            ></ion-textarea>
           </ion-item>
           <ion-button 
             expand="block" 
-            :disabled="!replyMessage || sendingReply" 
-            @click="sendReply"
+            @click="sendReply" 
+            :disabled="!replyMessage || sendingReply"
           >
-            <template #start>
-              <ion-icon :icon="send" />
-            </template>
+            <ion-icon :icon="send" slot="start"></ion-icon>
             {{ sendingReply ? (locale === 'fa' ? 'در حال ارسال...' : 'Sending...') : (locale === 'fa' ? 'ارسال پاسخ' : 'Send Reply') }}
           </ion-button>
         </div>

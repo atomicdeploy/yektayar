@@ -2,27 +2,17 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <template #start>
-          <ion-buttons>
-            <ion-back-button
-              :text="locale === 'fa' ? 'بازگشت' : 'Back'"
-              default-href="/tabs/profile"
-            />
-          </ion-buttons>
-        </template>
+        <ion-buttons slot="start">
+          <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'" default-href="/tabs/profile"></ion-back-button>
+        </ion-buttons>
         <ion-title>{{ locale === 'fa' ? 'اطلاعات شخصی' : 'Personal Information' }}</ion-title>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content
-      :fullscreen="true"
-      :scroll-y="false"
-    >
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">
-            {{ locale === 'fa' ? 'اطلاعات شخصی' : 'Personal Information' }}
-          </ion-title>
+          <ion-title size="large">{{ locale === 'fa' ? 'اطلاعات شخصی' : 'Personal Information' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -39,279 +29,179 @@
         defer
       >
         <div class="content-wrapper">
-          <!-- Profile Avatar Section with Beautiful Gradient -->
-          <div class="avatar-section">
-            <div class="gradient-overlay" />
-            <div class="avatar-container">
-              <div class="avatar-circle">
-                <ion-icon
-                  v-if="!formData.avatar"
-                  :icon="person"
-                />
-                <img
-                  v-else
-                  :src="formData.avatar"
-                  alt="Profile"
-                >
-                <div class="avatar-ring" />
-              </div>
-              <button
-                class="avatar-edit-button"
-                @click="handleAvatarUpload"
-              >
-                <ion-icon :icon="camera" />
-              </button>
-            </div>
-            <p class="avatar-hint">
-              {{ locale === 'fa' ? 'برای تغییر تصویر کلیک کنید' : 'Tap to change photo' }}
-            </p>
-            <div class="user-badge">
-              <ion-icon :icon="shieldCheckmark" />
-              <span>{{ locale === 'fa' ? 'حساب تایید شده' : 'Verified Account' }}</span>
-            </div>
+      <!-- Profile Avatar Section with Beautiful Gradient -->
+      <div class="avatar-section">
+        <div class="gradient-overlay"></div>
+        <div class="avatar-container">
+          <div class="avatar-circle">
+            <ion-icon v-if="!formData.avatar" :icon="person"></ion-icon>
+            <img v-else :src="formData.avatar" alt="Profile" />
+            <div class="avatar-ring"></div>
           </div>
+          <button class="avatar-edit-button" @click="handleAvatarUpload">
+            <ion-icon :icon="camera"></ion-icon>
+          </button>
+        </div>
+        <p class="avatar-hint">{{ locale === 'fa' ? 'برای تغییر تصویر کلیک کنید' : 'Tap to change photo' }}</p>
+        <div class="user-badge">
+          <ion-icon :icon="shieldCheckmark"></ion-icon>
+          <span>{{ locale === 'fa' ? 'حساب تایید شده' : 'Verified Account' }}</span>
+        </div>
+      </div>
 
-          <!-- Personal Information Form -->
-          <div class="form-section">
-            <div class="section-header">
-              <h2 class="section-title">
-                <ion-icon :icon="documentText" />
-                {{ locale === 'fa' ? 'اطلاعات حساب کاربری' : 'Account Information' }}
-              </h2>
-              <p class="section-subtitle">
-                {{ locale === 'fa' ? 'اطلاعات زیر را با دقت وارد کنید' : 'Please enter your information carefully' }}
-              </p>
-            </div>
+      <!-- Personal Information Form -->
+      <div class="form-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <ion-icon :icon="documentText"></ion-icon>
+            {{ locale === 'fa' ? 'اطلاعات حساب کاربری' : 'Account Information' }}
+          </h2>
+          <p class="section-subtitle">{{ locale === 'fa' ? 'اطلاعات زیر را با دقت وارد کنید' : 'Please enter your information carefully' }}</p>
+        </div>
 
-            <ion-list
-              :inset="true"
-              class="info-list"
-            >
-              <!-- Name Field with Enhanced Design -->
-              <ion-item :class="{ 'item-has-focus': focusedField === 'name', 'item-has-error': errors.name }">
-                <ion-label
-                  position="stacked"
-                  color="medium"
-                >
-                  <div class="label-content">
-                    <ion-icon
-                      :icon="personCircle"
-                      class="field-icon"
-                    />
-                    <span>{{ locale === 'fa' ? 'نام کامل' : 'Full Name' }}</span>
-                    <span class="required-mark">*</span>
-                  </div>
-                </ion-label>
-                <ion-input
-                  v-model="formData.name"
-                  :placeholder="locale === 'fa' ? 'نام و نام خانوادگی خود را وارد کنید' : 'Enter your full name'"
-                  type="text"
-                  :class="{ 'ion-invalid': errors.name }"
-                  @ion-focus="focusedField = 'name'"
-                  @ion-blur="handleBlur('name')"
-                />
-                <template #end>
-                  <ion-icon
-                    v-if="!errors.name && formData.name.trim()"
-                    :icon="checkmarkCircle"
-                    color="success"
-                    class="validation-icon"
-                  />
-                </template>
-                <template #error>
-                  <ion-note
-                    v-if="errors.name"
-                    class="error-note"
-                  >
-                    <ion-icon :icon="alertCircle" />
-                    {{ errors.name }}
-                  </ion-note>
-                </template>
-              </ion-item>
-
-              <!-- Email Field with Enhanced Design -->
-              <ion-item :class="{ 'item-has-focus': focusedField === 'email', 'item-has-error': errors.email }">
-                <ion-label
-                  position="stacked"
-                  color="medium"
-                >
-                  <div class="label-content">
-                    <ion-icon
-                      :icon="mail"
-                      class="field-icon"
-                    />
-                    <span>{{ locale === 'fa' ? 'ایمیل' : 'Email' }}</span>
-                  </div>
-                </ion-label>
-                <ion-input
-                  v-model="formData.email"
-                  :placeholder="locale === 'fa' ? 'آدرس ایمیل خود را وارد کنید' : 'Enter your email address'"
-                  type="email"
-                  :class="{ 'ion-invalid': errors.email }"
-                  @ion-focus="focusedField = 'email'"
-                  @ion-blur="handleBlur('email')"
-                />
-                <template #end>
-                  <ion-icon
-                    v-if="!errors.email && formData.email && isValidEmail(formData.email)"
-                    :icon="checkmarkCircle"
-                    color="success"
-                    class="validation-icon"
-                  />
-                </template>
-                <template #error>
-                  <ion-note
-                    v-if="errors.email"
-                    class="error-note"
-                  >
-                    <ion-icon :icon="alertCircle" />
-                    {{ errors.email }}
-                  </ion-note>
-                </template>
-              </ion-item>
-
-              <!-- Phone Field with Enhanced Design -->
-              <ion-item :class="{ 'item-has-focus': focusedField === 'phone', 'item-has-error': errors.phone }">
-                <ion-label
-                  position="stacked"
-                  color="medium"
-                >
-                  <div class="label-content">
-                    <ion-icon
-                      :icon="call"
-                      class="field-icon"
-                    />
-                    <span>{{ locale === 'fa' ? 'شماره تماس' : 'Phone Number' }}</span>
-                  </div>
-                </ion-label>
-                <ion-input
-                  v-model="formData.phone"
-                  :placeholder="locale === 'fa' ? 'شماره تلفن همراه خود را وارد کنید' : 'Enter your phone number'"
-                  type="tel"
-                  :class="{ 'ion-invalid': errors.phone }"
-                  @ion-focus="focusedField = 'phone'"
-                  @ion-blur="handleBlur('phone')"
-                />
-                <template #end>
-                  <ion-icon
-                    v-if="!errors.phone && formData.phone && isValidPhone(formData.phone)"
-                    :icon="checkmarkCircle"
-                    color="success"
-                    class="validation-icon"
-                  />
-                </template>
-                <template #error>
-                  <ion-note
-                    v-if="errors.phone"
-                    class="error-note"
-                  >
-                    <ion-icon :icon="alertCircle" />
-                    {{ errors.phone }}
-                  </ion-note>
-                </template>
-              </ion-item>
-
-              <!-- User Type with Badge Style -->
-              <ion-item class="type-item">
-                <ion-label
-                  position="stacked"
-                  color="medium"
-                >
-                  <div class="label-content">
-                    <ion-icon
-                      :icon="shield"
-                      class="field-icon"
-                    />
-                    <span>{{ locale === 'fa' ? 'نوع کاربر' : 'User Type' }}</span>
-                  </div>
-                </ion-label>
-                <div class="user-type-badge">
-                  <ion-icon :icon="ribbonOutline" />
-                  <span>{{ getUserTypeLabel(formData.type) }}</span>
-                </div>
-              </ion-item>
-            </ion-list>
-
-            <!-- Security & Privacy Notice -->
-            <div class="info-notice">
-              <div class="notice-icon-wrapper">
-                <ion-icon
-                  :icon="lockClosed"
-                  color="primary"
-                />
+        <ion-list :inset="true" class="info-list">
+          <!-- Name Field with Enhanced Design -->
+          <ion-item :class="{ 'item-has-focus': focusedField === 'name', 'item-has-error': errors.name }">
+            <ion-label position="stacked" color="medium">
+              <div class="label-content">
+                <ion-icon :icon="personCircle" class="field-icon"></ion-icon>
+                <span>{{ locale === 'fa' ? 'نام کامل' : 'Full Name' }}</span>
+                <span class="required-mark">*</span>
               </div>
-              <div class="notice-content">
-                <h3 class="notice-title">
-                  {{ locale === 'fa' ? 'امنیت و حریم خصوصی' : 'Security & Privacy' }}
-                </h3>
-                <p>{{ locale === 'fa' ? 'اطلاعات شما با بالاترین استانداردهای امنیتی رمزگذاری و محافظت می‌شود.' : 'Your information is encrypted and protected with the highest security standards.' }}</p>
-              </div>
-            </div>
+            </ion-label>
+            <ion-input
+              v-model="formData.name"
+              :placeholder="locale === 'fa' ? 'نام و نام خانوادگی خود را وارد کنید' : 'Enter your full name'"
+              type="text"
+              @ion-focus="focusedField = 'name'"
+              @ion-blur="handleBlur('name')"
+              :class="{ 'ion-invalid': errors.name }"
+            ></ion-input>
+            <ion-icon v-if="!errors.name && formData.name.trim()" :icon="checkmarkCircle" slot="end" color="success" class="validation-icon"></ion-icon>
+            <ion-note v-if="errors.name" slot="error" class="error-note">
+              <ion-icon :icon="alertCircle"></ion-icon>
+              {{ errors.name }}
+            </ion-note>
+          </ion-item>
 
-            <!-- Action Buttons with Beautiful Design -->
-            <div class="action-buttons">
-              <ion-button 
-                expand="block" 
-                :disabled="!isFormValid || isSaving"
-                class="save-button"
-                @click="handleSave"
-              >
-                <ion-icon
-                  v-if="!isSaving"
-                  slot="start"
-                  :icon="saveOutline"
-                />
-                <ion-spinner
-                  v-if="isSaving"
-                  slot="start"
-                  name="crescent"
-                />
-                {{ isSaving ? (locale === 'fa' ? 'در حال ذخیره...' : 'Saving...') : (locale === 'fa' ? 'ذخیره تغییرات' : 'Save Changes') }}
-              </ion-button>
+          <!-- Email Field with Enhanced Design -->
+          <ion-item :class="{ 'item-has-focus': focusedField === 'email', 'item-has-error': errors.email }">
+            <ion-label position="stacked" color="medium">
+              <div class="label-content">
+                <ion-icon :icon="mail" class="field-icon"></ion-icon>
+                <span>{{ locale === 'fa' ? 'ایمیل' : 'Email' }}</span>
+              </div>
+            </ion-label>
+            <ion-input
+              v-model="formData.email"
+              :placeholder="locale === 'fa' ? 'آدرس ایمیل خود را وارد کنید' : 'Enter your email address'"
+              type="email"
+              @ion-focus="focusedField = 'email'"
+              @ion-blur="handleBlur('email')"
+              :class="{ 'ion-invalid': errors.email }"
+            ></ion-input>
+            <ion-icon v-if="!errors.email && formData.email && isValidEmail(formData.email)" :icon="checkmarkCircle" slot="end" color="success" class="validation-icon"></ion-icon>
+            <ion-note v-if="errors.email" slot="error" class="error-note">
+              <ion-icon :icon="alertCircle"></ion-icon>
+              {{ errors.email }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Phone Field with Enhanced Design -->
+          <ion-item :class="{ 'item-has-focus': focusedField === 'phone', 'item-has-error': errors.phone }">
+            <ion-label position="stacked" color="medium">
+              <div class="label-content">
+                <ion-icon :icon="call" class="field-icon"></ion-icon>
+                <span>{{ locale === 'fa' ? 'شماره تماس' : 'Phone Number' }}</span>
+              </div>
+            </ion-label>
+            <ion-input
+              v-model="formData.phone"
+              :placeholder="locale === 'fa' ? 'شماره تلفن همراه خود را وارد کنید' : 'Enter your phone number'"
+              type="tel"
+              @ion-focus="focusedField = 'phone'"
+              @ion-blur="handleBlur('phone')"
+              :class="{ 'ion-invalid': errors.phone }"
+            ></ion-input>
+            <ion-icon v-if="!errors.phone && formData.phone && isValidPhone(formData.phone)" :icon="checkmarkCircle" slot="end" color="success" class="validation-icon"></ion-icon>
+            <ion-note v-if="errors.phone" slot="error" class="error-note">
+              <ion-icon :icon="alertCircle"></ion-icon>
+              {{ errors.phone }}
+            </ion-note>
+          </ion-item>
+
+          <!-- User Type with Badge Style -->
+          <ion-item class="type-item">
+            <ion-label position="stacked" color="medium">
+              <div class="label-content">
+                <ion-icon :icon="shield" class="field-icon"></ion-icon>
+                <span>{{ locale === 'fa' ? 'نوع کاربر' : 'User Type' }}</span>
+              </div>
+            </ion-label>
+            <div class="user-type-badge">
+              <ion-icon :icon="ribbonOutline"></ion-icon>
+              <span>{{ getUserTypeLabel(formData.type) }}</span>
+            </div>
+          </ion-item>
+        </ion-list>
+
+        <!-- Security & Privacy Notice -->
+        <div class="info-notice">
+          <div class="notice-icon-wrapper">
+            <ion-icon :icon="lockClosed" color="primary"></ion-icon>
+          </div>
+          <div class="notice-content">
+            <h3 class="notice-title">{{ locale === 'fa' ? 'امنیت و حریم خصوصی' : 'Security & Privacy' }}</h3>
+            <p>{{ locale === 'fa' ? 'اطلاعات شما با بالاترین استانداردهای امنیتی رمزگذاری و محافظت می‌شود.' : 'Your information is encrypted and protected with the highest security standards.' }}</p>
+          </div>
+        </div>
+
+        <!-- Action Buttons with Beautiful Design -->
+        <div class="action-buttons">
+          <ion-button 
+            expand="block" 
+            @click="handleSave"
+            :disabled="!isFormValid || isSaving"
+            class="save-button"
+          >
+            <ion-icon v-if="!isSaving" slot="start" :icon="saveOutline"></ion-icon>
+            <ion-spinner v-if="isSaving" slot="start" name="crescent"></ion-spinner>
+            {{ isSaving ? (locale === 'fa' ? 'در حال ذخیره...' : 'Saving...') : (locale === 'fa' ? 'ذخیره تغییرات' : 'Save Changes') }}
+          </ion-button>
           
-              <ion-button 
-                expand="block" 
-                fill="outline" 
-                :disabled="isSaving"
-                class="cancel-button"
-                @click="handleCancel"
-              >
-                <template #start>
-                  <ion-icon 
-                    :icon="closeCircleOutline"
-                  />
-                </template>
-                {{ locale === 'fa' ? 'انصراف' : 'Cancel' }}
-              </ion-button>
-            </div>
+          <ion-button 
+            expand="block" 
+            fill="outline" 
+            @click="handleCancel"
+            :disabled="isSaving"
+            class="cancel-button"
+          >
+            <ion-icon slot="start" :icon="closeCircleOutline"></ion-icon>
+            {{ locale === 'fa' ? 'انصراف' : 'Cancel' }}
+          </ion-button>
+        </div>
 
-            <!-- Quick Stats -->
-            <div class="stats-row">
-              <div class="stat-card">
-                <ion-icon
-                  :icon="calendarOutline"
-                  color="primary"
-                />
-                <div class="stat-info">
-                  <span class="stat-label">{{ locale === 'fa' ? 'عضویت' : 'Member Since' }}</span>
-                  <span class="stat-value">{{ locale === 'fa' ? '۱۴۰۲' : '2024' }}</span>
-                </div>
-              </div>
-              <div class="stat-card">
-                <ion-icon
-                  :icon="shieldCheckmark"
-                  color="success"
-                />
-                <div class="stat-info">
-                  <span class="stat-label">{{ locale === 'fa' ? 'وضعیت' : 'Status' }}</span>
-                  <span class="stat-value">{{ locale === 'fa' ? 'فعال' : 'Active' }}</span>
-                </div>
-              </div>
+        <!-- Quick Stats -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <ion-icon :icon="calendarOutline" color="primary"></ion-icon>
+            <div class="stat-info">
+              <span class="stat-label">{{ locale === 'fa' ? 'عضویت' : 'Member Since' }}</span>
+              <span class="stat-value">{{ locale === 'fa' ? '۱۴۰۲' : '2024' }}</span>
             </div>
           </div>
+          <div class="stat-card">
+            <ion-icon :icon="shieldCheckmark" color="success"></ion-icon>
+            <div class="stat-info">
+              <span class="stat-label">{{ locale === 'fa' ? 'وضعیت' : 'Status' }}</span>
+              <span class="stat-value">{{ locale === 'fa' ? 'فعال' : 'Active' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <!-- Bottom Spacing -->
-          <div style="height: 2rem;" />
+      <!-- Bottom Spacing -->
+      <div style="height: 2rem;"></div>
         </div>
       </OverlayScrollbarsComponent>
     </ion-content>

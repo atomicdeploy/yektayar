@@ -10,7 +10,7 @@
     "build": "vue-tsc && vite build && npx cap copy",
     "build:production": "node scripts/optimize-images.mjs && vite build --mode production && npx cap copy android",
     "preview": "vite preview",
-    "lint": "eslint . --fix",
+    "lint": "eslint .",
     "type-check": "vue-tsc --noEmit",
     "optimize-images": "node scripts/optimize-images.mjs",
     "ionic:build": "npm run build",

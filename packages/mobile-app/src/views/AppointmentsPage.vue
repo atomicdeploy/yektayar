@@ -3,27 +3,18 @@
     <ion-header :translucent="true">
       <ion-toolbar>
         <ion-title>{{ locale === 'fa' ? 'نوبت‌ها' : 'Appointments' }}</ion-title>
-        <template #end>
-          <ion-buttons>
-            <ion-button>
-              <template #icon-only>
-                <ion-icon :icon="filter" />
-              </template>
-            </ion-button>
-          </ion-buttons>
-        </template>
+        <ion-buttons slot="end">
+          <ion-button>
+            <ion-icon :icon="filter" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content
-      :fullscreen="true"
-      :scroll-y="false"
-    >
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">
-            {{ locale === 'fa' ? 'نوبت‌ها' : 'Appointments' }}
-          </ion-title>
+          <ion-title size="large">{{ locale === 'fa' ? 'نوبت‌ها' : 'Appointments' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -40,251 +31,194 @@
         defer
       >
         <div class="content-wrapper">
-          <!-- Calendar Summary -->
-          <div class="calendar-summary">
-            <div class="month-display">
-              <ion-button
-                fill="clear"
-                size="small"
-              >
-                <template #icon-only>
-                  <ion-icon :icon="chevronBack" />
-                </template>
-              </ion-button>
-              <h2>{{ locale === 'fa' ? 'آبان ۱۴۰۳' : 'November 2024' }}</h2>
-              <ion-button
-                fill="clear"
-                size="small"
-              >
-                <template #icon-only>
-                  <ion-icon :icon="chevronForward" />
-                </template>
-              </ion-button>
+      <!-- Calendar Summary -->
+      <div class="calendar-summary">
+        <div class="month-display">
+          <ion-button fill="clear" size="small">
+            <ion-icon :icon="chevronBack" slot="icon-only"></ion-icon>
+          </ion-button>
+          <h2>{{ locale === 'fa' ? 'آبان ۱۴۰۳' : 'November 2024' }}</h2>
+          <ion-button fill="clear" size="small">
+            <ion-icon :icon="chevronForward" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+        <div class="mini-calendar">
+          <div class="calendar-day">
+            <span class="day-label">{{ locale === 'fa' ? 'ش' : 'S' }}</span>
+            <span class="day-number">10</span>
+          </div>
+          <div class="calendar-day">
+            <span class="day-label">{{ locale === 'fa' ? 'ی' : 'M' }}</span>
+            <span class="day-number">11</span>
+          </div>
+          <div class="calendar-day active">
+            <span class="day-label">{{ locale === 'fa' ? 'د' : 'T' }}</span>
+            <span class="day-number">12</span>
+            <div class="day-indicator"></div>
+          </div>
+          <div class="calendar-day">
+            <span class="day-label">{{ locale === 'fa' ? 'س' : 'W' }}</span>
+            <span class="day-number">13</span>
+          </div>
+          <div class="calendar-day">
+            <span class="day-label">{{ locale === 'fa' ? 'چ' : 'T' }}</span>
+            <span class="day-number">14</span>
+            <div class="day-indicator"></div>
+          </div>
+          <div class="calendar-day">
+            <span class="day-label">{{ locale === 'fa' ? 'پ' : 'F' }}</span>
+            <span class="day-number">15</span>
+          </div>
+          <div class="calendar-day">
+            <span class="day-label">{{ locale === 'fa' ? 'ج' : 'S' }}</span>
+            <span class="day-number">16</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Appointments -->
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">{{ locale === 'fa' ? 'نوبت‌های آینده' : 'Upcoming' }}</h3>
+          <ion-badge color="secondary">3</ion-badge>
+        </div>
+
+        <div class="appointments-list">
+          <div class="appointment-card upcoming">
+            <div class="appointment-header">
+              <div class="appointment-time">
+                <ion-icon :icon="time"></ion-icon>
+                <span>{{ locale === 'fa' ? 'امروز، ۱۶:۰۰' : 'Today, 4:00 PM' }}</span>
+              </div>
+              <ion-badge color="success">{{ locale === 'fa' ? 'تایید شده' : 'Confirmed' }}</ion-badge>
             </div>
-            <div class="mini-calendar">
-              <div class="calendar-day">
-                <span class="day-label">{{ locale === 'fa' ? 'ش' : 'S' }}</span>
-                <span class="day-number">10</span>
+            <div class="appointment-body">
+              <div class="doctor-info">
+                <div class="doctor-avatar">
+                  <ion-icon :icon="person"></ion-icon>
+                </div>
+                <div class="doctor-details">
+                  <h4>{{ locale === 'fa' ? 'دکتر سارا احمدی' : 'Dr. Sara Ahmadi' }}</h4>
+                  <p>{{ locale === 'fa' ? 'روانشناس بالینی' : 'Clinical Psychologist' }}</p>
+                </div>
               </div>
-              <div class="calendar-day">
-                <span class="day-label">{{ locale === 'fa' ? 'ی' : 'M' }}</span>
-                <span class="day-number">11</span>
+              <div class="appointment-type">
+                <ion-icon :icon="videocam"></ion-icon>
+                <span>{{ locale === 'fa' ? 'جلسه آنلاین' : 'Video Session' }}</span>
               </div>
-              <div class="calendar-day active">
-                <span class="day-label">{{ locale === 'fa' ? 'د' : 'T' }}</span>
-                <span class="day-number">12</span>
-                <div class="day-indicator" />
-              </div>
-              <div class="calendar-day">
-                <span class="day-label">{{ locale === 'fa' ? 'س' : 'W' }}</span>
-                <span class="day-number">13</span>
-              </div>
-              <div class="calendar-day">
-                <span class="day-label">{{ locale === 'fa' ? 'چ' : 'T' }}</span>
-                <span class="day-number">14</span>
-                <div class="day-indicator" />
-              </div>
-              <div class="calendar-day">
-                <span class="day-label">{{ locale === 'fa' ? 'پ' : 'F' }}</span>
-                <span class="day-number">15</span>
-              </div>
-              <div class="calendar-day">
-                <span class="day-label">{{ locale === 'fa' ? 'ج' : 'S' }}</span>
-                <span class="day-number">16</span>
-              </div>
+            </div>
+            <div class="appointment-actions">
+              <ion-button expand="block" color="primary">
+                <ion-icon :icon="videocam" slot="start"></ion-icon>
+                {{ locale === 'fa' ? 'پیوستن به جلسه' : 'Join Session' }}
+              </ion-button>
             </div>
           </div>
 
-          <!-- Upcoming Appointments -->
-          <div class="section">
-            <div class="section-header">
-              <h3 class="section-title">
-                {{ locale === 'fa' ? 'نوبت‌های آینده' : 'Upcoming' }}
-              </h3>
-              <ion-badge color="secondary">
-                3
-              </ion-badge>
+          <div class="appointment-card">
+            <div class="appointment-header">
+              <div class="appointment-time">
+                <ion-icon :icon="time"></ion-icon>
+                <span>{{ locale === 'fa' ? 'فردا، ۱۰:۳۰' : 'Tomorrow, 10:30 AM' }}</span>
+              </div>
+              <ion-badge color="warning">{{ locale === 'fa' ? 'در انتظار' : 'Pending' }}</ion-badge>
             </div>
-
-            <div class="appointments-list">
-              <div class="appointment-card upcoming">
-                <div class="appointment-header">
-                  <div class="appointment-time">
-                    <ion-icon :icon="time" />
-                    <span>{{ locale === 'fa' ? 'امروز، ۱۶:۰۰' : 'Today, 4:00 PM' }}</span>
-                  </div>
-                  <ion-badge color="success">
-                    {{ locale === 'fa' ? 'تایید شده' : 'Confirmed' }}
-                  </ion-badge>
+            <div class="appointment-body">
+              <div class="doctor-info">
+                <div class="doctor-avatar">
+                  <ion-icon :icon="person"></ion-icon>
                 </div>
-                <div class="appointment-body">
-                  <div class="doctor-info">
-                    <div class="doctor-avatar">
-                      <ion-icon :icon="person" />
-                    </div>
-                    <div class="doctor-details">
-                      <h4>{{ locale === 'fa' ? 'دکتر سارا احمدی' : 'Dr. Sara Ahmadi' }}</h4>
-                      <p>{{ locale === 'fa' ? 'روانشناس بالینی' : 'Clinical Psychologist' }}</p>
-                    </div>
-                  </div>
-                  <div class="appointment-type">
-                    <ion-icon :icon="videocam" />
-                    <span>{{ locale === 'fa' ? 'جلسه آنلاین' : 'Video Session' }}</span>
-                  </div>
-                </div>
-                <div class="appointment-actions">
-                  <ion-button
-                    expand="block"
-                    color="primary"
-                  >
-                    <template #start>
-                      <ion-icon :icon="videocam" />
-                    </template>
-                    {{ locale === 'fa' ? 'پیوستن به جلسه' : 'Join Session' }}
-                  </ion-button>
+                <div class="doctor-details">
+                  <h4>{{ locale === 'fa' ? 'دکتر محمد رضایی' : 'Dr. Mohammad Rezaei' }}</h4>
+                  <p>{{ locale === 'fa' ? 'مشاور خانواده' : 'Family Counselor' }}</p>
                 </div>
               </div>
-
-              <div class="appointment-card">
-                <div class="appointment-header">
-                  <div class="appointment-time">
-                    <ion-icon :icon="time" />
-                    <span>{{ locale === 'fa' ? 'فردا، ۱۰:۳۰' : 'Tomorrow, 10:30 AM' }}</span>
-                  </div>
-                  <ion-badge color="warning">
-                    {{ locale === 'fa' ? 'در انتظار' : 'Pending' }}
-                  </ion-badge>
-                </div>
-                <div class="appointment-body">
-                  <div class="doctor-info">
-                    <div class="doctor-avatar">
-                      <ion-icon :icon="person" />
-                    </div>
-                    <div class="doctor-details">
-                      <h4>{{ locale === 'fa' ? 'دکتر محمد رضایی' : 'Dr. Mohammad Rezaei' }}</h4>
-                      <p>{{ locale === 'fa' ? 'مشاور خانواده' : 'Family Counselor' }}</p>
-                    </div>
-                  </div>
-                  <div class="appointment-type">
-                    <ion-icon :icon="location" />
-                    <span>{{ locale === 'fa' ? 'حضوری' : 'In-Person' }}</span>
-                  </div>
-                </div>
-                <div class="appointment-actions">
-                  <ion-button
-                    expand="block"
-                    fill="outline"
-                    color="medium"
-                  >
-                    {{ locale === 'fa' ? 'مشاهده جزئیات' : 'View Details' }}
-                  </ion-button>
-                </div>
-              </div>
-
-              <div class="appointment-card">
-                <div class="appointment-header">
-                  <div class="appointment-time">
-                    <ion-icon :icon="time" />
-                    <span>{{ locale === 'fa' ? 'پنجشنبه، ۱۴:۰۰' : 'Thursday, 2:00 PM' }}</span>
-                  </div>
-                  <ion-badge color="success">
-                    {{ locale === 'fa' ? 'تایید شده' : 'Confirmed' }}
-                  </ion-badge>
-                </div>
-                <div class="appointment-body">
-                  <div class="doctor-info">
-                    <div class="doctor-avatar">
-                      <ion-icon :icon="people" />
-                    </div>
-                    <div class="doctor-details">
-                      <h4>{{ locale === 'fa' ? 'گروه‌درمانی' : 'Group Therapy' }}</h4>
-                      <p>{{ locale === 'fa' ? 'مدیریت استرس' : 'Stress Management' }}</p>
-                    </div>
-                  </div>
-                  <div class="appointment-type">
-                    <ion-icon :icon="people" />
-                    <span>{{ locale === 'fa' ? 'گروهی' : 'Group' }}</span>
-                  </div>
-                </div>
-                <div class="appointment-actions">
-                  <ion-button
-                    expand="block"
-                    fill="outline"
-                    color="medium"
-                  >
-                    {{ locale === 'fa' ? 'مشاهده جزئیات' : 'View Details' }}
-                  </ion-button>
-                </div>
+              <div class="appointment-type">
+                <ion-icon :icon="location"></ion-icon>
+                <span>{{ locale === 'fa' ? 'حضوری' : 'In-Person' }}</span>
               </div>
             </div>
-          </div>
-
-          <!-- Past Appointments -->
-          <div class="section">
-            <div class="section-header">
-              <h3 class="section-title">
-                {{ locale === 'fa' ? 'نوبت‌های گذشته' : 'Past Appointments' }}
-              </h3>
-              <ion-button
-                fill="clear"
-                size="small"
-              >
-                {{ locale === 'fa' ? 'مشاهده همه' : 'View All' }}
+            <div class="appointment-actions">
+              <ion-button expand="block" fill="outline" color="medium">
+                {{ locale === 'fa' ? 'مشاهده جزئیات' : 'View Details' }}
               </ion-button>
             </div>
+          </div>
 
-            <div class="past-appointments">
-              <ion-item class="past-item">
-                <template #start>
-                  <ion-icon
-                    :icon="checkmarkCircle"
-                    color="success"
-                  />
-                </template>
-                <ion-label>
-                  <h3>{{ locale === 'fa' ? 'دکتر احمدی' : 'Dr. Ahmadi' }}</h3>
-                  <p>{{ locale === 'fa' ? 'هفته گذشته' : 'Last week' }}</p>
-                </ion-label>
-                <template #end>
-                  <ion-button fill="clear">
-                    <ion-icon :icon="documentText" />
-                  </ion-button>
-                </template>
-              </ion-item>
-
-              <ion-item class="past-item">
-                <template #start>
-                  <ion-icon
-                    :icon="checkmarkCircle"
-                    color="success"
-                  />
-                </template>
-                <ion-label>
-                  <h3>{{ locale === 'fa' ? 'گروه‌درمانی' : 'Group Therapy' }}</h3>
-                  <p>{{ locale === 'fa' ? 'دو هفته پیش' : 'Two weeks ago' }}</p>
-                </ion-label>
-                <template #end>
-                  <ion-button fill="clear">
-                    <ion-icon :icon="documentText" />
-                  </ion-button>
-                </template>
-              </ion-item>
+          <div class="appointment-card">
+            <div class="appointment-header">
+              <div class="appointment-time">
+                <ion-icon :icon="time"></ion-icon>
+                <span>{{ locale === 'fa' ? 'پنجشنبه، ۱۴:۰۰' : 'Thursday, 2:00 PM' }}</span>
+              </div>
+              <ion-badge color="success">{{ locale === 'fa' ? 'تایید شده' : 'Confirmed' }}</ion-badge>
+            </div>
+            <div class="appointment-body">
+              <div class="doctor-info">
+                <div class="doctor-avatar">
+                  <ion-icon :icon="people"></ion-icon>
+                </div>
+                <div class="doctor-details">
+                  <h4>{{ locale === 'fa' ? 'گروه‌درمانی' : 'Group Therapy' }}</h4>
+                  <p>{{ locale === 'fa' ? 'مدیریت استرس' : 'Stress Management' }}</p>
+                </div>
+              </div>
+              <div class="appointment-type">
+                <ion-icon :icon="people"></ion-icon>
+                <span>{{ locale === 'fa' ? 'گروهی' : 'Group' }}</span>
+              </div>
+            </div>
+            <div class="appointment-actions">
+              <ion-button expand="block" fill="outline" color="medium">
+                {{ locale === 'fa' ? 'مشاهده جزئیات' : 'View Details' }}
+              </ion-button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Past Appointments -->
+      <div class="section">
+        <div class="section-header">
+          <h3 class="section-title">{{ locale === 'fa' ? 'نوبت‌های گذشته' : 'Past Appointments' }}</h3>
+          <ion-button fill="clear" size="small">
+            {{ locale === 'fa' ? 'مشاهده همه' : 'View All' }}
+          </ion-button>
+        </div>
+
+        <div class="past-appointments">
+          <ion-item class="past-item">
+            <ion-icon :icon="checkmarkCircle" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h3>{{ locale === 'fa' ? 'دکتر احمدی' : 'Dr. Ahmadi' }}</h3>
+              <p>{{ locale === 'fa' ? 'هفته گذشته' : 'Last week' }}</p>
+            </ion-label>
+            <ion-button fill="clear" slot="end">
+              <ion-icon :icon="documentText"></ion-icon>
+            </ion-button>
+          </ion-item>
+
+          <ion-item class="past-item">
+            <ion-icon :icon="checkmarkCircle" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <h3>{{ locale === 'fa' ? 'گروه‌درمانی' : 'Group Therapy' }}</h3>
+              <p>{{ locale === 'fa' ? 'دو هفته پیش' : 'Two weeks ago' }}</p>
+            </ion-label>
+            <ion-button fill="clear" slot="end">
+              <ion-icon :icon="documentText"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </div>
+      </div>
         </div>
       </OverlayScrollbarsComponent>
 
       <!-- Quick Book -->
-      <template #fixed>
-        <ion-fab
-          vertical="bottom"
-          horizontal="end"
-        >
-          <ion-fab-button color="primary">
-            <ion-icon :icon="add" />
-          </ion-fab-button>
-        </ion-fab>
-      </template>
+      <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+        <ion-fab-button color="primary">
+          <ion-icon :icon="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
     </ion-content>
   </ion-page>
 </template>

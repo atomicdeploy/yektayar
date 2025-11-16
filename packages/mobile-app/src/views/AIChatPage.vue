@@ -2,31 +2,19 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <template #start>
-          <ion-buttons>
-            <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'" />
-          </ion-buttons>
-        </template>
+        <ion-buttons slot="start">
+          <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'"></ion-back-button>
+        </ion-buttons>
         <ion-title>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</ion-title>
-        <template #end>
-          <ion-buttons>
-            <ion-button @click="clearChat">
-              <template #icon-only>
-                <ion-icon 
-                  :icon="trash"
-                />
-              </template>
-            </ion-button>
-          </ion-buttons>
-        </template>
+        <ion-buttons slot="end">
+          <ion-button @click="clearChat">
+            <ion-icon slot="icon-only" :icon="trash"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content
-      ref="contentRef"
-      :fullscreen="true"
-      :scroll-y="false"
-    >
+    <ion-content :fullscreen="true" :scroll-y="false" ref="contentRef">
       <OverlayScrollbarsComponent
         class="scrollable-content"
         :options="{
@@ -40,104 +28,86 @@
         defer
       >
         <div class="content-wrapper">
-          <!-- Chat Header Info -->
-          <div class="chat-info-banner">
-            <div class="ai-avatar">
-              <ion-icon :icon="sparkles" />
-            </div>
-            <div class="ai-info">
-              <h3>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
-              <p>{{ locale === 'fa' ? 'همیشه آماده کمک به شما' : 'Always ready to help you' }}</p>
-            </div>
-            <div :class="['status-badge', isConnected ? 'online' : 'offline']">
-              {{ isConnected ? (locale === 'fa' ? 'آنلاین' : 'Online') : (locale === 'fa' ? 'آفلاین' : 'Offline') }}
-            </div>
-          </div>
+      <!-- Chat Header Info -->
+      <div class="chat-info-banner">
+        <div class="ai-avatar">
+          <ion-icon :icon="sparkles"></ion-icon>
+        </div>
+        <div class="ai-info">
+          <h3>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
+          <p>{{ locale === 'fa' ? 'همیشه آماده کمک به شما' : 'Always ready to help you' }}</p>
+        </div>
+        <div :class="['status-badge', isConnected ? 'online' : 'offline']">
+          {{ isConnected ? (locale === 'fa' ? 'آنلاین' : 'Online') : (locale === 'fa' ? 'آفلاین' : 'Offline') }}
+        </div>
+      </div>
 
-          <!-- Messages List -->
-          <div
-            ref="messagesContainer"
-            class="messages-container"
-          >
-            <!-- Welcome Message -->
-            <div
-              v-if="messages.length === 0"
-              class="welcome-message"
-            >
-              <div class="welcome-icon">
-                <ion-icon :icon="chatbubbles" />
-              </div>
-              <h2>{{ locale === 'fa' ? 'سلام! چطور می‌توانم کمکتان کنم؟' : 'Hello! How can I help you?' }}</h2>
-              <p>
-                {{ locale === 'fa' 
-                  ? 'می‌توانید هر سوالی در مورد سلامت روان خود بپرسید. من اینجا هستم تا به شما کمک کنم.' 
-                  : 'You can ask me any question about your mental health. I\'m here to help you.' }}
-              </p>
+      <!-- Messages List -->
+      <div class="messages-container" ref="messagesContainer">
+        <!-- Welcome Message -->
+        <div v-if="messages.length === 0" class="welcome-message">
+          <div class="welcome-icon">
+            <ion-icon :icon="chatbubbles"></ion-icon>
+          </div>
+          <h2>{{ locale === 'fa' ? 'سلام! چطور می‌توانم کمکتان کنم؟' : 'Hello! How can I help you?' }}</h2>
+          <p>{{ locale === 'fa' 
+            ? 'می‌توانید هر سوالی در مورد سلامت روان خود بپرسید. من اینجا هستم تا به شما کمک کنم.' 
+            : 'You can ask me any question about your mental health. I\'m here to help you.' }}</p>
           
-              <!-- Quick Suggestions -->
-              <div class="quick-suggestions">
-                <ion-chip 
-                  v-for="suggestion in quickSuggestions" 
-                  :key="suggestion.id"
-                  class="suggestion-chip"
-                  @click="sendMessage(suggestion.text)"
-                >
-                  <ion-icon :icon="suggestion.icon" />
-                  <ion-label>{{ locale === 'fa' ? suggestion.fa : suggestion.en }}</ion-label>
-                </ion-chip>
-              </div>
-            </div>
-
-            <!-- Chat Messages -->
-            <div
-              v-for="message in messages"
-              :key="message.id"
-              :class="['message-wrapper', message.role]"
+          <!-- Quick Suggestions -->
+          <div class="quick-suggestions">
+            <ion-chip 
+              v-for="suggestion in quickSuggestions" 
+              :key="suggestion.id"
+              @click="sendMessage(suggestion.text)"
+              class="suggestion-chip"
             >
-              <div class="message-bubble">
-                <div
-                  v-if="message.role === 'assistant'"
-                  class="message-header"
-                >
-                  <div class="assistant-avatar">
-                    <ion-icon :icon="sparkles" />
-                  </div>
-                  <span class="assistant-name">{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</span>
-                </div>
-                <div class="message-content">
-                  {{ message.content }}
-                </div>
-                <div class="message-footer">
-                  <span class="message-time">{{ formatTime(message.timestamp) }}</span>
-                  <ion-icon 
-                    v-if="message.role === 'user'" 
-                    :icon="message.sent ? checkmarkDone : checkmark" 
-                    :class="['message-status', message.sent ? 'sent' : 'sending']"
-                  />
-                </div>
-              </div>
-            </div>
+              <ion-icon :icon="suggestion.icon"></ion-icon>
+              <ion-label>{{ locale === 'fa' ? suggestion.fa : suggestion.en }}</ion-label>
+            </ion-chip>
+          </div>
+        </div>
 
-            <!-- Typing Indicator -->
-            <div
-              v-if="isTyping"
-              class="message-wrapper assistant"
-            >
-              <div class="message-bubble typing">
-                <div class="message-header">
-                  <div class="assistant-avatar">
-                    <ion-icon :icon="sparkles" />
-                  </div>
-                  <span class="assistant-name">{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</span>
-                </div>
-                <div class="typing-indicator">
-                  <span />
-                  <span />
-                  <span />
-                </div>
+        <!-- Chat Messages -->
+        <div v-for="message in messages" :key="message.id" :class="['message-wrapper', message.role]">
+          <div class="message-bubble">
+            <div class="message-header" v-if="message.role === 'assistant'">
+              <div class="assistant-avatar">
+                <ion-icon :icon="sparkles"></ion-icon>
               </div>
+              <span class="assistant-name">{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</span>
+            </div>
+            <div class="message-content">
+              {{ message.content }}
+            </div>
+            <div class="message-footer">
+              <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+              <ion-icon 
+                v-if="message.role === 'user'" 
+                :icon="message.sent ? checkmarkDone : checkmark" 
+                :class="['message-status', message.sent ? 'sent' : 'sending']"
+              ></ion-icon>
             </div>
           </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div v-if="isTyping" class="message-wrapper assistant">
+          <div class="message-bubble typing">
+            <div class="message-header">
+              <div class="assistant-avatar">
+                <ion-icon :icon="sparkles"></ion-icon>
+              </div>
+              <span class="assistant-name">{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</span>
+            </div>
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
         </div>
       </OverlayScrollbarsComponent>
     </ion-content>
@@ -146,15 +116,13 @@
     <ion-footer>
       <div class="message-input-container">
         <ion-button
+          @click="toggleVoiceInput"
           :disabled="!isVoiceSupported"
           class="voice-button"
           fill="clear"
           :class="{ 'recording': isListening }"
-          @click="toggleVoiceInput"
         >
-          <template #icon-only>
-            <ion-icon :icon="isListening ? micOff : mic" />
-          </template>
+          <ion-icon slot="icon-only" :icon="isListening ? micOff : mic"></ion-icon>
         </ion-button>
         <ion-textarea
           v-model="messageText"
@@ -162,25 +130,20 @@
           :auto-grow="true"
           :rows="1"
           :maxlength="1000"
-          class="message-input"
           @keydown.enter.exact.prevent="sendMessage()"
-        />
+          class="message-input"
+        ></ion-textarea>
         <ion-button 
-          :disabled="!messageText.trim() || isSending" 
+          @click="sendMessage()" 
+          :disabled="!messageText.trim() || isSending"
           class="send-button"
           fill="clear"
-          @click="sendMessage()"
         >
-          <template #icon-only>
-            <ion-icon :icon="send" />
-          </template>
+          <ion-icon slot="icon-only" :icon="send"></ion-icon>
         </ion-button>
       </div>
-      <div
-        v-if="isListening"
-        class="voice-indicator"
-      >
-        <div class="pulse" />
+      <div v-if="isListening" class="voice-indicator">
+        <div class="pulse"></div>
         <span>{{ locale === 'fa' ? 'در حال گوش دادن...' : 'Listening...' }}</span>
       </div>
     </ion-footer>

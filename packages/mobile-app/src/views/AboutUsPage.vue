@@ -2,24 +2,17 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <template #start>
-          <ion-buttons>
-            <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'" />
-          </ion-buttons>
-        </template>
+        <ion-buttons slot="start">
+          <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'"></ion-back-button>
+        </ion-buttons>
         <ion-title>{{ locale === 'fa' ? 'درباره ما' : 'About Us' }}</ion-title>
       </ion-toolbar>
     </ion-header>
     
-    <ion-content
-      :fullscreen="true"
-      :scroll-y="false"
-    >
+    <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">
-            {{ locale === 'fa' ? 'درباره ما' : 'About Us' }}
-          </ion-title>
+          <ion-title size="large">{{ locale === 'fa' ? 'درباره ما' : 'About Us' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -36,89 +29,57 @@
         defer
       >
         <div class="content-wrapper">
-          <!-- Loading State -->
-          <div
-            v-if="loading"
-            class="loading-container"
-          >
-            <ion-spinner
-              name="crescent"
-              color="primary"
-            />
-            <p>{{ locale === 'fa' ? 'در حال بارگذاری...' : 'Loading...' }}</p>
+      <!-- Loading State -->
+      <div v-if="loading" class="loading-container">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+        <p>{{ locale === 'fa' ? 'در حال بارگذاری...' : 'Loading...' }}</p>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="error-container">
+        <ion-icon :icon="alertCircle" color="danger" class="error-icon"></ion-icon>
+        <h3>{{ locale === 'fa' ? 'خطا در بارگذاری' : 'Loading Error' }}</h3>
+        <p>{{ error }}</p>
+        <ion-button @click="loadPage" color="primary">
+          <ion-icon :icon="refresh" slot="start"></ion-icon>
+          {{ locale === 'fa' ? 'تلاش مجدد' : 'Retry' }}
+        </ion-button>
+      </div>
+
+      <!-- Content -->
+      <div v-else-if="pageData" class="about-content">
+        <!-- Hero Section -->
+        <div class="hero-section">
+          <div class="hero-icon">
+            <ion-icon :icon="heart"></ion-icon>
           </div>
+          <h1 class="hero-title">{{ pageData.title }}</h1>
+        </div>
 
-          <!-- Error State -->
-          <div
-            v-else-if="error"
-            class="error-container"
-          >
-            <ion-icon
-              :icon="alertCircle"
-              color="danger"
-              class="error-icon"
-            />
-            <h3>{{ locale === 'fa' ? 'خطا در بارگذاری' : 'Loading Error' }}</h3>
-            <p>{{ error }}</p>
-            <ion-button
-              color="primary"
-              @click="loadPage"
-            >
-              <template #start>
-                <ion-icon :icon="refresh" />
-              </template>
-              {{ locale === 'fa' ? 'تلاش مجدد' : 'Retry' }}
-            </ion-button>
-          </div>
+        <!-- Content Section -->
+        <div class="content-section">
+          <div class="markdown-content" v-html="renderedContent"></div>
+        </div>
 
-          <!-- Content -->
-          <div
-            v-else-if="pageData"
-            class="about-content"
-          >
-            <!-- Hero Section -->
-            <div class="hero-section">
-              <div class="hero-icon">
-                <ion-icon :icon="heart" />
-              </div>
-              <h1 class="hero-title">
-                {{ pageData.title }}
-              </h1>
-            </div>
+        <!-- Contact CTA -->
+        <div class="cta-section">
+          <ion-card class="cta-card">
+            <ion-card-header>
+              <ion-card-title>{{ locale === 'fa' ? 'با ما در تماس باشید' : 'Get in Touch' }}</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>{{ locale === 'fa' ? 'برای اطلاعات بیشتر یا دریافت خدمات، با ما تماس بگیرید' : 'Contact us for more information or to receive services' }}</p>
+              <ion-button expand="block" color="primary" @click="navigateToContact">
+                <ion-icon :icon="call" slot="start"></ion-icon>
+                {{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </div>
 
-            <!-- Content Section -->
-            <div class="content-section">
-              <div
-                class="markdown-content"
-                v-html="renderedContent"
-              />
-            </div>
-
-            <!-- Contact CTA -->
-            <div class="cta-section">
-              <ion-card class="cta-card">
-                <ion-card-header>
-                  <ion-card-title>{{ locale === 'fa' ? 'با ما در تماس باشید' : 'Get in Touch' }}</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <p>{{ locale === 'fa' ? 'برای اطلاعات بیشتر یا دریافت خدمات، با ما تماس بگیرید' : 'Contact us for more information or to receive services' }}</p>
-                  <ion-button
-                    expand="block"
-                    color="primary"
-                    @click="navigateToContact"
-                  >
-                    <template #start>
-                      <ion-icon :icon="call" />
-                    </template>
-                    {{ locale === 'fa' ? 'تماس با ما' : 'Contact Us' }}
-                  </ion-button>
-                </ion-card-content>
-              </ion-card>
-            </div>
-          </div>
-
-          <!-- Bottom Spacing -->
-          <div style="height: 2rem;" />
+      <!-- Bottom Spacing -->
+      <div style="height: 2rem;"></div>
         </div>
       </OverlayScrollbarsComponent>
     </ion-content>

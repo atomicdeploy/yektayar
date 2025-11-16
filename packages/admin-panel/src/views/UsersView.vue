@@ -3,12 +3,8 @@
     <!-- Header -->
     <div class="mb-8 flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-          {{ t('users_page.title') }}
-        </h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">
-          {{ t('users_page.list_title') }}
-        </p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ t('users_page.title') }}</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">{{ t('users_page.list_title') }}</p>
       </div>
       <button
         v-if="permissionsStore.hasPermission('edit_users')"
@@ -28,75 +24,43 @@
           type="text"
           :placeholder="t('users_page.search_placeholder')"
           class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-        >
+        />
       </div>
       <div class="flex gap-2">
         <select
           v-model="filterRole"
           class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         >
-          <option value="">
-            همه نقش‌ها
-          </option>
-          <option value="admin">
-            {{ t('roles.admin') }}
-          </option>
-          <option value="psychologist">
-            {{ t('roles.psychologist') }}
-          </option>
-          <option value="user">
-            {{ t('roles.user') }}
-          </option>
-          <option value="moderator">
-            {{ t('roles.moderator') }}
-          </option>
+          <option value="">همه نقش‌ها</option>
+          <option value="admin">{{ t('roles.admin') }}</option>
+          <option value="psychologist">{{ t('roles.psychologist') }}</option>
+          <option value="user">{{ t('roles.user') }}</option>
+          <option value="moderator">{{ t('roles.moderator') }}</option>
         </select>
         <select
           v-model="filterStatus"
           class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         >
-          <option value="">
-            همه وضعیت‌ها
-          </option>
-          <option value="active">
-            {{ t('status.active') }}
-          </option>
-          <option value="inactive">
-            {{ t('status.inactive') }}
-          </option>
-          <option value="blocked">
-            {{ t('status.blocked') }}
-          </option>
+          <option value="">همه وضعیت‌ها</option>
+          <option value="active">{{ t('status.active') }}</option>
+          <option value="inactive">{{ t('status.inactive') }}</option>
+          <option value="blocked">{{ t('status.blocked') }}</option>
         </select>
       </div>
     </div>
 
     <!-- Users Table -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-      <div
-        v-if="isLoading"
-        class="p-8 text-center"
-      >
-        <LoadingSpinner
-          size="48px"
-          class="text-primary-500 mx-auto"
-        />
-        <p class="mt-4 text-gray-600 dark:text-gray-400">
-          {{ t('loading') }}
-        </p>
+      <div v-if="isLoading" class="p-8 text-center">
+        <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
+        <p class="mt-4 text-gray-600 dark:text-gray-400">{{ t('loading') }}</p>
       </div>
 
-      <div
-        v-else-if="filteredUsers.length === 0"
-        class="p-8 text-center text-gray-500 dark:text-gray-400"
-      >
+      <div v-else-if="filteredUsers.length === 0" class="p-8 text-center text-gray-500 dark:text-gray-400">
         {{ t('users_page.no_users') }}
       </div>
 
-      <table
-        v-else
-        class="w-full"
-      >
+      <table v-else class="w-full">
         <thead class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
           <tr>
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -117,10 +81,7 @@
             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               {{ t('users_page.created_at') }}
             </th>
-            <th
-              v-if="permissionsStore.hasPermission('edit_users')"
-              class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-            >
+            <th v-if="permissionsStore.hasPermission('edit_users')" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               {{ t('users_page.actions') }}
             </th>
           </tr>
@@ -139,21 +100,15 @@
                   </span>
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ user.name }}
-                  </p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ user.name }}</p>
                 </div>
               </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ user.email }}
-              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">{{ user.email }}</p>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ user.phone }}
-              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">{{ user.phone }}</p>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span
@@ -176,27 +131,22 @@
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                {{ formatDate(user.createdAt) }}
-              </p>
+              <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDate(user.createdAt) }}</p>
             </td>
-            <td
-              v-if="permissionsStore.hasPermission('edit_users')"
-              class="px-6 py-4 whitespace-nowrap"
-            >
+            <td v-if="permissionsStore.hasPermission('edit_users')" class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-2">
                 <button
+                  @click="editUser(user.id)"
                   class="p-1.5 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                   :title="t('edit')"
-                  @click="editUser(user.id)"
                 >
                   <PencilIcon class="w-5 h-5" />
                 </button>
                 <button
                   v-if="permissionsStore.hasPermission('delete_users')"
+                  @click="deleteUser(user.id)"
                   class="p-1.5 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                   :title="t('delete')"
-                  @click="deleteUser(user.id)"
                 >
                   <TrashIcon class="w-5 h-5" />
                 </button>
@@ -208,38 +158,35 @@
     </div>
 
     <!-- Pagination -->
-    <div
-      v-if="totalPages > 1"
-      class="mt-6 flex items-center justify-between"
-    >
+    <div v-if="totalPages > 1" class="mt-6 flex items-center justify-between">
       <p class="text-sm text-gray-600 dark:text-gray-400">
         نمایش {{ startIndex + 1 }} تا {{ Math.min(endIndex, filteredUsers.length) }} از {{ filteredUsers.length }} کاربر
       </p>
       <div class="flex gap-2">
         <button
+          @click="currentPage--"
           :disabled="currentPage === 1"
           class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
-          @click="currentPage--"
         >
           قبلی
         </button>
         <button
           v-for="page in visiblePages"
           :key="page"
+          @click="currentPage = page"
           :class="[
             'px-4 py-2 rounded-lg font-medium',
             page === currentPage
               ? 'bg-primary-500 text-white'
               : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700',
           ]"
-          @click="currentPage = page"
         >
           {{ page }}
         </button>
         <button
+          @click="currentPage++"
           :disabled="currentPage === totalPages"
           class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700"
-          @click="currentPage++"
         >
           بعدی
         </button>

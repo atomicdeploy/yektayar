@@ -16,13 +16,11 @@
             <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center">
               <span class="text-white font-bold text-lg">ی</span>
             </div>
-            <h1 class="text-xl font-bold text-gray-900 dark:text-white">
-              {{ t('admin_panel') }}
-            </h1>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ t('admin_panel') }}</h1>
           </div>
           <button
-            class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             @click="toggleSidebar"
+            class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <XMarkIcon class="w-6 h-6" />
           </button>
@@ -36,10 +34,7 @@
         >
           <nav>
             <ul class="space-y-2">
-              <li
-                v-for="item in visibleNavItems"
-                :key="item.to"
-              >
+              <li v-for="item in visibleNavItems" :key="item.to">
                 <router-link
                   :to="item.to"
                   :class="[
@@ -49,10 +44,7 @@
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
                   ]"
                 >
-                  <component
-                    :is="item.icon"
-                    class="w-5 h-5"
-                  />
+                  <component :is="item.icon" class="w-5 h-5" />
                   <span class="font-medium">{{ t(item.label) }}</span>
                 </router-link>
               </li>
@@ -67,12 +59,8 @@
               <UserIcon class="w-6 h-6 text-white" />
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                مدیر سیستم
-              </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {{ permissionsStore.userRole }}
-              </p>
+              <p class="text-sm font-medium text-gray-900 dark:text-white truncate">مدیر سیستم</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ permissionsStore.userRole }}</p>
             </div>
           </div>
         </div>
@@ -84,7 +72,7 @@
       v-if="isSidebarOpen"
       class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
       @click="toggleSidebar"
-    />
+    ></div>
 
     <!-- Main content -->
     <div
@@ -97,35 +85,24 @@
       <header class="sticky top-0 z-30 flex h-16 items-center justify-between bg-white dark:bg-gray-800 px-6 shadow-sm">
         <div class="flex items-center gap-4">
           <button
-            class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             @click="toggleSidebar"
+            class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <Bars3Icon class="w-6 h-6" />
           </button>
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ pageTitle }}
-          </h2>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ pageTitle }}</h2>
         </div>
 
         <div class="flex items-center gap-4">
           <!-- Theme toggle -->
           <button
+            @click="toggleTheme()"
             :title="currentTheme === 'auto' ? 'سیستم (پیش‌فرض)' : currentTheme === 'dark' ? 'حالت تاریک' : 'حالت روشن'"
             class="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-            @click="toggleTheme()"
           >
-            <ComputerDesktopIcon
-              v-if="currentTheme === 'auto'"
-              class="w-5 h-5"
-            />
-            <MoonIcon
-              v-else-if="currentTheme === 'dark'"
-              class="w-5 h-5"
-            />
-            <SunIcon
-              v-else
-              class="w-5 h-5"
-            />
+            <ComputerDesktopIcon v-if="currentTheme === 'auto'" class="w-5 h-5" />
+            <MoonIcon v-else-if="currentTheme === 'dark'" class="w-5 h-5" />
+            <SunIcon v-else class="w-5 h-5" />
           </button>
 
           <!-- Connection status -->
@@ -135,7 +112,7 @@
                 'w-2 h-2 rounded-full',
                 isSocketConnected ? 'bg-green-500' : 'bg-red-500',
               ]"
-            />
+            ></div>
             <span class="text-sm text-gray-600 dark:text-gray-400">
               {{ isSocketConnected ? 'متصل' : 'قطع شده' }}
             </span>
@@ -143,8 +120,8 @@
 
           <!-- Logout button -->
           <button
-            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             @click="handleLogout"
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           >
             {{ t('logout') }}
           </button>

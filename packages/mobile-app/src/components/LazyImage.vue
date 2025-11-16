@@ -1,34 +1,17 @@
 <template>
-  <div
-    class="lazy-image-wrapper"
-    :class="{ 'loaded': isLoaded, 'error': hasError }"
-  >
+  <div class="lazy-image-wrapper" :class="{ 'loaded': isLoaded, 'error': hasError }">
     <!-- Loading state with blur effect -->
-    <div
-      v-if="!isLoaded && !hasError"
-      class="image-placeholder"
-    >
-      <div class="image-skeleton" />
+    <div v-if="!isLoaded && !hasError" class="image-placeholder">
+      <div class="image-skeleton"></div>
       <div class="loading-spinner">
-        <ion-spinner
-          name="crescent"
-          color="primary"
-        />
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
       </div>
     </div>
 
     <!-- Error state with broken image icon -->
-    <div
-      v-if="hasError"
-      class="image-error"
-    >
-      <ion-icon
-        :icon="imageOutline"
-        class="error-icon"
-      />
-      <p class="error-text">
-        تصویر بارگذاری نشد
-      </p>
+    <div v-if="hasError" class="image-error">
+      <ion-icon :icon="imageOutline" class="error-icon"></ion-icon>
+      <p class="error-text">تصویر بارگذاری نشد</p>
     </div>
 
     <!-- Actual image with responsive srcset -->
@@ -38,14 +21,14 @@
         v-if="webpSrcset"
         :srcset="webpSrcset"
         type="image/webp"
-      >
+      />
       
       <!-- Standard sources for different densities -->
       <source
         v-if="srcset"
         :srcset="srcset"
         :type="imageType"
-      >
+      />
 
       <!-- Fallback image -->
       <img
@@ -56,7 +39,7 @@
         :loading="loading"
         @load="onLoad"
         @error="onError"
-      >
+      />
     </picture>
   </div>
 </template>
