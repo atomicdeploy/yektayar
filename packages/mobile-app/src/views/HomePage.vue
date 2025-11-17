@@ -36,7 +36,7 @@
         <div class="hero-content">
           <div class="logo-container">
             <div class="logo-circle">
-              <ion-icon :icon="heart" class="hero-icon"></ion-icon>
+              <img src="/icon.svg" alt="YektaYar Icon" class="hero-icon" />
             </div>
           </div>
           <h1 class="hero-title">{{ t('welcome') }}</h1>
@@ -181,7 +181,6 @@ import {
   IonButtons,
 } from '@ionic/vue'
 import { 
-  heart, 
   chatbubbles, 
   calendar, 
   person, 
@@ -264,8 +263,9 @@ const navigateToProfile = () => router.push('/tabs/profile')
 }
 
 .hero-icon {
-  font-size: 48px;
-  color: white;
+  width: 56px;
+  height: 56px;
+  filter: brightness(0) invert(1);
 }
 
 .hero-title {

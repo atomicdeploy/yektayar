@@ -9,7 +9,7 @@
         <!-- Header with Title and Logo -->
         <div class="welcome-header">
           <div class="logo-accent">
-            <ion-icon :icon="heartOutline" class="heart-icon"></ion-icon>
+            <img src="/icon.svg" alt="YektaYar Icon" class="app-icon" />
           </div>
           <h1 class="welcome-title">خوش آمدید!</h1>
           <div class="title-underline"></div>
@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
-import { heartOutline, lockClosedOutline } from 'ionicons/icons'
+import { lockClosedOutline } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
@@ -179,9 +179,10 @@ const onImageError = () => {
   animation: scaleIn 0.5s ease-out;
 }
 
-.heart-icon {
-  font-size: 32px;
-  color: white;
+.app-icon {
+  width: 36px;
+  height: 36px;
+  filter: brightness(0) invert(1);
   animation: heartbeat 2s ease-in-out infinite;
 }
 
