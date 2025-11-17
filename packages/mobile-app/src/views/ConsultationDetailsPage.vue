@@ -264,16 +264,12 @@ function initializeSpeechRecognition() {
       const isTrulyFinal = result.isFinal && confidence !== 0
       
       if (isTrulyFinal) {
-        // Mobile fix: On mobile, REPLACE finalized text instead of appending
-        // This prevents duplicates when the same result is re-emitted
-        if (isMobileOrTablet) {
-          finalizedTranscript = transcript
-        } else {
-          // On desktop, append with space separator
-          finalizedTranscript += (finalizedTranscript ? ' ' : '') + transcript
-        }
+        // For final results: ALWAYS append (don't replace)
+        // This ensures we accumulate all spoken words
+        finalizedTranscript += (finalizedTranscript ? ' ' : '') + transcript
       } else {
-        // Interim results: On mobile, replace instead of append
+        // Interim results: Show the current word being spoken
+        // On mobile, we only keep the latest interim (no accumulation)
         if (isMobileOrTablet) {
           interimTranscript = transcript
         } else {
@@ -283,12 +279,12 @@ function initializeSpeechRecognition() {
     }
 
     // Always SET the display value (never append to transcriptText directly!)
-    // This shows: finalized text + current interim text for live feedback
+    // This shows: all finalized text + current interim word for live feedback
     if (interimTranscript) {
-      // Show interim text with a space separator
+      // Show interim text with a space separator (the word being spoken right now)
       transcriptText.value = finalizedTranscript + (finalizedTranscript ? ' ' : '') + interimTranscript
     } else {
-      // No interim, just show finalized
+      // No interim, just show all finalized text
       transcriptText.value = finalizedTranscript
     }
   }
