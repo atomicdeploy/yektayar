@@ -70,8 +70,11 @@
           :disabled="!termsAccepted"
           expand="block" 
           size="large" 
-          class="cta-button cta-button-slide-down"
-          :class="{ 'cta-button-disabled': !termsAccepted }"
+          class="cta-button"
+          :class="{ 
+            'cta-button-disabled': !termsAccepted,
+            'cta-button-slide-down': !ctaHasBeenShown
+          }"
           @click="startApp"
         >
           <span class="button-content">
@@ -113,6 +116,10 @@ const termsAccepted = ref(false)
 // Welcome text height management
 const welcomeTextInner = ref<HTMLElement | null>(null)
 const welcomeTextHeight = ref('auto')
+const maxWelcomeTextHeight = ref<number | null>(null)
+
+// Track if CTA button has been shown (for one-time animation)
+const ctaHasBeenShown = ref(false)
 
 // Welcome text paragraphs
 const paragraphs = [
@@ -189,6 +196,16 @@ const allTypewritersComplete = computed(() => {
   return result
 })
 
+// Watch for when CTA button first appears and mark it
+watch(allTypewritersComplete, (isComplete) => {
+  if (isComplete && !ctaHasBeenShown.value) {
+    // Mark as shown after a short delay to allow animation to play
+    setTimeout(() => {
+      ctaHasBeenShown.value = true
+    }, 1200) // Animation delay (0.6s) + animation duration (0.6s)
+  }
+})
+
 // Fetch user preferences to check if terms were already accepted
 const fetchUserPreferences = async () => {
   try {
@@ -212,11 +229,48 @@ onMounted(async () => {
   await nextTick()
   setupParagraphObservers()
   
+  // Calculate max height by creating a virtual element with all text
+  if (welcomeTextInner.value) {
+    const virtualElement = document.createElement('div')
+    virtualElement.style.cssText = window.getComputedStyle(welcomeTextInner.value).cssText
+    virtualElement.style.position = 'absolute'
+    virtualElement.style.visibility = 'hidden'
+    virtualElement.style.width = welcomeTextInner.value.offsetWidth + 'px'
+    
+    // Add all paragraphs with full text
+    paragraphs.forEach((text, index) => {
+      const p = document.createElement('p')
+      p.className = index === 0 ? 'welcome-paragraph highlight-first' : 'welcome-paragraph'
+      p.innerHTML = text
+      virtualElement.appendChild(p)
+    })
+    
+    document.body.appendChild(virtualElement)
+    maxWelcomeTextHeight.value = virtualElement.offsetHeight
+    document.body.removeChild(virtualElement)
+    
+    logger.debug(`[WelcomeScreen] Max text height calculated: ${maxWelcomeTextHeight.value}px`)
+  }
+  
   // Set up ResizeObserver to watch inner container height
   if (welcomeTextInner.value) {
+    // Get line height from computed style
+    const computedStyle = window.getComputedStyle(welcomeTextInner.value.querySelector('.welcome-paragraph') || welcomeTextInner.value)
+    const fontSize = parseFloat(computedStyle.fontSize)
+    const lineHeight = parseFloat(computedStyle.lineHeight)
+    const lineHeightPx = lineHeight > 10 ? lineHeight : fontSize * lineHeight
+    
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        const height = entry.contentRect.height
+        let height = entry.contentRect.height
+        // Add one line height buffer to prevent text overflow
+        height += lineHeightPx
+        
+        // But don't exceed max height
+        if (maxWelcomeTextHeight.value && height > maxWelcomeTextHeight.value) {
+          height = maxWelcomeTextHeight.value
+        }
+        
         welcomeTextHeight.value = `${height}px`
       }
     })
