@@ -2,11 +2,26 @@
  * Custom Ionic Icons for YektaYar
  * 
  * This module registers custom SVG icons that can be used with ion-icon components.
- * Icons are imported from SVG files and registered with the addIcons function.
+ * Icons are registered with the addIcons function from ionicons.
  */
 
 import { addIcons } from 'ionicons'
-import yektayarLogoSvg from './logo.svg?raw'
+
+/**
+ * YektaYar Logo Icon - SVG Definition
+ * 
+ * This SVG is defined inline to ensure proper formatting for Ionic's icon system.
+ * The icon uses 'currentColor' for the fill to allow CSS color styling.
+ * 
+ * Source: assets/logo/logo.svg (modified to use currentColor)
+ */
+const yektayarIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8.11 17.43 77.76 82.3">
+  <path fill="currentColor" d="M45.6328,62.3946c3.47,3.15 5.93,-5.81 14.2,-10.22c11.01,-5.88 18.1,3.79 13.62,14.3c-5.66,13.27 -24.52,22.32 -24.14,22.98c0.05,0.09 8.94,4.29 8.94,4.29c0,0 5.69,-3.09 11.62,-8.2c8.63,-7.44 17.51,-16.53 15.77,-29.01c-2.18,-15.64 -20.99,-23.9 -38.53,-5.99c-1.7,-1.6 -3.35,-3.24 -5.23,-4.64c-10.91,-8.18 -26.16,-7.84 -32.11,5.88c-7.54,17.39 12.21,33.16 24.96,41.2c7.26,4.58 11.76,6.74 11.76,6.74l9.42,-4.82c0,0 -27.85,-11.98 -34.97,-28.28c-2.4,-5.49 -2.45,-12.89 3.91,-15.57c8.96,-3.76 18.76,9.5 20.78,11.34z"/>
+  <path fill="currentColor" d="M61.7228,37.8446c6.4,0.49 12.03,-5.87 10.6,-12.17c-1.72,-7.57 -10.7,-10.9 -16.75,-5.8c-7.16,6.05 -3.16,17.25 6.15,17.97z"/>
+  <path fill="currentColor" d="M31.1128,37.8446c5.37,0.43 10.66,-3.75 11.02,-9.21c0.6,-9.21 -9.98,-14.66 -17,-8.47c-7.02,6.19 -3.09,16.96 5.98,17.69z"/>
+</svg>
+`
 
 /**
  * Register all custom icons
@@ -14,11 +29,12 @@ import yektayarLogoSvg from './logo.svg?raw'
  * This function should be called once during app initialization (in main.ts)
  * to register all custom icons with the ionicons library.
  * 
- * The YektaYar logo is loaded from logo.svg file and registered as 'yektayar'.
  * Usage: <ion-icon name="yektayar"></ion-icon>
  */
 export function registerCustomIcons(): void {
+  console.log('Registering YektaYar custom icons...')
   addIcons({
-    'yektayar': yektayarLogoSvg
+    'yektayar': yektayarIcon
   })
+  console.log('YektaYar custom icons registered successfully')
 }

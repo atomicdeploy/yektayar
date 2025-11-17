@@ -83,6 +83,11 @@
             <p><strong>Icon Name:</strong> yektayar</p>
             <p><strong>Registration:</strong> {{ isIconRegistered ? '✓ Registered' : '✗ Not Registered' }}</p>
             <p><strong>Ionic Version:</strong> {{ ionicVersion }}</p>
+            <pre v-if="debugInfo">{{ debugInfo }}</pre>
+          </div>
+          <div style="margin-top: 1rem;">
+            <p><strong>Console Output:</strong></p>
+            <p style="font-size: 0.9rem;">Open browser console (F12) to see icon registration logs</p>
           </div>
         </div>
       </div>
@@ -108,6 +113,7 @@ import { arrowBack } from 'ionicons/icons'
 const router = useRouter()
 const isIconRegistered = ref(false)
 const ionicVersion = ref('8.x')
+const debugInfo = ref('')
 
 const goBack = () => {
   router.back()
@@ -120,9 +126,25 @@ onMounted(() => {
     const iconElement = document.querySelector('ion-icon[name="yektayar"]')
     if (iconElement) {
       const svgElement = iconElement.shadowRoot?.querySelector('svg')
+      const paths = iconElement.shadowRoot?.querySelectorAll('path')
       isIconRegistered.value = !!svgElement
+      
+      // Gather debug info
+      debugInfo.value = `
+Icon Element: ${iconElement ? 'Found' : 'Not Found'}
+Shadow Root: ${iconElement?.shadowRoot ? 'Present' : 'Missing'}
+SVG Element: ${svgElement ? 'Present' : 'Missing'}
+Path Count: ${paths?.length || 0}
+SVG ViewBox: ${svgElement?.getAttribute('viewBox') || 'N/A'}
+Icon Class: ${iconElement?.className || 'N/A'}
+      `.trim()
+      
+      console.log('Icon Debug Info:', debugInfo.value)
+      console.log('Shadow DOM:', iconElement?.shadowRoot)
+    } else {
+      debugInfo.value = 'Icon element not found in DOM'
     }
-  }, 500)
+  }, 1000)
 })
 </script>
 
@@ -131,6 +153,15 @@ onMounted(() => {
   padding: 2rem 1rem;
   max-width: 800px;
   margin: 0 auto;
+}
+
+.debug-info pre {
+  background: #f5f5f5;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 h1 {
