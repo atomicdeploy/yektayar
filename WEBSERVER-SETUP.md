@@ -255,12 +255,29 @@ sudo chmod 755 /var/www/yektayar/static
 
 ### "Vite WebSocket/HMR Connection Failed"
 **Problem:** Vite's Hot Module Replacement (HMR) WebSocket fails to connect when accessed through reverse proxy  
-**Solution:** This has been fixed in the Vite configuration. The `server.hmr.clientPort: 443` setting in both `packages/mobile-app/vite.config.ts` and `packages/admin-panel/vite.config.ts` ensures the WebSocket connects through the proxy (wss://app.yektayar.ir or wss://panel.yektayar.ir) instead of trying to connect directly to localhost.
 
-**Note:** If you encounter this error, ensure:
-- The web server is properly configured to forward WebSocket connections (already configured in provided configs)
-- The Vite dev server is running (`npm run dev:mobile` or `npm run dev:admin`)
-- Port 443 (HTTPS) is accessible
+**Solution:** This has been fixed in the Vite configuration using the `VITE_HMR_CLIENT_PORT` environment variable. The configuration in both `packages/mobile-app/vite.config.ts` and `packages/admin-panel/vite.config.ts` now supports both HTTP and HTTPS connections.
+
+**How to use:**
+- **For HTTPS** (recommended): `VITE_HMR_CLIENT_PORT=443 npm run dev:mobile`
+- **For HTTP**: `VITE_HMR_CLIENT_PORT=80 npm run dev:mobile`
+- **For local development**: Just `npm run dev:mobile` (no env var needed)
+- **For custom ports**: Set `VITE_HMR_CLIENT_PORT` to your custom port
+
+**Example systemd service or PM2 config:**
+```bash
+# For HTTPS reverse proxy
+VITE_HMR_CLIENT_PORT=443 npm run dev:mobile
+
+# For HTTP reverse proxy
+VITE_HMR_CLIENT_PORT=80 npm run dev:mobile
+```
+
+**Note:** The HMR WebSocket will automatically:
+- Use the same protocol as the page (http/https)
+- Use the same hostname as the page
+- Use the port specified in `VITE_HMR_CLIENT_PORT` (or dev server port if not set)
+- Support subpaths if configured with the `base` option in vite.config.ts
 
 ---
 

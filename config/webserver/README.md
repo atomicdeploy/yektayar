@@ -438,12 +438,33 @@ sudo firewall-cmd --reload
   ```
 
 ##### Vite HMR WebSocket Issue
-If you see errors in the browser console about Vite HMR WebSocket failing to connect when accessing through a reverse proxy (e.g., `https://app.yektayar.ir` or `https://panel.yektayar.ir`), this has been fixed in the Vite configuration:
+If you see errors in the browser console about Vite HMR WebSocket failing to connect when accessing through a reverse proxy (e.g., `https://app.yektayar.ir` or `https://panel.yektayar.ir`), this has been fixed using environment-based configuration:
 
-- **Mobile App:** `packages/mobile-app/vite.config.ts` includes `server.hmr.clientPort: 443`
-- **Admin Panel:** `packages/admin-panel/vite.config.ts` includes `server.hmr.clientPort: 443`
+**Configuration:**
+- **Mobile App:** `packages/mobile-app/vite.config.ts` uses `VITE_HMR_CLIENT_PORT` env var
+- **Admin Panel:** `packages/admin-panel/vite.config.ts` uses `VITE_HMR_CLIENT_PORT` env var
 
-This ensures the HMR WebSocket connects through the proxy using wss:// protocol instead of trying to connect directly to localhost.
+**Usage:**
+```bash
+# For HTTPS (port 443)
+VITE_HMR_CLIENT_PORT=443 npm run dev:mobile
+
+# For HTTP (port 80)
+VITE_HMR_CLIENT_PORT=80 npm run dev:mobile
+
+# For local development (no proxy)
+npm run dev:mobile  # Uses dev server port automatically
+```
+
+**How it works:**
+- The HMR client uses the page's protocol (http/https) automatically
+- The HMR client uses the page's hostname automatically
+- The `VITE_HMR_CLIENT_PORT` specifies which port to connect to
+- This supports HTTP, HTTPS, custom ports, and subpaths
+
+**For production deployment with PM2 or systemd:**
+Set the environment variable in your process manager configuration to match your reverse proxy setup (typically 443 for HTTPS or 80 for HTTP).
+
 
 #### 5. Static Files 403 Forbidden
 - **Cause:** Incorrect permissions on static directory

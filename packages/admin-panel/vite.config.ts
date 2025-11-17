@@ -42,8 +42,12 @@ export default defineConfig(({ mode }) => {
       },
       hmr: {
         // Fix WebSocket connection when running behind a reverse proxy
-        // This ensures HMR WebSocket uses the same protocol/host as the client
-        clientPort: 443
+        // Use environment variable to support both HTTP (80) and HTTPS (443)
+        // For reverse proxy: set VITE_HMR_CLIENT_PORT=443 (HTTPS) or 80 (HTTP)
+        // For local dev: leave unset to use dev server port (5173)
+        clientPort: process.env.VITE_HMR_CLIENT_PORT 
+          ? parseInt(process.env.VITE_HMR_CLIENT_PORT) 
+          : undefined
       }
     }
   }
