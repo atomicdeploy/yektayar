@@ -30,10 +30,11 @@
         </div>
 
         <!-- Welcome Text Content with Card Style -->
-        <div class="welcome-text" ref="welcomeTextRef">
+        <div class="welcome-text">
           <p 
             v-for="(item, index) in typewriters" 
             :key="index"
+            :ref="(el) => { paragraphRefs[index] = el as HTMLElement | null }"
             v-show="index === 0 || typewriters[index - 1].isComplete.value"
             class="welcome-paragraph"
             :class="{ 'highlight-first': index === 0 }"
@@ -67,8 +68,11 @@
           :disabled="!termsAccepted"
           expand="block" 
           size="large" 
-          class="cta-button cta-button-slide-down"
-          :class="{ 'cta-button-disabled': !termsAccepted }"
+          class="cta-button"
+          :class="{ 
+            'cta-button-disabled': !termsAccepted,
+            'cta-button-slide-down': ctaButtonHasBeenShown && termsAccepted
+          }"
           @click="startApp"
         >
           <span class="button-content">
@@ -98,8 +102,7 @@ import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
-import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 
 const router = useRouter()
 
@@ -107,9 +110,6 @@ const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 
 // Terms acceptance state
 const termsAccepted = ref(false)
-
-// Reference to welcome text container for intersection observer
-const welcomeTextRef = ref<HTMLElement | null>(null)
 
 // Welcome text paragraphs
 const paragraphs = [
@@ -119,11 +119,11 @@ const paragraphs = [
   'فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.'
 ]
 
-// Initialize typewriter effects using a loop
-// Use 'character' mode by default (can be changed to 'word' mode)
-// Only the first typewriter auto-starts, others are triggered by watchers
+// Track if CTA button has been shown at least once
+const ctaButtonHasBeenShown = ref(false)
 
-const typewriters = paragraphs.map((text, index) => {
+// Initialize typewriter effects using a loop
+const typewriters = paragraphs.map((text) => {
   return useTypewriter(text, {
     speed: 20,
     startDelay: 0,
@@ -133,20 +133,57 @@ const typewriters = paragraphs.map((text, index) => {
   })
 })
 
-// Set up intersection observer for viewport-based triggering
-const { isIntersecting } = useIntersectionObserver(welcomeTextRef, {
-  threshold: 0.2,
-  rootMargin: '0px'
-})
+// Create refs for each paragraph to track viewport entry
+const paragraphRefs = ref<(HTMLElement | null)[]>([])
 
-// Watch for when welcome text enters viewport and start first typewriter
-let hasStartedTyping = false
-watch(isIntersecting, (inViewport) => {
-  if (inViewport && !hasStartedTyping && typewriters[0]) {
-    logger.info('[WelcomeScreen] Welcome text entered viewport, starting typewriter effects')
-    hasStartedTyping = true
-    typewriters[0].start()
-  }
+// Set up intersection observers for each paragraph manually
+const setupParagraphObservers = () => {
+  paragraphRefs.value.forEach((element, index) => {
+    if (!element) return
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Check if this typewriter should start
+            const shouldStart = index === 0 || typewriters[index - 1].isComplete.value
+            
+            if (shouldStart && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
+              logger.info(`[WelcomeScreen] Paragraph ${index + 1} entered viewport, starting typewriter`)
+              setTimeout(() => {
+                typewriters[index].start()
+              }, index === 0 ? 0 : 500)
+              observer.unobserve(element)
+            } else if (index > 0 && !typewriters[index - 1].isComplete.value) {
+              // Wait for previous to complete
+              const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+                if (isComplete && entry.isIntersecting) {
+                  logger.info(`[WelcomeScreen] Previous paragraph complete, starting paragraph ${index + 1}`)
+                  setTimeout(() => {
+                    typewriters[index].start()
+                  }, 500)
+                  observer.unobserve(element)
+                  unwatch()
+                }
+              })
+            }
+          }
+        })
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px'
+      }
+    )
+    
+    observer.observe(element)
+  })
+}
+
+// Set up observers after component is mounted and refs are populated
+onMounted(async () => {
+  await nextTick()
+  setupParagraphObservers()
 })
 
 // Computed property to check if all typewriters are complete
@@ -158,17 +195,11 @@ const allTypewritersComplete = computed(() => {
   return result
 })
 
-// Chain the typewriter effects with 500ms delay between each paragraph
-typewriters.forEach((typewriter, index) => {
-  if (index < typewriters.length - 1) {
-    watch(() => typewriter.isComplete.value, (isComplete) => {
-      if (isComplete) {
-        logger.info(`[WelcomeScreen] Typewriter ${index + 1} complete, starting next`)
-        setTimeout(() => {
-          typewriters[index + 1].start()
-        }, 500)
-      }
-    })
+// Watch for when CTA button first appears and mark it as shown
+watch(allTypewritersComplete, (isComplete) => {
+  if (isComplete && !ctaButtonHasBeenShown.value) {
+    ctaButtonHasBeenShown.value = true
+    logger.info('[WelcomeScreen] CTA button shown for the first time')
   }
 })
 
