@@ -31,18 +31,31 @@
 
         <!-- Welcome Text Content with Card Style -->
         <div class="welcome-text">
-          <p class="welcome-paragraph highlight-first" v-html="typewriter1.displayText.value || '&nbsp;'"></p>
-          <p class="welcome-paragraph" v-if="typewriter1.isComplete.value" v-html="typewriter2.displayText.value || '&nbsp;'"></p>
-          <p class="welcome-paragraph" v-if="typewriter2.isComplete.value" v-html="typewriter3.displayText.value || '&nbsp;'"></p>
-          <p class="welcome-paragraph" v-if="typewriter3.isComplete.value" v-html="typewriter4.displayText.value || '&nbsp;'"></p>
+          <p class="welcome-paragraph highlight-first">
+            <span v-html="typewriter1.displayText.value || '&nbsp;'"></span>
+            <span v-if="typewriter1.isTyping.value && typewriter1.showCursor.value" class="typewriter-cursor"></span>
+          </p>
+          <p class="welcome-paragraph" v-if="typewriter1.isComplete.value">
+            <span v-html="typewriter2.displayText.value || '&nbsp;'"></span>
+            <span v-if="typewriter2.isTyping.value && typewriter2.showCursor.value" class="typewriter-cursor"></span>
+          </p>
+          <p class="welcome-paragraph" v-if="typewriter2.isComplete.value">
+            <span v-html="typewriter3.displayText.value || '&nbsp;'"></span>
+            <span v-if="typewriter3.isTyping.value && typewriter3.showCursor.value" class="typewriter-cursor"></span>
+          </p>
+          <p class="welcome-paragraph" v-if="typewriter3.isComplete.value">
+            <span v-html="typewriter4.displayText.value || '&nbsp;'"></span>
+            <span v-if="typewriter4.isTyping.value && typewriter4.showCursor.value" class="typewriter-cursor"></span>
+          </p>
         </div>
 
-        <!-- CTA Button with Enhanced Design -->
+        <!-- CTA Button with Enhanced Design - Only show after all typewriter effects complete -->
         <ion-button 
+          v-if="allTypewritersComplete"
           expand="block" 
           size="large" 
           color="success"
-          class="cta-button"
+          class="cta-button cta-button-slide-down"
           @click="startApp"
         >
           <span class="button-content">
@@ -71,7 +84,7 @@ import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
-import { watch } from 'vue'
+import { watch, computed } from 'vue'
 
 const router = useRouter()
 
@@ -85,27 +98,42 @@ const paragraph4 = 'فقط کافیه رو دکمه‌ی شروع گفتگو ب�
 
 // Initialize typewriter effects for each paragraph
 // Start after the fade-in animation completes (800ms animation + 500ms delay = 1300ms)
-const typewriter1 = useTypewriter(paragraph1, { speed: 20, startDelay: 1300 })
-const typewriter2 = useTypewriter(paragraph2, { speed: 20, startDelay: 0 })
-const typewriter3 = useTypewriter(paragraph3, { speed: 20, startDelay: 0 })
-const typewriter4 = useTypewriter(paragraph4, { speed: 20, startDelay: 0 })
+// Use 'character' mode by default (can be changed to 'word' mode)
+const typewriter1 = useTypewriter(paragraph1, { speed: 20, startDelay: 1300, showCursor: true, mode: 'character' })
+const typewriter2 = useTypewriter(paragraph2, { speed: 20, startDelay: 0, showCursor: true, mode: 'character' })
+const typewriter3 = useTypewriter(paragraph3, { speed: 20, startDelay: 0, showCursor: true, mode: 'character' })
+const typewriter4 = useTypewriter(paragraph4, { speed: 20, startDelay: 0, showCursor: true, mode: 'character' })
 
-// Chain the typewriter effects - start next paragraph when previous completes
+// Computed property to check if all typewriters are complete
+const allTypewritersComplete = computed(() => {
+  return typewriter1.isComplete.value && 
+         typewriter2.isComplete.value && 
+         typewriter3.isComplete.value && 
+         typewriter4.isComplete.value
+})
+
+// Chain the typewriter effects with 500ms delay between each paragraph
 watch(() => typewriter1.isComplete.value, (isComplete) => {
   if (isComplete) {
-    typewriter2.start()
+    setTimeout(() => {
+      typewriter2.start()
+    }, 500)
   }
 })
 
 watch(() => typewriter2.isComplete.value, (isComplete) => {
   if (isComplete) {
-    typewriter3.start()
+    setTimeout(() => {
+      typewriter3.start()
+    }, 500)
   }
 })
 
 watch(() => typewriter3.isComplete.value, (isComplete) => {
   if (isComplete) {
-    typewriter4.start()
+    setTimeout(() => {
+      typewriter4.start()
+    }, 500)
   }
 })
 
@@ -303,6 +331,37 @@ const onImageError = () => {
   color: #01183a;
 }
 
+/* Typewriter cursor styling */
+.typewriter-cursor {
+  display: inline-block;
+  width: 12px;
+  height: 1.2em;
+  background: #d4a43e;
+  margin-left: 2px;
+  margin-right: 2px;
+  vertical-align: text-bottom;
+  animation: blink 1s infinite, glow 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(212, 164, 62, 0.6);
+}
+
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(212, 164, 62, 0.6), 0 0 12px rgba(212, 164, 62, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(212, 164, 62, 0.8), 0 0 24px rgba(212, 164, 62, 0.6), 0 0 32px rgba(212, 164, 62, 0.4);
+  }
+}
+
 /* CTA Button styling */
 .cta-button {
   --border-radius: 20px;
@@ -311,11 +370,26 @@ const onImageError = () => {
   --box-shadow: 0 8px 24px rgba(76, 175, 80, 0.3);
   margin: 2.5rem 0 1.5rem 0;
   text-transform: none;
-  animation: fadeInUp 0.8s ease-out 0.6s both;
   font-size: 1.3rem;
   font-weight: 700;
   position: relative;
   overflow: hidden;
+}
+
+/* SlideDown animation for CTA button */
+.cta-button-slide-down {
+  animation: slideDown 0.6s ease-out both;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .cta-button::before {

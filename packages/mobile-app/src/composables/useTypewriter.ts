@@ -1,8 +1,10 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
+export type TypewriterMode = 'character' | 'word'
+
 export interface TypewriterOptions {
   /**
-   * Speed in milliseconds per character
+   * Speed in milliseconds per character/word
    * @default 30
    */
   speed?: number
@@ -15,9 +17,15 @@ export interface TypewriterOptions {
   
   /**
    * Whether to show a cursor during typing
-   * @default false
+   * @default true
    */
   showCursor?: boolean
+  
+  /**
+   * Typing mode: character-by-character or word-by-word
+   * @default 'character'
+   */
+  mode?: TypewriterMode
 }
 
 /**
@@ -31,7 +39,8 @@ export function useTypewriter(
   const {
     speed = 30,
     startDelay = 0,
-    showCursor = false
+    showCursor = true,
+    mode = 'character'
   } = options
 
   const displayText = ref('')
@@ -40,6 +49,43 @@ export function useTypewriter(
   
   let timeoutId: number | null = null
   let currentIndex = 0
+  let words: string[] = []
+
+  // Split text into words while preserving HTML tags
+  const prepareWords = () => {
+    if (mode === 'word') {
+      // Split by spaces but keep HTML tags intact
+      const parts: string[] = []
+      let buffer = ''
+      let inTag = false
+      
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i]
+        
+        if (char === '<') {
+          inTag = true
+          buffer += char
+        } else if (char === '>') {
+          inTag = false
+          buffer += char
+        } else if (char === ' ' && !inTag) {
+          if (buffer) {
+            parts.push(buffer)
+            buffer = ''
+          }
+          parts.push(' ')
+        } else {
+          buffer += char
+        }
+      }
+      
+      if (buffer) {
+        parts.push(buffer)
+      }
+      
+      words = parts
+    }
+  }
 
   const typeNextCharacter = () => {
     if (currentIndex < text.length) {
@@ -51,14 +97,34 @@ export function useTypewriter(
       isComplete.value = true
     }
   }
+  
+  const typeNextWord = () => {
+    if (currentIndex < words.length) {
+      displayText.value = words.slice(0, currentIndex + 1).join('')
+      currentIndex++
+      timeoutId = window.setTimeout(typeNextWord, speed)
+    } else {
+      isTyping.value = false
+      isComplete.value = true
+    }
+  }
 
   const start = () => {
     isTyping.value = true
     currentIndex = 0
     displayText.value = ''
+    isComplete.value = false
+    
+    if (mode === 'word') {
+      prepareWords()
+    }
     
     timeoutId = window.setTimeout(() => {
-      typeNextCharacter()
+      if (mode === 'word') {
+        typeNextWord()
+      } else {
+        typeNextCharacter()
+      }
     }, startDelay)
   }
 
