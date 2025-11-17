@@ -72,9 +72,8 @@
           @click="startApp"
         >
           <span class="button-content">
-            <span class="button-icon">✨</span>
-            <span class="button-text">شروع سفر به سلامت روان</span>
-            <span class="button-icon">🚀</span>
+            <span class="button-icon">✅</span>
+            <span class="button-text">شروع گفتگو</span>
           </span>
           <div class="button-shine"></div>
         </ion-button>
@@ -120,7 +119,10 @@ const paragraphs = [
   'فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.'
 ]
 
-// Initialize typewriter effects using a loop (DRY principle)
+// Initialize typewriter effects using a loop
+// Use 'character' mode by default (can be changed to 'word' mode)
+// Only the first typewriter auto-starts, others are triggered by watchers
+
 const typewriters = paragraphs.map((text, index) => {
   return useTypewriter(text, {
     speed: 20,
@@ -156,7 +158,7 @@ const allTypewritersComplete = computed(() => {
   return result
 })
 
-// Chain the typewriter effects with 500ms delay between each paragraph using a loop
+// Chain the typewriter effects with 500ms delay between each paragraph
 typewriters.forEach((typewriter, index) => {
   if (index < typewriters.length - 1) {
     watch(() => typewriter.isComplete.value, (isComplete) => {
@@ -509,19 +511,19 @@ const onImageError = () => {
 
 /* CTA Button styling - Enhanced with gradient and effects */
 .cta-button {
-  --border-radius: 24px;
-  --padding-top: 20px;
-  --padding-bottom: 20px;
+  --border-radius: 20px;
+  --padding-top: 18px;
+  --padding-bottom: 18px;
   --box-shadow: 
     0 8px 32px rgba(212, 164, 62, 0.3),
     0 4px 16px rgba(1, 24, 58, 0.2);
-  margin: 2rem 0 1.5rem 0;
+  margin: 2.5rem 0 1.5rem 0;
   text-transform: none;
-  font-size: 1.4rem;
-  font-weight: 800;
+  font-size: 1.3rem;
+  font-weight: 700;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
+  background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
   background-size: 200% 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -549,7 +551,7 @@ const onImageError = () => {
 .cta-button-disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: linear-gradient(135deg, #9e9e9e 0%, #bdbdbd 100%);
+  background-image: linear-gradient(135deg, #9e9e9e 0%, #bdbdbd 100%);
   --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
@@ -576,7 +578,7 @@ const onImageError = () => {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
+  background-image: linear-gradient(
     90deg,
     transparent,
     rgba(255, 255, 255, 0.3),
@@ -603,15 +605,15 @@ const onImageError = () => {
 }
 
 .cta-button:not(.cta-button-disabled):hover::before {
-  width: 400px;
-  height: 400px;
+  width: 300px;
+  height: 300px;
 }
 
 .button-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   position: relative;
   z-index: 1;
   pointer-events: none;
@@ -620,13 +622,13 @@ const onImageError = () => {
 }
 
 .button-icon {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   animation: bounce 2s ease-in-out infinite;
 }
 
 .button-text {
-  font-size: 1.4rem;
-  letter-spacing: -0.3px;
+  font-size: 1.3rem;
+  /* letter-spacing: -0.3px; */
 }
 
 /* Disclaimer styling */
@@ -857,7 +859,7 @@ const onImageError = () => {
   }
 
   .button-icon {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   .terms-text {
