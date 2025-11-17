@@ -39,6 +39,11 @@ export default defineConfig(({ mode }) => {
           target: process.env.API_BASE_URL,
           changeOrigin: true
         }
+      },
+      hmr: {
+        // Fix WebSocket connection when running behind a reverse proxy
+        // This ensures HMR WebSocket uses the same protocol/host as the client
+        clientPort: 443
       }
     }
   }
