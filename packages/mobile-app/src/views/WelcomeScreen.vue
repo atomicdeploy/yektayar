@@ -9,7 +9,7 @@
         <!-- Header with Title and Logo -->
         <div class="welcome-header">
           <div class="logo-accent">
-            <ion-icon icon="yektayar" class="yektayar-icon"></ion-icon>
+            <ion-icon name="yektayar" class="yektayar-icon"></ion-icon>
           </div>
           <h1 class="welcome-title">خوش آمدید!</h1>
           <div class="title-underline"></div>

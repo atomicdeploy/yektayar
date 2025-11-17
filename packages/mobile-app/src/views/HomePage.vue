@@ -36,7 +36,7 @@
         <div class="hero-content">
           <div class="logo-container">
             <div class="logo-circle">
-              <ion-icon icon="yektayar" class="hero-icon"></ion-icon>
+              <ion-icon name="yektayar" class="hero-icon"></ion-icon>
             </div>
           </div>
           <h1 class="hero-title">{{ t('welcome') }}</h1>
