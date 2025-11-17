@@ -253,6 +253,15 @@ sudo chown -R caddy:caddy /var/www/yektayar/static
 sudo chmod 755 /var/www/yektayar/static
 ```
 
+### "Vite WebSocket/HMR Connection Failed"
+**Problem:** Vite's Hot Module Replacement (HMR) WebSocket fails to connect when accessed through reverse proxy  
+**Solution:** This has been fixed in the Vite configuration. The `server.hmr.clientPort: 443` setting in both `packages/mobile-app/vite.config.ts` and `packages/admin-panel/vite.config.ts` ensures the WebSocket connects through the proxy (wss://app.yektayar.ir or wss://panel.yektayar.ir) instead of trying to connect directly to localhost.
+
+**Note:** If you encounter this error, ensure:
+- The web server is properly configured to forward WebSocket connections (already configured in provided configs)
+- The Vite dev server is running (`npm run dev:mobile` or `npm run dev:admin`)
+- Port 443 (HTTPS) is accessible
+
 ---
 
 ## 📚 Detailed Documentation

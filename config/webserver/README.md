@@ -437,6 +437,14 @@ sudo firewall-cmd --reload
   sudo systemctl restart apache2
   ```
 
+##### Vite HMR WebSocket Issue
+If you see errors in the browser console about Vite HMR WebSocket failing to connect when accessing through a reverse proxy (e.g., `https://app.yektayar.ir` or `https://panel.yektayar.ir`), this has been fixed in the Vite configuration:
+
+- **Mobile App:** `packages/mobile-app/vite.config.ts` includes `server.hmr.clientPort: 443`
+- **Admin Panel:** `packages/admin-panel/vite.config.ts` includes `server.hmr.clientPort: 443`
+
+This ensures the HMR WebSocket connects through the proxy using wss:// protocol instead of trying to connect directly to localhost.
+
 #### 5. Static Files 403 Forbidden
 - **Cause:** Incorrect permissions on static directory
 - **Solution:** Fix permissions
