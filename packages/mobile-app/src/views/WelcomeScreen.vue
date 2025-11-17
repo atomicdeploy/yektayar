@@ -30,38 +30,53 @@
         </div>
 
         <!-- Welcome Text Content with Card Style -->
-        <div class="welcome-text">
-          <p class="welcome-paragraph highlight-first">
-            <span v-html="typewriter1.displayText.value || '&nbsp;'"></span>
-            <span v-if="typewriter1.isTyping.value && typewriter1.showCursor.value" class="typewriter-cursor"></span>
-          </p>
-          <p class="welcome-paragraph" v-if="typewriter1.isComplete.value">
-            <span v-html="typewriter2.displayText.value || '&nbsp;'"></span>
-            <span v-if="typewriter2.isTyping.value && typewriter2.showCursor.value" class="typewriter-cursor"></span>
-          </p>
-          <p class="welcome-paragraph" v-if="typewriter2.isComplete.value">
-            <span v-html="typewriter3.displayText.value || '&nbsp;'"></span>
-            <span v-if="typewriter3.isTyping.value && typewriter3.showCursor.value" class="typewriter-cursor"></span>
-          </p>
-          <p class="welcome-paragraph" v-if="typewriter3.isComplete.value">
-            <span v-html="typewriter4.displayText.value || '&nbsp;'"></span>
-            <span v-if="typewriter4.isTyping.value && typewriter4.showCursor.value" class="typewriter-cursor"></span>
+        <div class="welcome-text" ref="welcomeTextRef">
+          <p 
+            v-for="(item, index) in typewriters" 
+            :key="index"
+            v-show="index === 0 || typewriters[index - 1].isComplete.value"
+            class="welcome-paragraph"
+            :class="{ 'highlight-first': index === 0 }"
+          >
+            <span v-html="item.displayText.value || '&nbsp;'"></span>
+            <span v-if="item.isTyping.value && item.showCursor.value" class="typewriter-cursor"></span>
           </p>
         </div>
 
-        <!-- CTA Button with Enhanced Design - Only show after all typewriter effects complete -->
+        <!-- Terms Acceptance Checkbox -->
+        <div class="terms-container" v-if="allTypewritersComplete">
+          <label class="terms-checkbox">
+            <input 
+              type="checkbox" 
+              v-model="termsAccepted" 
+              class="checkbox-input"
+            />
+            <span class="checkbox-custom">
+              <ion-icon :icon="checkmarkOutline" class="checkbox-icon"></ion-icon>
+            </span>
+            <span class="terms-text">
+              <a href="#" @click.prevent="showTerms" class="terms-link">شرایط و قوانین</a>
+              را خوانده‌ام و می‌پذیرم
+            </span>
+          </label>
+        </div>
+
+        <!-- Enhanced CTA Button - Only show after all typewriter effects complete and terms accepted -->
         <ion-button 
           v-if="allTypewritersComplete"
+          :disabled="!termsAccepted"
           expand="block" 
           size="large" 
-          color="success"
           class="cta-button cta-button-slide-down"
+          :class="{ 'cta-button-disabled': !termsAccepted }"
           @click="startApp"
         >
           <span class="button-content">
+            <span class="button-icon">✨</span>
+            <span class="button-text">شروع سفر به سلامت روان</span>
             <span class="button-icon">🚀</span>
-            <span class="button-text">شروع گفتگو</span>
           </span>
+          <div class="button-shine"></div>
         </ion-button>
 
         <!-- Disclaimer with Icon -->
@@ -78,82 +93,96 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
-import { heartOutline, lockClosedOutline } from 'ionicons/icons'
+import { heartOutline, lockClosedOutline, checkmarkOutline } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
-import { watch, computed } from 'vue'
+import { useIntersectionObserver } from '@/composables/useIntersectionObserver'
+import { ref, computed, watch } from 'vue'
 
 const router = useRouter()
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 
-// Welcome text paragraphs
-const paragraph1 = 'به <strong>یکتایار</strong> خوش اومدی؛ جایی که دیگه لازم نیست مشکلاتت رو توی دلت نگه داری. اینجا خیلی راحت می‌تونی حرف بزنی، احساساتت رو بگی و دغدغه‌هات رو مطرح کنی و فوراً یک نقشه مسیر علمی برای حل مشکلاتت بگیری.'
-const paragraph2 = 'در یکتایار، دیگه خبری از سردرگمی و اتلاف وقت نیست؛ فوراً در مسیر درست حل مشکلاتت قرار می‌گیری، در کنارش سریع‌ترین راه برای دریافت وقت جلسات مشاوره جلوی پای تو هست و مطمئن می‌شی که همیشه یه تیم پشتیبان هم کنارت هست.'
-const paragraph3 = 'از مشاوره و روان‌درمانی فردی گرفته تا زوج‌درمانی و خانواده درمانی، همه‌چی اینجا آمادست تا هر چه سریع‌تر، <u>آرامش</u>، <u>امنیت</u> و <u>حال خوب</u> به زندگیت بیاد.'
-const paragraph4 = 'فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.'
+// Terms acceptance state
+const termsAccepted = ref(false)
 
-// Initialize typewriter effects for each paragraph
-// Start after the fade-in animation completes (800ms animation + 500ms delay = 1300ms)
-// Use 'character' mode by default (can be changed to 'word' mode)
-// Only the first typewriter auto-starts, others are triggered by watchers
-const typewriter1 = useTypewriter(paragraph1, { speed: 20, startDelay: 1300, showCursor: true, mode: 'character', autoStart: true })
-const typewriter2 = useTypewriter(paragraph2, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
-const typewriter3 = useTypewriter(paragraph3, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
-const typewriter4 = useTypewriter(paragraph4, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
+// Reference to welcome text container for intersection observer
+const welcomeTextRef = ref<HTMLElement | null>(null)
+
+// Welcome text paragraphs
+const paragraphs = [
+  'به <strong>یکتایار</strong> خوش اومدی؛ جایی که دیگه لازم نیست مشکلاتت رو توی دلت نگه داری. اینجا خیلی راحت می‌تونی حرف بزنی، احساساتت رو بگی و دغدغه‌هات رو مطرح کنی و فوراً یک نقشه مسیر علمی برای حل مشکلاتت بگیری.',
+  'در یکتایار، دیگه خبری از سردرگمی و اتلاف وقت نیست؛ فوراً در مسیر درست حل مشکلاتت قرار می‌گیری، در کنارش سریع‌ترین راه برای دریافت وقت جلسات مشاوره جلوی پای تو هست و مطمئن می‌شی که همیشه یه تیم پشتیبان هم کنارت هست.',
+  'از مشاوره و روان‌درمانی فردی گرفته تا زوج‌درمانی و خانواده درمانی، همه‌چی اینجا آمادست تا هر چه سریع‌تر، <u>آرامش</u>، <u>امنیت</u> و <u>حال خوب</u> به زندگیت بیاد.',
+  'فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.'
+]
+
+// Initialize typewriter effects using a loop (DRY principle)
+const typewriters = paragraphs.map((text, index) => {
+  return useTypewriter(text, {
+    speed: 20,
+    startDelay: 0,
+    showCursor: true,
+    mode: 'character',
+    autoStart: false
+  })
+})
+
+// Set up intersection observer for viewport-based triggering
+const { isIntersecting } = useIntersectionObserver(welcomeTextRef, {
+  threshold: 0.2,
+  rootMargin: '0px'
+})
+
+// Watch for when welcome text enters viewport and start first typewriter
+let hasStartedTyping = false
+watch(isIntersecting, (inViewport) => {
+  if (inViewport && !hasStartedTyping && typewriters[0]) {
+    logger.info('[WelcomeScreen] Welcome text entered viewport, starting typewriter effects')
+    hasStartedTyping = true
+    typewriters[0].start()
+  }
+})
 
 // Computed property to check if all typewriters are complete
 const allTypewritersComplete = computed(() => {
-  const result = typewriter1.isComplete.value && 
-         typewriter2.isComplete.value && 
-         typewriter3.isComplete.value && 
-         typewriter4.isComplete.value
+  const result = typewriters.every(tw => tw.isComplete.value)
   
-  logger.debug(`[WelcomeScreen] All typewriters complete: ${result}`, {
-    tw1: typewriter1.isComplete.value,
-    tw2: typewriter2.isComplete.value,
-    tw3: typewriter3.isComplete.value,
-    tw4: typewriter4.isComplete.value
-  })
+  logger.debug(`[WelcomeScreen] All typewriters complete: ${result}`)
   
   return result
 })
 
-// Chain the typewriter effects with 500ms delay between each paragraph
-watch(() => typewriter1.isComplete.value, (isComplete) => {
-  logger.info('[WelcomeScreen] Typewriter 1 complete:', isComplete)
-  if (isComplete) {
-    setTimeout(() => {
-      logger.info('[WelcomeScreen] Starting typewriter 2')
-      typewriter2.start()
-    }, 500)
+// Chain the typewriter effects with 500ms delay between each paragraph using a loop
+typewriters.forEach((typewriter, index) => {
+  if (index < typewriters.length - 1) {
+    watch(() => typewriter.isComplete.value, (isComplete) => {
+      if (isComplete) {
+        logger.info(`[WelcomeScreen] Typewriter ${index + 1} complete, starting next`)
+        setTimeout(() => {
+          typewriters[index + 1].start()
+        }, 500)
+      }
+    })
   }
 })
 
-watch(() => typewriter2.isComplete.value, (isComplete) => {
-  logger.info('[WelcomeScreen] Typewriter 2 complete:', isComplete)
-  if (isComplete) {
-    setTimeout(() => {
-      logger.info('[WelcomeScreen] Starting typewriter 3')
-      typewriter3.start()
-    }, 500)
-  }
-})
-
-watch(() => typewriter3.isComplete.value, (isComplete) => {
-  logger.info('[WelcomeScreen] Typewriter 3 complete:', isComplete)
-  if (isComplete) {
-    setTimeout(() => {
-      logger.info('[WelcomeScreen] Starting typewriter 4')
-      typewriter4.start()
-    }, 500)
-  }
-})
+const showTerms = () => {
+  // TODO: Navigate to terms and conditions page or show modal
+  logger.info('Show terms and conditions')
+  // For now, just open in a new tab or show an alert
+  alert('شرایط و قوانین استفاده از یکتایار در اینجا نمایش داده خواهد شد.')
+}
 
 const startApp = async () => {
+  if (!termsAccepted.value) {
+    logger.warn('Cannot start app without accepting terms')
+    return
+  }
+  
   logger.info('User started the app from welcome screen')
   
   // Mark welcome screen as shown in localStorage
@@ -162,7 +191,8 @@ const startApp = async () => {
   // Also mark on backend if user is authenticated
   try {
     await apiClient.post('/api/users/preferences', {
-      welcomeScreenShown: true
+      welcomeScreenShown: true,
+      termsAccepted: true
     })
     logger.info('Welcome screen preference saved to backend')
   } catch (error) {
@@ -352,6 +382,99 @@ const onImageError = () => {
   font-weight: 700;
 }
 
+/* Terms Acceptance Checkbox styling */
+.terms-container {
+  margin: 2rem 0 1rem 0;
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: 0.3s;
+}
+
+.terms-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  direction: rtl;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border: 2px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.terms-checkbox:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(212, 164, 62, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 164, 62, 0.2);
+}
+
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkbox-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid #d4a43e;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.checkbox-icon {
+  font-size: 20px;
+  color: white;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.checkbox-input:checked ~ .checkbox-custom {
+  background: linear-gradient(135deg, #d4a43e 0%, #e8c170 100%);
+  border-color: #d4a43e;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px rgba(212, 164, 62, 0.2);
+}
+
+.checkbox-input:checked ~ .checkbox-custom .checkbox-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.terms-text {
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: right;
+}
+
+.terms-link {
+  color: #d4a43e;
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(212, 164, 62, 0.3);
+  transition: all 0.2s;
+  padding-bottom: 1px;
+}
+
+.terms-link:hover {
+  color: #c99433;
+  border-bottom-color: #c99433;
+}
+
 /* Typewriter cursor styling */
 .typewriter-cursor {
   display: inline-block;
@@ -384,18 +507,50 @@ const onImageError = () => {
   }
 }
 
-/* CTA Button styling */
+/* CTA Button styling - Enhanced with gradient and effects */
 .cta-button {
-  --border-radius: 20px;
-  --padding-top: 18px;
-  --padding-bottom: 18px;
-  --box-shadow: 0 8px 24px rgba(76, 175, 80, 0.3);
-  margin: 2.5rem 0 1.5rem 0;
+  --border-radius: 24px;
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  --box-shadow: 
+    0 8px 32px rgba(212, 164, 62, 0.3),
+    0 4px 16px rgba(1, 24, 58, 0.2);
+  margin: 2rem 0 1.5rem 0;
   text-transform: none;
-  font-size: 1.3rem;
-  font-weight: 700;
+  font-size: 1.4rem;
+  font-weight: 800;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
+  background-size: 200% 100%;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cta-button:not(.cta-button-disabled) {
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.cta-button:not(.cta-button-disabled):active {
+  transform: scale(0.98);
+  --box-shadow: 
+    0 4px 16px rgba(212, 164, 62, 0.4),
+    0 2px 8px rgba(1, 24, 58, 0.3);
+}
+
+.cta-button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #9e9e9e 0%, #bdbdbd 100%);
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* SlideDown animation for CTA button */
@@ -414,6 +569,26 @@ const onImageError = () => {
   }
 }
 
+/* Shine effect for CTA button */
+.button-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.cta-button:not(.cta-button-disabled):hover .button-shine {
+  left: 100%;
+}
+
 .cta-button::before {
   content: '';
   position: absolute;
@@ -422,33 +597,36 @@ const onImageError = () => {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   transform: translate(-50%, -50%);
   transition: width 0.6s, height 0.6s;
 }
 
-.cta-button:hover::before {
-  width: 300px;
-  height: 300px;
+.cta-button:not(.cta-button-disabled):hover::before {
+  width: 400px;
+  height: 400px;
 }
 
 .button-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   position: relative;
   z-index: 1;
   pointer-events: none;
+  color: #01183a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .button-icon {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   animation: bounce 2s ease-in-out infinite;
 }
 
 .button-text {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
+  letter-spacing: -0.3px;
 }
 
 /* Disclaimer styling */
@@ -622,6 +800,29 @@ const onImageError = () => {
   .disclaimer-icon {
     color: #adb5bd;
   }
+
+  .terms-checkbox {
+    background: rgba(26, 31, 46, 0.6);
+    border-color: transparent;
+  }
+
+  .terms-checkbox:hover {
+    background: rgba(26, 31, 46, 0.8);
+    border-color: rgba(212, 164, 62, 0.3);
+  }
+
+  .terms-text {
+    color: #e9ecef;
+  }
+
+  .checkbox-custom {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #d4a43e;
+  }
+
+  .cta-button:not(.cta-button-disabled) {
+    background: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
+  }
 }
 
 /* Responsive adjustments */
@@ -653,6 +854,23 @@ const onImageError = () => {
 
   .button-text {
     font-size: 1.2rem;
+  }
+
+  .button-icon {
+    font-size: 1.3rem;
+  }
+
+  .terms-text {
+    font-size: 0.95rem;
+  }
+
+  .checkbox-custom {
+    width: 26px;
+    height: 26px;
+  }
+
+  .checkbox-icon {
+    font-size: 18px;
   }
 }
 
@@ -700,6 +918,19 @@ const onImageError = () => {
 
   .button-icon {
     font-size: 1.2rem;
+  }
+
+  .terms-text {
+    font-size: 0.9rem;
+  }
+
+  .checkbox-custom {
+    width: 24px;
+    height: 24px;
+  }
+
+  .checkbox-icon {
+    font-size: 16px;
   }
 
   .disclaimer-text {
