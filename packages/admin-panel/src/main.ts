@@ -51,8 +51,9 @@ async function initializeApp() {
       title: 'API Configuration Error',
       message: 'Cannot start the admin panel due to API configuration issues.',
       details: validationResult.error,
-      solution: solution,
-      errorType: validationResult.errorType
+      solution: import.meta.env.DEV ? solution : null, // Don't send solution in production
+      errorType: validationResult.errorType,
+      isBuiltInError: true
     })
     
     errorApp.use(i18n)

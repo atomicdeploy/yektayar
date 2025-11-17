@@ -53,12 +53,14 @@ interface Props {
   details?: string
   solution?: Solution | null
   errorType?: string
+  isBuiltInError?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: 'Configuration Error',
   solution: null,
-  errorType: undefined
+  errorType: undefined,
+  isBuiltInError: false
 })
 
 const { t, locale } = useI18n()
@@ -76,24 +78,17 @@ const textDirection = computed(() => {
   return locale.value === 'fa' ? 'rtl' : 'ltr'
 })
 
-// Check if the error message is one of our built-in translatable errors
-const isBuiltInError = computed(() => {
-  if (!props.details) return false
-  // Built-in errors contain specific markers that indicate they should be translated
-  return props.details.includes('API_BASE_URL')
-})
-
 const displayDetails = computed(() => {
   if (!props.details) return ''
   // Use translated message for built-in errors, raw message otherwise
-  return isBuiltInError.value 
+  return props.isBuiltInError 
     ? t('error_screen.api_url_missing') 
     : props.details
 })
 
 const detailsDirection = computed(() => {
   // Built-in errors use app's text direction, raw errors are always LTR (English)
-  return isBuiltInError.value ? textDirection.value : 'ltr'
+  return props.isBuiltInError ? textDirection.value : 'ltr'
 })
 
 const shouldShowDetails = computed(() => {
@@ -120,6 +115,7 @@ onMounted(() => {
   if (window.matchMedia) {
     darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     isDarkMode.value = darkModeMediaQuery.matches
+    // Listen for changes to dark mode preference
     darkModeMediaQuery.addEventListener('change', updateDarkMode)
   }
 })
