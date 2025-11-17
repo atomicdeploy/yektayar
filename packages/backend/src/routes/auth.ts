@@ -3,6 +3,7 @@ import { getDatabase } from '../services/database'
 import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
+import { logger } from '@yektayar/shared'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request }) => {
@@ -30,7 +31,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         }
       }
     } catch (error) {
-      console.error('Error acquiring session:', error)
+      logger.error('Error acquiring session:', error)
       return {
         success: false,
         error: 'Failed to acquire session',
@@ -77,7 +78,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         }
       }
     } catch (error) {
-      console.error('Error validating session:', error)
+      logger.error('Error validating session:', error)
       return {
         success: false,
         error: 'Failed to validate session',
@@ -424,7 +425,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         message: 'Logged out successfully'
       }
     } catch (error) {
-      console.error('Error during logout:', error)
+      logger.error('Error during logout:', error)
       return {
         success: false,
         error: 'Failed to logout'

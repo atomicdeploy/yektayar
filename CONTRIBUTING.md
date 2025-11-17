@@ -53,9 +53,34 @@ chore: update dependencies
 ### TypeScript/JavaScript
 - Use **TypeScript** for all new code
 - Follow existing code style
-- Use ESLint for linting
+- Use ESLint for linting: `npm run lint`
+- Fix linting issues: `npm run lint:fix`
 - Prefer clear, descriptive names over comments
 - Add comments only for complex logic
+
+### Logging Standards ⚠️
+
+**CRITICAL: Always use the logger utility instead of console methods**
+
+❌ **DO NOT USE:**
+```typescript
+console.log('Message')
+console.error('Error')
+console.warn('Warning')
+```
+
+✅ **ALWAYS USE:**
+```typescript
+import { logger } from '@yektayar/shared'
+
+logger.info('Message')
+logger.error('Error')
+logger.warn('Warning')
+logger.success('Success')
+logger.debug('Debug info')
+```
+
+See `.github/copilot-instructions.md` for detailed logging guidelines.
 
 ### Vue/Frontend
 - Use **Composition API** for Vue components
@@ -72,11 +97,13 @@ chore: update dependencies
 ## Pull Requests
 
 ### Before Submitting
-- [ ] Code builds without errors
-- [ ] Linter passes
-- [ ] Tests pass (if applicable)
+- [ ] Code builds without errors: `npm run build`
+- [ ] Linter passes: `npm run lint`
+- [ ] Tests pass: `npm run test`
+- [ ] No direct console.* usage (use logger instead)
 - [ ] Documentation updated
 - [ ] Self-review completed
+- [ ] CI checks pass
 
 ### PR Description
 Include:
@@ -128,10 +155,17 @@ If yes to 1-2 and no to 3-4, proceed with adding the dependency.
 
 ## Testing
 
+### Running Tests
+- Run all tests: `npm run test`
+- Watch mode: `npm run test:watch`
+- With UI: `npm run test:ui`
+- Coverage: `npm run test:coverage`
+
 ### Unit Tests
 - Write tests for business logic
-- Use appropriate test framework (Vitest recommended)
+- Use Vitest test framework
 - Aim for good coverage of critical paths
+- Run tests before committing
 
 ### Integration Tests
 - Test API endpoints
