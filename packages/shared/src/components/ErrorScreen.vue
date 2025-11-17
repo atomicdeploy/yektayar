@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .error-screen {
   /* CSS Variables for theming */
   --error-bg: #f8f9fa;
