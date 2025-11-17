@@ -62,12 +62,14 @@
           </label>
         </div>
 
-        <!-- Enhanced CTA Button - Only show after all typewriter effects complete and terms accepted -->
+        <!-- Enhanced CTA Button - Only show after all typewriter effects complete -->
         <ion-button 
-          v-if="allTypewritersComplete && termsAccepted"
+          v-if="allTypewritersComplete"
+          :disabled="!termsAccepted"
           expand="block" 
           size="large" 
           class="cta-button cta-button-slide-down"
+          :class="{ 'cta-button-disabled': !termsAccepted }"
           @click="startApp"
         >
           <span class="button-content">
@@ -392,6 +394,8 @@ const onImageError = () => {
   border: 1px solid rgba(212, 164, 62, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.8s ease-out 0.5s both;
+  transition: height 0.3s ease-out;
+  overflow: hidden;
 }
 
 .welcome-paragraph {
@@ -595,6 +599,7 @@ const onImageError = () => {
 /* SlideDown animation for CTA button */
 .cta-button-slide-down {
   animation: slideDown 0.6s ease-out both;
+  animation-delay: 0.6s;
 }
 
 @keyframes slideDown {
