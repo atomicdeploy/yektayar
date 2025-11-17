@@ -31,19 +31,10 @@
 
         <!-- Welcome Text Content with Card Style -->
         <div class="welcome-text">
-          <p class="welcome-paragraph highlight-first">
-            به <strong>یکتایار</strong> خوش اومدی؛ جایی که دیگه لازم نیست مشکلاتت رو توی دلت نگه داری.
-            اینجا خیلی راحت می‌تونی حرف بزنی، احساساتت رو بگی و دغدغه‌هات رو مطرح کنی و فوراً یک نقشه مسیر علمی برای حل مشکلاتت بگیری.
-          </p>
-          <p class="welcome-paragraph">
-            در یکتایار، دیگه خبری از سردرگمی و اتلاف وقت نیست؛ فوراً در مسیر درست حل مشکلاتت قرار می‌گیری، در کنارش سریع‌ترین راه برای دریافت وقت جلسات مشاوره جلوی پای تو هست و مطمئن می‌شی که همیشه یه تیم پشتیبان هم کنارت هست.
-          </p>
-          <p class="welcome-paragraph">
-            از مشاوره و روان‌درمانی فردی گرفته تا زوج‌درمانی و خانواده درمانی، همه‌چی اینجا آمادست تا هر چه سریع‌تر، <u>آرامش</u>، <u>امنیت</u> و <u>حال خوب</u> به زندگیت بیاد.
-          </p>
-          <p class="welcome-paragraph">
-            فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.
-          </p>
+          <p class="welcome-paragraph highlight-first" v-html="typewriter1.displayText.value || '&nbsp;'"></p>
+          <p class="welcome-paragraph" v-if="typewriter1.isComplete.value" v-html="typewriter2.displayText.value || '&nbsp;'"></p>
+          <p class="welcome-paragraph" v-if="typewriter2.isComplete.value" v-html="typewriter3.displayText.value || '&nbsp;'"></p>
+          <p class="welcome-paragraph" v-if="typewriter3.isComplete.value" v-html="typewriter4.displayText.value || '&nbsp;'"></p>
         </div>
 
         <!-- CTA Button with Enhanced Design -->
@@ -79,10 +70,44 @@ import { useRouter } from 'vue-router'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
+import { useTypewriter } from '@/composables/useTypewriter'
+import { watch } from 'vue'
 
 const router = useRouter()
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
+
+// Welcome text paragraphs
+const paragraph1 = 'به <strong>یکتایار</strong> خوش اومدی؛ جایی که دیگه لازم نیست مشکلاتت رو توی دلت نگه داری. اینجا خیلی راحت می‌تونی حرف بزنی، احساساتت رو بگی و دغدغه‌هات رو مطرح کنی و فوراً یک نقشه مسیر علمی برای حل مشکلاتت بگیری.'
+const paragraph2 = 'در یکتایار، دیگه خبری از سردرگمی و اتلاف وقت نیست؛ فوراً در مسیر درست حل مشکلاتت قرار می‌گیری، در کنارش سریع‌ترین راه برای دریافت وقت جلسات مشاوره جلوی پای تو هست و مطمئن می‌شی که همیشه یه تیم پشتیبان هم کنارت هست.'
+const paragraph3 = 'از مشاوره و روان‌درمانی فردی گرفته تا زوج‌درمانی و خانواده درمانی، همه‌چی اینجا آمادست تا هر چه سریع‌تر، <u>آرامش</u>، <u>امنیت</u> و <u>حال خوب</u> به زندگیت بیاد.'
+const paragraph4 = 'فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.'
+
+// Initialize typewriter effects for each paragraph
+// Start after the fade-in animation completes (800ms animation + 500ms delay = 1300ms)
+const typewriter1 = useTypewriter(paragraph1, { speed: 20, startDelay: 1300 })
+const typewriter2 = useTypewriter(paragraph2, { speed: 20, startDelay: 0 })
+const typewriter3 = useTypewriter(paragraph3, { speed: 20, startDelay: 0 })
+const typewriter4 = useTypewriter(paragraph4, { speed: 20, startDelay: 0 })
+
+// Chain the typewriter effects - start next paragraph when previous completes
+watch(() => typewriter1.isComplete.value, (isComplete) => {
+  if (isComplete) {
+    typewriter2.start()
+  }
+})
+
+watch(() => typewriter2.isComplete.value, (isComplete) => {
+  if (isComplete) {
+    typewriter3.start()
+  }
+})
+
+watch(() => typewriter3.isComplete.value, (isComplete) => {
+  if (isComplete) {
+    typewriter4.start()
+  }
+})
 
 const startApp = async () => {
   logger.info('User started the app from welcome screen')
