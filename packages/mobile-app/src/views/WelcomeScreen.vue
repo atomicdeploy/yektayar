@@ -99,39 +99,55 @@ const paragraph4 = 'فقط کافیه رو دکمه‌ی شروع گفتگو ب�
 // Initialize typewriter effects for each paragraph
 // Start after the fade-in animation completes (800ms animation + 500ms delay = 1300ms)
 // Use 'character' mode by default (can be changed to 'word' mode)
-const typewriter1 = useTypewriter(paragraph1, { speed: 20, startDelay: 1300, showCursor: true, mode: 'character' })
-const typewriter2 = useTypewriter(paragraph2, { speed: 20, startDelay: 0, showCursor: true, mode: 'character' })
-const typewriter3 = useTypewriter(paragraph3, { speed: 20, startDelay: 0, showCursor: true, mode: 'character' })
-const typewriter4 = useTypewriter(paragraph4, { speed: 20, startDelay: 0, showCursor: true, mode: 'character' })
+// Only the first typewriter auto-starts, others are triggered by watchers
+const typewriter1 = useTypewriter(paragraph1, { speed: 20, startDelay: 1300, showCursor: true, mode: 'character', autoStart: true })
+const typewriter2 = useTypewriter(paragraph2, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
+const typewriter3 = useTypewriter(paragraph3, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
+const typewriter4 = useTypewriter(paragraph4, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
 
 // Computed property to check if all typewriters are complete
 const allTypewritersComplete = computed(() => {
-  return typewriter1.isComplete.value && 
+  const result = typewriter1.isComplete.value && 
          typewriter2.isComplete.value && 
          typewriter3.isComplete.value && 
          typewriter4.isComplete.value
+  
+  logger.debug(`[WelcomeScreen] All typewriters complete: ${result}`, {
+    tw1: typewriter1.isComplete.value,
+    tw2: typewriter2.isComplete.value,
+    tw3: typewriter3.isComplete.value,
+    tw4: typewriter4.isComplete.value
+  })
+  
+  return result
 })
 
 // Chain the typewriter effects with 500ms delay between each paragraph
 watch(() => typewriter1.isComplete.value, (isComplete) => {
+  logger.info('[WelcomeScreen] Typewriter 1 complete:', isComplete)
   if (isComplete) {
     setTimeout(() => {
+      logger.info('[WelcomeScreen] Starting typewriter 2')
       typewriter2.start()
     }, 500)
   }
 })
 
 watch(() => typewriter2.isComplete.value, (isComplete) => {
+  logger.info('[WelcomeScreen] Typewriter 2 complete:', isComplete)
   if (isComplete) {
     setTimeout(() => {
+      logger.info('[WelcomeScreen] Starting typewriter 3')
       typewriter3.start()
     }, 500)
   }
 })
 
 watch(() => typewriter3.isComplete.value, (isComplete) => {
+  logger.info('[WelcomeScreen] Typewriter 3 complete:', isComplete)
   if (isComplete) {
     setTimeout(() => {
+      logger.info('[WelcomeScreen] Starting typewriter 4')
       typewriter4.start()
     }, 500)
   }
@@ -340,6 +356,7 @@ const onImageError = () => {
   margin-left: 2px;
   margin-right: 2px;
   vertical-align: text-bottom;
+  border-radius: 3px;
   animation: blink 1s infinite, glow 1.5s ease-in-out infinite;
   box-shadow: 0 0 8px rgba(212, 164, 62, 0.6);
 }
