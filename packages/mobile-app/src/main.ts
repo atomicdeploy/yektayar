@@ -29,10 +29,10 @@ import '@ionic/vue/css/flex-utils.css'
 import '@ionic/vue/css/display.css'
 
 /* Sahel Font */
-import './theme/fonts.css'
+import './theme/fonts.scss'
 
 /* Theme variables */
-import './theme/variables.css'
+import './theme/variables.scss'
 
 // Log startup information
 logger.startup('YektaYar Mobile App', {

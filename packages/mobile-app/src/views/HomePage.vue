@@ -208,7 +208,7 @@ const navigateToAppointments = () => router.push('/tabs/appointments')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;

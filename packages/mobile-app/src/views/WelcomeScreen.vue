@@ -110,7 +110,7 @@ const onImageError = () => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .welcome-content {
   --background: linear-gradient(135deg, 
     #f8f9fa 0%, 
