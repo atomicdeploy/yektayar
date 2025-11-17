@@ -11,6 +11,7 @@ import { useSessionStore } from './stores/session'
 import { logger } from '@yektayar/shared'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
+import { registerCustomIcons } from './icons/custom-icons'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -143,6 +144,9 @@ const i18n = createI18n({
 
 // Validate API configuration and reachability before mounting the app
 async function initializeApp() {
+  // Register custom icons before anything else
+  registerCustomIcons()
+  
   logger.info('=== YektaYar Mobile App Initialization ===')
   logger.info(`Environment: ${config.environment}`)
   

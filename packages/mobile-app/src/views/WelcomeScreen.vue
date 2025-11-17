@@ -9,7 +9,7 @@
         <!-- Header with Title and Logo -->
         <div class="welcome-header">
           <div class="logo-accent">
-            <img src="/icon.svg" alt="YektaYar Icon" class="app-icon" />
+            <ion-icon icon="yektayar" class="yektayar-icon"></ion-icon>
           </div>
           <h1 class="welcome-title">خوش آمدید!</h1>
           <div class="title-underline"></div>
@@ -179,10 +179,9 @@ const onImageError = () => {
   animation: scaleIn 0.5s ease-out;
 }
 
-.app-icon {
-  width: 36px;
-  height: 36px;
-  filter: brightness(0) invert(1);
+.yektayar-icon {
+  font-size: 32px;
+  color: white;
   animation: heartbeat 2s ease-in-out infinite;
 }
 

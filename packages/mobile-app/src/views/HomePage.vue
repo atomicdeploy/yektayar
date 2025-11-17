@@ -36,7 +36,7 @@
         <div class="hero-content">
           <div class="logo-container">
             <div class="logo-circle">
-              <img src="/icon.svg" alt="YektaYar Icon" class="hero-icon" />
+              <ion-icon icon="yektayar" class="hero-icon"></ion-icon>
             </div>
           </div>
           <h1 class="hero-title">{{ t('welcome') }}</h1>
@@ -263,9 +263,8 @@ const navigateToProfile = () => router.push('/tabs/profile')
 }
 
 .hero-icon {
-  width: 56px;
-  height: 56px;
-  filter: brightness(0) invert(1);
+  font-size: 48px;
+  color: white;
 }
 
 .hero-title {
