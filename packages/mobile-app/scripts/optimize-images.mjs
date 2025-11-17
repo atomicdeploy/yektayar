@@ -69,18 +69,27 @@ async function convertToWebP() {
           .webp({ quality: WEBP_QUALITY })
           .toFile(webpPath);
 
-        // Optimize JPEG
-        await sharp(inputPath)
-          .resize(config.width, null, { fit: 'inside', withoutEnlargement: true })
-          .jpeg({ quality: JPEG_QUALITY, progressive: true })
-          .toFile(jpegPath);
+        // Optimize JPEG - skip if it's the same as input to avoid overwriting
+        if (jpegPath !== inputPath) {
+          await sharp(inputPath)
+            .resize(config.width, null, { fit: 'inside', withoutEnlargement: true })
+            .jpeg({ quality: JPEG_QUALITY, progressive: true })
+            .toFile(jpegPath);
+        }
 
         const webpStats = await fs.stat(webpPath);
-        const jpegStats = await fs.stat(jpegPath);
         
         console.log(`   ${density} (${config.width}px):`);
-        console.log(`      JPG: ${(jpegStats.size / 1024).toFixed(2)} KB`);
-        console.log(`      WebP: ${(webpStats.size / 1024).toFixed(2)} KB (${((1 - webpStats.size / jpegStats.size) * 100).toFixed(1)}% smaller)`);
+        
+        // Only report JPEG stats if we created a new file (not the original)
+        if (jpegPath !== inputPath) {
+          const jpegStats = await fs.stat(jpegPath);
+          console.log(`      JPG: ${(jpegStats.size / 1024).toFixed(2)} KB`);
+          console.log(`      WebP: ${(webpStats.size / 1024).toFixed(2)} KB (${((1 - webpStats.size / jpegStats.size) * 100).toFixed(1)}% smaller)`);
+        } else {
+          console.log(`      JPG: ${inputSizeKB} KB (original)`);
+          console.log(`      WebP: ${(webpStats.size / 1024).toFixed(2)} KB (${((1 - webpStats.size / inputStats.size) * 100).toFixed(1)}% smaller)`);
+        }
       }
 
       // Generate thumbnail for blur placeholder

@@ -80,7 +80,7 @@
       <div class="section">
         <div class="section-header">
           <h3 class="section-title">{{ locale === 'fa' ? 'نوبت‌های آینده' : 'Upcoming' }}</h3>
-          <ion-badge color="primary">3</ion-badge>
+          <ion-badge color="secondary">3</ion-badge>
         </div>
 
         <div class="appointments-list">
@@ -257,7 +257,7 @@ import { useI18n } from 'vue-i18n'
 const { locale } = useI18n()
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;
@@ -363,7 +363,7 @@ const { locale } = useI18n()
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
 }
 
 /* Appointments List */

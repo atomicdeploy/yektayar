@@ -53,14 +53,14 @@
               <ion-icon :icon="sparkles" class="action-icon"></ion-icon>
             </div>
             <div class="action-content">
-              <h3>{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</h3>
-              <p>{{ locale === 'fa' ? 'گفتگو با هوش مصنوعی' : 'Chat with AI assistant' }}</p>
+              <h3>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
+              <p>{{ locale === 'fa' ? 'گفتگو با هوشمند' : 'Chat with AI assistant' }}</p>
             </div>
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
 
           <div class="action-card" @click="navigateToChat">
-            <div class="action-icon-wrapper primary">
+            <div class="action-icon-wrapper secondary">
               <ion-icon :icon="chatbubbles" class="action-icon"></ion-icon>
             </div>
             <div class="action-content">
@@ -221,7 +221,7 @@ const navigateToAppointments = () => router.push('/tabs/appointments')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;
@@ -305,7 +305,20 @@ const navigateToProfile = () => router.push('/tabs/profile')
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 1rem 0.5rem;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--secondary-gradient);
+  border-radius: 2px;
 }
 
 /* Quick Actions */
@@ -323,8 +336,14 @@ const navigateToProfile = () => router.push('/tabs/profile')
   align-items: center;
   gap: 1rem;
   box-shadow: var(--card-shadow);
+  border-left: 3px solid var(--secondary-accent-light);
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  border-left-color: var(--secondary-accent);
+  box-shadow: var(--card-shadow-hover), var(--secondary-glow);
 }
 
 .action-card:active {
@@ -343,6 +362,11 @@ const navigateToProfile = () => router.push('/tabs/profile')
 
 .action-icon-wrapper.primary {
   background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-tint) 100%);
+}
+
+.action-icon-wrapper.secondary {
+  background: var(--secondary-gradient);
+  box-shadow: var(--secondary-glow);
 }
 
 .action-icon-wrapper.success {
@@ -421,7 +445,7 @@ const navigateToProfile = () => router.push('/tabs/profile')
 ion-card-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
 }
 
 ion-card-content {

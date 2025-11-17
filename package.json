@@ -24,13 +24,15 @@
     "test:deps": "node scripts/test-dependencies.js",
     "socketio:test": "node scripts/socketio-tui.js",
     "ai:test": "node scripts/pollination-ai-tui.js",
+    "db:cli": "bash scripts/db-cli.sh",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
     "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android",
     "android:build": "npm run build:mobile && cd packages/mobile-app && npm run cap:sync && npm run android:build:debug",
     "android:analyze": "bash scripts/analyze-apk.sh",
-    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs"
+    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs",
+    "list-routes": "node scripts/list-routes.mjs"
   },
   "keywords": [
     "mental-health",
@@ -43,7 +45,7 @@
   "author": "YektaYar Team",
   "license": "PROPRIETARY",
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=20.19.0",
     "npm": ">=9.0.0"
   },
   "devDependencies": {

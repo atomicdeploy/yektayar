@@ -69,7 +69,7 @@ This document provides detailed information for developers working on the YektaY
 
 ### Required Tools
 
-- **Node.js**: >= 18.0.0
+- **Node.js**: >= 20.19.0
 - **npm**: >= 9.0.0
 - **Bun**: >= 1.0.0 (for backend runtime)
 - **PostgreSQL**: >= 15.0
@@ -442,6 +442,33 @@ CREATE TABLE sessions (
 ```bash
 # TODO: Setup migration tool (e.g., node-pg-migrate)
 # For now, run SQL scripts manually
+```
+
+### Database CLI Access
+
+To quickly connect to the database using credentials from your `.env` file:
+
+```bash
+npm run db:cli
+```
+
+This command will:
+1. Load database credentials from the unified `.env` file in the project root
+2. Launch `pgcli` if available (recommended for better experience)
+3. Fall back to `psql` if `pgcli` is not installed
+
+**Install pgcli for enhanced features:**
+```bash
+pip install pgcli
+```
+
+**Direct connection (alternative):**
+```bash
+# Using psql
+psql -h localhost -U yektayar_user -d yektayar
+
+# Using pgcli
+pgcli -h localhost -U yektayar_user -d yektayar
 ```
 
 ---
