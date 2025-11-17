@@ -64,15 +64,10 @@
 
         <!-- Enhanced CTA Button - Only show after all typewriter effects complete and terms accepted -->
         <ion-button 
-          v-if="allTypewritersComplete"
-          :disabled="!termsAccepted"
+          v-if="allTypewritersComplete && termsAccepted"
           expand="block" 
           size="large" 
-          class="cta-button"
-          :class="{ 
-            'cta-button-disabled': !termsAccepted,
-            'cta-button-slide-down': ctaButtonHasBeenShown && termsAccepted
-          }"
+          class="cta-button cta-button-slide-down"
           @click="startApp"
         >
           <span class="button-content">
@@ -118,9 +113,6 @@ const paragraphs = [
   'از مشاوره و روان‌درمانی فردی گرفته تا زوج‌درمانی و خانواده درمانی، همه‌چی اینجا آمادست تا هر چه سریع‌تر، <u>آرامش</u>، <u>امنیت</u> و <u>حال خوب</u> به زندگیت بیاد.',
   'فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.'
 ]
-
-// Track if CTA button has been shown at least once
-const ctaButtonHasBeenShown = ref(false)
 
 // Initialize typewriter effects using a loop
 const typewriters = paragraphs.map((text) => {
@@ -180,12 +172,6 @@ const setupParagraphObservers = () => {
   })
 }
 
-// Set up observers after component is mounted and refs are populated
-onMounted(async () => {
-  await nextTick()
-  setupParagraphObservers()
-})
-
 // Computed property to check if all typewriters are complete
 const allTypewritersComplete = computed(() => {
   const result = typewriters.every(tw => tw.isComplete.value)
@@ -195,12 +181,28 @@ const allTypewritersComplete = computed(() => {
   return result
 })
 
-// Watch for when CTA button first appears and mark it as shown
-watch(allTypewritersComplete, (isComplete) => {
-  if (isComplete && !ctaButtonHasBeenShown.value) {
-    ctaButtonHasBeenShown.value = true
-    logger.info('[WelcomeScreen] CTA button shown for the first time')
+// Fetch user preferences to check if terms were already accepted
+const fetchUserPreferences = async () => {
+  try {
+    const response = await apiClient.get('/api/users/preferences')
+    if (response.data?.termsAccepted) {
+      termsAccepted.value = true
+      logger.info('[WelcomeScreen] User has previously accepted terms')
+    }
+  } catch (error) {
+    // If fetch fails, default to unchecked (false)
+    logger.debug('[WelcomeScreen] Could not fetch user preferences, defaulting to unchecked')
   }
+}
+
+// Fetch preferences on mount
+onMounted(async () => {
+  // Fetch user preferences first
+  await fetchUserPreferences()
+  
+  // Then set up observers
+  await nextTick()
+  setupParagraphObservers()
 })
 
 const showTerms = () => {
