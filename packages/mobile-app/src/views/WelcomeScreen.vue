@@ -347,6 +347,11 @@ const onImageError = () => {
   color: #01183a;
 }
 
+.welcome-paragraph :deep(strong) {
+  color: #d4a43e;
+  font-weight: 700;
+}
+
 /* Typewriter cursor styling */
 .typewriter-cursor {
   display: inline-block;
