@@ -196,8 +196,11 @@ const shouldShowTextarea = computed(() => {
 
 // Web Speech API
 let recognition: any = null
-// Store finalized transcript separately from what's displayed
+// Store finalized transcript separately - this is the committed text
 let finalizedTranscript = ''
+// Track if we're on mobile for special handling
+const isMobileOrTablet = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+  (navigator.maxTouchPoints && navigator.maxTouchPoints > 2)
 
 // Computed property for arrow icon based on locale
 const continueArrowIcon = computed(() => {
@@ -248,25 +251,46 @@ function initializeSpeechRecognition() {
   }
 
   recognition.onresult = (event: any) => {
-    // Build transcript from results
     let interimTranscript = ''
 
-    // Process only new results starting from resultIndex
+    // Mobile-optimized result handling (inspired by debugger)
     for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcript = event.results[i][0].transcript
+      const result = event.results[i]
+      const transcript = result[0].transcript
+      const confidence = result[0].confidence
       
-      if (event.results[i].isFinal) {
-        // Add final results to the finalized storage
-        finalizedTranscript += transcript + ' '
+      // Mobile fix: treat confidence=0 as interim (not truly final)
+      // On mobile, results can have isFinal=true but confidence=0, which means they're still uncertain
+      const isTrulyFinal = result.isFinal && confidence !== 0
+      
+      if (isTrulyFinal) {
+        // Mobile fix: On mobile, REPLACE finalized text instead of appending
+        // This prevents duplicates when the same result is re-emitted
+        if (isMobileOrTablet) {
+          finalizedTranscript = transcript
+        } else {
+          // On desktop, append with space separator
+          finalizedTranscript += (finalizedTranscript ? ' ' : '') + transcript
+        }
       } else {
-        // Accumulate interim results to show live feedback
-        interimTranscript += transcript
+        // Interim results: On mobile, replace instead of append
+        if (isMobileOrTablet) {
+          interimTranscript = transcript
+        } else {
+          interimTranscript += transcript
+        }
       }
     }
 
-    // IMPORTANT: SET the display value (don't append!)
-    // This shows finalized text + current interim text for live feedback
-    transcriptText.value = finalizedTranscript + interimTranscript
+    // Always SET the display value (never append to transcriptText directly!)
+    // This shows: finalized text + current interim text for live feedback
+    if (interimTranscript) {
+      // Show interim text with a space separator
+      transcriptText.value = finalizedTranscript + (finalizedTranscript ? ' ' : '') + interimTranscript
+    } else {
+      // No interim, just show finalized
+      transcriptText.value = finalizedTranscript
+    }
   }
 
   recognition.onerror = (event: any) => {
