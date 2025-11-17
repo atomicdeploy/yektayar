@@ -30,18 +30,20 @@
         </div>
 
         <!-- Welcome Text Content with Card Style -->
-        <div class="welcome-text">
-          <p 
-            v-for="(item, index) in typewriters" 
-            :key="index"
-            :ref="(el) => { paragraphRefs[index] = el as HTMLElement | null }"
-            v-show="index === 0 || typewriters[index - 1].isComplete.value"
-            class="welcome-paragraph"
-            :class="{ 'highlight-first': index === 0 }"
-          >
-            <span v-html="item.displayText.value || '&nbsp;'"></span>
-            <span v-if="item.isTyping.value && item.showCursor.value" class="typewriter-cursor"></span>
-          </p>
+        <div class="welcome-text" :style="{ height: welcomeTextHeight }">
+          <div ref="welcomeTextInner" class="welcome-text-inner">
+            <p 
+              v-for="(item, index) in typewriters" 
+              :key="index"
+              :ref="(el) => { paragraphRefs[index] = el as HTMLElement | null }"
+              v-show="index === 0 || typewriters[index - 1].isComplete.value"
+              class="welcome-paragraph"
+              :class="{ 'highlight-first': index === 0 }"
+            >
+              <span v-html="item.displayText.value || '&nbsp;'"></span>
+              <span v-if="item.isTyping.value && item.showCursor.value" class="typewriter-cursor"></span>
+            </p>
+          </div>
         </div>
 
         <!-- Terms Acceptance Checkbox -->
@@ -68,11 +70,8 @@
           :disabled="!termsAccepted"
           expand="block" 
           size="large" 
-          class="cta-button"
-          :class="{ 
-            'cta-button-disabled': !termsAccepted,
-            'cta-button-slide-down': termsAccepted
-          }"
+          class="cta-button cta-button-slide-down"
+          :class="{ 'cta-button-disabled': !termsAccepted }"
           @click="startApp"
         >
           <span class="button-content">
@@ -110,6 +109,10 @@ const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 
 // Terms acceptance state
 const termsAccepted = ref(false)
+
+// Welcome text height management
+const welcomeTextInner = ref<HTMLElement | null>(null)
+const welcomeTextHeight = ref('auto')
 
 // Welcome text paragraphs
 const paragraphs = [
@@ -208,6 +211,17 @@ onMounted(async () => {
   // Then set up observers
   await nextTick()
   setupParagraphObservers()
+  
+  // Set up ResizeObserver to watch inner container height
+  if (welcomeTextInner.value) {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const height = entry.contentRect.height
+        welcomeTextHeight.value = `${height}px`
+      }
+    })
+    resizeObserver.observe(welcomeTextInner.value)
+  }
 })
 
 const showTerms = () => {
@@ -399,6 +413,10 @@ const onImageError = () => {
   animation: fadeIn 0.8s ease-out 0.5s both;
   transition: height 0.3s ease-out;
   overflow: hidden;
+}
+
+.welcome-text-inner {
+  /* Inner container that holds the actual content */
 }
 
 .welcome-paragraph {
