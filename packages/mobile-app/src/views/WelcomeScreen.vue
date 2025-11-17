@@ -68,8 +68,11 @@
           :disabled="!termsAccepted"
           expand="block" 
           size="large" 
-          class="cta-button cta-button-slide-down"
-          :class="{ 'cta-button-disabled': !termsAccepted }"
+          class="cta-button"
+          :class="{ 
+            'cta-button-disabled': !termsAccepted,
+            'cta-button-slide-down': termsAccepted
+          }"
           @click="startApp"
         >
           <span class="button-content">
