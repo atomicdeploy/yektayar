@@ -72,7 +72,7 @@
           @click="startApp"
         >
           <span class="button-content">
-            <span class="button-icon">✅</span>
+            <span class="button-icon">✨</span>
             <span class="button-text">شروع گفتگو</span>
           </span>
           <div class="button-shine"></div>
@@ -82,7 +82,7 @@
         <div class="disclaimer-container">
           <ion-icon :icon="lockClosedOutline" class="disclaimer-icon"></ion-icon>
           <p class="disclaimer-text">
-            اطلاعات شما محرمّانه است، و تنها برای کمک به شما استفاده می‌شود.
+            اطلاعات شما محرمانه است، و تنها برای کمک به شما استفاده می‌شود.
           </p>
         </div>
       </div>
@@ -386,7 +386,7 @@ const onImageError = () => {
 
 /* Terms Acceptance Checkbox styling */
 .terms-container {
-  margin: 2rem 0 1rem 0;
+  margin: 0; /* 2rem 0 1rem 0; */
   animation: fadeInUp 0.6s ease-out both;
   animation-delay: 0.3s;
 }
@@ -394,7 +394,7 @@ const onImageError = () => {
 .terms-checkbox {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.75rem;
   cursor: pointer;
   direction: rtl;
@@ -403,13 +403,14 @@ const onImageError = () => {
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
   border: 2px solid transparent;
+  border-color: rgba(212, 164, 62, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .terms-checkbox:hover {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(212, 164, 62, 0.3);
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */
   box-shadow: 0 4px 12px rgba(212, 164, 62, 0.2);
 }
 
@@ -526,6 +527,7 @@ const onImageError = () => {
   background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
   background-size: 200% 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--border-radius);
 }
 
 .cta-button:not(.cta-button-disabled) {
