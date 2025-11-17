@@ -55,7 +55,7 @@
               <ion-icon :icon="checkmarkOutline" class="checkbox-icon"></ion-icon>
             </span>
             <span class="terms-text">
-              <a href="#" @click.prevent="showTerms" class="terms-link">شرایط و قوانین</a>
+              <a href="#terms" @click.prevent="showTerms" class="terms-link">شرایط و قوانین</a>
               را خوانده‌ام و می‌پذیرم
             </span>
           </label>
@@ -529,7 +529,7 @@ const onImageError = () => {
   background-size: 200% 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: var(--border-radius);
-  --background: transparent; /* Fix for the `button-native` inside; otherwise 
+  --background: transparent; /* Fix for the `button-native` inside; otherwise it'll mask the actual cta-button */
 }
 
 .cta-button:not(.cta-button-disabled) {
