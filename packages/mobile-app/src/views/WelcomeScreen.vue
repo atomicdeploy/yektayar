@@ -101,6 +101,7 @@ const startApp = async () => {
     logger.warn('Failed to save welcome preference to backend:', error)
   }
   
+  // TODO: Navigate back to the previous screen (if present) instead of home
   router.replace('/tabs/home')
 }
 
