@@ -15,7 +15,7 @@
           <div class="title-underline"></div>
         </div>
 
-        <!-- Hero Image with Lazy Loading (ABOVE text as requested) -->
+        <!-- Hero Image with Lazy Loading (above text) -->
         <div class="hero-image-container">
           <LazyImage
             src="/welcome-hero.jpg"
@@ -524,10 +524,12 @@ const onImageError = () => {
   font-weight: 700;
   position: relative;
   overflow: hidden;
+  /* TODO: can be "success" (green) in light mode, instead of branding's navy seal */
   background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
   background-size: 200% 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: var(--border-radius);
+  --background: transparent; /* Fix for the `button-native` inside; otherwise 
 }
 
 .cta-button:not(.cta-button-disabled) {
