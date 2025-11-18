@@ -232,10 +232,13 @@ onMounted(async () => {
   // Calculate max height by creating a virtual element with all text
   if (welcomeTextInner.value) {
     const virtualElement = document.createElement('div')
-    virtualElement.style.cssText = window.getComputedStyle(welcomeTextInner.value).cssText
+    // Copy the computed style from the inner container
+    const innerStyle = window.getComputedStyle(welcomeTextInner.value)
+    virtualElement.style.cssText = innerStyle.cssText
     virtualElement.style.position = 'absolute'
     virtualElement.style.visibility = 'hidden'
     virtualElement.style.width = welcomeTextInner.value.offsetWidth + 'px'
+    virtualElement.style.left = '-9999px'
     
     // Add all paragraphs with full text
     paragraphs.forEach((text, index) => {
@@ -246,7 +249,8 @@ onMounted(async () => {
     })
     
     document.body.appendChild(virtualElement)
-    maxWelcomeTextHeight.value = virtualElement.offsetHeight
+    // Use scrollHeight to include all content including margins
+    maxWelcomeTextHeight.value = virtualElement.scrollHeight
     document.body.removeChild(virtualElement)
     
     logger.debug(`[WelcomeScreen] Max text height calculated: ${maxWelcomeTextHeight.value}px`)
