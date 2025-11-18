@@ -368,21 +368,43 @@ onMounted(async () => {
   // Wait for next tick to ensure DOM is ready
   await nextTick()
   
-  // Mark container as ready after nextTick (any CSS transitions would have started)
-  // Check if welcome-container element exists and wait for any transitions
+  // Listen for transitions/animations on welcome-container
   const welcomeContainer = document.querySelector('.welcome-container')
   if (welcomeContainer) {
     const style = window.getComputedStyle(welcomeContainer)
-    const transitionDuration = parseFloat(style.transitionDuration || '0')
+    const hasTransition = style.transitionDuration && parseFloat(style.transitionDuration) > 0
+    const hasAnimation = style.animationDuration && parseFloat(style.animationDuration) > 0
     
-    if (transitionDuration > 0) {
-      // Wait for transition to complete
-      setTimeout(() => {
+    if (hasTransition || hasAnimation) {
+      // Set up event listeners
+      const handleTransitionEnd = () => {
         containerReady.value = true
         logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
-      }, transitionDuration * 1000)
+        welcomeContainer.removeEventListener('transitionend', handleTransitionEnd)
+      }
+      
+      const handleAnimationEnd = () => {
+        containerReady.value = true
+        logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
+        welcomeContainer.removeEventListener('animationend', handleAnimationEnd)
+      }
+      
+      if (hasTransition) {
+        welcomeContainer.addEventListener('transitionend', handleTransitionEnd)
+      }
+      if (hasAnimation) {
+        welcomeContainer.addEventListener('animationend', handleAnimationEnd)
+      }
+      
+      // Fallback timeout in case events don't fire
+      setTimeout(() => {
+        if (!containerReady.value) {
+          containerReady.value = true
+          logger.info('[WelcomeScreen] Container ready (fallback timeout)')
+        }
+      }, 2000)
     } else {
-      // No transition, mark as ready immediately
+      // No transition or animation, mark as ready immediately
       containerReady.value = true
     }
   } else {
