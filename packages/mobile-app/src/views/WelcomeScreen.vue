@@ -47,7 +47,11 @@
         </div>
 
         <!-- Terms Acceptance Checkbox -->
-        <div class="terms-container" v-if="allTypewritersComplete">
+        <div 
+          class="terms-container" 
+          :class="{ 'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations }"
+          v-if="allTypewritersComplete"
+        >
           <label class="terms-checkbox">
             <input 
               type="checkbox" 
@@ -73,7 +77,7 @@
           class="cta-button"
           :class="{ 
             'cta-button-disabled': !termsAccepted,
-            'cta-button-slide-down': !ctaHasBeenShown
+            'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown
           }"
           @click="startApp"
         >
@@ -110,6 +114,36 @@ const router = useRouter()
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 
+// ==========================================
+// DEVELOPER CONFIGURATION
+// ==========================================
+// These variables allow developers to easily enable/disable features
+// for testing, debugging, or customization purposes.
+const FEATURE_CONFIG = {
+  // Enable/disable typewriter effect completely
+  // When false, all text appears immediately without animation
+  enableTypewriter: true,
+  
+  // Enable/disable dynamic height adjustment for the text container
+  // When false, container uses height: auto and skips ResizeObserver
+  enableDynamicHeight: true,
+  
+  // Viewport waiting mode for typewriter effects:
+  // - 'all': Each paragraph waits for viewport entry (default, best UX)
+  // - 'first': Only first paragraph waits for viewport, rest start in sequence
+  // - 'none': No viewport waiting, all paragraphs start immediately
+  viewportWaitingMode: 'all' as 'all' | 'first' | 'none',
+  
+  // Enable/disable F6 skip hotkey to skip current paragraph
+  // Useful for testing but can be disabled for production
+  enableSkipHotkey: true,
+  
+  // Enable/disable smooth animations (slide-down effects for terms and CTA)
+  // When false, elements appear instantly without animation
+  enableSmoothAnimations: true
+}
+// ==========================================
+
 // Terms acceptance state
 const termsAccepted = ref(false)
 
@@ -133,11 +167,11 @@ const paragraphs = [
 // Initialize typewriter effects using a loop
 const typewriters = paragraphs.map((text) => {
   return useTypewriter(text, {
-    speed: 20,
+    speed: FEATURE_CONFIG.enableTypewriter ? 20 : 0,
     startDelay: 0,
-    showCursor: true,
+    showCursor: FEATURE_CONFIG.enableTypewriter,
     mode: 'character',
-    autoStart: false
+    autoStart: !FEATURE_CONFIG.enableTypewriter // Auto-start if typewriter disabled
   })
 })
 
@@ -146,6 +180,66 @@ const paragraphRefs = ref<(HTMLElement | null)[]>([])
 
 // Set up intersection observers for each paragraph manually
 const setupParagraphObservers = () => {
+  // If typewriter is disabled, mark all as complete and skip
+  if (!FEATURE_CONFIG.enableTypewriter) {
+    typewriters.forEach((tw, idx) => {
+      tw.displayText.value = paragraphs[idx]
+      tw.isComplete.value = true
+      tw.isTyping.value = false
+    })
+    return
+  }
+  
+  // If viewport waiting is disabled, start all immediately
+  if (FEATURE_CONFIG.viewportWaitingMode === 'none') {
+    typewriters.forEach((tw, index) => {
+      if (index === 0) {
+        tw.start()
+      } else {
+        // Watch for previous to complete
+        watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+          if (isComplete && !tw.isTyping.value && !tw.isComplete.value) {
+            setTimeout(() => tw.start(), 500)
+          }
+        }, { immediate: true })
+      }
+    })
+    return
+  }
+  
+  // If only first paragraph waits for viewport
+  if (FEATURE_CONFIG.viewportWaitingMode === 'first') {
+    paragraphRefs.value.forEach((element, index) => {
+      if (!element) return
+      
+      if (index === 0) {
+        // Only first paragraph uses viewport observer
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && !typewriters[0].isTyping.value && !typewriters[0].isComplete.value) {
+                logger.info(`[WelcomeScreen] First paragraph entered viewport, starting typewriter`)
+                typewriters[0].start()
+                observer.unobserve(element)
+              }
+            })
+          },
+          { threshold: 0.2, rootMargin: '0px' }
+        )
+        observer.observe(element)
+      } else {
+        // Rest start when previous completes
+        watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+          if (isComplete && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
+            setTimeout(() => typewriters[index].start(), 500)
+          }
+        }, { immediate: true })
+      }
+    })
+    return
+  }
+  
+  // Default: 'all' mode - each paragraph waits for viewport entry
   paragraphRefs.value.forEach((element, index) => {
     if (!element) return
     
@@ -199,6 +293,9 @@ const allTypewritersComplete = computed(() => {
 
 // Function to skip current typing paragraph
 const skipCurrentParagraph = () => {
+  // Skip if feature is disabled
+  if (!FEATURE_CONFIG.enableSkipHotkey) return
+  
   // Find the first typewriter that is currently typing
   const currentIndex = typewriters.findIndex(tw => tw.isTyping.value)
   
@@ -215,7 +312,7 @@ const skipCurrentParagraph = () => {
 
 // Set up keyboard shortcuts
 const handleKeyPress = (event: KeyboardEvent) => {
-  if (event.key === 'F6') {
+  if (event.key === 'F6' && FEATURE_CONFIG.enableSkipHotkey) {
     event.preventDefault()
     skipCurrentParagraph()
   }
@@ -289,8 +386,8 @@ onMounted(async () => {
     logger.debug(`[WelcomeScreen] Max text height calculated: ${maxWelcomeTextHeight.value}px`)
   }
   
-  // Set up ResizeObserver to watch inner container height
-  if (welcomeTextInner.value) {
+  // Set up ResizeObserver to watch inner container height (only if feature enabled)
+  if (FEATURE_CONFIG.enableDynamicHeight && welcomeTextInner.value) {
     // Get line height from computed style
     const computedStyle = window.getComputedStyle(welcomeTextInner.value.querySelector('.welcome-paragraph') || welcomeTextInner.value)
     const fontSize = parseFloat(computedStyle.fontSize)
@@ -637,6 +734,9 @@ const onImageError = () => {
 /* Terms Acceptance Checkbox styling */
 .terms-container {
   margin: 2rem 0 0 0; /* Added top margin back for proper spacing */
+}
+
+.terms-container-slide {
   animation: fadeInUp 0.6s ease-out both;
   animation-delay: 0.3s;
 }
