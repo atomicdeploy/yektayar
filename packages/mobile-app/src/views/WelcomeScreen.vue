@@ -104,7 +104,7 @@ import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 
 const router = useRouter()
 
@@ -197,6 +197,25 @@ const allTypewritersComplete = computed(() => {
   return result
 })
 
+// Function to skip current typing paragraph
+const skipCurrentParagraph = () => {
+  // Find the first typewriter that is currently typing
+  const currentIndex = typewriters.findIndex(tw => tw.isTyping.value)
+  
+  if (currentIndex !== -1) {
+    logger.info(`[WelcomeScreen] Skipping paragraph ${currentIndex + 1}`)
+    typewriters[currentIndex].complete()
+  }
+}
+
+// Set up keyboard shortcuts
+const handleKeyPress = (event: KeyboardEvent) => {
+  if (event.key === 'F6') {
+    event.preventDefault()
+    skipCurrentParagraph()
+  }
+}
+
 // Watch for when CTA button first appears and mark it
 watch(allTypewritersComplete, (isComplete) => {
   if (isComplete && !ctaHasBeenShown.value) {
@@ -221,8 +240,16 @@ const fetchUserPreferences = async () => {
   }
 }
 
+// Set up keyboard shortcuts
+const setupKeyboardShortcuts = () => {
+  window.addEventListener('keydown', handleKeyPress)
+}
+
 // Fetch preferences on mount
 onMounted(async () => {
+  // Set up keyboard shortcuts
+  setupKeyboardShortcuts()
+  
   // Fetch user preferences first
   await fetchUserPreferences()
   
@@ -352,9 +379,9 @@ onMounted(async () => {
           height = currentMax
         }
         
-        // Overflow check: if text is overflowing, use max height and log debug info
+        // Overflow check: if text is overflowing, extend height to fit all content
         if (welcomeTextInner.value && welcomeTextInner.value.scrollHeight > height) {
-          logger.warn('[WelcomeScreen] Text overflow detected, adjusting height')
+          logger.warn('[WelcomeScreen] Text overflow detected, extending height to fit content')
           
           // Show detailed debug info only when problem occurs
           console.warn('[WelcomeScreen] OVERFLOW DEBUG:')
@@ -366,7 +393,8 @@ onMounted(async () => {
           // Recalculate with debug mode to see virtual element details
           recalculateMaxHeight(true)
           
-          height = currentMax || height + lineHeightPx * 2
+          // Extend height to fit all content (use scrollHeight + buffer)
+          height = welcomeTextInner.value.scrollHeight + lineHeightPx
         }
         
         welcomeTextHeight.value = `${height}px`
@@ -375,6 +403,11 @@ onMounted(async () => {
     })
     resizeObserver.observe(welcomeTextInner.value)
   }
+})
+
+// Cleanup keyboard shortcuts on unmount
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyPress)
 })
 
 const showTerms = () => {
