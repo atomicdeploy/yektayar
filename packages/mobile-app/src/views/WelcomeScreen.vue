@@ -288,11 +288,11 @@ const fetchUserPreferences = async () => {
     const response = await apiClient.get('/api/users/preferences')
     if (response.data?.termsAccepted) {
       termsAccepted.value = true
-      logger.info('[WelcomeScreen] Terms previously accepted')
+      logger.info('[WelcomeScreen] User has previously accepted terms')
     }
   } catch (error) {
     // If fetch fails, default to unchecked (false)
-    logger.debug('[WelcomeScreen] Could not fetch preferences, defaulting to unchecked')
+    logger.debug('[WelcomeScreen] Could not fetch user preferences, defaulting to unchecked')
   }
 }
 
@@ -359,6 +359,8 @@ onMounted(async () => {
       document.body.appendChild(virtualElement)
       
       // Use scrollHeight to include all content including padding
+      const paddingTop = parseFloat(outerStyle.paddingTop)
+      const paddingBottom = parseFloat(outerStyle.paddingBottom)
       const calculatedMax = virtualElement.scrollHeight
       
       if (debugMode) {
