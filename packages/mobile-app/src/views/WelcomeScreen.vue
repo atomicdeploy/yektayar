@@ -816,23 +816,19 @@ const onImageError = () => {
     0 2px 8px rgba(1, 24, 58, 0.3);
 }
 
+/* SlideDown animation for CTA button - Define first so disabled can override */
+.cta-button-slide-down {
+  --final-opacity: 1;
+  animation: slideDown 0.6s ease-out forwards;
+  animation-delay: 0.6s;
+}
+
 .cta-button-disabled {
-  opacity: 0.5;
+  --final-opacity: 0.5;
+  opacity: var(--final-opacity);
   cursor: not-allowed;
   background-image: linear-gradient(135deg, #9e9e9e 0%, #bdbdbd 100%);
   --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-/* SlideDown animation for CTA button */
-.cta-button-slide-down {
-  animation: slideDown 0.6s ease-out both;
-  animation-delay: 0.6s;
-}
-
-/* When button is disabled during slide-down, ensure it respects disabled opacity */
-.cta-button-disabled.cta-button-slide-down {
-  animation: slideDownDisabled 0.6s ease-out both;
-  animation-delay: 0.6s;
 }
 
 @keyframes slideDown {
@@ -841,18 +837,7 @@ const onImageError = () => {
     transform: translateY(-30px);
   }
   to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideDownDisabled {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 0.5; /* Respect disabled opacity */
+    opacity: var(--final-opacity);
     transform: translateY(0);
   }
 }
