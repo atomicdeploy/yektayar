@@ -266,31 +266,78 @@ onMounted(async () => {
     
     let previousHeight = 0
     
+    // Function to recalculate max height dynamically
+    const recalculateMaxHeight = () => {
+      if (!welcomeTextInner.value) return
+      
+      const virtualElement = document.createElement('div')
+      // Copy the computed style from the inner container
+      const innerStyle = window.getComputedStyle(welcomeTextInner.value)
+      virtualElement.style.cssText = innerStyle.cssText
+      virtualElement.style.position = 'absolute'
+      virtualElement.style.visibility = 'hidden'
+      virtualElement.style.width = welcomeTextInner.value.offsetWidth + 'px'
+      virtualElement.style.left = '-9999px'
+      
+      // Add all paragraphs with full text
+      paragraphs.forEach((text, index) => {
+        const p = document.createElement('p')
+        p.className = index === 0 ? 'welcome-paragraph highlight-first' : 'welcome-paragraph'
+        p.innerHTML = text
+        virtualElement.appendChild(p)
+      })
+      
+      document.body.appendChild(virtualElement)
+      // Use scrollHeight to include all content including margins
+      const calculatedMax = virtualElement.scrollHeight
+      document.body.removeChild(virtualElement)
+      
+      maxWelcomeTextHeight.value = calculatedMax
+      console.log('[WelcomeScreen] Recalculated max height:', calculatedMax)
+      
+      return calculatedMax
+    }
+    
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         let height = entry.contentRect.height
         
+        console.log('[WelcomeScreen] ResizeObserver - contentRect.height:', height)
+        console.log('[WelcomeScreen] ResizeObserver - scrollHeight:', welcomeTextInner.value?.scrollHeight)
+        
+        // Recalculate max height on each resize for accuracy
+        const currentMax = recalculateMaxHeight()
+        
         // Ensure height grows by at least one full line height
         if (previousHeight > 0 && height > previousHeight) {
           const diff = height - previousHeight
+          console.log('[WelcomeScreen] Height difference:', diff, 'Line height:', lineHeightPx)
           if (diff < lineHeightPx) {
             height = previousHeight + lineHeightPx
+            console.log('[WelcomeScreen] Rounded up to full line height:', height)
           }
         }
         
         // Add one line height buffer to prevent text overflow
         height += lineHeightPx
+        console.log('[WelcomeScreen] Height with buffer:', height)
         
         // But don't exceed max height
-        if (maxWelcomeTextHeight.value && height > maxWelcomeTextHeight.value) {
-          height = maxWelcomeTextHeight.value
+        if (currentMax && height > currentMax) {
+          height = currentMax
+          console.log('[WelcomeScreen] Capped at max height:', height)
         }
         
         // Overflow check: if text is overflowing, force max height
         if (welcomeTextInner.value && welcomeTextInner.value.scrollHeight > height) {
           logger.warn('[WelcomeScreen] Text overflow detected, using max height')
-          height = maxWelcomeTextHeight.value || height + lineHeightPx * 2
+          console.warn('[WelcomeScreen] OVERFLOW DETECTED - scrollHeight:', welcomeTextInner.value.scrollHeight, 'current height:', height)
+          height = currentMax || height + lineHeightPx * 2
+          console.log('[WelcomeScreen] New height after overflow fix:', height)
         }
+        
+        console.log('[WelcomeScreen] Final height set:', height)
+        console.log('---')
         
         welcomeTextHeight.value = `${height}px`
         previousHeight = height - lineHeightPx // Store without buffer for next comparison
