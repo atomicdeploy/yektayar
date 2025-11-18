@@ -174,6 +174,36 @@ const canStartTypewriter = () => {
   return true
 }
 
+// Helper to start typewriter with proper delay and conditions check
+const startTypewriterWithConditions = (
+  index: number,
+  entry: IntersectionObserverEntry,
+  observer: IntersectionObserver,
+  element: HTMLElement
+) => {
+  const delay = index === 0 ? 500 : 500 // 0.5s delay for all paragraphs
+  
+  if (canStartTypewriter()) {
+    logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
+    setTimeout(() => {
+      typewriters[index].start()
+    }, delay)
+    observer.unobserve(element)
+  } else {
+    // Watch for readiness conditions
+    const unwatchReady = watch([containerReady, initialHeightSet], () => {
+      if (canStartTypewriter() && entry.isIntersecting) {
+        logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter (after waiting)`)
+        setTimeout(() => {
+          typewriters[index].start()
+        }, delay)
+        observer.unobserve(element)
+        unwatchReady()
+      }
+    })
+  }
+}
+
 // Set up intersection observers for each paragraph manually
 const setupParagraphObservers = () => {
   const config = FEATURE_CONFIG.value
@@ -217,22 +247,7 @@ const setupParagraphObservers = () => {
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting && !typewriters[0].isTyping.value && !typewriters[0].isComplete.value) {
-                // Wait for all conditions before starting
-                if (canStartTypewriter()) {
-                  logger.info('[WelcomeScreen] Starting first paragraph typewriter')
-                  typewriters[0].start()
-                  observer.unobserve(element)
-                } else {
-                  // Watch for readiness conditions
-                  const unwatch = watch([containerReady, initialHeightSet], () => {
-                    if (canStartTypewriter() && entry.isIntersecting) {
-                      logger.info('[WelcomeScreen] Starting first paragraph typewriter (after waiting)')
-                      typewriters[0].start()
-                      observer.unobserve(element)
-                      unwatch()
-                    }
-                  })
-                }
+                startTypewriterWithConditions(0, entry, observer, element)
               }
             })
           },
@@ -263,52 +278,13 @@ const setupParagraphObservers = () => {
             const shouldStart = index === 0 || typewriters[index - 1].isComplete.value
             
             if (shouldStart && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
-              // Wait for all conditions before starting
-              if (canStartTypewriter()) {
-                logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
-                setTimeout(() => {
-                  typewriters[index].start()
-                }, index === 0 ? 0 : 500)
-                observer.unobserve(element)
-              } else {
-                // Watch for readiness conditions
-                const unwatchReady = watch([containerReady, initialHeightSet], () => {
-                  if (canStartTypewriter() && entry.isIntersecting) {
-                    logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter (after waiting)`)
-                    setTimeout(() => {
-                      typewriters[index].start()
-                    }, index === 0 ? 0 : 500)
-                    observer.unobserve(element)
-                    unwatchReady()
-                  }
-                })
-              }
+              startTypewriterWithConditions(index, entry, observer, element)
             } else if (index > 0 && !typewriters[index - 1].isComplete.value) {
               // Wait for previous to complete
               const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
                 if (isComplete && entry.isIntersecting) {
-                  // Also check readiness conditions
-                  if (canStartTypewriter()) {
-                    logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} after previous complete`)
-                    setTimeout(() => {
-                      typewriters[index].start()
-                    }, 500)
-                    observer.unobserve(element)
-                    unwatch()
-                  } else {
-                    // Watch for readiness conditions
-                    const unwatchReady = watch([containerReady, initialHeightSet], () => {
-                      if (canStartTypewriter()) {
-                        logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} after previous complete (after waiting)`)
-                        setTimeout(() => {
-                          typewriters[index].start()
-                        }, 500)
-                        observer.unobserve(element)
-                        unwatch()
-                        unwatchReady()
-                      }
-                    })
-                  }
+                  startTypewriterWithConditions(index, entry, observer, element)
+                  unwatch()
                 }
               })
             }
