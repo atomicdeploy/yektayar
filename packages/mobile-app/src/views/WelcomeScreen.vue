@@ -204,7 +204,12 @@ const skipCurrentParagraph = () => {
   
   if (currentIndex !== -1) {
     logger.info(`[WelcomeScreen] Skipping paragraph ${currentIndex + 1}`)
-    typewriters[currentIndex].complete()
+    // Call stop() method and mark as complete
+    typewriters[currentIndex].stop()
+    // Manually set the full text
+    typewriters[currentIndex].displayText.value = paragraphs[currentIndex]
+    typewriters[currentIndex].isComplete.value = true
+    typewriters[currentIndex].isTyping.value = false
   }
 }
 
@@ -615,7 +620,7 @@ const onImageError = () => {
 }
 
 .welcome-paragraph:last-child {
-  margin-bottom: 0;
+  margin-bottom: 1.25rem; /* Keep margin for proper height calculation */
 }
 
 .welcome-paragraph.highlight-first {
@@ -631,7 +636,7 @@ const onImageError = () => {
 
 /* Terms Acceptance Checkbox styling */
 .terms-container {
-  margin: 0; /* 2rem 0 1rem 0; */
+  margin: 2rem 0 0 0; /* Added top margin back for proper spacing */
   animation: fadeInUp 0.6s ease-out both;
   animation-delay: 0.3s;
 }
@@ -763,7 +768,7 @@ const onImageError = () => {
   --box-shadow: 
     0 8px 32px rgba(212, 164, 62, 0.3),
     0 4px 16px rgba(1, 24, 58, 0.2);
-  margin: 2.5rem 0 1.5rem 0;
+  margin: 1.5rem 0 1.5rem 0;
   text-transform: none;
   font-size: 1.3rem;
   font-weight: 700;
@@ -772,7 +777,7 @@ const onImageError = () => {
   /* TODO: can be "success" (green) in light mode, instead of branding's navy seal */
   background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
   background-size: 200% 100%;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease-out;
   border-radius: var(--border-radius);
   --background: transparent; /* Fix for the `button-native` inside; otherwise it'll mask the actual cta-button */
 }
