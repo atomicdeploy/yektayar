@@ -109,40 +109,16 @@ import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { useDebugConfigStore } from '@/stores/debugConfig'
+import { createKeyboardHandler } from './WelcomeScreen.utils'
 
 const router = useRouter()
+const configStore = useDebugConfigStore()
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 
-// ==========================================
-// DEVELOPER CONFIGURATION
-// ==========================================
-// These variables allow developers to easily enable/disable features
-// for testing, debugging, or customization purposes.
-const FEATURE_CONFIG = {
-  // Enable/disable typewriter effect completely
-  // When false, all text appears immediately without animation
-  enableTypewriter: true,
-  
-  // Enable/disable dynamic height adjustment for the text container
-  // When false, container uses height: auto and skips ResizeObserver
-  enableDynamicHeight: true,
-  
-  // Viewport waiting mode for typewriter effects:
-  // - 'all': Each paragraph waits for viewport entry (default, best UX)
-  // - 'first': Only first paragraph waits for viewport, rest start in sequence
-  // - 'none': No viewport waiting, all paragraphs start immediately
-  viewportWaitingMode: 'all' as 'all' | 'first' | 'none',
-  
-  // Enable/disable F6 skip hotkey to skip current paragraph
-  // Useful for testing but can be disabled for production
-  enableSkipHotkey: true,
-  
-  // Enable/disable smooth animations (slide-down effects for terms and CTA)
-  // When false, elements appear instantly without animation
-  enableSmoothAnimations: true
-}
-// ==========================================
+// Get feature config from Pinia store
+const FEATURE_CONFIG = computed(() => configStore.welcomeConfig)
 
 // Terms acceptance state
 const termsAccepted = ref(false)
@@ -166,12 +142,15 @@ const paragraphs = [
 
 // Initialize typewriter effects using a loop
 const typewriters = paragraphs.map((text) => {
+  const config = FEATURE_CONFIG.value
+  const shouldSkip = configStore.skipTypewriter
+  
   return useTypewriter(text, {
-    speed: FEATURE_CONFIG.enableTypewriter ? 20 : 0,
+    speed: (config.enableTypewriter && !shouldSkip) ? 20 : 0,
     startDelay: 0,
-    showCursor: FEATURE_CONFIG.enableTypewriter,
+    showCursor: config.enableTypewriter && !shouldSkip,
     mode: 'character',
-    autoStart: !FEATURE_CONFIG.enableTypewriter // Auto-start if typewriter disabled
+    autoStart: !config.enableTypewriter || shouldSkip
   })
 })
 
@@ -180,8 +159,11 @@ const paragraphRefs = ref<(HTMLElement | null)[]>([])
 
 // Set up intersection observers for each paragraph manually
 const setupParagraphObservers = () => {
-  // If typewriter is disabled, mark all as complete and skip
-  if (!FEATURE_CONFIG.enableTypewriter) {
+  const config = FEATURE_CONFIG.value
+  const shouldSkip = configStore.skipTypewriter
+  
+  // If typewriter is disabled or should be skipped, mark all as complete
+  if (!config.enableTypewriter || shouldSkip) {
     typewriters.forEach((tw, idx) => {
       tw.displayText.value = paragraphs[idx]
       tw.isComplete.value = true
@@ -191,7 +173,7 @@ const setupParagraphObservers = () => {
   }
   
   // If viewport waiting is disabled, start all immediately
-  if (FEATURE_CONFIG.viewportWaitingMode === 'none') {
+  if (config.viewportWaitingMode === 'none') {
     typewriters.forEach((tw, index) => {
       if (index === 0) {
         tw.start()
@@ -208,7 +190,7 @@ const setupParagraphObservers = () => {
   }
   
   // If only first paragraph waits for viewport
-  if (FEATURE_CONFIG.viewportWaitingMode === 'first') {
+  if (config.viewportWaitingMode === 'first') {
     paragraphRefs.value.forEach((element, index) => {
       if (!element) return
       
@@ -218,7 +200,7 @@ const setupParagraphObservers = () => {
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting && !typewriters[0].isTyping.value && !typewriters[0].isComplete.value) {
-                logger.info(`[WelcomeScreen] First paragraph entered viewport, starting typewriter`)
+                logger.info('[WelcomeScreen] Starting first paragraph typewriter')
                 typewriters[0].start()
                 observer.unobserve(element)
               }
@@ -251,7 +233,7 @@ const setupParagraphObservers = () => {
             const shouldStart = index === 0 || typewriters[index - 1].isComplete.value
             
             if (shouldStart && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
-              logger.info(`[WelcomeScreen] Paragraph ${index + 1} entered viewport, starting typewriter`)
+              logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
               setTimeout(() => {
                 typewriters[index].start()
               }, index === 0 ? 0 : 500)
@@ -260,7 +242,7 @@ const setupParagraphObservers = () => {
               // Wait for previous to complete
               const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
                 if (isComplete && entry.isIntersecting) {
-                  logger.info(`[WelcomeScreen] Previous paragraph complete, starting paragraph ${index + 1}`)
+                  logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} after previous complete`)
                   setTimeout(() => {
                     typewriters[index].start()
                   }, 500)
@@ -284,39 +266,11 @@ const setupParagraphObservers = () => {
 
 // Computed property to check if all typewriters are complete
 const allTypewritersComplete = computed(() => {
-  const result = typewriters.every(tw => tw.isComplete.value)
-  
-  logger.debug(`[WelcomeScreen] All typewriters complete: ${result}`)
-  
-  return result
+  return typewriters.every(tw => tw.isComplete.value)
 })
 
-// Function to skip current typing paragraph
-const skipCurrentParagraph = () => {
-  // Skip if feature is disabled
-  if (!FEATURE_CONFIG.enableSkipHotkey) return
-  
-  // Find the first typewriter that is currently typing
-  const currentIndex = typewriters.findIndex(tw => tw.isTyping.value)
-  
-  if (currentIndex !== -1) {
-    logger.info(`[WelcomeScreen] Skipping paragraph ${currentIndex + 1}`)
-    // Use reset() to stop the typing animation and clear text
-    typewriters[currentIndex].reset()
-    // Manually set the full text and mark as complete
-    typewriters[currentIndex].displayText.value = paragraphs[currentIndex]
-    typewriters[currentIndex].isComplete.value = true
-    typewriters[currentIndex].isTyping.value = false
-  }
-}
-
-// Set up keyboard shortcuts
-const handleKeyPress = (event: KeyboardEvent) => {
-  if (event.key === 'F6' && FEATURE_CONFIG.enableSkipHotkey) {
-    event.preventDefault()
-    skipCurrentParagraph()
-  }
-}
+// Set up keyboard shortcuts using utility function
+const handleKeyPress = createKeyboardHandler(typewriters, paragraphs)
 
 // Watch for when CTA button first appears and mark it
 watch(allTypewritersComplete, (isComplete) => {
@@ -334,23 +288,18 @@ const fetchUserPreferences = async () => {
     const response = await apiClient.get('/api/users/preferences')
     if (response.data?.termsAccepted) {
       termsAccepted.value = true
-      logger.info('[WelcomeScreen] User has previously accepted terms')
+      logger.info('[WelcomeScreen] Terms previously accepted')
     }
   } catch (error) {
     // If fetch fails, default to unchecked (false)
-    logger.debug('[WelcomeScreen] Could not fetch user preferences, defaulting to unchecked')
+    logger.debug('[WelcomeScreen] Could not fetch preferences, defaulting to unchecked')
   }
-}
-
-// Set up keyboard shortcuts
-const setupKeyboardShortcuts = () => {
-  window.addEventListener('keydown', handleKeyPress)
 }
 
 // Fetch preferences on mount
 onMounted(async () => {
   // Set up keyboard shortcuts
-  setupKeyboardShortcuts()
+  window.addEventListener('keydown', handleKeyPress)
   
   // Fetch user preferences first
   await fetchUserPreferences()
@@ -359,35 +308,8 @@ onMounted(async () => {
   await nextTick()
   setupParagraphObservers()
   
-  // Calculate max height by creating a virtual element with all text
-  if (welcomeTextInner.value) {
-    const virtualElement = document.createElement('div')
-    // Copy the computed style from the inner container
-    const innerStyle = window.getComputedStyle(welcomeTextInner.value)
-    virtualElement.style.cssText = innerStyle.cssText
-    virtualElement.style.position = 'absolute'
-    virtualElement.style.visibility = 'hidden'
-    virtualElement.style.width = welcomeTextInner.value.offsetWidth + 'px'
-    virtualElement.style.left = '-9999px'
-    
-    // Add all paragraphs with full text
-    paragraphs.forEach((text, index) => {
-      const p = document.createElement('p')
-      p.className = index === 0 ? 'welcome-paragraph highlight-first' : 'welcome-paragraph'
-      p.innerHTML = text
-      virtualElement.appendChild(p)
-    })
-    
-    document.body.appendChild(virtualElement)
-    // Use scrollHeight to include all content including margins
-    maxWelcomeTextHeight.value = virtualElement.scrollHeight
-    document.body.removeChild(virtualElement)
-    
-    logger.debug(`[WelcomeScreen] Max text height calculated: ${maxWelcomeTextHeight.value}px`)
-  }
-  
   // Set up ResizeObserver to watch inner container height (only if feature enabled)
-  if (FEATURE_CONFIG.enableDynamicHeight && welcomeTextInner.value) {
+  if (FEATURE_CONFIG.value.enableDynamicHeight && welcomeTextInner.value) {
     // Get line height from computed style
     const computedStyle = window.getComputedStyle(welcomeTextInner.value.querySelector('.welcome-paragraph') || welcomeTextInner.value)
     const fontSize = parseFloat(computedStyle.fontSize)
@@ -436,19 +358,14 @@ onMounted(async () => {
       virtualElement.appendChild(virtualInner)
       document.body.appendChild(virtualElement)
       
-      // Use scrollHeight to include all content including margins
-      // Also account for container's vertical padding
-      const paddingTop = parseFloat(outerStyle.paddingTop)
-      const paddingBottom = parseFloat(outerStyle.paddingBottom)
+      // Use scrollHeight to include all content including padding
       const calculatedMax = virtualElement.scrollHeight
       
       if (debugMode) {
-        console.log('[WelcomeScreen] Virtual element calculation:')
-        console.log('  - Outer width:', welcomeTextOuter.value.offsetWidth)
-        console.log('  - Padding top/bottom:', paddingTop, '/', paddingBottom)
-        console.log('  - Virtual scrollHeight:', calculatedMax)
-        console.log('  - Virtual inner scrollHeight:', virtualInner.scrollHeight)
-        console.log('  - Actual inner scrollHeight:', welcomeTextInner.value.scrollHeight)
+        console.log('[WelcomeScreen] Height calculation debug:')
+        console.log(`  Outer: ${welcomeTextOuter.value.offsetWidth}px wide, padding: ${paddingTop}/${paddingBottom}`)
+        console.log(`  Virtual: ${calculatedMax}px, Inner: ${virtualInner.scrollHeight}px`)
+        console.log(`  Actual inner: ${welcomeTextInner.value.scrollHeight}px`)
       }
       
       document.body.removeChild(virtualElement)
@@ -483,20 +400,14 @@ onMounted(async () => {
         
         // Overflow check: if text is overflowing, extend height to fit all content
         if (welcomeTextInner.value && welcomeTextInner.value.scrollHeight > height) {
-          logger.warn('[WelcomeScreen] Text overflow detected, extending height to fit content')
+          logger.warn(`[WelcomeScreen] Text overflow: ${welcomeTextInner.value.scrollHeight}px needed, ${height}px available`)
           
           // Show detailed debug info only when problem occurs
-          console.warn('[WelcomeScreen] OVERFLOW DEBUG:')
-          console.warn('  - Content scrollHeight:', welcomeTextInner.value.scrollHeight)
-          console.warn('  - Current height:', height)
-          console.warn('  - Max height:', currentMax)
-          console.warn('  - Line height:', lineHeightPx)
-          
-          // Recalculate with debug mode to see virtual element details
           recalculateMaxHeight(true)
           
           // Extend height to fit all content (use scrollHeight + buffer)
           height = welcomeTextInner.value.scrollHeight + lineHeightPx
+          logger.info(`[WelcomeScreen] Extended height to ${height}px to fit content`)
         }
         
         welcomeTextHeight.value = `${height}px`
@@ -705,6 +616,7 @@ const onImageError = () => {
 
 .welcome-text-inner {
   /* Inner container that holds the actual content */
+  padding-bottom: 1.25rem; /* Use padding instead of margin on last paragraph for proper height calculation */
 }
 
 .welcome-paragraph {
@@ -717,7 +629,7 @@ const onImageError = () => {
 }
 
 .welcome-paragraph:last-child {
-  margin-bottom: 1.25rem; /* Keep margin for proper height calculation */
+  margin-bottom: 0; /* Remove margin, use padding on parent instead */
 }
 
 .welcome-paragraph.highlight-first {
@@ -915,6 +827,12 @@ const onImageError = () => {
   animation-delay: 0.6s;
 }
 
+/* When button is disabled during slide-down, ensure it respects disabled opacity */
+.cta-button-disabled.cta-button-slide-down {
+  animation: slideDownDisabled 0.6s ease-out both;
+  animation-delay: 0.6s;
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -922,6 +840,17 @@ const onImageError = () => {
   }
   to {
     opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDownDisabled {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 0.5; /* Respect disabled opacity */
     transform: translateY(0);
   }
 }
