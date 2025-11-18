@@ -272,14 +272,21 @@ onMounted(async () => {
       if (!welcomeTextInner.value || !welcomeTextOuter.value) return
       
       const virtualElement = document.createElement('div')
-      // Copy the computed style from the OUTER container to include padding
       const outerStyle = window.getComputedStyle(welcomeTextOuter.value)
-      virtualElement.style.cssText = outerStyle.cssText
+      
+      // Copy only the necessary styles, not everything (avoid animation/transition issues)
       virtualElement.style.position = 'absolute'
       virtualElement.style.visibility = 'hidden'
       virtualElement.style.left = '-9999px'
-      // Use the actual width of the outer container
       virtualElement.style.width = welcomeTextOuter.value.offsetWidth + 'px'
+      virtualElement.style.boxSizing = outerStyle.boxSizing
+      virtualElement.style.padding = outerStyle.padding
+      virtualElement.style.direction = outerStyle.direction
+      virtualElement.style.textAlign = outerStyle.textAlign
+      virtualElement.style.fontSize = outerStyle.fontSize
+      virtualElement.style.fontFamily = outerStyle.fontFamily
+      virtualElement.style.fontWeight = outerStyle.fontWeight
+      virtualElement.style.lineHeight = outerStyle.lineHeight
       
       // Create inner container to match structure
       const virtualInner = document.createElement('div')
@@ -305,6 +312,8 @@ onMounted(async () => {
       console.log('  - Virtual scrollHeight:', calculatedMax)
       console.log('  - Virtual offsetHeight:', virtualElement.offsetHeight)
       console.log('  - Virtual clientHeight:', virtualElement.clientHeight)
+      console.log('  - Virtual inner scrollHeight:', virtualInner.scrollHeight)
+      console.log('  - Actual inner scrollHeight:', welcomeTextInner.value.scrollHeight)
       
       document.body.removeChild(virtualElement)
       
