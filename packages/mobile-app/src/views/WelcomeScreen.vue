@@ -267,26 +267,30 @@ onMounted(async () => {
     
     let previousHeight = 0
     
-    // Function to recalculate max height dynamically
-    const recalculateMaxHeight = () => {
-      if (!welcomeTextInner.value || !welcomeTextOuter.value) return
-      
+    // Function to create virtual element with proper styles
+    const createVirtualElement = (outerStyle: CSSStyleDeclaration) => {
       const virtualElement = document.createElement('div')
-      const outerStyle = window.getComputedStyle(welcomeTextOuter.value)
       
-      // Copy only the necessary styles, not everything (avoid animation/transition issues)
+      // Copy only necessary styles to avoid animation/transition interference
+      const stylesToCopy = ['boxSizing', 'padding', 'paddingTop', 'paddingBottom', 'direction', 'textAlign', 'fontSize', 'fontFamily', 'fontWeight', 'lineHeight']
+      stylesToCopy.forEach(prop => {
+        virtualElement.style[prop as any] = outerStyle[prop as any]
+      })
+      
       virtualElement.style.position = 'absolute'
       virtualElement.style.visibility = 'hidden'
       virtualElement.style.left = '-9999px'
-      virtualElement.style.width = welcomeTextOuter.value.offsetWidth + 'px'
-      virtualElement.style.boxSizing = outerStyle.boxSizing
-      virtualElement.style.padding = outerStyle.padding
-      virtualElement.style.direction = outerStyle.direction
-      virtualElement.style.textAlign = outerStyle.textAlign
-      virtualElement.style.fontSize = outerStyle.fontSize
-      virtualElement.style.fontFamily = outerStyle.fontFamily
-      virtualElement.style.fontWeight = outerStyle.fontWeight
-      virtualElement.style.lineHeight = outerStyle.lineHeight
+      virtualElement.style.width = welcomeTextOuter.value!.offsetWidth + 'px'
+      
+      return virtualElement
+    }
+    
+    // Function to recalculate max height dynamically
+    const recalculateMaxHeight = (debugMode = false) => {
+      if (!welcomeTextInner.value || !welcomeTextOuter.value) return
+      
+      const outerStyle = window.getComputedStyle(welcomeTextOuter.value)
+      const virtualElement = createVirtualElement(outerStyle)
       
       // Create inner container to match structure
       const virtualInner = document.createElement('div')
@@ -304,21 +308,23 @@ onMounted(async () => {
       document.body.appendChild(virtualElement)
       
       // Use scrollHeight to include all content including margins
+      // Also account for container's vertical padding
+      const paddingTop = parseFloat(outerStyle.paddingTop)
+      const paddingBottom = parseFloat(outerStyle.paddingBottom)
       const calculatedMax = virtualElement.scrollHeight
       
-      console.log('[WelcomeScreen] Virtual element calculation:')
-      console.log('  - Outer width:', welcomeTextOuter.value.offsetWidth)
-      console.log('  - Outer padding:', outerStyle.padding)
-      console.log('  - Virtual scrollHeight:', calculatedMax)
-      console.log('  - Virtual offsetHeight:', virtualElement.offsetHeight)
-      console.log('  - Virtual clientHeight:', virtualElement.clientHeight)
-      console.log('  - Virtual inner scrollHeight:', virtualInner.scrollHeight)
-      console.log('  - Actual inner scrollHeight:', welcomeTextInner.value.scrollHeight)
+      if (debugMode) {
+        console.log('[WelcomeScreen] Virtual element calculation:')
+        console.log('  - Outer width:', welcomeTextOuter.value.offsetWidth)
+        console.log('  - Padding top/bottom:', paddingTop, '/', paddingBottom)
+        console.log('  - Virtual scrollHeight:', calculatedMax)
+        console.log('  - Virtual inner scrollHeight:', virtualInner.scrollHeight)
+        console.log('  - Actual inner scrollHeight:', welcomeTextInner.value.scrollHeight)
+      }
       
       document.body.removeChild(virtualElement)
       
       maxWelcomeTextHeight.value = calculatedMax
-      console.log('[WelcomeScreen] Recalculated max height:', calculatedMax)
       
       return calculatedMax
     }
@@ -327,42 +333,41 @@ onMounted(async () => {
       for (const entry of entries) {
         let height = entry.contentRect.height
         
-        console.log('[WelcomeScreen] ResizeObserver - contentRect.height:', height)
-        console.log('[WelcomeScreen] ResizeObserver - scrollHeight:', welcomeTextInner.value?.scrollHeight)
-        
         // Recalculate max height on each resize for accuracy
-        const currentMax = recalculateMaxHeight()
+        const currentMax = recalculateMaxHeight(false)
         
         // Ensure height grows by at least one full line height
         if (previousHeight > 0 && height > previousHeight) {
           const diff = height - previousHeight
-          console.log('[WelcomeScreen] Height difference:', diff, 'Line height:', lineHeightPx)
           if (diff < lineHeightPx) {
             height = previousHeight + lineHeightPx
-            console.log('[WelcomeScreen] Rounded up to full line height:', height)
           }
         }
         
         // Add one line height buffer to prevent text overflow
         height += lineHeightPx
-        console.log('[WelcomeScreen] Height with buffer:', height)
         
         // But don't exceed max height
         if (currentMax && height > currentMax) {
           height = currentMax
-          console.log('[WelcomeScreen] Capped at max height:', height)
         }
         
-        // Overflow check: if text is overflowing, force max height
+        // Overflow check: if text is overflowing, use max height and log debug info
         if (welcomeTextInner.value && welcomeTextInner.value.scrollHeight > height) {
-          logger.warn('[WelcomeScreen] Text overflow detected, using max height')
-          console.warn('[WelcomeScreen] OVERFLOW DETECTED - scrollHeight:', welcomeTextInner.value.scrollHeight, 'current height:', height)
+          logger.warn('[WelcomeScreen] Text overflow detected, adjusting height')
+          
+          // Show detailed debug info only when problem occurs
+          console.warn('[WelcomeScreen] OVERFLOW DEBUG:')
+          console.warn('  - Content scrollHeight:', welcomeTextInner.value.scrollHeight)
+          console.warn('  - Current height:', height)
+          console.warn('  - Max height:', currentMax)
+          console.warn('  - Line height:', lineHeightPx)
+          
+          // Recalculate with debug mode to see virtual element details
+          recalculateMaxHeight(true)
+          
           height = currentMax || height + lineHeightPx * 2
-          console.log('[WelcomeScreen] New height after overflow fix:', height)
         }
-        
-        console.log('[WelcomeScreen] Final height set:', height)
-        console.log('---')
         
         welcomeTextHeight.value = `${height}px`
         previousHeight = height - lineHeightPx // Store without buffer for next comparison
