@@ -132,6 +132,10 @@ const maxWelcomeTextHeight = ref<number | null>(null)
 // Track if CTA button has been shown (for one-time animation)
 const ctaHasBeenShown = ref(false)
 
+// Track readiness for typewriter start
+const containerReady = ref(false)
+const initialHeightSet = ref(false)
+
 // Welcome text paragraphs
 const paragraphs = [
   'به <strong>یکتایار</strong> خوش اومدی؛ جایی که دیگه لازم نیست مشکلاتت رو توی دلت نگه داری. اینجا خیلی راحت می‌تونی حرف بزنی، احساساتت رو بگی و دغدغه‌هات رو مطرح کنی و فوراً یک نقشه مسیر علمی برای حل مشکلاتت بگیری.',
@@ -156,6 +160,19 @@ const typewriters = paragraphs.map((text) => {
 
 // Create refs for each paragraph to track viewport entry
 const paragraphRefs = ref<(HTMLElement | null)[]>([])
+
+// Helper to check if all conditions are met to start typewriter
+const canStartTypewriter = () => {
+  const config = FEATURE_CONFIG.value
+  
+  // Always wait for container to be ready
+  if (!containerReady.value) return false
+  
+  // If dynamic height is enabled, wait for initial height to be set
+  if (config.enableDynamicHeight && !initialHeightSet.value) return false
+  
+  return true
+}
 
 // Set up intersection observers for each paragraph manually
 const setupParagraphObservers = () => {
@@ -200,9 +217,22 @@ const setupParagraphObservers = () => {
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting && !typewriters[0].isTyping.value && !typewriters[0].isComplete.value) {
-                logger.info('[WelcomeScreen] Starting first paragraph typewriter')
-                typewriters[0].start()
-                observer.unobserve(element)
+                // Wait for all conditions before starting
+                if (canStartTypewriter()) {
+                  logger.info('[WelcomeScreen] Starting first paragraph typewriter')
+                  typewriters[0].start()
+                  observer.unobserve(element)
+                } else {
+                  // Watch for readiness conditions
+                  const unwatch = watch([containerReady, initialHeightSet], () => {
+                    if (canStartTypewriter() && entry.isIntersecting) {
+                      logger.info('[WelcomeScreen] Starting first paragraph typewriter (after waiting)')
+                      typewriters[0].start()
+                      observer.unobserve(element)
+                      unwatch()
+                    }
+                  })
+                }
               }
             })
           },
@@ -233,21 +263,52 @@ const setupParagraphObservers = () => {
             const shouldStart = index === 0 || typewriters[index - 1].isComplete.value
             
             if (shouldStart && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
-              logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
-              setTimeout(() => {
-                typewriters[index].start()
-              }, index === 0 ? 0 : 500)
-              observer.unobserve(element)
+              // Wait for all conditions before starting
+              if (canStartTypewriter()) {
+                logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
+                setTimeout(() => {
+                  typewriters[index].start()
+                }, index === 0 ? 0 : 500)
+                observer.unobserve(element)
+              } else {
+                // Watch for readiness conditions
+                const unwatchReady = watch([containerReady, initialHeightSet], () => {
+                  if (canStartTypewriter() && entry.isIntersecting) {
+                    logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter (after waiting)`)
+                    setTimeout(() => {
+                      typewriters[index].start()
+                    }, index === 0 ? 0 : 500)
+                    observer.unobserve(element)
+                    unwatchReady()
+                  }
+                })
+              }
             } else if (index > 0 && !typewriters[index - 1].isComplete.value) {
               // Wait for previous to complete
               const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
                 if (isComplete && entry.isIntersecting) {
-                  logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} after previous complete`)
-                  setTimeout(() => {
-                    typewriters[index].start()
-                  }, 500)
-                  observer.unobserve(element)
-                  unwatch()
+                  // Also check readiness conditions
+                  if (canStartTypewriter()) {
+                    logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} after previous complete`)
+                    setTimeout(() => {
+                      typewriters[index].start()
+                    }, 500)
+                    observer.unobserve(element)
+                    unwatch()
+                  } else {
+                    // Watch for readiness conditions
+                    const unwatchReady = watch([containerReady, initialHeightSet], () => {
+                      if (canStartTypewriter()) {
+                        logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} after previous complete (after waiting)`)
+                        setTimeout(() => {
+                          typewriters[index].start()
+                        }, 500)
+                        observer.unobserve(element)
+                        unwatch()
+                        unwatchReady()
+                      }
+                    })
+                  }
                 }
               })
             }
@@ -304,8 +365,32 @@ onMounted(async () => {
   // Fetch user preferences first
   await fetchUserPreferences()
   
-  // Then set up observers
+  // Wait for next tick to ensure DOM is ready
   await nextTick()
+  
+  // Mark container as ready after nextTick (any CSS transitions would have started)
+  // Check if welcome-container element exists and wait for any transitions
+  const welcomeContainer = document.querySelector('.welcome-container')
+  if (welcomeContainer) {
+    const style = window.getComputedStyle(welcomeContainer)
+    const transitionDuration = parseFloat(style.transitionDuration || '0')
+    
+    if (transitionDuration > 0) {
+      // Wait for transition to complete
+      setTimeout(() => {
+        containerReady.value = true
+        logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
+      }, transitionDuration * 1000)
+    } else {
+      // No transition, mark as ready immediately
+      containerReady.value = true
+    }
+  } else {
+    // Container not found, mark as ready
+    containerReady.value = true
+  }
+  
+  // Set up observers
   setupParagraphObservers()
   
   // Set up ResizeObserver to watch inner container height (only if feature enabled)
@@ -317,6 +402,7 @@ onMounted(async () => {
     const lineHeightPx = lineHeight > 10 ? lineHeight : fontSize * lineHeight
     
     let previousHeight = 0
+    let isFirstHeight = true
     
     // Function to create virtual element with proper styles
     const createVirtualElement = (outerStyle: CSSStyleDeclaration) => {
@@ -414,9 +500,19 @@ onMounted(async () => {
         
         welcomeTextHeight.value = `${height}px`
         previousHeight = height - lineHeightPx // Store without buffer for next comparison
+        
+        // Mark initial height as set on first observation
+        if (isFirstHeight) {
+          isFirstHeight = false
+          initialHeightSet.value = true
+          logger.info('[WelcomeScreen] Initial height set, ready for typewriter')
+        }
       }
     })
     resizeObserver.observe(welcomeTextInner.value)
+  } else {
+    // If dynamic height is disabled, mark as set immediately
+    initialHeightSet.value = true
   }
 })
 
