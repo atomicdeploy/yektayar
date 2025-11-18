@@ -30,7 +30,7 @@
         </div>
 
         <!-- Welcome Text Content with Card Style -->
-        <div class="welcome-text" :style="{ height: welcomeTextHeight }">
+        <div ref="welcomeTextOuter" class="welcome-text" :style="{ height: welcomeTextHeight }">
           <div ref="welcomeTextInner" class="welcome-text-inner">
             <p 
               v-for="(item, index) in typewriters" 
@@ -114,6 +114,7 @@ const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 const termsAccepted = ref(false)
 
 // Welcome text height management
+const welcomeTextOuter = ref<HTMLElement | null>(null)
 const welcomeTextInner = ref<HTMLElement | null>(null)
 const welcomeTextHeight = ref('auto')
 const maxWelcomeTextHeight = ref<number | null>(null)
@@ -268,28 +269,43 @@ onMounted(async () => {
     
     // Function to recalculate max height dynamically
     const recalculateMaxHeight = () => {
-      if (!welcomeTextInner.value) return
+      if (!welcomeTextInner.value || !welcomeTextOuter.value) return
       
       const virtualElement = document.createElement('div')
-      // Copy the computed style from the inner container
-      const innerStyle = window.getComputedStyle(welcomeTextInner.value)
-      virtualElement.style.cssText = innerStyle.cssText
+      // Copy the computed style from the OUTER container to include padding
+      const outerStyle = window.getComputedStyle(welcomeTextOuter.value)
+      virtualElement.style.cssText = outerStyle.cssText
       virtualElement.style.position = 'absolute'
       virtualElement.style.visibility = 'hidden'
-      virtualElement.style.width = welcomeTextInner.value.offsetWidth + 'px'
       virtualElement.style.left = '-9999px'
+      // Use the actual width of the outer container
+      virtualElement.style.width = welcomeTextOuter.value.offsetWidth + 'px'
+      
+      // Create inner container to match structure
+      const virtualInner = document.createElement('div')
+      virtualInner.className = 'welcome-text-inner'
       
       // Add all paragraphs with full text
       paragraphs.forEach((text, index) => {
         const p = document.createElement('p')
         p.className = index === 0 ? 'welcome-paragraph highlight-first' : 'welcome-paragraph'
         p.innerHTML = text
-        virtualElement.appendChild(p)
+        virtualInner.appendChild(p)
       })
       
+      virtualElement.appendChild(virtualInner)
       document.body.appendChild(virtualElement)
+      
       // Use scrollHeight to include all content including margins
       const calculatedMax = virtualElement.scrollHeight
+      
+      console.log('[WelcomeScreen] Virtual element calculation:')
+      console.log('  - Outer width:', welcomeTextOuter.value.offsetWidth)
+      console.log('  - Outer padding:', outerStyle.padding)
+      console.log('  - Virtual scrollHeight:', calculatedMax)
+      console.log('  - Virtual offsetHeight:', virtualElement.offsetHeight)
+      console.log('  - Virtual clientHeight:', virtualElement.clientHeight)
+      
       document.body.removeChild(virtualElement)
       
       maxWelcomeTextHeight.value = calculatedMax
