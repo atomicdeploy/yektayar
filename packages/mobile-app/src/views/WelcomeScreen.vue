@@ -264,9 +264,20 @@ onMounted(async () => {
     const lineHeight = parseFloat(computedStyle.lineHeight)
     const lineHeightPx = lineHeight > 10 ? lineHeight : fontSize * lineHeight
     
+    let previousHeight = 0
+    
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         let height = entry.contentRect.height
+        
+        // Ensure height grows by at least one full line height
+        if (previousHeight > 0 && height > previousHeight) {
+          const diff = height - previousHeight
+          if (diff < lineHeightPx) {
+            height = previousHeight + lineHeightPx
+          }
+        }
+        
         // Add one line height buffer to prevent text overflow
         height += lineHeightPx
         
@@ -275,7 +286,14 @@ onMounted(async () => {
           height = maxWelcomeTextHeight.value
         }
         
+        // Overflow check: if text is overflowing, force max height
+        if (welcomeTextInner.value && welcomeTextInner.value.scrollHeight > height) {
+          logger.warn('[WelcomeScreen] Text overflow detected, using max height')
+          height = maxWelcomeTextHeight.value || height + lineHeightPx * 2
+        }
+        
         welcomeTextHeight.value = `${height}px`
+        previousHeight = height - lineHeightPx // Store without buffer for next comparison
       }
     })
     resizeObserver.observe(welcomeTextInner.value)
@@ -459,7 +477,7 @@ const onImageError = () => {
 
 /* Text content styling */
 .welcome-text {
-  text-align: right;
+  text-align: justify;
   direction: rtl;
   margin-bottom: 2rem;
   background: rgba(255, 255, 255, 0.6);
@@ -483,6 +501,7 @@ const onImageError = () => {
   color: #2c3e50;
   margin: 0 0 1.25rem 0;
   font-weight: 400;
+  text-indent: 1.5rem;
 }
 
 .welcome-paragraph:last-child {
