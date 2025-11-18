@@ -301,9 +301,9 @@ const skipCurrentParagraph = () => {
   
   if (currentIndex !== -1) {
     logger.info(`[WelcomeScreen] Skipping paragraph ${currentIndex + 1}`)
-    // Call stop() method and mark as complete
-    typewriters[currentIndex].stop()
-    // Manually set the full text
+    // Use reset() to stop the typing animation and clear text
+    typewriters[currentIndex].reset()
+    // Manually set the full text and mark as complete
     typewriters[currentIndex].displayText.value = paragraphs[currentIndex]
     typewriters[currentIndex].isComplete.value = true
     typewriters[currentIndex].isTyping.value = false
