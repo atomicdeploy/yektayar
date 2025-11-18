@@ -1,6 +1,18 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
+    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="false">
+      <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          }
+        }"
+        defer
+      >
       <div class="welcome-container">
         <!-- Decorative background elements -->
         <div class="bg-decoration bg-decoration-1"></div>
@@ -82,7 +94,7 @@
           @click="startApp"
         >
           <span class="button-content">
-            <span class="button-icon">✨</span>
+            <span class="button-icon">🚀</span>
             <span class="button-text">شروع گفتگو</span>
           </span>
           <div class="button-shine"></div>
@@ -96,6 +108,7 @@
           </p>
         </div>
       </div>
+      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -559,6 +572,11 @@ const onImageError = () => {
 </script>
 
 <style scoped lang="scss">
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
 .welcome-content {
   --background: linear-gradient(135deg, 
     #f8f9fa 0%, 
