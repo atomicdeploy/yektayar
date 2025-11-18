@@ -819,7 +819,7 @@ const onImageError = () => {
 /* SlideDown animation for CTA button - Define first so disabled can override */
 .cta-button-slide-down {
   --final-opacity: 1;
-  animation: slideDown 0.6s ease-out forwards;
+  animation: slideDown 0.6s ease-out both;
   animation-delay: 0.6s;
 }
 
