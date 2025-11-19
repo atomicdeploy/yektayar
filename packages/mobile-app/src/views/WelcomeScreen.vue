@@ -1,6 +1,39 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
+      <!-- 
+        OverlayScrollbars temporarily disabled due to animation replay bug.
+        
+        Issue: OverlayScrollbars causes page animations to replay when CTA/terms appear.
+        Root cause: OverlayScrollbars creates internal DOM structure that triggers layout
+        changes and animation events when content height changes dynamically.
+        
+        Attempted fixes:
+        - Added event.target filtering to ignore child elements
+        - Added containerReady state check to prevent re-triggering
+        - Added OverlayScrollbars element filtering (.os-scrollbar class)
+        - Added explicit overflow configuration
+        
+        Result: Animation replay still occurs despite event isolation attempts.
+        
+        TODO: Investigate deeper integration approach or alternative scrolling solution.
+      -->
+      <!-- <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          },
+          overflow: {
+            x: 'hidden',
+            y: 'scroll'
+          }
+        }"
+        defer
+      > -->
       <div class="welcome-container">
         <!-- Decorative background elements -->
         <div class="bg-decoration bg-decoration-1"></div>
@@ -15,7 +48,7 @@
           <div class="title-underline"></div>
         </div>
 
-        <!-- Hero Image with Lazy Loading (ABOVE text as requested) -->
+        <!-- Hero Image with Lazy Loading (above text) -->
         <div class="hero-image-container">
           <LazyImage
             src="/welcome-hero.jpg"
@@ -30,130 +63,523 @@
         </div>
 
         <!-- Welcome Text Content with Card Style -->
-        <div class="welcome-text">
-          <p class="welcome-paragraph highlight-first">
-            <span v-html="typewriter1.displayText.value || '&nbsp;'"></span>
-            <span v-if="typewriter1.isTyping.value && typewriter1.showCursor.value" class="typewriter-cursor"></span>
-          </p>
-          <p class="welcome-paragraph" v-if="typewriter1.isComplete.value">
-            <span v-html="typewriter2.displayText.value || '&nbsp;'"></span>
-            <span v-if="typewriter2.isTyping.value && typewriter2.showCursor.value" class="typewriter-cursor"></span>
-          </p>
-          <p class="welcome-paragraph" v-if="typewriter2.isComplete.value">
-            <span v-html="typewriter3.displayText.value || '&nbsp;'"></span>
-            <span v-if="typewriter3.isTyping.value && typewriter3.showCursor.value" class="typewriter-cursor"></span>
-          </p>
-          <p class="welcome-paragraph" v-if="typewriter3.isComplete.value">
-            <span v-html="typewriter4.displayText.value || '&nbsp;'"></span>
-            <span v-if="typewriter4.isTyping.value && typewriter4.showCursor.value" class="typewriter-cursor"></span>
-          </p>
+        <div ref="welcomeTextOuter" class="welcome-text" :style="{ height: welcomeTextHeight }">
+          <div ref="welcomeTextInner" class="welcome-text-inner">
+            <p 
+              v-for="(item, index) in typewriters" 
+              :key="index"
+              :ref="(el: unknown) => { paragraphRefs[index] = el as HTMLElement | null }"
+              v-show="index === 0 || typewriters[index - 1].isComplete.value"
+              class="welcome-paragraph"
+              :class="{ 'highlight-first': index === 0 }"
+            >
+              <span v-html="item.displayText.value || '&nbsp;'"></span>
+              <span v-if="(item.isTyping.value || (index === 0 && !item.isComplete.value && FEATURE_CONFIG.showCursorInitially)) && item.showCursor.value" class="typewriter-cursor"></span>
+            </p>
+          </div>
         </div>
 
-        <!-- CTA Button with Enhanced Design - Only show after all typewriter effects complete -->
+        <!-- Terms Acceptance Checkbox -->
+        <div 
+          class="terms-container" 
+          :class="{ 'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations }"
+          v-if="allTypewritersComplete"
+        >
+          <label class="terms-checkbox">
+            <input 
+              type="checkbox" 
+              v-model="termsAccepted" 
+              class="checkbox-input"
+            />
+            <span class="checkbox-custom">
+              <ion-icon :icon="checkmarkOutline" class="checkbox-icon"></ion-icon>
+            </span>
+            <span class="terms-text">
+              <a href="#terms" @click.prevent="showTerms" class="terms-link">شرایط و قوانین</a>
+              را خوانده‌ام و می‌پذیرم
+            </span>
+          </label>
+        </div>
+
+        <!-- Enhanced CTA Button - Only show after all typewriter effects complete -->
         <ion-button 
           v-if="allTypewritersComplete"
+          :disabled="!termsAccepted"
           expand="block" 
           size="large" 
-          color="success"
-          class="cta-button cta-button-slide-down"
+          class="cta-button"
+          :class="{ 
+            'cta-button-disabled': !termsAccepted,
+            'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown
+          }"
           @click="startApp"
         >
           <span class="button-content">
             <span class="button-icon">🚀</span>
             <span class="button-text">شروع گفتگو</span>
           </span>
+          <div class="button-shine"></div>
         </ion-button>
 
         <!-- Disclaimer with Icon -->
         <div class="disclaimer-container">
           <ion-icon :icon="lockClosedOutline" class="disclaimer-icon"></ion-icon>
           <p class="disclaimer-text">
-            اطلاعات شما محرمّانه است، و تنها برای کمک به شما استفاده می‌شود.
+            اطلاعات شما محرمانه است، و تنها برای کمک به شما استفاده می‌شود.
           </p>
         </div>
       </div>
+      <!-- </OverlayScrollbarsComponent> -->
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
-import { heartOutline, lockClosedOutline } from 'ionicons/icons'
+import { heartOutline, lockClosedOutline, checkmarkOutline } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
-import { watch, computed } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { useDebugConfigStore } from '@/stores/debugConfig'
+import { createKeyboardHandler } from './WelcomeScreen.utils'
 
 const router = useRouter()
+const configStore = useDebugConfigStore()
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 
-// Welcome text paragraphs
-const paragraph1 = 'به <strong>یکتایار</strong> خوش اومدی؛ جایی که دیگه لازم نیست مشکلاتت رو توی دلت نگه داری. اینجا خیلی راحت می‌تونی حرف بزنی، احساساتت رو بگی و دغدغه‌هات رو مطرح کنی و فوراً یک نقشه مسیر علمی برای حل مشکلاتت بگیری.'
-const paragraph2 = 'در یکتایار، دیگه خبری از سردرگمی و اتلاف وقت نیست؛ فوراً در مسیر درست حل مشکلاتت قرار می‌گیری، در کنارش سریع‌ترین راه برای دریافت وقت جلسات مشاوره جلوی پای تو هست و مطمئن می‌شی که همیشه یه تیم پشتیبان هم کنارت هست.'
-const paragraph3 = 'از مشاوره و روان‌درمانی فردی گرفته تا زوج‌درمانی و خانواده درمانی، همه‌چی اینجا آمادست تا هر چه سریع‌تر، <u>آرامش</u>، <u>امنیت</u> و <u>حال خوب</u> به زندگیت بیاد.'
-const paragraph4 = 'فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.'
+// Get feature config from Pinia store
+const FEATURE_CONFIG = computed(() => configStore.welcomeConfig)
 
-// Initialize typewriter effects for each paragraph
-// Start after the fade-in animation completes (800ms animation + 500ms delay = 1300ms)
-// Use 'character' mode by default (can be changed to 'word' mode)
-// Only the first typewriter auto-starts, others are triggered by watchers
-const typewriter1 = useTypewriter(paragraph1, { speed: 20, startDelay: 1300, showCursor: true, mode: 'character', autoStart: true })
-const typewriter2 = useTypewriter(paragraph2, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
-const typewriter3 = useTypewriter(paragraph3, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
-const typewriter4 = useTypewriter(paragraph4, { speed: 20, startDelay: 0, showCursor: true, mode: 'character', autoStart: false })
+// Terms acceptance state
+const termsAccepted = ref(false)
+
+// Welcome text height management
+const welcomeTextOuter = ref<HTMLElement | null>(null)
+const welcomeTextInner = ref<HTMLElement | null>(null)
+const welcomeTextHeight = ref('auto')
+const maxWelcomeTextHeight = ref<number | null>(null)
+
+// Track if CTA button has been shown (for one-time animation)
+const ctaHasBeenShown = ref(false)
+
+// Track readiness for typewriter start
+const containerReady = ref(false)
+const initialHeightSet = ref(false)
+
+// Welcome text paragraphs
+const paragraphs = [
+  'به <strong>یکتایار</strong> خوش اومدی؛ جایی که دیگه لازم نیست مشکلاتت رو توی دلت نگه داری. اینجا خیلی راحت می‌تونی حرف بزنی، احساساتت رو بگی و دغدغه‌هات رو مطرح کنی و فوراً یک نقشه مسیر علمی برای حل مشکلاتت بگیری.',
+  'در یکتایار، دیگه خبری از سردرگمی و اتلاف وقت نیست؛ فوراً در مسیر درست حل مشکلاتت قرار می‌گیری، در کنارش سریع‌ترین راه برای دریافت وقت جلسات مشاوره جلوی پای تو هست و مطمئن می‌شی که همیشه یه تیم پشتیبان هم کنارت هست.',
+  'از مشاوره و روان‌درمانی فردی گرفته تا زوج‌درمانی و خانواده درمانی، همه‌چی اینجا آمادست تا هر چه سریع‌تر، <u>آرامش</u>، <u>امنیت</u> و <u>حال خوب</u> به زندگیت بیاد.',
+  'فقط کافیه رو دکمه‌ی شروع گفتگو بزنی و ببینی چطور همه‌چیز یکی‌یکی سر جاش قرار می‌گیره.'
+]
+
+// Initialize typewriter effects using a loop
+const typewriters = paragraphs.map((text) => {
+  const config = FEATURE_CONFIG.value
+  const shouldSkip = configStore.skipTypewriter
+  
+  return useTypewriter(text, {
+    speed: (config.enableTypewriter && !shouldSkip) ? 20 : 0,
+    startDelay: 0,
+    showCursor: config.enableTypewriter && !shouldSkip,
+    mode: 'character',
+    autoStart: !config.enableTypewriter || shouldSkip
+  })
+})
+
+// Create refs for each paragraph to track viewport entry
+const paragraphRefs = ref<(HTMLElement | null)[]>([])
+
+// Helper to check if all conditions are met to start typewriter
+const canStartTypewriter = () => {
+  const config = FEATURE_CONFIG.value
+  
+  // Always wait for container to be ready
+  if (!containerReady.value) return false
+  
+  // If dynamic height is enabled, wait for initial height to be set
+  if (config.enableDynamicHeight && !initialHeightSet.value) return false
+  
+  return true
+}
+
+// Helper to start typewriter with proper delay and conditions check
+const startTypewriterWithConditions = (
+  index: number,
+  entry: IntersectionObserverEntry,
+  observer: IntersectionObserver,
+  element: HTMLElement
+) => {
+  const delay = index === 0 ? 0 : 500 // 0.2s delay for first paragraph, 0.5s for others
+  
+  if (canStartTypewriter()) {
+    logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
+    setTimeout(() => {
+      typewriters[index].start()
+    }, delay)
+    observer.unobserve(element)
+  } else {
+    // Watch for readiness conditions
+    const unwatchReady = watch([containerReady, initialHeightSet], () => {
+      if (canStartTypewriter() && entry.isIntersecting) {
+        logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter (after waiting)`)
+        setTimeout(() => {
+          typewriters[index].start()
+        }, delay)
+        observer.unobserve(element)
+        unwatchReady()
+      }
+    })
+  }
+}
+
+// Set up intersection observers for each paragraph manually
+const setupParagraphObservers = () => {
+  const config = FEATURE_CONFIG.value
+  const shouldSkip = configStore.skipTypewriter
+  
+  // If typewriter is disabled or should be skipped, mark all as complete
+  if (!config.enableTypewriter || shouldSkip) {
+    typewriters.forEach((tw, idx) => {
+      tw.displayText.value = paragraphs[idx]
+      tw.isComplete.value = true
+      tw.isTyping.value = false
+    })
+    return
+  }
+  
+  // If viewport waiting is disabled, start all immediately
+  if (config.viewportWaitingMode === 'none') {
+    typewriters.forEach((tw, index) => {
+      if (index === 0) {
+        setTimeout(() => tw.start(), 200) // 0.2s delay for first paragraph
+      } else {
+        // Watch for previous to complete
+        watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
+          if (isComplete && !tw.isTyping.value && !tw.isComplete.value) {
+            setTimeout(() => tw.start(), 500)
+          }
+        }, { immediate: true })
+      }
+    })
+    return
+  }
+  
+  // If only first paragraph waits for viewport
+  if (config.viewportWaitingMode === 'first') {
+    paragraphRefs.value.forEach((element: HTMLElement | null, index: number) => {
+      if (!element) return
+      
+      if (index === 0) {
+        // Only first paragraph uses viewport observer
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting && !typewriters[0].isTyping.value && !typewriters[0].isComplete.value) {
+                startTypewriterWithConditions(0, entry, observer, element)
+              }
+            })
+          },
+          { threshold: 0.2, rootMargin: '0px' }
+        )
+        observer.observe(element)
+      } else {
+        // Rest start when previous completes
+        watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
+          if (isComplete && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
+            setTimeout(() => typewriters[index].start(), 500)
+          }
+        }, { immediate: true })
+      }
+    })
+    return
+  }
+  
+  // Default: 'all' mode - each paragraph waits for viewport entry
+  paragraphRefs.value.forEach((element: HTMLElement | null, index: number) => {
+    if (!element) return
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Check if this typewriter should start
+            const shouldStart = index === 0 || typewriters[index - 1].isComplete.value
+            
+            if (shouldStart && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
+              startTypewriterWithConditions(index, entry, observer, element)
+            } else if (index > 0 && !typewriters[index - 1].isComplete.value) {
+              // Wait for previous to complete
+              const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
+                if (isComplete && entry.isIntersecting) {
+                  startTypewriterWithConditions(index, entry, observer, element)
+                  unwatch()
+                }
+              })
+            }
+          }
+        })
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px'
+      }
+    )
+    
+    observer.observe(element)
+  })
+}
 
 // Computed property to check if all typewriters are complete
 const allTypewritersComplete = computed(() => {
-  const result = typewriter1.isComplete.value && 
-         typewriter2.isComplete.value && 
-         typewriter3.isComplete.value && 
-         typewriter4.isComplete.value
+  return typewriters.every(tw => tw.isComplete.value)
+})
+
+// Set up keyboard shortcuts using utility function
+const handleKeyPress = createKeyboardHandler(typewriters, paragraphs)
+
+// Watch for when CTA button first appears and mark it
+watch(allTypewritersComplete, (isComplete: boolean) => {
+  if (isComplete && !ctaHasBeenShown.value) {
+    // Mark as shown after a short delay to allow animation to play
+    setTimeout(() => {
+      ctaHasBeenShown.value = true
+    }, 1200) // Animation delay (0.6s) + animation duration (0.6s)
+  }
+})
+
+// Fetch user preferences to check if terms were already accepted
+const fetchUserPreferences = async () => {
+  try {
+    const response = await apiClient.get('/api/users/preferences')
+    if (response.data?.termsAccepted) {
+      termsAccepted.value = true
+      logger.info('[WelcomeScreen] User has previously accepted terms')
+    }
+  } catch (error) {
+    // If fetch fails, default to unchecked (false)
+    logger.debug('[WelcomeScreen] Could not fetch user preferences, defaulting to unchecked')
+  }
+}
+
+// Fetch preferences on mount
+onMounted(async () => {
+  // Set up keyboard shortcuts
+  window.addEventListener('keydown', handleKeyPress)
   
-  logger.debug(`[WelcomeScreen] All typewriters complete: ${result}`, {
-    tw1: typewriter1.isComplete.value,
-    tw2: typewriter2.isComplete.value,
-    tw3: typewriter3.isComplete.value,
-    tw4: typewriter4.isComplete.value
-  })
+  // Fetch user preferences first
+  await fetchUserPreferences()
   
-  return result
-})
-
-// Chain the typewriter effects with 500ms delay between each paragraph
-watch(() => typewriter1.isComplete.value, (isComplete) => {
-  logger.info('[WelcomeScreen] Typewriter 1 complete:', isComplete)
-  if (isComplete) {
-    setTimeout(() => {
-      logger.info('[WelcomeScreen] Starting typewriter 2')
-      typewriter2.start()
-    }, 500)
+  // Wait for next tick to ensure DOM is ready
+  await nextTick()
+  
+  // Listen for transitions/animations on welcome-container
+  const welcomeContainer = document.querySelector('.welcome-container')
+  if (welcomeContainer) {
+    const style = window.getComputedStyle(welcomeContainer)
+    const hasTransition = style.transitionDuration && parseFloat(style.transitionDuration) > 0
+    const hasAnimation = style.animationDuration && parseFloat(style.animationDuration) > 0
+    
+    if (hasTransition || hasAnimation) {
+      // Set up event listeners with additional filtering
+      const handleTransitionEnd = (event: TransitionEvent) => {
+        // Only respond to events from the container itself, not children or OverlayScrollbars elements
+        if (event.target === welcomeContainer && !containerReady.value) {
+          // Check that the target is not an OverlayScrollbars internal element
+          const target = event.target as HTMLElement
+          if (!target.classList.contains('os-scrollbar') && !target.closest('.os-scrollbar')) {
+            containerReady.value = true
+            logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
+            welcomeContainer.removeEventListener('transitionend', handleTransitionEnd)
+          }
+        }
+      }
+      
+      const handleAnimationEnd = (event: AnimationEvent) => {
+        // Only respond to events from the container itself, not children or OverlayScrollbars elements
+        if (event.target === welcomeContainer && !containerReady.value) {
+          // Check that the target is not an OverlayScrollbars internal element
+          const target = event.target as HTMLElement
+          if (!target.classList.contains('os-scrollbar') && !target.closest('.os-scrollbar')) {
+            containerReady.value = true
+            logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
+            welcomeContainer.removeEventListener('animationend', handleAnimationEnd)
+          }
+        }
+      }
+      
+      if (hasTransition) {
+        welcomeContainer.addEventListener('transitionend', handleTransitionEnd)
+      }
+      if (hasAnimation) {
+        welcomeContainer.addEventListener('animationend', handleAnimationEnd)
+      }
+      
+      // Fallback timeout in case events don't fire
+      setTimeout(() => {
+        if (!containerReady.value) {
+          containerReady.value = true
+          logger.info('[WelcomeScreen] Container ready (fallback timeout)')
+        }
+      }, 2000)
+    } else {
+      // No transition or animation, mark as ready immediately
+      containerReady.value = true
+    }
+  } else {
+    // Container not found, mark as ready
+    containerReady.value = true
+  }
+  
+  // Set up observers
+  setupParagraphObservers()
+  
+  // Set up ResizeObserver to watch inner container height (only if feature enabled)
+  if (FEATURE_CONFIG.value.enableDynamicHeight && welcomeTextInner.value) {
+    // Get line height from computed style
+    const computedStyle = window.getComputedStyle(welcomeTextInner.value.querySelector('.welcome-paragraph') || welcomeTextInner.value)
+    const fontSize = parseFloat(computedStyle.fontSize)
+    const lineHeight = parseFloat(computedStyle.lineHeight)
+    const lineHeightPx = lineHeight > 10 ? lineHeight : fontSize * lineHeight
+    
+    let previousHeight = 0
+    let isFirstHeight = true
+    
+    // Function to create virtual element with proper styles
+    const createVirtualElement = (outerStyle: CSSStyleDeclaration) => {
+      const virtualElement = document.createElement('div')
+      
+      // Copy only necessary styles to avoid animation/transition interference
+      const stylesToCopy = ['boxSizing', 'padding', 'paddingTop', 'paddingBottom', 'direction', 'textAlign', 'fontSize', 'fontFamily', 'fontWeight', 'lineHeight']
+      stylesToCopy.forEach(prop => {
+        virtualElement.style[prop as any] = outerStyle[prop as any]
+      })
+      
+      virtualElement.style.position = 'absolute'
+      virtualElement.style.visibility = 'hidden'
+      virtualElement.style.left = '-9999px'
+      virtualElement.style.width = welcomeTextOuter.value!.offsetWidth + 'px'
+      
+      return virtualElement
+    }
+    
+    // Function to recalculate max height dynamically
+    const recalculateMaxHeight = (debugMode = false) => {
+      if (!welcomeTextInner.value || !welcomeTextOuter.value) return
+      
+      const outerStyle = window.getComputedStyle(welcomeTextOuter.value)
+      const virtualElement = createVirtualElement(outerStyle)
+      
+      // Create inner container to match structure
+      const virtualInner = document.createElement('div')
+      virtualInner.className = 'welcome-text-inner'
+      
+      // Add all paragraphs with full text
+      paragraphs.forEach((text, index) => {
+        const p = document.createElement('p')
+        p.className = index === 0 ? 'welcome-paragraph highlight-first' : 'welcome-paragraph'
+        p.innerHTML = text
+        virtualInner.appendChild(p)
+      })
+      
+      virtualElement.appendChild(virtualInner)
+      document.body.appendChild(virtualElement)
+      
+      // Use scrollHeight to include all content including padding
+      const paddingTop = parseFloat(outerStyle.paddingTop)
+      const paddingBottom = parseFloat(outerStyle.paddingBottom)
+      const calculatedMax = virtualElement.scrollHeight
+      
+      if (debugMode) {
+        console.log('[WelcomeScreen] Height calculation debug:')
+        console.log(`  Outer: ${welcomeTextOuter.value.offsetWidth}px wide, padding: ${paddingTop}/${paddingBottom}`)
+        console.log(`  Virtual: ${calculatedMax}px, Inner: ${virtualInner.scrollHeight}px`)
+        console.log(`  Actual inner: ${welcomeTextInner.value.scrollHeight}px`)
+      }
+      
+      document.body.removeChild(virtualElement)
+      
+      maxWelcomeTextHeight.value = calculatedMax
+      
+      return calculatedMax
+    }
+    
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        let height = entry.contentRect.height
+        
+        // Recalculate max height on each resize for accuracy
+        const currentMax = recalculateMaxHeight(false)
+        
+        // Ensure height grows by at least one full line height
+        if (previousHeight > 0 && height > previousHeight) {
+          const diff = height - previousHeight
+          if (diff < lineHeightPx) {
+            height = previousHeight + lineHeightPx
+          }
+        }
+        
+        // Add one line height buffer to prevent text overflow
+        height += lineHeightPx
+        
+        // But don't exceed max height
+        if (currentMax && height > currentMax) {
+          height = currentMax
+        }
+        
+        // Overflow check: if text is overflowing, extend height to fit all content
+        if (welcomeTextInner.value && welcomeTextInner.value.scrollHeight > height) {
+          logger.warn(`[WelcomeScreen] Text overflow: ${welcomeTextInner.value.scrollHeight}px needed, ${height}px available`)
+          
+          // Show detailed debug info only when problem occurs
+          recalculateMaxHeight(true)
+          
+          // Extend height to fit all content (use scrollHeight + buffer)
+          height = welcomeTextInner.value.scrollHeight + lineHeightPx
+          logger.info(`[WelcomeScreen] Extended height to ${height}px to fit content`)
+        }
+        
+        welcomeTextHeight.value = `${height}px`
+        previousHeight = height - lineHeightPx // Store without buffer for next comparison
+        
+        // Mark initial height as set on first observation
+        if (isFirstHeight) {
+          isFirstHeight = false
+          initialHeightSet.value = true
+          logger.info('[WelcomeScreen] Initial height set, ready for typewriter')
+        }
+      }
+    })
+    resizeObserver.observe(welcomeTextInner.value)
+  } else {
+    // If dynamic height is disabled, mark as set immediately
+    initialHeightSet.value = true
   }
 })
 
-watch(() => typewriter2.isComplete.value, (isComplete) => {
-  logger.info('[WelcomeScreen] Typewriter 2 complete:', isComplete)
-  if (isComplete) {
-    setTimeout(() => {
-      logger.info('[WelcomeScreen] Starting typewriter 3')
-      typewriter3.start()
-    }, 500)
-  }
+// Cleanup keyboard shortcuts on unmount
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyPress)
 })
 
-watch(() => typewriter3.isComplete.value, (isComplete) => {
-  logger.info('[WelcomeScreen] Typewriter 3 complete:', isComplete)
-  if (isComplete) {
-    setTimeout(() => {
-      logger.info('[WelcomeScreen] Starting typewriter 4')
-      typewriter4.start()
-    }, 500)
-  }
-})
+const showTerms = () => {
+  // TODO: Navigate to terms and conditions page or show modal
+  logger.info('Show terms and conditions')
+  // For now, just open in a new tab or show an alert
+  alert('شرایط و قوانین استفاده از یکتایار در اینجا نمایش داده خواهد شد.')
+}
 
 const startApp = async () => {
+  if (!termsAccepted.value) {
+    logger.warn('Cannot start app without accepting terms')
+    return
+  }
+  
   logger.info('User started the app from welcome screen')
   
   // Mark welcome screen as shown in localStorage
@@ -162,7 +588,8 @@ const startApp = async () => {
   // Also mark on backend if user is authenticated
   try {
     await apiClient.post('/api/users/preferences', {
-      welcomeScreenShown: true
+      welcomeScreenShown: true,
+      termsAccepted: true
     })
     logger.info('Welcome screen preference saved to backend')
   } catch (error) {
@@ -180,6 +607,11 @@ const onImageError = () => {
 </script>
 
 <style scoped lang="scss">
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
 .welcome-content {
   --background: linear-gradient(135deg, 
     #f8f9fa 0%, 
@@ -317,7 +749,7 @@ const onImageError = () => {
 
 /* Text content styling */
 .welcome-text {
-  text-align: right;
+  text-align: justify;
   direction: rtl;
   margin-bottom: 2rem;
   background: rgba(255, 255, 255, 0.6);
@@ -327,6 +759,13 @@ const onImageError = () => {
   border: 1px solid rgba(212, 164, 62, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.8s ease-out 0.5s both;
+  transition: height 0.3s ease-out;
+  overflow: hidden;
+}
+
+.welcome-text-inner {
+  /* Inner container that holds the actual content */
+  padding-bottom: 1.25rem; /* Use padding instead of margin on last paragraph for proper height calculation */
 }
 
 .welcome-paragraph {
@@ -335,16 +774,119 @@ const onImageError = () => {
   color: #2c3e50;
   margin: 0 0 1.25rem 0;
   font-weight: 400;
+  text-indent: 1.5rem;
 }
 
 .welcome-paragraph:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0; /* Remove margin, use padding on parent instead */
 }
 
 .welcome-paragraph.highlight-first {
   font-size: 1.1rem;
   font-weight: 500;
   color: #01183a;
+}
+
+.welcome-paragraph :deep(strong) {
+  color: #d4a43e;
+  font-weight: 700;
+}
+
+/* Terms Acceptance Checkbox styling */
+.terms-container {
+  margin: 0; /* 2rem 0 1rem 0; */
+}
+
+.terms-container-slide {
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: 0.3s;
+}
+
+.terms-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  direction: rtl;
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border: 2px solid transparent;
+  border-color: rgba(212, 164, 62, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.terms-checkbox:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(212, 164, 62, 0.3);
+  /* transform: translateY(-2px); */
+  box-shadow: 0 4px 12px rgba(212, 164, 62, 0.2);
+}
+
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkbox-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid #d4a43e;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.checkbox-icon {
+  font-size: 20px;
+  color: white;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.checkbox-input:checked ~ .checkbox-custom {
+  background: linear-gradient(135deg, #d4a43e 0%, #e8c170 100%);
+  border-color: #d4a43e;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px rgba(212, 164, 62, 0.2);
+}
+
+.checkbox-input:checked ~ .checkbox-custom .checkbox-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.terms-text {
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 500;
+  line-height: 1.6;
+  text-align: right;
+}
+
+.terms-link {
+  color: #d4a43e;
+  text-decoration: none;
+  font-weight: 700;
+  border-bottom: 2px solid rgba(212, 164, 62, 0.3);
+  transition: all 0.2s;
+  padding-bottom: 1px;
+}
+
+.terms-link:hover {
+  color: #c99433;
+  border-bottom-color: #c99433;
 }
 
 /* Typewriter cursor styling */
@@ -379,23 +921,61 @@ const onImageError = () => {
   }
 }
 
-/* CTA Button styling */
+/* CTA Button styling - Enhanced with gradient and effects */
 .cta-button {
   --border-radius: 20px;
   --padding-top: 18px;
   --padding-bottom: 18px;
-  --box-shadow: 0 8px 24px rgba(76, 175, 80, 0.3);
+  --box-shadow: 
+    0 8px 32px rgba(212, 164, 62, 0.3),
+    0 4px 16px rgba(1, 24, 58, 0.2);
   margin: 2.5rem 0 1.5rem 0;
   text-transform: none;
   font-size: 1.3rem;
   font-weight: 700;
   position: relative;
   overflow: hidden;
+  /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
+  background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
+  background-size: 200% 100%;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease-out;
+  border-radius: var(--border-radius);
+  --background: transparent; /* Fix for the `button-native` inside; otherwise it'll mask the actual cta-button */
 }
 
-/* SlideDown animation for CTA button */
+.cta-button:not(.cta-button-disabled) {
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.cta-button:not(.cta-button-disabled):active {
+  transform: scale(0.98);
+  --box-shadow: 
+    0 4px 16px rgba(212, 164, 62, 0.4),
+    0 2px 8px rgba(1, 24, 58, 0.3);
+}
+
+/* SlideDown animation for CTA button - Define first so disabled can override */
 .cta-button-slide-down {
+  --final-opacity: 1;
   animation: slideDown 0.6s ease-out both;
+  animation-delay: 0.6s;
+}
+
+.cta-button-disabled {
+  --final-opacity: 0.5;
+  opacity: var(--final-opacity);
+  cursor: not-allowed;
+  background-image: linear-gradient(135deg, #9e9e9e 0%, #bdbdbd 100%);
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes slideDown {
@@ -404,9 +984,29 @@ const onImageError = () => {
     transform: translateY(-30px);
   }
   to {
-    opacity: 1;
+    opacity: var(--final-opacity);
     transform: translateY(0);
   }
+}
+
+/* Shine effect for CTA button */
+.button-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.cta-button:not(.cta-button-disabled):hover .button-shine {
+  left: 100%;
 }
 
 .cta-button::before {
@@ -417,12 +1017,12 @@ const onImageError = () => {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   transform: translate(-50%, -50%);
   transition: width 0.6s, height 0.6s;
 }
 
-.cta-button:hover::before {
+.cta-button:not(.cta-button-disabled):hover::before {
   width: 300px;
   height: 300px;
 }
@@ -435,6 +1035,8 @@ const onImageError = () => {
   position: relative;
   z-index: 1;
   pointer-events: none;
+  color: #01183a;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .button-icon {
@@ -444,6 +1046,7 @@ const onImageError = () => {
 
 .button-text {
   font-size: 1.3rem;
+  /* letter-spacing: -0.3px; */
 }
 
 /* Disclaimer styling */
@@ -617,6 +1220,29 @@ const onImageError = () => {
   .disclaimer-icon {
     color: #adb5bd;
   }
+
+  .terms-checkbox {
+    background: rgba(26, 31, 46, 0.6);
+    border-color: transparent;
+  }
+
+  .terms-checkbox:hover {
+    background: rgba(26, 31, 46, 0.8);
+    border-color: rgba(212, 164, 62, 0.3);
+  }
+
+  .terms-text {
+    color: #e9ecef;
+  }
+
+  .checkbox-custom {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #d4a43e;
+  }
+
+  .cta-button:not(.cta-button-disabled) {
+    background: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
+  }
 }
 
 /* Responsive adjustments */
@@ -648,6 +1274,23 @@ const onImageError = () => {
 
   .button-text {
     font-size: 1.2rem;
+  }
+
+  .button-icon {
+    font-size: 1.2rem;
+  }
+
+  .terms-text {
+    font-size: 0.95rem;
+  }
+
+  .checkbox-custom {
+    width: 26px;
+    height: 26px;
+  }
+
+  .checkbox-icon {
+    font-size: 18px;
   }
 }
 
@@ -695,6 +1338,19 @@ const onImageError = () => {
 
   .button-icon {
     font-size: 1.2rem;
+  }
+
+  .terms-text {
+    font-size: 0.9rem;
+  }
+
+  .checkbox-custom {
+    width: 24px;
+    height: 24px;
+  }
+
+  .checkbox-icon {
+    font-size: 16px;
   }
 
   .disclaimer-text {
