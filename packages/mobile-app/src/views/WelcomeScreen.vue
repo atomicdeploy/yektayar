@@ -53,7 +53,7 @@
               :class="{ 'highlight-first': index === 0 }"
             >
               <span v-html="item.displayText.value || '&nbsp;'"></span>
-              <span v-if="item.isTyping.value && item.showCursor.value" class="typewriter-cursor"></span>
+              <span v-if="(item.isTyping.value || containerReady) && item.showCursor.value" class="typewriter-cursor"></span>
             </p>
           </div>
         </div>
@@ -198,8 +198,6 @@ const startTypewriterWithConditions = (
   
   if (canStartTypewriter()) {
     logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
-    // Show cursor immediately before starting
-    typewriters[index].isTyping.value = true
     setTimeout(() => {
       typewriters[index].start()
     }, delay)
@@ -209,8 +207,6 @@ const startTypewriterWithConditions = (
     const unwatchReady = watch([containerReady, initialHeightSet], () => {
       if (canStartTypewriter() && entry.isIntersecting) {
         logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter (after waiting)`)
-        // Show cursor immediately before starting
-        typewriters[index].isTyping.value = true
         setTimeout(() => {
           typewriters[index].start()
         }, delay)
@@ -240,15 +236,11 @@ const setupParagraphObservers = () => {
   if (config.viewportWaitingMode === 'none') {
     typewriters.forEach((tw, index) => {
       if (index === 0) {
-        // Show cursor immediately before starting
-        tw.isTyping.value = true
         setTimeout(() => tw.start(), 200) // 0.2s delay for first paragraph
       } else {
         // Watch for previous to complete
         watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
           if (isComplete && !tw.isTyping.value && !tw.isComplete.value) {
-            // Show cursor immediately before starting
-            tw.isTyping.value = true
             setTimeout(() => tw.start(), 500)
           }
         }, { immediate: true })
@@ -279,8 +271,6 @@ const setupParagraphObservers = () => {
         // Rest start when previous completes
         watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
           if (isComplete && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
-            // Show cursor immediately before starting
-            typewriters[index].isTyping.value = true
             setTimeout(() => typewriters[index].start(), 500)
           }
         }, { immediate: true })
