@@ -1,7 +1,24 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="false">
-      <OverlayScrollbarsComponent
+    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
+      <!-- 
+        OverlayScrollbars temporarily disabled due to animation replay bug.
+        
+        Issue: OverlayScrollbars causes page animations to replay when CTA/terms appear.
+        Root cause: OverlayScrollbars creates internal DOM structure that triggers layout
+        changes and animation events when content height changes dynamically.
+        
+        Attempted fixes:
+        - Added event.target filtering to ignore child elements
+        - Added containerReady state check to prevent re-triggering
+        - Added OverlayScrollbars element filtering (.os-scrollbar class)
+        - Added explicit overflow configuration
+        
+        Result: Animation replay still occurs despite event isolation attempts.
+        
+        TODO: Investigate deeper integration approach or alternative scrolling solution.
+      -->
+      <!-- <OverlayScrollbarsComponent
         class="scrollable-content"
         :options="{
           scrollbars: {
@@ -16,7 +33,7 @@
           }
         }"
         defer
-      >
+      > -->
       <div class="welcome-container">
         <!-- Decorative background elements -->
         <div class="bg-decoration bg-decoration-1"></div>
@@ -112,7 +129,7 @@
           </p>
         </div>
       </div>
-      </OverlayScrollbarsComponent>
+      <!-- </OverlayScrollbarsComponent> -->
     </ion-content>
   </ion-page>
 </template>
