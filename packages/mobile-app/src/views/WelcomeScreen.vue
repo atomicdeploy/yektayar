@@ -89,6 +89,7 @@
             <input 
               type="checkbox" 
               v-model="termsAccepted" 
+              :disabled="isLoading"
               class="checkbox-input"
             />
             <span class="checkbox-custom">
@@ -104,22 +105,37 @@
         <!-- Enhanced CTA Button - Only show after all typewriter effects complete -->
         <ion-button 
           v-if="allTypewritersComplete"
-          :disabled="!termsAccepted"
+          :disabled="!termsAccepted || isLoading"
           expand="block" 
           size="large" 
           class="cta-button"
           :class="{ 
-            'cta-button-disabled': !termsAccepted,
-            'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown
+            'cta-button-disabled': !termsAccepted || isLoading,
+            'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown,
+            'cta-button-loading': isLoading
           }"
           @click="startApp"
         >
           <span class="button-content">
-            <span class="button-icon">✨</span>
-            <span class="button-text">شروع گفتگو</span>
+            <span v-if="isLoading" class="button-spinner">
+              <ion-icon class="spinner-icon"></ion-icon>
+            </span>
+            <template v-else>
+              <span class="button-icon">✨</span>
+              <span class="button-text">شروع گفتگو</span>
+            </template>
           </span>
           <div class="button-shine"></div>
         </ion-button>
+
+        <!-- Error Message -->
+        <div 
+          v-if="errorMessage" 
+          class="error-message"
+        >
+          <ion-icon :icon="alertCircleOutline" class="error-icon"></ion-icon>
+          <span class="error-text">{{ errorMessage }}</span>
+        </div>
 
         <!-- Disclaimer with Icon -->
         <div class="disclaimer-container">
@@ -136,7 +152,7 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
-import { heartOutline, lockClosedOutline, checkmarkOutline } from 'ionicons/icons'
+import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
@@ -156,6 +172,10 @@ const FEATURE_CONFIG = computed(() => configStore.welcomeConfig)
 
 // Terms acceptance state
 const termsAccepted = ref(false)
+
+// Loading and error states
+const isLoading = ref(false)
+const errorMessage = ref<string | null>(null)
 
 // Welcome text height management
 const welcomeTextOuter = ref<HTMLElement | null>(null)
@@ -575,30 +595,58 @@ const showTerms = () => {
 }
 
 const startApp = async () => {
-  if (!termsAccepted.value) {
-    logger.warn('Cannot start app without accepting terms')
+  if (!termsAccepted.value || isLoading.value) {
+    logger.warn('Cannot start app without accepting terms or while loading')
     return
   }
   
+  // Reset error message
+  errorMessage.value = null
+  
+  // Set loading state
+  isLoading.value = true
+  
   logger.info('User started the app from welcome screen')
   
-  // Mark welcome screen as shown in localStorage
-  localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
-  
-  // Also mark on backend if user is authenticated
   try {
+    // Mark welcome screen as shown in localStorage
+    localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
+    
+    // Also mark on backend if user is authenticated
     await apiClient.post('/api/users/preferences', {
       welcomeScreenShown: true,
       termsAccepted: true
     })
     logger.info('Welcome screen preference saved to backend')
-  } catch (error) {
-    // If backend call fails, it's okay - localStorage will handle it
-    logger.warn('Failed to save welcome preference to backend:', error)
+    
+    // Success! Add animation before navigation
+    const welcomeContainer = document.querySelector('.welcome-container')
+    if (welcomeContainer) {
+      welcomeContainer.classList.add('fade-out-exit')
+      
+      // Wait for animation to complete before navigating
+      await new Promise(resolve => setTimeout(resolve, 600))
+    }
+    
+    // Navigate to home
+    router.replace('/tabs/home')
+  } catch (error: any) {
+    logger.error('Failed to save welcome preference to backend:', error)
+    
+    // Set error message based on the error type
+    if (error.response?.status === 401) {
+      errorMessage.value = 'لطفاً ابتدا وارد حساب کاربری خود شوید'
+    } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      errorMessage.value = 'زمان اتصال به سرور به پایان رسید. لطفاً دوباره تلاش کنید'
+    } else if (!navigator.onLine) {
+      errorMessage.value = 'اتصال به اینترنت برقرار نیست. لطفاً اتصال خود را بررسی کنید'
+    } else {
+      errorMessage.value = 'خطایی رخ داد. لطفاً دوباره تلاش کنید'
+    }
+    
+    // Reset loading state
+    isLoading.value = false
   }
-  
-  // TODO: Navigate back to the previous screen (if present) instead of home
-  router.replace('/tabs/home')
 }
 
 const onImageError = () => {
@@ -632,6 +680,12 @@ const onImageError = () => {
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.welcome-container.fade-out-exit {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 
 /* Decorative background elements */
@@ -818,6 +872,11 @@ const onImageError = () => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.terms-checkbox:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .terms-checkbox:hover {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(212, 164, 62, 0.3);
@@ -944,8 +1003,12 @@ const onImageError = () => {
   --background: transparent; /* Fix for the `button-native` inside; otherwise it'll mask the actual cta-button */
 }
 
-.cta-button:not(.cta-button-disabled) {
+.cta-button:not(.cta-button-disabled):not(.cta-button-loading) {
   animation: gradientShift 3s ease-in-out infinite;
+}
+
+.cta-button-loading {
+  cursor: wait;
 }
 
 @keyframes gradientShift {
@@ -1048,6 +1111,58 @@ const onImageError = () => {
 .button-text {
   font-size: 1.3rem;
   /* letter-spacing: -0.3px; */
+}
+
+/* Loading Spinner */
+.button-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-icon {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #01183a;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error Message */
+.error-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  margin-top: 1rem;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.error-icon {
+  font-size: 1.2rem;
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.error-text {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #dc2626;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 500;
+  direction: rtl;
 }
 
 /* Disclaimer styling */
@@ -1245,6 +1360,19 @@ const onImageError = () => {
     /* dark mode CTA background */
     /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
     background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
+  }
+
+  .error-message {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+
+  .error-icon {
+    color: #f87171;
+  }
+
+  .error-text {
+    color: #fca5a5;
   }
 }
 
