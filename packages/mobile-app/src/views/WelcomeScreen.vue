@@ -1,7 +1,8 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="false">
-      <OverlayScrollbarsComponent
+    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
+      <!-- Temporarily disabled OverlayScrollbars to debug animation issue -->
+      <!-- <OverlayScrollbarsComponent
         class="scrollable-content"
         :options="{
           scrollbars: {
@@ -12,7 +13,7 @@
           }
         }"
         defer
-      >
+      > -->
       <div class="welcome-container">
         <!-- Decorative background elements -->
         <div class="bg-decoration bg-decoration-1"></div>
@@ -108,7 +109,7 @@
           </p>
         </div>
       </div>
-      </OverlayScrollbarsComponent>
+      <!-- </OverlayScrollbarsComponent> -->
     </ion-content>
   </ion-page>
 </template>
