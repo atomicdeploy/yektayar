@@ -47,13 +47,13 @@
             <p 
               v-for="(item, index) in typewriters" 
               :key="index"
-              :ref="(el) => { paragraphRefs[index] = el as HTMLElement | null }"
+              :ref="(el: unknown) => { paragraphRefs[index] = el as HTMLElement | null }"
               v-show="index === 0 || typewriters[index - 1].isComplete.value"
               class="welcome-paragraph"
               :class="{ 'highlight-first': index === 0 }"
             >
               <span v-html="item.displayText.value || '&nbsp;'"></span>
-              <span v-if="(item.isTyping.value || containerReady) && item.showCursor.value" class="typewriter-cursor"></span>
+              <span v-if="(item.isTyping.value || FEATURE_CONFIG.alwaysShowCursor) && item.showCursor.value" class="typewriter-cursor"></span>
             </p>
           </div>
         </div>
@@ -239,7 +239,7 @@ const setupParagraphObservers = () => {
         setTimeout(() => tw.start(), 200) // 0.2s delay for first paragraph
       } else {
         // Watch for previous to complete
-        watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+        watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
           if (isComplete && !tw.isTyping.value && !tw.isComplete.value) {
             setTimeout(() => tw.start(), 500)
           }
@@ -251,7 +251,7 @@ const setupParagraphObservers = () => {
   
   // If only first paragraph waits for viewport
   if (config.viewportWaitingMode === 'first') {
-    paragraphRefs.value.forEach((element, index) => {
+    paragraphRefs.value.forEach((element: HTMLElement | null, index: number) => {
       if (!element) return
       
       if (index === 0) {
@@ -269,7 +269,7 @@ const setupParagraphObservers = () => {
         observer.observe(element)
       } else {
         // Rest start when previous completes
-        watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+        watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
           if (isComplete && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
             setTimeout(() => typewriters[index].start(), 500)
           }
@@ -280,7 +280,7 @@ const setupParagraphObservers = () => {
   }
   
   // Default: 'all' mode - each paragraph waits for viewport entry
-  paragraphRefs.value.forEach((element, index) => {
+  paragraphRefs.value.forEach((element: HTMLElement | null, index: number) => {
     if (!element) return
     
     const observer = new IntersectionObserver(
@@ -294,7 +294,7 @@ const setupParagraphObservers = () => {
               startTypewriterWithConditions(index, entry, observer, element)
             } else if (index > 0 && !typewriters[index - 1].isComplete.value) {
               // Wait for previous to complete
-              const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+              const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
                 if (isComplete && entry.isIntersecting) {
                   startTypewriterWithConditions(index, entry, observer, element)
                   unwatch()
@@ -323,7 +323,7 @@ const allTypewritersComplete = computed(() => {
 const handleKeyPress = createKeyboardHandler(typewriters, paragraphs)
 
 // Watch for when CTA button first appears and mark it
-watch(allTypewritersComplete, (isComplete) => {
+watch(allTypewritersComplete, (isComplete: boolean) => {
   if (isComplete && !ctaHasBeenShown.value) {
     // Mark as shown after a short delay to allow animation to play
     setTimeout(() => {
