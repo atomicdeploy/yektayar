@@ -1,6 +1,39 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
+      <!-- 
+        OverlayScrollbars temporarily disabled due to animation replay bug.
+        
+        Issue: OverlayScrollbars causes page animations to replay when CTA/terms appear.
+        Root cause: OverlayScrollbars creates internal DOM structure that triggers layout
+        changes and animation events when content height changes dynamically.
+        
+        Attempted fixes:
+        - Added event.target filtering to ignore child elements
+        - Added containerReady state check to prevent re-triggering
+        - Added OverlayScrollbars element filtering (.os-scrollbar class)
+        - Added explicit overflow configuration
+        
+        Result: Animation replay still occurs despite event isolation attempts.
+        
+        TODO: Investigate deeper integration approach or alternative scrolling solution.
+      -->
+      <!-- <OverlayScrollbarsComponent
+        class="scrollable-content"
+        :options="{
+          scrollbars: {
+            theme: 'os-theme-yektayar-mobile',
+            visibility: 'auto',
+            autoHide: 'scroll',
+            autoHideDelay: 1300
+          },
+          overflow: {
+            x: 'hidden',
+            y: 'scroll'
+          }
+        }"
+        defer
+      > -->
       <div class="welcome-container">
         <!-- Decorative background elements -->
         <div class="bg-decoration bg-decoration-1"></div>
@@ -35,13 +68,13 @@
             <p 
               v-for="(item, index) in typewriters" 
               :key="index"
-              :ref="(el) => { paragraphRefs[index] = el as HTMLElement | null }"
+              :ref="(el: unknown) => { paragraphRefs[index] = el as HTMLElement | null }"
               v-show="index === 0 || typewriters[index - 1].isComplete.value"
               class="welcome-paragraph"
               :class="{ 'highlight-first': index === 0 }"
             >
               <span v-html="item.displayText.value || '&nbsp;'"></span>
-              <span v-if="item.isTyping.value && item.showCursor.value" class="typewriter-cursor"></span>
+              <span v-if="(item.isTyping.value || (index === 0 && !item.isComplete.value && FEATURE_CONFIG.showCursorInitially)) && item.showCursor.value" class="typewriter-cursor"></span>
             </p>
           </div>
         </div>
@@ -82,7 +115,7 @@
           @click="startApp"
         >
           <span class="button-content">
-            <span class="button-icon">✨</span>
+            <span class="button-icon">🚀</span>
             <span class="button-text">شروع گفتگو</span>
           </span>
           <div class="button-shine"></div>
@@ -96,6 +129,7 @@
           </p>
         </div>
       </div>
+      <!-- </OverlayScrollbarsComponent> -->
     </ion-content>
   </ion-page>
 </template>
@@ -181,7 +215,7 @@ const startTypewriterWithConditions = (
   observer: IntersectionObserver,
   element: HTMLElement
 ) => {
-  const delay = index === 0 ? 500 : 500 // 0.5s delay for all paragraphs
+  const delay = index === 0 ? 0 : 500 // 0.2s delay for first paragraph, 0.5s for others
   
   if (canStartTypewriter()) {
     logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
@@ -223,10 +257,10 @@ const setupParagraphObservers = () => {
   if (config.viewportWaitingMode === 'none') {
     typewriters.forEach((tw, index) => {
       if (index === 0) {
-        tw.start()
+        setTimeout(() => tw.start(), 200) // 0.2s delay for first paragraph
       } else {
         // Watch for previous to complete
-        watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+        watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
           if (isComplete && !tw.isTyping.value && !tw.isComplete.value) {
             setTimeout(() => tw.start(), 500)
           }
@@ -238,7 +272,7 @@ const setupParagraphObservers = () => {
   
   // If only first paragraph waits for viewport
   if (config.viewportWaitingMode === 'first') {
-    paragraphRefs.value.forEach((element, index) => {
+    paragraphRefs.value.forEach((element: HTMLElement | null, index: number) => {
       if (!element) return
       
       if (index === 0) {
@@ -256,7 +290,7 @@ const setupParagraphObservers = () => {
         observer.observe(element)
       } else {
         // Rest start when previous completes
-        watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+        watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
           if (isComplete && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
             setTimeout(() => typewriters[index].start(), 500)
           }
@@ -267,7 +301,7 @@ const setupParagraphObservers = () => {
   }
   
   // Default: 'all' mode - each paragraph waits for viewport entry
-  paragraphRefs.value.forEach((element, index) => {
+  paragraphRefs.value.forEach((element: HTMLElement | null, index: number) => {
     if (!element) return
     
     const observer = new IntersectionObserver(
@@ -281,7 +315,7 @@ const setupParagraphObservers = () => {
               startTypewriterWithConditions(index, entry, observer, element)
             } else if (index > 0 && !typewriters[index - 1].isComplete.value) {
               // Wait for previous to complete
-              const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
+              const unwatch = watch(() => typewriters[index - 1].isComplete.value, (isComplete: boolean) => {
                 if (isComplete && entry.isIntersecting) {
                   startTypewriterWithConditions(index, entry, observer, element)
                   unwatch()
@@ -310,7 +344,7 @@ const allTypewritersComplete = computed(() => {
 const handleKeyPress = createKeyboardHandler(typewriters, paragraphs)
 
 // Watch for when CTA button first appears and mark it
-watch(allTypewritersComplete, (isComplete) => {
+watch(allTypewritersComplete, (isComplete: boolean) => {
   if (isComplete && !ctaHasBeenShown.value) {
     // Mark as shown after a short delay to allow animation to play
     setTimeout(() => {
@@ -352,17 +386,31 @@ onMounted(async () => {
     const hasAnimation = style.animationDuration && parseFloat(style.animationDuration) > 0
     
     if (hasTransition || hasAnimation) {
-      // Set up event listeners
-      const handleTransitionEnd = () => {
-        containerReady.value = true
-        logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
-        welcomeContainer.removeEventListener('transitionend', handleTransitionEnd)
+      // Set up event listeners with additional filtering
+      const handleTransitionEnd = (event: TransitionEvent) => {
+        // Only respond to events from the container itself, not children or OverlayScrollbars elements
+        if (event.target === welcomeContainer && !containerReady.value) {
+          // Check that the target is not an OverlayScrollbars internal element
+          const target = event.target as HTMLElement
+          if (!target.classList.contains('os-scrollbar') && !target.closest('.os-scrollbar')) {
+            containerReady.value = true
+            logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
+            welcomeContainer.removeEventListener('transitionend', handleTransitionEnd)
+          }
+        }
       }
       
-      const handleAnimationEnd = () => {
-        containerReady.value = true
-        logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
-        welcomeContainer.removeEventListener('animationend', handleAnimationEnd)
+      const handleAnimationEnd = (event: AnimationEvent) => {
+        // Only respond to events from the container itself, not children or OverlayScrollbars elements
+        if (event.target === welcomeContainer && !containerReady.value) {
+          // Check that the target is not an OverlayScrollbars internal element
+          const target = event.target as HTMLElement
+          if (!target.classList.contains('os-scrollbar') && !target.closest('.os-scrollbar')) {
+            containerReady.value = true
+            logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
+            welcomeContainer.removeEventListener('animationend', handleAnimationEnd)
+          }
+        }
       }
       
       if (hasTransition) {
@@ -559,6 +607,11 @@ const onImageError = () => {
 </script>
 
 <style scoped lang="scss">
+.scrollable-content {
+  height: 100%;
+  width: 100%;
+}
+
 .welcome-content {
   --background: linear-gradient(135deg, 
     #f8f9fa 0%, 
@@ -741,7 +794,7 @@ const onImageError = () => {
 
 /* Terms Acceptance Checkbox styling */
 .terms-container {
-  margin: 2rem 0 0 0; /* Added top margin back for proper spacing */
+  margin: 0; /* 2rem 0 1rem 0; */
 }
 
 .terms-container-slide {
@@ -876,14 +929,14 @@ const onImageError = () => {
   --box-shadow: 
     0 8px 32px rgba(212, 164, 62, 0.3),
     0 4px 16px rgba(1, 24, 58, 0.2);
-  margin: 1.5rem 0 1.5rem 0;
+  margin: 2.5rem 0 1.5rem 0;
   text-transform: none;
   font-size: 1.3rem;
   font-weight: 700;
   position: relative;
   overflow: hidden;
-  /* TODO: can be "success" (green) in light mode, instead of branding's navy seal */
-  background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
+  /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
+  background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
   background-size: 200% 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease-out;
   border-radius: var(--border-radius);
