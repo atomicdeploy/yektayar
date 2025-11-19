@@ -215,7 +215,7 @@ const startTypewriterWithConditions = (
   observer: IntersectionObserver,
   element: HTMLElement
 ) => {
-  const delay = index === 0 ? 200 : 500 // 0.2s delay for first paragraph, 0.5s for others
+  const delay = index === 0 ? 0 : 500 // 0.2s delay for first paragraph, 0.5s for others
   
   if (canStartTypewriter()) {
     logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
@@ -794,7 +794,7 @@ const onImageError = () => {
 
 /* Terms Acceptance Checkbox styling */
 .terms-container {
-  margin: 2rem 0 0 0; /* Added top margin back for proper spacing */
+  margin: 0; /* 2rem 0 1rem 0; */
 }
 
 .terms-container-slide {
@@ -929,14 +929,14 @@ const onImageError = () => {
   --box-shadow: 
     0 8px 32px rgba(212, 164, 62, 0.3),
     0 4px 16px rgba(1, 24, 58, 0.2);
-  margin: 1.5rem 0 1.5rem 0;
+  margin: 2.5rem 0 1.5rem 0;
   text-transform: none;
   font-size: 1.3rem;
   font-weight: 700;
   position: relative;
   overflow: hidden;
-  /* TODO: can be "success" (green) in light mode, instead of branding's navy seal */
-  background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
+  /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
+  background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
   background-size: 200% 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease-out;
   border-radius: var(--border-radius);
