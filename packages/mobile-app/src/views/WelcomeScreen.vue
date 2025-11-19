@@ -194,10 +194,12 @@ const startTypewriterWithConditions = (
   observer: IntersectionObserver,
   element: HTMLElement
 ) => {
-  const delay = index === 0 ? 500 : 500 // 0.5s delay for all paragraphs
+  const delay = index === 0 ? 200 : 500 // 0.2s delay for first paragraph, 0.5s for others
   
   if (canStartTypewriter()) {
     logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter`)
+    // Show cursor immediately before starting
+    typewriters[index].isTyping.value = true
     setTimeout(() => {
       typewriters[index].start()
     }, delay)
@@ -207,6 +209,8 @@ const startTypewriterWithConditions = (
     const unwatchReady = watch([containerReady, initialHeightSet], () => {
       if (canStartTypewriter() && entry.isIntersecting) {
         logger.info(`[WelcomeScreen] Starting paragraph ${index + 1} typewriter (after waiting)`)
+        // Show cursor immediately before starting
+        typewriters[index].isTyping.value = true
         setTimeout(() => {
           typewriters[index].start()
         }, delay)
@@ -236,11 +240,15 @@ const setupParagraphObservers = () => {
   if (config.viewportWaitingMode === 'none') {
     typewriters.forEach((tw, index) => {
       if (index === 0) {
-        tw.start()
+        // Show cursor immediately before starting
+        tw.isTyping.value = true
+        setTimeout(() => tw.start(), 200) // 0.2s delay for first paragraph
       } else {
         // Watch for previous to complete
         watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
           if (isComplete && !tw.isTyping.value && !tw.isComplete.value) {
+            // Show cursor immediately before starting
+            tw.isTyping.value = true
             setTimeout(() => tw.start(), 500)
           }
         }, { immediate: true })
@@ -271,6 +279,8 @@ const setupParagraphObservers = () => {
         // Rest start when previous completes
         watch(() => typewriters[index - 1].isComplete.value, (isComplete) => {
           if (isComplete && !typewriters[index].isTyping.value && !typewriters[index].isComplete.value) {
+            // Show cursor immediately before starting
+            typewriters[index].isTyping.value = true
             setTimeout(() => typewriters[index].start(), 500)
           }
         }, { immediate: true })
