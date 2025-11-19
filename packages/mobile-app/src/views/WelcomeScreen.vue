@@ -1,8 +1,7 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
-      <!-- Temporarily disabled OverlayScrollbars to debug animation issue -->
-      <!-- <OverlayScrollbarsComponent
+    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="false">
+      <OverlayScrollbarsComponent
         class="scrollable-content"
         :options="{
           scrollbars: {
@@ -10,10 +9,14 @@
             visibility: 'auto',
             autoHide: 'scroll',
             autoHideDelay: 1300
+          },
+          overflow: {
+            x: 'hidden',
+            y: 'scroll'
           }
         }"
         defer
-      > -->
+      >
       <div class="welcome-container">
         <!-- Decorative background elements -->
         <div class="bg-decoration bg-decoration-1"></div>
@@ -109,7 +112,7 @@
           </p>
         </div>
       </div>
-      <!-- </OverlayScrollbarsComponent> -->
+      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -366,22 +369,30 @@ onMounted(async () => {
     const hasAnimation = style.animationDuration && parseFloat(style.animationDuration) > 0
     
     if (hasTransition || hasAnimation) {
-      // Set up event listeners
+      // Set up event listeners with additional filtering
       const handleTransitionEnd = (event: TransitionEvent) => {
-        // Only respond to events from the container itself, not children
-        if (event.target === welcomeContainer) {
-          containerReady.value = true
-          logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
-          welcomeContainer.removeEventListener('transitionend', handleTransitionEnd)
+        // Only respond to events from the container itself, not children or OverlayScrollbars elements
+        if (event.target === welcomeContainer && !containerReady.value) {
+          // Check that the target is not an OverlayScrollbars internal element
+          const target = event.target as HTMLElement
+          if (!target.classList.contains('os-scrollbar') && !target.closest('.os-scrollbar')) {
+            containerReady.value = true
+            logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
+            welcomeContainer.removeEventListener('transitionend', handleTransitionEnd)
+          }
         }
       }
       
       const handleAnimationEnd = (event: AnimationEvent) => {
-        // Only respond to events from the container itself, not children
-        if (event.target === welcomeContainer) {
-          containerReady.value = true
-          logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
-          welcomeContainer.removeEventListener('animationend', handleAnimationEnd)
+        // Only respond to events from the container itself, not children or OverlayScrollbars elements
+        if (event.target === welcomeContainer && !containerReady.value) {
+          // Check that the target is not an OverlayScrollbars internal element
+          const target = event.target as HTMLElement
+          if (!target.classList.contains('os-scrollbar') && !target.closest('.os-scrollbar')) {
+            containerReady.value = true
+            logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
+            welcomeContainer.removeEventListener('animationend', handleAnimationEnd)
+          }
         }
       }
       
