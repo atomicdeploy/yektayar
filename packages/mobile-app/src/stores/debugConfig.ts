@@ -26,7 +26,7 @@ export interface WelcomeScreenConfig {
   enableSkipHotkey: boolean
   enableSmoothAnimations: boolean
   skipTypewriter: boolean
-  alwaysShowCursor: boolean
+  showCursorInitially: boolean
 }
 
 // General debug config (can be extended for other pages/features)
@@ -48,7 +48,7 @@ const DEFAULT_WELCOME_CONFIG: WelcomeScreenConfig = {
   enableSkipHotkey: true,
   enableSmoothAnimations: true,
   skipTypewriter: false,
-  alwaysShowCursor: true
+  showCursorInitially: true
 }
 
 const DEFAULT_CONFIG: DebugConfig = {
@@ -249,7 +249,7 @@ if (typeof window !== 'undefined') {
   - enableSkipHotkey: boolean (enable/disable F6/Shift+F6 hotkeys)
   - enableSmoothAnimations: boolean (enable/disable slide animations)
   - skipTypewriter: boolean (permanently skip typewriter effect)
-  - alwaysShowCursor: boolean (show cursor even when not typing)
+  - showCursorInitially: boolean (show cursor before first paragraph typing starts)
 
 %cKeyboard Shortcuts (Welcome Screen):%c
   F6 → Skip current paragraph

@@ -53,7 +53,7 @@
               :class="{ 'highlight-first': index === 0 }"
             >
               <span v-html="item.displayText.value || '&nbsp;'"></span>
-              <span v-if="(item.isTyping.value || FEATURE_CONFIG.alwaysShowCursor) && item.showCursor.value" class="typewriter-cursor"></span>
+              <span v-if="(item.isTyping.value || (index === 0 && !item.isComplete.value && FEATURE_CONFIG.showCursorInitially)) && item.showCursor.value" class="typewriter-cursor"></span>
             </p>
           </div>
         </div>
@@ -366,16 +366,22 @@ onMounted(async () => {
     
     if (hasTransition || hasAnimation) {
       // Set up event listeners
-      const handleTransitionEnd = () => {
-        containerReady.value = true
-        logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
-        welcomeContainer.removeEventListener('transitionend', handleTransitionEnd)
+      const handleTransitionEnd = (event: TransitionEvent) => {
+        // Only respond to events from the container itself, not children
+        if (event.target === welcomeContainer) {
+          containerReady.value = true
+          logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
+          welcomeContainer.removeEventListener('transitionend', handleTransitionEnd)
+        }
       }
       
-      const handleAnimationEnd = () => {
-        containerReady.value = true
-        logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
-        welcomeContainer.removeEventListener('animationend', handleAnimationEnd)
+      const handleAnimationEnd = (event: AnimationEvent) => {
+        // Only respond to events from the container itself, not children
+        if (event.target === welcomeContainer) {
+          containerReady.value = true
+          logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
+          welcomeContainer.removeEventListener('animationend', handleAnimationEnd)
+        }
       }
       
       if (hasTransition) {
