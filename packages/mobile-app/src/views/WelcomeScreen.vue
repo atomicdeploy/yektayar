@@ -115,7 +115,7 @@
           @click="startApp"
         >
           <span class="button-content">
-            <span class="button-icon">🚀</span>
+            <span class="button-icon">✨</span>
             <span class="button-text">شروع گفتگو</span>
           </span>
           <div class="button-shine"></div>
