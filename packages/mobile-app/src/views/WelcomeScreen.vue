@@ -935,6 +935,7 @@ const onImageError = () => {
   font-weight: 700;
   position: relative;
   overflow: hidden;
+  /* light mode CTA background */
   /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
   background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
   background-size: 200% 100%;
@@ -1241,7 +1242,9 @@ const onImageError = () => {
   }
 
   .cta-button:not(.cta-button-disabled) {
-    background: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%);
+    /* dark mode CTA background */
+    /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
+    background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
   }
 }
 
