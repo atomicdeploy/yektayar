@@ -153,7 +153,8 @@
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
 import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline } from 'ionicons/icons'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
@@ -163,9 +164,14 @@ import { useDebugConfigStore } from '@/stores/debugConfig'
 import { createKeyboardHandler } from './WelcomeScreen.utils'
 
 const router = useRouter()
+const route = useRoute()
+const { t } = useI18n()
 const configStore = useDebugConfigStore()
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
+
+// Get intended destination from query params or default to home
+const intendedDestination = ref<string>((route.query.redirect as string) || '/tabs/home')
 
 // Get feature config from Pinia store
 const FEATURE_CONFIG = computed(() => configStore.welcomeConfig)
@@ -628,20 +634,23 @@ const startApp = async () => {
       await new Promise(resolve => setTimeout(resolve, 600))
     }
     
-    // Navigate to home
-    router.replace('/tabs/home')
+    // TODO: Navigate back to the previous screen (if present) instead of home
+    // Navigate to intended destination (from query param or default to home)
+    router.replace(intendedDestination.value)
   } catch (error: any) {
     logger.error('Failed to save welcome preference to backend:', error)
     
-    // Set error message based on the error type
+    // Set error message based on the error type using i18n
     if (error.response?.status === 401) {
-      errorMessage.value = 'لطفاً ابتدا وارد حساب کاربری خود شوید'
+      errorMessage.value = t('welcome_screen.auth_required')
+    } else if (error.response?.status >= 500) {
+      errorMessage.value = t('welcome_screen.server_error')
     } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-      errorMessage.value = 'زمان اتصال به سرور به پایان رسید. لطفاً دوباره تلاش کنید'
+      errorMessage.value = t('welcome_screen.request_timeout')
     } else if (!navigator.onLine) {
-      errorMessage.value = 'اتصال به اینترنت برقرار نیست. لطفاً اتصال خود را بررسی کنید'
+      errorMessage.value = t('welcome_screen.network_offline')
     } else {
-      errorMessage.value = 'خطایی رخ داد. لطفاً دوباره تلاش کنید'
+      errorMessage.value = t('welcome_screen.generic_error')
     }
     
     // Reset loading state
@@ -1135,34 +1144,65 @@ const onImageError = () => {
   }
 }
 
-/* Error Message */
+/* Error Message - Elegant and Professional Design */
 .error-message {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: rgba(239, 68, 68, 0.1);
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.12) 100%);
   padding: 1rem 1.25rem;
   border-radius: 16px;
   margin-top: 1rem;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  animation: fadeInUp 0.3s ease-out;
+  border: 1.5px solid rgba(239, 68, 68, 0.25);
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 4px 12px rgba(239, 68, 68, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.05);
+  animation: errorSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.error-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  border-radius: 16px 0 0 16px;
+}
+
+@keyframes errorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .error-icon {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: #dc2626;
   flex-shrink: 0;
+  margin-top: 0.1rem;
+  filter: drop-shadow(0 1px 2px rgba(220, 38, 38, 0.3));
 }
 
 .error-text {
-  text-align: center;
+  text-align: right;
   font-size: 0.95rem;
-  color: #dc2626;
+  color: #991b1b;
   line-height: 1.6;
   margin: 0;
-  font-weight: 500;
+  font-weight: 600;
   direction: rtl;
+  flex: 1;
+  letter-spacing: -0.01em;
 }
 
 /* Disclaimer styling */
@@ -1363,8 +1403,15 @@ const onImageError = () => {
   }
 
   .error-message {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.2) 100%);
+    border-color: rgba(239, 68, 68, 0.35);
+    box-shadow: 
+      0 4px 16px rgba(239, 68, 68, 0.2),
+      0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .error-message::before {
+    background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
   }
 
   .error-icon {

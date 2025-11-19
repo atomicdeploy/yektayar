@@ -91,6 +91,13 @@ const i18n = createI18n({
         unknown_step_1: 'کنسول مرورگر را برای پیام‌های خطای دقیق بررسی کنید',
         unknown_step_2: 'بررسی کنید که همه متغیرهای محیطی به درستی پیکربندی شده‌اند',
         unknown_step_3: 'سعی کنید هم سرور فرانت‌اند و هم بک‌اند را مجدداً راه‌اندازی کنید',
+      },
+      welcome_screen: {
+        auth_required: 'لطفاً ابتدا وارد حساب کاربری خود شوید',
+        request_timeout: 'زمان درخواست به پایان رسید. لطفاً دوباره تلاش کنید',
+        network_offline: 'اتصال به اینترنت برقرار نیست. لطفاً اتصال خود را بررسی کنید',
+        generic_error: 'خطایی رخ داد. لطفاً دوباره تلاش کنید',
+        server_error: 'مشکلی در سرور پیش آمده است. لطفاً بعداً تلاش کنید'
       }
     },
     en: {
@@ -136,6 +143,13 @@ const i18n = createI18n({
         unknown_step_1: 'Check the browser console for detailed error messages',
         unknown_step_2: 'Verify all environment variables are correctly configured',
         unknown_step_3: 'Try restarting both the frontend and backend servers',
+      },
+      welcome_screen: {
+        auth_required: 'Please log in first',
+        request_timeout: 'Request timed out. Please try again',
+        network_offline: 'No internet connection. Please check your connection',
+        generic_error: 'An error occurred. Please try again',
+        server_error: 'Server error occurred. Please try again later'
       }
     }
   }
