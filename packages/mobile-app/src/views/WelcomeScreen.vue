@@ -49,7 +49,10 @@
         </div>
 
         <!-- Hero Image with Lazy Loading (above text) -->
-        <div class="hero-image-container">
+        <div 
+          class="hero-image-container"
+          :class="{ 'slide-away': isLoading }"
+        >
           <LazyImage
             src="/welcome-hero.jpg"
             :srcset="`/welcome-hero.jpg 1x, /welcome-hero@2x.jpg 2x, /welcome-hero@3x.jpg 3x`"
@@ -63,7 +66,12 @@
         </div>
 
         <!-- Welcome Text Content with Card Style -->
-        <div ref="welcomeTextOuter" class="welcome-text" :style="{ height: welcomeTextHeight }">
+        <div 
+          ref="welcomeTextOuter" 
+          class="welcome-text" 
+          :class="{ 'slide-away': isLoading }"
+          :style="{ height: welcomeTextHeight }"
+        >
           <div ref="welcomeTextInner" class="welcome-text-inner">
             <p 
               v-for="(item, index) in typewriters" 
@@ -785,6 +793,13 @@ const onImageError = () => {
   position: relative;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   min-height: 280px;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-image-container.slide-away {
+  opacity: 0;
+  transform: translateX(-50px) scale(0.95);
+  filter: blur(8px);
 }
 
 .hero-image-container :deep(.lazy-image) {
@@ -822,8 +837,14 @@ const onImageError = () => {
   border: 1px solid rgba(212, 164, 62, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.8s ease-out 0.5s both;
-  transition: height 0.3s ease-out;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s ease-out;
   overflow: hidden;
+}
+
+.welcome-text.slide-away {
+  opacity: 0;
+  transform: translateX(50px) scale(0.95);
+  filter: blur(8px);
 }
 
 .welcome-text-inner {
@@ -1016,8 +1037,34 @@ const onImageError = () => {
   animation: gradientShift 3s ease-in-out infinite;
 }
 
+/* Elegant Loading State - Overrides disabled styles */
 .cta-button-loading {
-  cursor: wait;
+  cursor: wait !important;
+  opacity: 1 !important;
+  background-image: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #4facfe 75%,
+    #667eea 100%
+  ) !important;
+  background-size: 300% 100% !important;
+  animation: loadingGradient 2s ease-in-out infinite !important;
+  --box-shadow: 
+    0 12px 40px rgba(102, 126, 234, 0.4),
+    0 6px 20px rgba(118, 75, 162, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  transform: scale(1.02);
+}
+
+@keyframes loadingGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @keyframes gradientShift {
@@ -1110,6 +1157,12 @@ const onImageError = () => {
   pointer-events: none;
   color: #01183a;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease;
+}
+
+.cta-button-loading .button-content {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .button-icon {
@@ -1122,7 +1175,7 @@ const onImageError = () => {
   /* letter-spacing: -0.3px; */
 }
 
-/* Loading Spinner */
+/* Loading Spinner - Enhanced for elegant loading state */
 .button-spinner {
   display: flex;
   align-items: center;
@@ -1130,12 +1183,16 @@ const onImageError = () => {
 }
 
 .spinner-icon {
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #01183a;
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #ffffff;
+  border-right-color: rgba(255, 255, 255, 0.8);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  box-shadow: 
+    0 0 15px rgba(255, 255, 255, 0.5),
+    inset 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 @keyframes spin {
