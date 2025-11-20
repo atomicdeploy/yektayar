@@ -145,6 +145,23 @@
           <span class="error-text">{{ errorMessage }}</span>
         </div>
 
+        <!-- Scroll Reminder -->
+        <transition name="scroll-reminder-fade">
+          <div 
+            v-if="showScrollReminder"
+            class="scroll-reminder"
+            @click="scrollToBottom"
+          >
+            <div class="scroll-reminder-content">
+              <div class="scroll-reminder-icon">
+                <ion-icon :icon="chevronDownOutline" class="scroll-icon"></ion-icon>
+              </div>
+              <p class="scroll-reminder-text">برای مشاهده بیشتر به پایین بروید</p>
+            </div>
+            <div class="scroll-reminder-mask"></div>
+          </div>
+        </transition>
+
         <!-- Disclaimer with Icon -->
         <div class="disclaimer-container">
           <ion-icon :icon="lockClosedOutline" class="disclaimer-icon"></ion-icon>
@@ -160,7 +177,7 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
-import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline } from 'ionicons/icons'
+import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { logger } from '@yektayar/shared'
@@ -190,6 +207,12 @@ const termsAccepted = ref(false)
 // Loading and error states
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
+
+// Scroll reminder state
+const showScrollReminder = ref(false)
+const userHasScrolled = ref(false)
+let scrollReminderTimeout: ReturnType<typeof setTimeout> | null = null
+let activityTimeout: ReturnType<typeof setTimeout> | null = null
 
 // Welcome text height management
 const welcomeTextOuter = ref<HTMLElement | null>(null)
@@ -473,6 +496,15 @@ onMounted(async () => {
   // Set up observers
   setupParagraphObservers()
   
+  // Set up scroll and activity listeners for scroll reminder
+  await nextTick()
+  const content = document.querySelector('ion-content')
+  if (content) {
+    content.addEventListener('ionScroll', handleScroll)
+  }
+  window.addEventListener('click', handleUserActivity)
+  window.addEventListener('touchstart', handleUserActivity)
+  
   // Set up ResizeObserver to watch inner container height (only if feature enabled)
   if (FEATURE_CONFIG.value.enableDynamicHeight && welcomeTextInner.value) {
     // Get line height from computed style
@@ -596,9 +628,73 @@ onMounted(async () => {
   }
 })
 
-// Cleanup keyboard shortcuts on unmount
+// Scroll reminder logic
+const handleScroll = () => {
+  if (!userHasScrolled.value) {
+    userHasScrolled.value = true
+    hideScrollReminder()
+  }
+}
+
+const handleUserActivity = () => {
+  // Reset activity timeout on any user interaction
+  if (activityTimeout) {
+    clearTimeout(activityTimeout)
+  }
+  
+  // If scroll reminder is showing and user clicks/types, hide it
+  if (showScrollReminder.value) {
+    hideScrollReminder()
+  }
+}
+
+const hideScrollReminder = () => {
+  showScrollReminder.value = false
+  if (scrollReminderTimeout) {
+    clearTimeout(scrollReminderTimeout)
+    scrollReminderTimeout = null
+  }
+  if (activityTimeout) {
+    clearTimeout(activityTimeout)
+    activityTimeout = null
+  }
+}
+
+const scrollToBottom = () => {
+  const content = document.querySelector('ion-content')
+  if (content) {
+    content.scrollToBottom(500)
+  }
+  hideScrollReminder()
+}
+
+// Watch for first paragraph completion to show scroll reminder
+watch(() => typewriters[0].isComplete.value, (isComplete) => {
+  if (isComplete && !userHasScrolled.value && !showScrollReminder.value) {
+    // Wait 3 seconds of inactivity before showing reminder
+    activityTimeout = setTimeout(() => {
+      // Check if user still hasn't scrolled
+      if (!userHasScrolled.value) {
+        showScrollReminder.value = true
+        logger.info('[WelcomeScreen] Showing scroll reminder')
+      }
+    }, 3000)
+  }
+})
+
+// Cleanup keyboard shortcuts and scroll reminder on unmount
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyPress)
+  hideScrollReminder()
+  
+  // Remove scroll and activity listeners
+  const content = document.querySelector('ion-content')
+  if (content) {
+    content.removeEventListener('ionScroll', handleScroll)
+  }
+  window.removeEventListener('click', handleUserActivity)
+  window.removeEventListener('keydown', handleUserActivity)
+  window.removeEventListener('touchstart', handleUserActivity)
 })
 
 const showTerms = () => {
@@ -1262,6 +1358,124 @@ const onImageError = () => {
   letter-spacing: -0.01em;
 }
 
+/* Scroll Reminder - Elegant and Professional */
+.scroll-reminder {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.scroll-reminder-content {
+  position: relative;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  gap: 0.75rem;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.scroll-reminder-content:hover {
+  transform: translateY(-4px);
+}
+
+.scroll-reminder-content:active {
+  transform: translateY(-2px);
+}
+
+.scroll-reminder-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d4a43e 0%, #e8c170 100%);
+  border-radius: 50%;
+  box-shadow: 
+    0 4px 16px rgba(212, 164, 62, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: bounceDown 2s ease-in-out infinite;
+}
+
+.scroll-icon {
+  font-size: 28px;
+  color: #01183a;
+  animation: arrowBounce 1.5s ease-in-out infinite;
+}
+
+.scroll-reminder-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #01183a;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+  direction: rtl;
+}
+
+.scroll-reminder-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 255, 255, 0.7) 40%,
+    rgba(255, 255, 255, 0.9) 70%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Scroll reminder animation */
+@keyframes bounceDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes arrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* Scroll reminder transitions */
+.scroll-reminder-fade-enter-active {
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.scroll-reminder-fade-leave-active {
+  transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+}
+
+.scroll-reminder-fade-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scroll-reminder-fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
 /* Disclaimer styling */
 .disclaimer-container {
   display: flex;
@@ -1478,6 +1692,22 @@ const onImageError = () => {
   .error-text {
     color: #fca5a5;
   }
+
+  .scroll-reminder-text {
+    color: #e9ecef;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+
+  .scroll-reminder-mask {
+    background: linear-gradient(
+      to bottom,
+      rgba(15, 20, 25, 0) 0%,
+      rgba(15, 20, 25, 0.4) 20%,
+      rgba(15, 20, 25, 0.7) 40%,
+      rgba(15, 20, 25, 0.9) 70%,
+      rgba(15, 20, 25, 1) 100%
+    );
+  }
 }
 
 /* Responsive adjustments */
@@ -1526,6 +1756,23 @@ const onImageError = () => {
 
   .checkbox-icon {
     font-size: 18px;
+  }
+
+  .scroll-reminder-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .scroll-icon {
+    font-size: 24px;
+  }
+
+  .scroll-reminder-text {
+    font-size: 0.85rem;
+  }
+
+  .scroll-reminder-mask {
+    height: 180px;
   }
 }
 
