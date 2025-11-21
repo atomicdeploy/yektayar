@@ -147,6 +147,7 @@
 
         <!-- Error Message -->
         <div 
+          ref="errorMessageRef"
           v-if="errorMessage" 
           class="error-message"
         >
@@ -234,6 +235,7 @@ const termsContainerRef = ref<HTMLElement | null>(null)
 const heroContainerRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
 const disclaimerRef = ref<HTMLElement | null>(null)
+const errorMessageRef = ref<HTMLElement | null>(null)
 
 // Scroll reminder state
 const showScrollReminder = ref(false)
@@ -847,34 +849,32 @@ const startApp = async () => {
   // Reset error message
   errorMessage.value = null
   
-  // Set loading state
+  // Set loading state (show loading spinner on button)
   isLoading.value = true
   
   logger.info('User started the app from welcome screen')
   
   try {
-    // Execute sequential exit animations
-    await exitElementsSequentially()
-    
     // Mark welcome screen as shown in localStorage
     localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
     
-    // Also mark on backend if user is authenticated
+    // Make API request while showing loading state
     await apiClient.post('/api/users/preferences', {
       welcomeScreenShown: true,
       termsAccepted: true
     })
     logger.info('Welcome screen preference saved to backend')
     
-    // Success! Navigate to intended destination
+    // Success! Now trigger exit animations
+    await exitElementsSequentially()
+    
+    // Navigate to intended destination after animations complete
     // Supports dynamic routing via ?redirect=/intended/path query parameter
     router.replace(intendedDestination.value)
   } catch (error: any) {
     logger.error('Failed to save welcome preference to backend:', error)
     
-    // Restore elements by removing all exit states
-    resetExitStates()
-    
+    // Don't trigger exit animations on error - keep elements visible
     // Set error message based on the error type using i18n
     if (error.response?.status === 401) {
       errorMessage.value = t('welcome_screen.auth_required')
@@ -890,6 +890,12 @@ const startApp = async () => {
     
     // Reset loading state
     isLoading.value = false
+    
+    // Scroll error message into view
+    await nextTick()
+    if (errorMessageRef.value) {
+      errorMessageRef.value.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
   }
 }
 
@@ -1548,7 +1554,8 @@ const onImageError = () => {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.12) 100%);
   padding: 1rem 1.25rem;
   border-radius: 16px;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
   border: 1.5px solid rgba(239, 68, 68, 0.25);
   backdrop-filter: blur(10px);
   box-shadow: 
