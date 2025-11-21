@@ -814,12 +814,12 @@ const startApp = async () => {
     // Start exit animation sequence before API call
     isExiting.value = true
     
-    // Wait for exit animations to complete (staggered)
-    // CTA and terms disappear first (0.4s)
-    // Then text (0.4s after 0.15s delay = 0.55s)
-    // Then hero image (0.4s after 0.15s delay = 0.7s)
-    // Then header (0.4s after 0.15s delay = 0.85s)
-    // Total: ~0.85s
+    // Wait for exit animations to complete (staggered):
+    // - CTA and terms: 0s delay + 0.4s duration = 0.4s
+    // - Welcome text: 0.15s delay + 0.4s duration = 0.55s
+    // - Hero image: 0.3s delay + 0.4s duration = 0.7s
+    // - Header: 0.45s delay + 0.4s duration = 0.85s total
+    // We wait 0.9s to ensure all animations complete with a small buffer
     await new Promise(resolve => setTimeout(resolve, 900))
     
     // Mark welcome screen as shown in localStorage
@@ -1098,6 +1098,13 @@ const onImageError = () => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* 
+  Note: :has() pseudo-class is supported in modern browsers:
+  - Safari 15.4+ (March 2022)
+  - Chrome 105+ (August 2022)
+  - Firefox 121+ (December 2023)
+  Ionic/Capacitor apps typically use modern WebView engines that support this.
+*/
 .terms-checkbox:has(input:disabled) {
   opacity: 0.6;
   cursor: not-allowed;
