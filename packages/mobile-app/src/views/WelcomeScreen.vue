@@ -42,7 +42,7 @@
         <div class="bg-decoration bg-decoration-2"></div>
         
         <!-- Header with Title and Logo -->
-        <div class="welcome-header">
+        <div class="welcome-header" :class="{ 'exit-header': isExiting }">
           <div class="logo-accent">
             <ion-icon :icon="heartOutline" class="heart-icon"></ion-icon>
           </div>
@@ -53,7 +53,7 @@
         <!-- Hero Image with Lazy Loading (above text) -->
         <div 
           class="hero-image-container"
-          :class="{ 'slide-away': isLoading }"
+          :class="{ 'exit-hero': isExiting }"
         >
           <LazyImage
             src="/welcome-hero.jpg"
@@ -71,7 +71,7 @@
         <div 
           ref="welcomeTextOuter" 
           class="welcome-text" 
-          :class="{ 'slide-away': isLoading }"
+          :class="{ 'exit-text': isExiting }"
           :style="{ height: welcomeTextHeight }"
         >
           <div ref="welcomeTextInner" class="welcome-text-inner">
@@ -92,7 +92,10 @@
         <!-- Terms Acceptance Checkbox -->
         <div 
           class="terms-container" 
-          :class="{ 'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations }"
+          :class="{ 
+            'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations,
+            'exit-terms': isExiting 
+          }"
           v-if="allTypewritersComplete"
         >
           <label class="terms-checkbox">
@@ -122,7 +125,8 @@
           :class="{ 
             'cta-button-disabled': !termsAccepted || isLoading,
             'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown,
-            'cta-button-loading': isLoading
+            'cta-button-loading': isLoading,
+            'exit-cta': isExiting
           }"
           @click="startApp"
         >
@@ -209,6 +213,9 @@ const termsAccepted = ref(false)
 // Loading and error states
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
+
+// Exit animation state
+const isExiting = ref(false)
 
 // Scroll reminder state
 const showScrollReminder = ref(false)
@@ -804,6 +811,17 @@ const startApp = async () => {
   logger.info('User started the app from welcome screen')
   
   try {
+    // Start exit animation sequence before API call
+    isExiting.value = true
+    
+    // Wait for exit animations to complete (staggered)
+    // CTA and terms disappear first (0.4s)
+    // Then text (0.4s after 0.15s delay = 0.55s)
+    // Then hero image (0.4s after 0.15s delay = 0.7s)
+    // Then header (0.4s after 0.15s delay = 0.85s)
+    // Total: ~0.85s
+    await new Promise(resolve => setTimeout(resolve, 900))
+    
     // Mark welcome screen as shown in localStorage
     localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
     
@@ -814,20 +832,14 @@ const startApp = async () => {
     })
     logger.info('Welcome screen preference saved to backend')
     
-    // Success! Add animation before navigation
-    const welcomeContainer = document.querySelector('.welcome-container')
-    if (welcomeContainer) {
-      welcomeContainer.classList.add('fade-out-exit')
-      
-      // Wait for animation to complete before navigating
-      await new Promise(resolve => setTimeout(resolve, 600))
-    }
-    
-    // Navigate to intended destination (from query param or default to home)
+    // Success! Navigate to intended destination
     // Supports dynamic routing via ?redirect=/intended/path query parameter
     router.replace(intendedDestination.value)
   } catch (error: any) {
     logger.error('Failed to save welcome preference to backend:', error)
+    
+    // Restore elements by removing exit state
+    isExiting.value = false
     
     // Set error message based on the error type using i18n
     if (error.response?.status === 401) {
@@ -878,12 +890,6 @@ const onImageError = () => {
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-
-.welcome-container.fade-out-exit {
-  opacity: 0;
-  transform: translateY(-20px);
 }
 
 /* Decorative background elements */
@@ -918,6 +924,12 @@ const onImageError = () => {
   text-align: center;
   margin-bottom: 2rem;
   position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.welcome-header.exit-header {
+  animation: fadeOutUp 0.4s ease-in forwards;
+  animation-delay: 0.45s;
 }
 
 .logo-accent {
@@ -977,10 +989,9 @@ const onImageError = () => {
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.hero-image-container.slide-away {
-  opacity: 0;
-  transform: translateX(-50px) scale(0.95);
-  filter: blur(8px);
+.hero-image-container.exit-hero {
+  animation: fadeOutUp 0.4s ease-in forwards;
+  animation-delay: 0.3s;
 }
 
 .hero-image-container :deep(.lazy-image) {
@@ -1022,10 +1033,9 @@ const onImageError = () => {
   overflow: hidden;
 }
 
-.welcome-text.slide-away {
-  opacity: 0;
-  transform: translateX(50px) scale(0.95);
-  filter: blur(8px);
+.welcome-text.exit-text {
+  animation: fadeOutUp 0.4s ease-in forwards;
+  animation-delay: 0.15s;
 }
 
 .welcome-text-inner {
@@ -1060,6 +1070,11 @@ const onImageError = () => {
 /* Terms Acceptance Checkbox styling */
 .terms-container {
   margin: 0; /* 2rem 0 1rem 0; */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.terms-container.exit-terms {
+  animation: fadeOutDown 0.4s ease-in forwards;
 }
 
 .terms-container-slide {
@@ -1088,7 +1103,7 @@ const onImageError = () => {
   cursor: not-allowed;
 }
 
-.terms-checkbox:hover {
+.terms-checkbox:not(:has(input:disabled)):hover {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(212, 164, 62, 0.3);
   /* transform: translateY(-2px); */
@@ -1212,6 +1227,10 @@ const onImageError = () => {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease-out;
   border-radius: var(--border-radius);
   --background: transparent; /* Fix for the `button-native` inside; otherwise it'll mask the actual cta-button */
+}
+
+.cta-button.exit-cta {
+  animation: fadeOutDown 0.4s ease-in forwards;
 }
 
 .cta-button:not(.cta-button-disabled):not(.cta-button-loading) {
@@ -1671,6 +1690,29 @@ const onImageError = () => {
   }
 }
 
+/* Exit animations - Reverse of entry animations */
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .welcome-content {
@@ -1738,7 +1780,7 @@ const onImageError = () => {
     border-color: transparent;
   }
 
-  .terms-checkbox:hover {
+  .terms-checkbox:not(:has(input:disabled)):hover {
     background: rgba(26, 31, 46, 0.8);
     border-color: rgba(212, 164, 62, 0.3);
   }
