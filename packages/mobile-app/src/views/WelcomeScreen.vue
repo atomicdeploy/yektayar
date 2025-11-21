@@ -16,6 +16,8 @@
         
         Result: Animation replay still occurs despite event isolation attempts.
         
+        Note: Native scroll handlers now implemented for scroll reminder (ionScroll, wheel, scroll events).
+        
         TODO: Investigate deeper integration approach or alternative scrolling solution.
       -->
       <!-- <OverlayScrollbarsComponent
