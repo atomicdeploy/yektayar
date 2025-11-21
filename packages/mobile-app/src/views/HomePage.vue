@@ -36,6 +36,7 @@
         <div class="hero-content">
           <div class="logo-container">
             <div class="logo-circle">
+              <!-- <ion-icon name="yektayar" :icon="yektayar" class="yektayar-icon"></ion-icon> -->
               <img src="/logo-simple.svg" alt="YektaYar Logo" class="hero-icon" />
             </div>
           </div>
