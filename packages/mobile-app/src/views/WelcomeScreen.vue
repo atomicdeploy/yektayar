@@ -42,7 +42,7 @@
         <div class="bg-decoration bg-decoration-2"></div>
         
         <!-- Header with Title and Logo -->
-        <div class="welcome-header" :class="{ 'exit-header': isExiting }">
+        <div ref="headerRef" class="welcome-header" :class="{ 'exit-header': exitStates.header }">
           <div class="logo-accent">
             <ion-icon :icon="heartOutline" class="heart-icon"></ion-icon>
           </div>
@@ -52,8 +52,9 @@
 
         <!-- Hero Image with Lazy Loading (above text) -->
         <div 
+          ref="heroContainerRef"
           class="hero-image-container"
-          :class="{ 'exit-hero': isExiting }"
+          :class="{ 'exit-hero': exitStates.hero }"
         >
           <LazyImage
             src="/welcome-hero.jpg"
@@ -71,7 +72,7 @@
         <div 
           ref="welcomeTextOuter" 
           class="welcome-text" 
-          :class="{ 'exit-text': isExiting }"
+          :class="{ 'exit-text': exitStates.text }"
           :style="{ height: welcomeTextHeight }"
         >
           <div ref="welcomeTextInner" class="welcome-text-inner">
@@ -91,10 +92,11 @@
 
         <!-- Terms Acceptance Checkbox -->
         <div 
+          ref="termsContainerRef"
           class="terms-container" 
           :class="{ 
             'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations,
-            'exit-terms': isExiting 
+            'exit-terms': exitStates.terms 
           }"
           v-if="allTypewritersComplete"
         >
@@ -117,6 +119,7 @@
 
         <!-- Enhanced CTA Button - Only show after all typewriter effects complete -->
         <ion-button 
+          ref="ctaButtonRef"
           v-if="allTypewritersComplete"
           :disabled="!termsAccepted || isLoading"
           expand="block" 
@@ -126,7 +129,7 @@
             'cta-button-disabled': !termsAccepted || isLoading,
             'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown,
             'cta-button-loading': isLoading,
-            'exit-cta': isExiting
+            'exit-cta': exitStates.cta
           }"
           @click="startApp"
         >
@@ -169,7 +172,7 @@
         </transition>
 
         <!-- Disclaimer with Icon -->
-        <div class="disclaimer-container">
+        <div ref="disclaimerRef" class="disclaimer-container" :class="{ 'exit-disclaimer': exitStates.disclaimer }">
           <ion-icon :icon="lockClosedOutline" class="disclaimer-icon"></ion-icon>
           <p class="disclaimer-text">
             اطلاعات شما محرمانه است، و تنها برای کمک به شما استفاده می‌شود.
@@ -214,8 +217,23 @@ const termsAccepted = ref(false)
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 
-// Exit animation state
-const isExiting = ref(false)
+// Exit animation state - removed simple boolean approach
+// Individual element exit states for event-based control
+const exitStates = ref({
+  cta: false,
+  terms: false,
+  text: false,
+  hero: false,
+  header: false,
+  disclaimer: false
+})
+
+// Refs for elements that need to exit
+const ctaButtonRef = ref<HTMLElement | null>(null)
+const termsContainerRef = ref<HTMLElement | null>(null)
+const heroContainerRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
+const disclaimerRef = ref<HTMLElement | null>(null)
 
 // Scroll reminder state
 const showScrollReminder = ref(false)
@@ -811,16 +829,8 @@ const startApp = async () => {
   logger.info('User started the app from welcome screen')
   
   try {
-    // Start exit animation sequence before API call
-    isExiting.value = true
-    
-    // Wait for exit animations to complete (staggered):
-    // - CTA and terms: 0s delay + 0.4s duration = 0.4s
-    // - Welcome text: 0.15s delay + 0.4s duration = 0.55s
-    // - Hero image: 0.3s delay + 0.4s duration = 0.7s
-    // - Header: 0.45s delay + 0.4s duration = 0.85s total
-    // We wait 0.9s to ensure all animations complete with a small buffer
-    await new Promise(resolve => setTimeout(resolve, 900))
+    // Execute sequential exit animations
+    await exitElementsSequentially()
     
     // Mark welcome screen as shown in localStorage
     localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
@@ -838,8 +848,8 @@ const startApp = async () => {
   } catch (error: any) {
     logger.error('Failed to save welcome preference to backend:', error)
     
-    // Restore elements by removing exit state
-    isExiting.value = false
+    // Restore elements by removing all exit states
+    resetExitStates()
     
     // Set error message based on the error type using i18n
     if (error.response?.status === 401) {
@@ -857,6 +867,70 @@ const startApp = async () => {
     // Reset loading state
     isLoading.value = false
   }
+}
+
+// Helper to reset all exit states
+const resetExitStates = () => {
+  exitStates.value = {
+    cta: false,
+    terms: false,
+    text: false,
+    hero: false,
+    header: false,
+    disclaimer: false
+  }
+}
+
+// Sequential exit animation with proper height calculation
+const exitElementsSequentially = async () => {
+  // Helper function to animate a single element
+  const animateElementExit = (element: HTMLElement | null, stateName: keyof typeof exitStates.value): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!element) {
+        resolve()
+        return
+      }
+      
+      // Calculate and set current height before collapsing
+      const currentHeight = element.offsetHeight
+      element.style.maxHeight = `${currentHeight}px`
+      
+      // Force reflow to ensure maxHeight is applied
+      element.offsetHeight
+      
+      // Wait a frame, then apply exit class
+      requestAnimationFrame(() => {
+        exitStates.value[stateName] = true
+        
+        // Wait for animation to complete (400ms animation + small buffer)
+        setTimeout(() => {
+          resolve()
+        }, 450)
+      })
+    })
+  }
+  
+  // Exit elements in sequence (bottom to top, reverse of entry)
+  // 1. CTA button (0s delay)
+  await animateElementExit(ctaButtonRef.value?.$el || ctaButtonRef.value, 'cta')
+  
+  // 2. Terms checkbox (immediately after CTA)
+  await animateElementExit(termsContainerRef.value, 'terms')
+  
+  // 3. Welcome text (0.15s after terms)
+  await new Promise(resolve => setTimeout(resolve, 150))
+  await animateElementExit(welcomeTextOuter.value, 'text')
+  
+  // 4. Hero image (0.15s after text)
+  await new Promise(resolve => setTimeout(resolve, 150))
+  await animateElementExit(heroContainerRef.value, 'hero')
+  
+  // 5. Header (0.15s after hero)
+  await new Promise(resolve => setTimeout(resolve, 150))
+  await animateElementExit(headerRef.value, 'header')
+  
+  // 6. Disclaimer (immediately after header)
+  await animateElementExit(disclaimerRef.value, 'disclaimer')
 }
 
 const onImageError = () => {
@@ -929,12 +1003,10 @@ const onImageError = () => {
 
 .welcome-header.exit-header {
   animation: fadeOutUp 0.4s ease-in forwards;
-  animation-delay: 0.45s;
   pointer-events: none;
   margin-bottom: 0 !important;
   overflow: hidden;
-  transition: max-height 0.4s ease-in 0.45s, margin-bottom 0.4s ease-in 0.45s;
-  max-height: 0;
+  transition: max-height 0.4s ease-in, margin-bottom 0.4s ease-in;
 }
 
 .logo-accent {
@@ -996,13 +1068,11 @@ const onImageError = () => {
 
 .hero-image-container.exit-hero {
   animation: fadeOutUp 0.4s ease-in forwards;
-  animation-delay: 0.3s;
   pointer-events: none;
-  transition: max-height 0.4s ease-in 0.3s, margin 0.4s ease-in 0.3s, min-height 0.4s ease-in 0.3s;
+  transition: max-height 0.4s ease-in, margin 0.4s ease-in, min-height 0.4s ease-in;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   min-height: 0 !important;
-  max-height: 0;
   overflow: hidden;
 }
 
@@ -1047,12 +1117,10 @@ const onImageError = () => {
 
 .welcome-text.exit-text {
   animation: fadeOutUp 0.4s ease-in forwards;
-  animation-delay: 0.15s;
   pointer-events: none;
-  transition: max-height 0.4s ease-in 0.15s, margin-bottom 0.4s ease-in 0.15s, padding 0.4s ease-in 0.15s;
+  transition: max-height 0.4s ease-in, margin-bottom 0.4s ease-in, padding 0.4s ease-in;
   margin-bottom: 0 !important;
   padding: 0 !important;
-  max-height: 0;
   overflow: hidden;
 }
 
@@ -1096,7 +1164,6 @@ const onImageError = () => {
   pointer-events: none;
   transition: max-height 0.4s ease-in, margin 0.4s ease-in;
   margin: 0 !important;
-  max-height: 0;
   overflow: hidden;
 }
 
@@ -1264,7 +1331,6 @@ const onImageError = () => {
   pointer-events: none;
   transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
   margin-top: 0 !important;
-  max-height: 0;
   overflow: hidden;
 }
 
@@ -1626,6 +1692,16 @@ const onImageError = () => {
   border-radius: 16px;
   animation: fadeIn 0.8s ease-out 0.8s both;
   border: 1px solid rgba(108, 117, 125, 0.1);
+  transition: all 0.4s ease-in;
+}
+
+.disclaimer-container.exit-disclaimer {
+  animation: fadeOutDown 0.4s ease-in forwards;
+  pointer-events: none;
+  transition: max-height 0.4s ease-in, margin 0.4s ease-in, padding 0.4s ease-in;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
 }
 
 .disclaimer-icon {
