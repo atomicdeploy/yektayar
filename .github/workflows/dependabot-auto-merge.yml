@@ -35,7 +35,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 30
-          running-workflow-name: 'dependabot-auto-merge'
+          running-workflow-name: 'Auto-approve and merge Dependabot PRs'
           allowed-conclusions: success,skipped,neutral
       
       - name: Auto-approve PR
