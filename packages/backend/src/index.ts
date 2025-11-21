@@ -18,7 +18,11 @@ import { aiRoutes } from './routes/ai'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
 import { initializeDatabase } from './services/database'
-import { SOCKET_IO_PATH } from '@yektayar/shared'
+import { SOCKET_IO_PATH, getVersionFromPackageJson } from '@yektayar/shared'
+import packageJson from '../package.json'
+
+// Get version from package.json
+const APP_VERSION = getVersionFromPackageJson(packageJson)
 
 // Configure CORS based on environment
 // When behind a reverse proxy (like Apache), disable application-level CORS
@@ -65,7 +69,7 @@ app
       documentation: {
         info: {
           title: 'YektaYar API',
-          version: '0.1.0',
+          version: APP_VERSION,
           description: 'Mental Health Care Platform API'
         },
         tags: [
@@ -96,7 +100,7 @@ app
   })
   .get('/', () => ({
     message: 'YektaYar API Server',
-    version: '0.1.0',
+    version: APP_VERSION,
     status: 'running',
     features: {
       rest: true,

@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import packageJson from './package.json'
 
 /**
  * Extract HMR client port from base URL
@@ -60,7 +61,8 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL || ''),
       'import.meta.env.SOLUTIONS_MD': JSON.stringify(solutionsContent),
-      'import.meta.env.EXPECTED_BASE_URL': JSON.stringify(baseUrl || '')
+      'import.meta.env.EXPECTED_BASE_URL': JSON.stringify(baseUrl || ''),
+      'import.meta.env.APP_VERSION': JSON.stringify(packageJson.version)
     },
     server: {
       port: 8100,
