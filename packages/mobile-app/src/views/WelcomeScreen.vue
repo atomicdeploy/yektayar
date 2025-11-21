@@ -933,6 +933,7 @@ const onImageError = () => {
   pointer-events: none;
   margin-bottom: 0 !important;
   overflow: hidden;
+  transition: max-height 0.4s ease-in 0.45s, margin-bottom 0.4s ease-in 0.45s;
   max-height: 0;
 }
 
@@ -997,6 +998,7 @@ const onImageError = () => {
   animation: fadeOutUp 0.4s ease-in forwards;
   animation-delay: 0.3s;
   pointer-events: none;
+  transition: max-height 0.4s ease-in 0.3s, margin 0.4s ease-in 0.3s, min-height 0.4s ease-in 0.3s;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   min-height: 0 !important;
@@ -1047,6 +1049,7 @@ const onImageError = () => {
   animation: fadeOutUp 0.4s ease-in forwards;
   animation-delay: 0.15s;
   pointer-events: none;
+  transition: max-height 0.4s ease-in 0.15s, margin-bottom 0.4s ease-in 0.15s, padding 0.4s ease-in 0.15s;
   margin-bottom: 0 !important;
   padding: 0 !important;
   max-height: 0;
@@ -1091,6 +1094,7 @@ const onImageError = () => {
 .terms-container.exit-terms {
   animation: fadeOutDown 0.4s ease-in forwards;
   pointer-events: none;
+  transition: max-height 0.4s ease-in, margin 0.4s ease-in;
   margin: 0 !important;
   max-height: 0;
   overflow: hidden;
@@ -1258,7 +1262,8 @@ const onImageError = () => {
 .cta-button.exit-cta {
   animation: fadeOutDown 0.4s ease-in forwards;
   pointer-events: none;
-  margin: 0 !important;
+  transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
+  margin-top: 0 !important;
   max-height: 0;
   overflow: hidden;
 }
