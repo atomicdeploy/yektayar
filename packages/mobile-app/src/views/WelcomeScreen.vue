@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
+    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true" :scrollEvents="true">
       <!-- 
         OverlayScrollbars temporarily disabled due to animation replay bug.
         
@@ -15,6 +15,8 @@
         - Added explicit overflow configuration
         
         Result: Animation replay still occurs despite event isolation attempts.
+        
+        Note: Native scroll handlers now implemented for scroll reminder (ionScroll, wheel, scroll events).
         
         TODO: Investigate deeper integration approach or alternative scrolling solution.
       -->
@@ -49,7 +51,10 @@
         </div>
 
         <!-- Hero Image with Lazy Loading (above text) -->
-        <div class="hero-image-container">
+        <div 
+          class="hero-image-container"
+          :class="{ 'slide-away': isLoading }"
+        >
           <LazyImage
             src="/welcome-hero.jpg"
             :srcset="`/welcome-hero.jpg 1x, /welcome-hero@2x.jpg 2x, /welcome-hero@3x.jpg 3x`"
@@ -63,7 +68,12 @@
         </div>
 
         <!-- Welcome Text Content with Card Style -->
-        <div ref="welcomeTextOuter" class="welcome-text" :style="{ height: welcomeTextHeight }">
+        <div 
+          ref="welcomeTextOuter" 
+          class="welcome-text" 
+          :class="{ 'slide-away': isLoading }"
+          :style="{ height: welcomeTextHeight }"
+        >
           <div ref="welcomeTextInner" class="welcome-text-inner">
             <p 
               v-for="(item, index) in typewriters" 
@@ -89,6 +99,7 @@
             <input 
               type="checkbox" 
               v-model="termsAccepted" 
+              :disabled="isLoading"
               class="checkbox-input"
             />
             <span class="checkbox-custom">
@@ -104,22 +115,54 @@
         <!-- Enhanced CTA Button - Only show after all typewriter effects complete -->
         <ion-button 
           v-if="allTypewritersComplete"
-          :disabled="!termsAccepted"
+          :disabled="!termsAccepted || isLoading"
           expand="block" 
           size="large" 
           class="cta-button"
           :class="{ 
-            'cta-button-disabled': !termsAccepted,
-            'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown
+            'cta-button-disabled': !termsAccepted || isLoading,
+            'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown,
+            'cta-button-loading': isLoading
           }"
           @click="startApp"
         >
           <span class="button-content">
-            <span class="button-icon">✨</span>
-            <span class="button-text">شروع گفتگو</span>
+            <span v-if="isLoading" class="button-spinner">
+              <ion-icon class="spinner-icon"></ion-icon>
+            </span>
+            <template v-else>
+              <span class="button-icon">✨</span>
+              <span class="button-text">شروع گفتگو</span>
+            </template>
           </span>
           <div class="button-shine"></div>
         </ion-button>
+
+        <!-- Error Message -->
+        <div 
+          v-if="errorMessage" 
+          class="error-message"
+        >
+          <ion-icon :icon="alertCircleOutline" class="error-icon"></ion-icon>
+          <span class="error-text">{{ errorMessage }}</span>
+        </div>
+
+        <!-- Scroll Reminder -->
+        <transition name="scroll-reminder-fade">
+          <div 
+            v-if="showScrollReminder"
+            class="scroll-reminder"
+            @click="scrollToBottom"
+          >
+            <div class="scroll-reminder-content">
+              <div class="scroll-reminder-icon">
+                <ion-icon :icon="chevronDownOutline" class="scroll-icon"></ion-icon>
+              </div>
+              <p class="scroll-reminder-text">برای مشاهده بیشتر به پایین بروید</p>
+            </div>
+            <div class="scroll-reminder-mask"></div>
+          </div>
+        </transition>
 
         <!-- Disclaimer with Icon -->
         <div class="disclaimer-container">
@@ -136,8 +179,9 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
-import { heartOutline, lockClosedOutline, checkmarkOutline } from 'ionicons/icons'
-import { useRouter } from 'vue-router'
+import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
+import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
 import LazyImage from '@/components/LazyImage.vue'
@@ -147,15 +191,32 @@ import { useDebugConfigStore } from '@/stores/debugConfig'
 import { createKeyboardHandler } from './WelcomeScreen.utils'
 
 const router = useRouter()
+const route = useRoute()
+const { t } = useI18n()
 const configStore = useDebugConfigStore()
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
+
+// Get intended destination from query params or default to home
+const intendedDestination = ref<string>((route.query.redirect as string) || '/tabs/home')
 
 // Get feature config from Pinia store
 const FEATURE_CONFIG = computed(() => configStore.welcomeConfig)
 
 // Terms acceptance state
 const termsAccepted = ref(false)
+
+// Loading and error states
+const isLoading = ref(false)
+const errorMessage = ref<string | null>(null)
+
+// Scroll reminder state
+const showScrollReminder = ref(false)
+const userHasScrolled = ref(false)
+let scrollReminderTimeout: ReturnType<typeof setTimeout> | null = null
+let activityTimeout: ReturnType<typeof setTimeout> | null = null
+let scrollElement: HTMLElement | null = null
+let keydownHandler: ((e: KeyboardEvent) => void) | null = null
 
 // Welcome text height management
 const welcomeTextOuter = ref<HTMLElement | null>(null)
@@ -439,6 +500,43 @@ onMounted(async () => {
   // Set up observers
   setupParagraphObservers()
   
+  // Set up scroll and activity listeners for scroll reminder
+  await nextTick()
+  const content = document.querySelector('ion-content')
+  if (content) {
+    // Listen for Ionic scroll events (touch/swipe on mobile)
+    content.addEventListener('ionScroll', handleScroll)
+    logger.info('[WelcomeScreen] ionScroll event listener added to ion-content')
+    
+    // Get the actual scrollable element inside ion-content for wheel/keyboard events
+    scrollElement = await content.getScrollElement()
+    if (scrollElement) {
+      // Listen for wheel events (desktop mouse wheel)
+      scrollElement.addEventListener('wheel', handleScroll, { passive: true })
+      // Listen for scroll events (fallback for keyboard and other scroll methods)
+      scrollElement.addEventListener('scroll', handleScroll, { passive: true })
+      logger.info('[WelcomeScreen] wheel and scroll event listeners added to scroll element')
+    } else {
+      logger.warn('[WelcomeScreen] Scroll element not found inside ion-content')
+    }
+  } else {
+    logger.warn('[WelcomeScreen] ion-content not found - scroll listener not added')
+  }
+  
+  // Listen for keyboard events (arrow keys, page up/down, etc.)
+  keydownHandler = (e: KeyboardEvent) => {
+    const scrollKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ']
+    if (scrollKeys.includes(e.key)) {
+      logger.debug('[WelcomeScreen] Scroll key pressed:', e.key)
+      handleUserActivity(e)
+    }
+  }
+  window.addEventListener('keydown', keydownHandler)
+  
+  window.addEventListener('click', handleUserActivity)
+  window.addEventListener('touchstart', handleUserActivity)
+  logger.info('[WelcomeScreen] Activity listeners (click, touchstart, keydown) added to window')
+  
   // Set up ResizeObserver to watch inner container height (only if feature enabled)
   if (FEATURE_CONFIG.value.enableDynamicHeight && welcomeTextInner.value) {
     // Get line height from computed style
@@ -562,9 +660,126 @@ onMounted(async () => {
   }
 })
 
-// Cleanup keyboard shortcuts on unmount
+// Scroll reminder logic
+const handleScroll = (event?: any) => {
+  logger.info('[WelcomeScreen] handleScroll triggered', {
+    userHasScrolled: userHasScrolled.value,
+    showScrollReminder: showScrollReminder.value,
+    eventType: event?.type,
+    detail: event?.detail
+  })
+  
+  if (!userHasScrolled.value) {
+    userHasScrolled.value = true
+    logger.info('[WelcomeScreen] User has scrolled - hiding scroll reminder')
+    hideScrollReminder()
+  } else {
+    logger.debug('[WelcomeScreen] Scroll event but user already scrolled')
+  }
+}
+
+const handleUserActivity = (event?: any) => {
+  logger.debug('[WelcomeScreen] handleUserActivity triggered', {
+    eventType: event?.type,
+    showScrollReminder: showScrollReminder.value,
+    hasActivityTimeout: !!activityTimeout
+  })
+  
+  // Reset activity timeout on any user interaction
+  if (activityTimeout) {
+    clearTimeout(activityTimeout)
+    logger.debug('[WelcomeScreen] Cleared activity timeout')
+  }
+  
+  // If scroll reminder is showing and user clicks/types, hide it
+  if (showScrollReminder.value) {
+    logger.info('[WelcomeScreen] Hiding scroll reminder due to user activity')
+    hideScrollReminder()
+  }
+}
+
+const hideScrollReminder = () => {
+  logger.info('[WelcomeScreen] Hiding scroll reminder', {
+    wasShowing: showScrollReminder.value
+  })
+  
+  showScrollReminder.value = false
+  if (scrollReminderTimeout) {
+    clearTimeout(scrollReminderTimeout)
+    scrollReminderTimeout = null
+  }
+  if (activityTimeout) {
+    clearTimeout(activityTimeout)
+    activityTimeout = null
+  }
+}
+
+const scrollToBottom = () => {
+  logger.info('[WelcomeScreen] scrollToBottom triggered - auto-scrolling to bottom')
+  const content = document.querySelector('ion-content')
+  if (content) {
+    content.scrollToBottom(500)
+    logger.info('[WelcomeScreen] Scroll to bottom initiated')
+  } else {
+    logger.warn('[WelcomeScreen] ion-content element not found')
+  }
+  hideScrollReminder()
+}
+
+// Watch for first paragraph completion to show scroll reminder
+watch(() => typewriters[0].isComplete.value, (isComplete) => {
+  logger.info('[WelcomeScreen] First paragraph completion watch triggered', {
+    isComplete,
+    userHasScrolled: userHasScrolled.value,
+    showScrollReminder: showScrollReminder.value
+  })
+  
+  if (isComplete && !userHasScrolled.value && !showScrollReminder.value) {
+    logger.info('[WelcomeScreen] Setting 3-second timeout to show scroll reminder')
+    // Wait 3 seconds of inactivity before showing reminder
+    activityTimeout = setTimeout(() => {
+      // Check if user still hasn't scrolled
+      if (!userHasScrolled.value) {
+        showScrollReminder.value = true
+        logger.info('[WelcomeScreen] Showing scroll reminder after timeout')
+      } else {
+        logger.info('[WelcomeScreen] User scrolled during timeout - not showing reminder')
+      }
+    }, 3000)
+  } else {
+    logger.debug('[WelcomeScreen] Scroll reminder not triggered', {
+      reason: !isComplete ? 'paragraph not complete' : 
+              userHasScrolled.value ? 'user already scrolled' :
+              showScrollReminder.value ? 'reminder already showing' : 'unknown'
+    })
+  }
+})
+
+// Cleanup keyboard shortcuts and scroll reminder on unmount
 onUnmounted(() => {
+  logger.info('[WelcomeScreen] Component unmounting - cleaning up listeners')
   window.removeEventListener('keydown', handleKeyPress)
+  hideScrollReminder()
+  
+  // Remove scroll and activity listeners
+  const content = document.querySelector('ion-content')
+  if (content) {
+    content.removeEventListener('ionScroll', handleScroll)
+    logger.info('[WelcomeScreen] Removed ionScroll event listener from ion-content')
+  }
+  
+  if (scrollElement) {
+    scrollElement.removeEventListener('wheel', handleScroll)
+    scrollElement.removeEventListener('scroll', handleScroll)
+    logger.info('[WelcomeScreen] Removed wheel and scroll event listeners from scroll element')
+  }
+  
+  if (keydownHandler) {
+    window.removeEventListener('keydown', keydownHandler)
+  }
+  window.removeEventListener('click', handleUserActivity)
+  window.removeEventListener('touchstart', handleUserActivity)
+  logger.info('[WelcomeScreen] Removed activity listeners from window')
 })
 
 const showTerms = () => {
@@ -575,30 +790,61 @@ const showTerms = () => {
 }
 
 const startApp = async () => {
-  if (!termsAccepted.value) {
-    logger.warn('Cannot start app without accepting terms')
+  if (!termsAccepted.value || isLoading.value) {
+    logger.warn('Cannot start app without accepting terms or while loading')
     return
   }
   
+  // Reset error message
+  errorMessage.value = null
+  
+  // Set loading state
+  isLoading.value = true
+  
   logger.info('User started the app from welcome screen')
   
-  // Mark welcome screen as shown in localStorage
-  localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
-  
-  // Also mark on backend if user is authenticated
   try {
+    // Mark welcome screen as shown in localStorage
+    localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
+    
+    // Also mark on backend if user is authenticated
     await apiClient.post('/api/users/preferences', {
       welcomeScreenShown: true,
       termsAccepted: true
     })
     logger.info('Welcome screen preference saved to backend')
-  } catch (error) {
-    // If backend call fails, it's okay - localStorage will handle it
-    logger.warn('Failed to save welcome preference to backend:', error)
+    
+    // Success! Add animation before navigation
+    const welcomeContainer = document.querySelector('.welcome-container')
+    if (welcomeContainer) {
+      welcomeContainer.classList.add('fade-out-exit')
+      
+      // Wait for animation to complete before navigating
+      await new Promise(resolve => setTimeout(resolve, 600))
+    }
+    
+    // Navigate to intended destination (from query param or default to home)
+    // Supports dynamic routing via ?redirect=/intended/path query parameter
+    router.replace(intendedDestination.value)
+  } catch (error: any) {
+    logger.error('Failed to save welcome preference to backend:', error)
+    
+    // Set error message based on the error type using i18n
+    if (error.response?.status === 401) {
+      errorMessage.value = t('welcome_screen.auth_required')
+    } else if (error.response?.status >= 500) {
+      errorMessage.value = t('welcome_screen.server_error')
+    } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      errorMessage.value = t('welcome_screen.request_timeout')
+    } else if (!navigator.onLine) {
+      errorMessage.value = t('welcome_screen.network_offline')
+    } else {
+      errorMessage.value = t('welcome_screen.generic_error')
+    }
+    
+    // Reset loading state
+    isLoading.value = false
   }
-  
-  // TODO: Navigate back to the previous screen (if present) instead of home
-  router.replace('/tabs/home')
 }
 
 const onImageError = () => {
@@ -632,6 +878,12 @@ const onImageError = () => {
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.welcome-container.fade-out-exit {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 
 /* Decorative background elements */
@@ -722,6 +974,13 @@ const onImageError = () => {
   position: relative;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   min-height: 280px;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-image-container.slide-away {
+  opacity: 0;
+  transform: translateX(-50px) scale(0.95);
+  filter: blur(8px);
 }
 
 .hero-image-container :deep(.lazy-image) {
@@ -759,8 +1018,14 @@ const onImageError = () => {
   border: 1px solid rgba(212, 164, 62, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.8s ease-out 0.5s both;
-  transition: height 0.3s ease-out;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s ease-out;
   overflow: hidden;
+}
+
+.welcome-text.slide-away {
+  opacity: 0;
+  transform: translateX(50px) scale(0.95);
+  filter: blur(8px);
 }
 
 .welcome-text-inner {
@@ -816,6 +1081,11 @@ const onImageError = () => {
   border: 2px solid transparent;
   border-color: rgba(212, 164, 62, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.terms-checkbox:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .terms-checkbox:hover {
@@ -944,8 +1214,38 @@ const onImageError = () => {
   --background: transparent; /* Fix for the `button-native` inside; otherwise it'll mask the actual cta-button */
 }
 
-.cta-button:not(.cta-button-disabled) {
+.cta-button:not(.cta-button-disabled):not(.cta-button-loading) {
   animation: gradientShift 3s ease-in-out infinite;
+}
+
+/* Elegant Loading State - Overrides disabled styles */
+.cta-button-loading {
+  cursor: wait !important;
+  opacity: 1 !important;
+  background-image: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #4facfe 75%,
+    #667eea 100%
+  ) !important;
+  background-size: 300% 100% !important;
+  animation: loadingGradient 2s ease-in-out infinite !important;
+  --box-shadow: 
+    0 12px 40px rgba(102, 126, 234, 0.4),
+    0 6px 20px rgba(118, 75, 162, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  transform: scale(1.02);
+}
+
+@keyframes loadingGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @keyframes gradientShift {
@@ -1038,6 +1338,12 @@ const onImageError = () => {
   pointer-events: none;
   color: #01183a;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease;
+}
+
+.cta-button-loading .button-content {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .button-icon {
@@ -1048,6 +1354,211 @@ const onImageError = () => {
 .button-text {
   font-size: 1.3rem;
   /* letter-spacing: -0.3px; */
+}
+
+/* Loading Spinner - Enhanced for elegant loading state */
+.button-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-icon {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #ffffff;
+  border-right-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  box-shadow: 
+    0 0 15px rgba(255, 255, 255, 0.5),
+    inset 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error Message - Elegant and Professional Design */
+.error-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.12) 100%);
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  margin-top: 1rem;
+  border: 1.5px solid rgba(239, 68, 68, 0.25);
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 4px 12px rgba(239, 68, 68, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.05);
+  animation: errorSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.error-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  border-radius: 16px 0 0 16px;
+}
+
+@keyframes errorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-icon {
+  font-size: 1.25rem;
+  color: #dc2626;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  filter: drop-shadow(0 1px 2px rgba(220, 38, 38, 0.3));
+}
+
+.error-text {
+  text-align: right;
+  font-size: 0.95rem;
+  color: #991b1b;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 600;
+  direction: rtl;
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+/* Scroll Reminder - Elegant and Professional */
+.scroll-reminder {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.scroll-reminder-content {
+  position: relative;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  gap: 0.75rem;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.scroll-reminder-content:hover {
+  transform: translateY(-4px);
+}
+
+.scroll-reminder-content:active {
+  transform: translateY(-2px);
+}
+
+.scroll-reminder-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d4a43e 0%, #e8c170 100%);
+  border-radius: 50%;
+  box-shadow: 
+    0 4px 16px rgba(212, 164, 62, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: bounceDown 2s ease-in-out infinite;
+}
+
+.scroll-icon {
+  font-size: 28px;
+  color: #01183a;
+  animation: arrowBounce 1.5s ease-in-out infinite;
+}
+
+.scroll-reminder-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #01183a;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+  direction: rtl;
+}
+
+.scroll-reminder-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 255, 255, 0.7) 40%,
+    rgba(255, 255, 255, 0.9) 70%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Scroll reminder animation */
+@keyframes bounceDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes arrowBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* Scroll reminder transitions */
+.scroll-reminder-fade-enter-active {
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.scroll-reminder-fade-leave-active {
+  transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+}
+
+.scroll-reminder-fade-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scroll-reminder-fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 /* Disclaimer styling */
@@ -1246,6 +1757,42 @@ const onImageError = () => {
     /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
     background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
   }
+
+  .error-message {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.2) 100%);
+    border-color: rgba(239, 68, 68, 0.35);
+    box-shadow: 
+      0 4px 16px rgba(239, 68, 68, 0.2),
+      0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .error-message::before {
+    background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
+  }
+
+  .error-icon {
+    color: #f87171;
+  }
+
+  .error-text {
+    color: #fca5a5;
+  }
+
+  .scroll-reminder-text {
+    color: #e9ecef;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+
+  .scroll-reminder-mask {
+    background: linear-gradient(
+      to bottom,
+      rgba(15, 20, 25, 0) 0%,
+      rgba(15, 20, 25, 0.4) 20%,
+      rgba(15, 20, 25, 0.7) 40%,
+      rgba(15, 20, 25, 0.9) 70%,
+      rgba(15, 20, 25, 1) 100%
+    );
+  }
 }
 
 /* Responsive adjustments */
@@ -1294,6 +1841,23 @@ const onImageError = () => {
 
   .checkbox-icon {
     font-size: 18px;
+  }
+
+  .scroll-reminder-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .scroll-icon {
+    font-size: 24px;
+  }
+
+  .scroll-reminder-text {
+    font-size: 0.85rem;
+  }
+
+  .scroll-reminder-mask {
+    height: 180px;
   }
 }
 
