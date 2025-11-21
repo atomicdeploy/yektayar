@@ -42,7 +42,7 @@
         <div class="bg-decoration bg-decoration-2"></div>
         
         <!-- Header with Title and Logo -->
-        <div class="welcome-header">
+        <div ref="headerRef" class="welcome-header" :class="{ 'exit-header': exitStates.header }">
           <div class="logo-accent">
             <ion-icon :icon="heartOutline" class="heart-icon"></ion-icon>
           </div>
@@ -52,8 +52,9 @@
 
         <!-- Hero Image with Lazy Loading (above text) -->
         <div 
+          ref="heroContainerRef"
           class="hero-image-container"
-          :class="{ 'slide-away': isLoading }"
+          :class="{ 'exit-hero': exitStates.hero }"
         >
           <LazyImage
             src="/welcome-hero.jpg"
@@ -71,7 +72,7 @@
         <div 
           ref="welcomeTextOuter" 
           class="welcome-text" 
-          :class="{ 'slide-away': isLoading }"
+          :class="{ 'exit-text': exitStates.text }"
           :style="{ height: welcomeTextHeight }"
         >
           <div ref="welcomeTextInner" class="welcome-text-inner">
@@ -91,8 +92,12 @@
 
         <!-- Terms Acceptance Checkbox -->
         <div 
+          ref="termsContainerRef"
           class="terms-container" 
-          :class="{ 'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations }"
+          :class="{ 
+            'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations,
+            'exit-terms': exitStates.terms 
+          }"
           v-if="allTypewritersComplete"
         >
           <label class="terms-checkbox">
@@ -114,6 +119,7 @@
 
         <!-- Enhanced CTA Button - Only show after all typewriter effects complete -->
         <ion-button 
+          ref="ctaButtonRef"
           v-if="allTypewritersComplete"
           :disabled="!termsAccepted || isLoading"
           expand="block" 
@@ -122,7 +128,8 @@
           :class="{ 
             'cta-button-disabled': !termsAccepted || isLoading,
             'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown,
-            'cta-button-loading': isLoading
+            'cta-button-loading': isLoading,
+            'exit-cta': exitStates.cta
           }"
           @click="startApp"
         >
@@ -140,6 +147,7 @@
 
         <!-- Error Message -->
         <div 
+          ref="errorMessageRef"
           v-if="errorMessage" 
           class="error-message"
         >
@@ -165,7 +173,7 @@
         </transition>
 
         <!-- Disclaimer with Icon -->
-        <div class="disclaimer-container">
+        <div ref="disclaimerRef" class="disclaimer-container" :class="{ 'exit-disclaimer': exitStates.disclaimer }">
           <ion-icon :icon="lockClosedOutline" class="disclaimer-icon"></ion-icon>
           <p class="disclaimer-text">
             اطلاعات شما محرمانه است، و تنها برای کمک به شما استفاده می‌شود.
@@ -209,6 +217,25 @@ const termsAccepted = ref(false)
 // Loading and error states
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
+
+// Exit animation state - removed simple boolean approach
+// Individual element exit states for event-based control
+const exitStates = ref({
+  cta: false,
+  terms: false,
+  text: false,
+  hero: false,
+  header: false,
+  disclaimer: false
+})
+
+// Refs for elements that need to exit
+const ctaButtonRef = ref<HTMLElement | null>(null)
+const termsContainerRef = ref<HTMLElement | null>(null)
+const heroContainerRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
+const disclaimerRef = ref<HTMLElement | null>(null)
+const errorMessageRef = ref<HTMLElement | null>(null)
 
 // Scroll reminder state
 const showScrollReminder = ref(false)
@@ -404,6 +431,28 @@ const allTypewritersComplete = computed(() => {
 // Set up keyboard shortcuts using utility function
 const handleKeyPress = createKeyboardHandler(typewriters, paragraphs)
 
+// Debug hotkey: Numpad Dash to toggle exit animation (for testing)
+const handleDebugKey = (event: KeyboardEvent) => {
+  // Numpad Dash (109) or regular Dash with Numpad modifier
+  if (event.key === 'Subtract' || (event.code === 'NumpadSubtract')) {
+    event.preventDefault()
+    logger.info('[WelcomeScreen] Debug hotkey pressed - toggling exit animation')
+    
+    // Toggle loading state
+    isLoading.value = !isLoading.value
+    
+    if (isLoading.value) {
+      // Simulate exit animation
+      exitElementsSequentially().catch(error => {
+        logger.error('[WelcomeScreen] Debug exit animation error:', error)
+      })
+    } else {
+      // Reset exit states to restore elements
+      resetExitStates()
+    }
+  }
+}
+
 // Watch for when CTA button first appears and mark it
 watch(allTypewritersComplete, (isComplete: boolean) => {
   if (isComplete && !ctaHasBeenShown.value) {
@@ -432,6 +481,7 @@ const fetchUserPreferences = async () => {
 onMounted(async () => {
   // Set up keyboard shortcuts
   window.addEventListener('keydown', handleKeyPress)
+  window.addEventListener('keydown', handleDebugKey)
   
   // Fetch user preferences first
   await fetchUserPreferences()
@@ -759,6 +809,7 @@ watch(() => typewriters[0].isComplete.value, (isComplete) => {
 onUnmounted(() => {
   logger.info('[WelcomeScreen] Component unmounting - cleaning up listeners')
   window.removeEventListener('keydown', handleKeyPress)
+  window.removeEventListener('keydown', handleDebugKey)
   hideScrollReminder()
   
   // Remove scroll and activity listeners
@@ -798,7 +849,7 @@ const startApp = async () => {
   // Reset error message
   errorMessage.value = null
   
-  // Set loading state
+  // Set loading state (show loading spinner on button)
   isLoading.value = true
   
   logger.info('User started the app from welcome screen')
@@ -807,28 +858,23 @@ const startApp = async () => {
     // Mark welcome screen as shown in localStorage
     localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
     
-    // Also mark on backend if user is authenticated
+    // Make API request while showing loading state
     await apiClient.post('/api/users/preferences', {
       welcomeScreenShown: true,
       termsAccepted: true
     })
     logger.info('Welcome screen preference saved to backend')
     
-    // Success! Add animation before navigation
-    const welcomeContainer = document.querySelector('.welcome-container')
-    if (welcomeContainer) {
-      welcomeContainer.classList.add('fade-out-exit')
-      
-      // Wait for animation to complete before navigating
-      await new Promise(resolve => setTimeout(resolve, 600))
-    }
+    // Success! Now trigger exit animations
+    await exitElementsSequentially()
     
-    // Navigate to intended destination (from query param or default to home)
+    // Navigate to intended destination after animations complete
     // Supports dynamic routing via ?redirect=/intended/path query parameter
     router.replace(intendedDestination.value)
   } catch (error: any) {
     logger.error('Failed to save welcome preference to backend:', error)
     
+    // Don't trigger exit animations on error - keep elements visible
     // Set error message based on the error type using i18n
     if (error.response?.status === 401) {
       errorMessage.value = t('welcome_screen.auth_required')
@@ -844,7 +890,86 @@ const startApp = async () => {
     
     // Reset loading state
     isLoading.value = false
+    
+    // Scroll error message into view
+    await nextTick()
+    if (errorMessageRef.value) {
+      errorMessageRef.value.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
   }
+}
+
+// Helper to reset all exit states
+const resetExitStates = () => {
+  exitStates.value = {
+    cta: false,
+    terms: false,
+    text: false,
+    hero: false,
+    header: false,
+    disclaimer: false
+  }
+}
+
+// Sequential exit animation with proper height calculation and overlapping transitions
+const exitElementsSequentially = async () => {
+  const ANIMATION_DURATION = 400 // Animation duration in ms
+  const OVERLAP_PERCENTAGE = 0.7 // Start next animation when previous is 70% complete
+  const overlapDelay = ANIMATION_DURATION * (1 - OVERLAP_PERCENTAGE) // ~120ms
+  
+  // Helper function to animate a single element
+  const animateElementExit = (element: HTMLElement | null, stateName: keyof typeof exitStates.value): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!element) {
+        resolve()
+        return
+      }
+      
+      // Calculate and set current height before collapsing
+      const currentHeight = element.offsetHeight
+      element.style.maxHeight = `${currentHeight}px`
+      
+      // Force reflow to ensure maxHeight is applied
+      element.offsetHeight
+      
+      // Wait a frame, then apply exit class
+      requestAnimationFrame(() => {
+        exitStates.value[stateName] = true
+        
+        // Resolve when animation is mostly complete (for overlapping)
+        setTimeout(() => {
+          resolve()
+        }, ANIMATION_DURATION * OVERLAP_PERCENTAGE)
+      })
+    })
+  }
+  
+  // Exit elements with overlapping animations (bottom to top, reverse of entry)
+  // 1. CTA button - start immediately
+  const ctaPromise = animateElementExit(ctaButtonRef.value?.$el || ctaButtonRef.value, 'cta')
+  
+  // 2. Terms checkbox - start when CTA is 70% complete
+  await ctaPromise
+  const termsPromise = animateElementExit(termsContainerRef.value, 'terms')
+  
+  // 3. Welcome text - start when terms is 70% complete
+  await termsPromise
+  const textPromise = animateElementExit(welcomeTextOuter.value, 'text')
+  
+  // 4. Hero image - start when text is 70% complete
+  await textPromise
+  const heroPromise = animateElementExit(heroContainerRef.value, 'hero')
+  
+  // 5. Header - start when hero is 70% complete
+  await heroPromise
+  const headerPromise = animateElementExit(headerRef.value, 'header')
+  
+  // 6. Disclaimer - start when header is 70% complete
+  await headerPromise
+  await animateElementExit(disclaimerRef.value, 'disclaimer')
+  
+  // Wait for the last animation to fully complete
+  await new Promise(resolve => setTimeout(resolve, ANIMATION_DURATION * (1 - OVERLAP_PERCENTAGE)))
 }
 
 const onImageError = () => {
@@ -878,12 +1003,6 @@ const onImageError = () => {
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-
-.welcome-container.fade-out-exit {
-  opacity: 0;
-  transform: translateY(-20px);
 }
 
 /* Decorative background elements */
@@ -918,6 +1037,16 @@ const onImageError = () => {
   text-align: center;
   margin-bottom: 2rem;
   position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.welcome-header.exit-header {
+  animation: fadeOutUp 0.4s ease-in forwards;
+  pointer-events: none;
+  margin-bottom: 0 !important;
+  overflow: hidden;
+  transition: max-height 0.4s ease-in, margin-bottom 0.4s ease-in;
+  max-height: 0 !important;
 }
 
 .logo-accent {
@@ -977,10 +1106,15 @@ const onImageError = () => {
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.hero-image-container.slide-away {
-  opacity: 0;
-  transform: translateX(-50px) scale(0.95);
-  filter: blur(8px);
+.hero-image-container.exit-hero {
+  animation: fadeOutUp 0.4s ease-in forwards;
+  pointer-events: none;
+  transition: max-height 0.4s ease-in, margin 0.4s ease-in, min-height 0.4s ease-in;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden;
 }
 
 .hero-image-container :deep(.lazy-image) {
@@ -1022,10 +1156,14 @@ const onImageError = () => {
   overflow: hidden;
 }
 
-.welcome-text.slide-away {
-  opacity: 0;
-  transform: translateX(50px) scale(0.95);
-  filter: blur(8px);
+.welcome-text.exit-text {
+  animation: fadeOutUp 0.4s ease-in forwards;
+  pointer-events: none;
+  transition: max-height 0.4s ease-in, margin-bottom 0.4s ease-in, padding 0.4s ease-in;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden;
 }
 
 .welcome-text-inner {
@@ -1060,6 +1198,16 @@ const onImageError = () => {
 /* Terms Acceptance Checkbox styling */
 .terms-container {
   margin: 0; /* 2rem 0 1rem 0; */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.terms-container.exit-terms {
+  animation: fadeOutDown 0.4s ease-in forwards;
+  pointer-events: none;
+  transition: max-height 0.4s ease-in, margin 0.4s ease-in;
+  margin: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden;
 }
 
 .terms-container-slide {
@@ -1083,12 +1231,19 @@ const onImageError = () => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* 
+  Note: :has() pseudo-class is supported in modern browsers:
+  - Safari 15.4+ (March 2022)
+  - Chrome 105+ (August 2022)
+  - Firefox 121+ (December 2023)
+  Ionic/Capacitor apps typically use modern WebView engines that support this.
+*/
 .terms-checkbox:has(input:disabled) {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.terms-checkbox:hover {
+.terms-checkbox:not(:has(input:disabled)):hover {
   background: rgba(255, 255, 255, 0.7);
   border-color: rgba(212, 164, 62, 0.3);
   /* transform: translateY(-2px); */
@@ -1212,6 +1367,15 @@ const onImageError = () => {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease-out;
   border-radius: var(--border-radius);
   --background: transparent; /* Fix for the `button-native` inside; otherwise it'll mask the actual cta-button */
+}
+
+.cta-button.exit-cta {
+  animation: fadeOutDown 0.4s ease-in forwards;
+  pointer-events: none;
+  transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
+  margin-top: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden;
 }
 
 .cta-button:not(.cta-button-disabled):not(.cta-button-loading) {
@@ -1390,7 +1554,8 @@ const onImageError = () => {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.12) 100%);
   padding: 1rem 1.25rem;
   border-radius: 16px;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
   border: 1.5px solid rgba(239, 68, 68, 0.25);
   backdrop-filter: blur(10px);
   box-shadow: 
@@ -1572,6 +1737,17 @@ const onImageError = () => {
   border-radius: 16px;
   animation: fadeIn 0.8s ease-out 0.8s both;
   border: 1px solid rgba(108, 117, 125, 0.1);
+  transition: all 0.4s ease-in;
+}
+
+.disclaimer-container.exit-disclaimer {
+  animation: fadeOutDown 0.4s ease-in forwards;
+  pointer-events: none;
+  transition: max-height 0.4s ease-in, margin 0.4s ease-in, padding 0.4s ease-in;
+  margin: 0 !important;
+  padding: 0 !important;
+  max-height: 0 !important;
+  overflow: hidden;
 }
 
 .disclaimer-icon {
@@ -1671,6 +1847,29 @@ const onImageError = () => {
   }
 }
 
+/* Exit animations - Reverse of entry animations */
+@keyframes fadeOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes fadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .welcome-content {
@@ -1738,7 +1937,7 @@ const onImageError = () => {
     border-color: transparent;
   }
 
-  .terms-checkbox:hover {
+  .terms-checkbox:not(:has(input:disabled)):hover {
     background: rgba(26, 31, 46, 0.8);
     border-color: rgba(212, 164, 62, 0.3);
   }
