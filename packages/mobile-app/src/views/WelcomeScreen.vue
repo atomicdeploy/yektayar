@@ -429,6 +429,28 @@ const allTypewritersComplete = computed(() => {
 // Set up keyboard shortcuts using utility function
 const handleKeyPress = createKeyboardHandler(typewriters, paragraphs)
 
+// Debug hotkey: Numpad Dash to toggle exit animation (for testing)
+const handleDebugKey = (event: KeyboardEvent) => {
+  // Numpad Dash (109) or regular Dash with Numpad modifier
+  if (event.key === 'Subtract' || (event.code === 'NumpadSubtract')) {
+    event.preventDefault()
+    logger.info('[WelcomeScreen] Debug hotkey pressed - toggling exit animation')
+    
+    // Toggle loading state
+    isLoading.value = !isLoading.value
+    
+    if (isLoading.value) {
+      // Simulate exit animation
+      exitElementsSequentially().catch(error => {
+        logger.error('[WelcomeScreen] Debug exit animation error:', error)
+      })
+    } else {
+      // Reset exit states to restore elements
+      resetExitStates()
+    }
+  }
+}
+
 // Watch for when CTA button first appears and mark it
 watch(allTypewritersComplete, (isComplete: boolean) => {
   if (isComplete && !ctaHasBeenShown.value) {
@@ -457,6 +479,7 @@ const fetchUserPreferences = async () => {
 onMounted(async () => {
   // Set up keyboard shortcuts
   window.addEventListener('keydown', handleKeyPress)
+  window.addEventListener('keydown', handleDebugKey)
   
   // Fetch user preferences first
   await fetchUserPreferences()
@@ -784,6 +807,7 @@ watch(() => typewriters[0].isComplete.value, (isComplete) => {
 onUnmounted(() => {
   logger.info('[WelcomeScreen] Component unmounting - cleaning up listeners')
   window.removeEventListener('keydown', handleKeyPress)
+  window.removeEventListener('keydown', handleDebugKey)
   hideScrollReminder()
   
   // Remove scroll and activity listeners
@@ -881,8 +905,12 @@ const resetExitStates = () => {
   }
 }
 
-// Sequential exit animation with proper height calculation
+// Sequential exit animation with proper height calculation and overlapping transitions
 const exitElementsSequentially = async () => {
+  const ANIMATION_DURATION = 400 // Animation duration in ms
+  const OVERLAP_PERCENTAGE = 0.7 // Start next animation when previous is 70% complete
+  const overlapDelay = ANIMATION_DURATION * (1 - OVERLAP_PERCENTAGE) // ~120ms
+  
   // Helper function to animate a single element
   const animateElementExit = (element: HTMLElement | null, stateName: keyof typeof exitStates.value): Promise<void> => {
     return new Promise((resolve) => {
@@ -902,35 +930,40 @@ const exitElementsSequentially = async () => {
       requestAnimationFrame(() => {
         exitStates.value[stateName] = true
         
-        // Wait for animation to complete (400ms animation + small buffer)
+        // Resolve when animation is mostly complete (for overlapping)
         setTimeout(() => {
           resolve()
-        }, 450)
+        }, ANIMATION_DURATION * OVERLAP_PERCENTAGE)
       })
     })
   }
   
-  // Exit elements in sequence (bottom to top, reverse of entry)
-  // 1. CTA button (0s delay)
-  await animateElementExit(ctaButtonRef.value?.$el || ctaButtonRef.value, 'cta')
+  // Exit elements with overlapping animations (bottom to top, reverse of entry)
+  // 1. CTA button - start immediately
+  const ctaPromise = animateElementExit(ctaButtonRef.value?.$el || ctaButtonRef.value, 'cta')
   
-  // 2. Terms checkbox (immediately after CTA)
-  await animateElementExit(termsContainerRef.value, 'terms')
+  // 2. Terms checkbox - start when CTA is 70% complete
+  await ctaPromise
+  const termsPromise = animateElementExit(termsContainerRef.value, 'terms')
   
-  // 3. Welcome text (0.15s after terms)
-  await new Promise(resolve => setTimeout(resolve, 150))
-  await animateElementExit(welcomeTextOuter.value, 'text')
+  // 3. Welcome text - start when terms is 70% complete
+  await termsPromise
+  const textPromise = animateElementExit(welcomeTextOuter.value, 'text')
   
-  // 4. Hero image (0.15s after text)
-  await new Promise(resolve => setTimeout(resolve, 150))
-  await animateElementExit(heroContainerRef.value, 'hero')
+  // 4. Hero image - start when text is 70% complete
+  await textPromise
+  const heroPromise = animateElementExit(heroContainerRef.value, 'hero')
   
-  // 5. Header (0.15s after hero)
-  await new Promise(resolve => setTimeout(resolve, 150))
-  await animateElementExit(headerRef.value, 'header')
+  // 5. Header - start when hero is 70% complete
+  await heroPromise
+  const headerPromise = animateElementExit(headerRef.value, 'header')
   
-  // 6. Disclaimer (immediately after header)
+  // 6. Disclaimer - start when header is 70% complete
+  await headerPromise
   await animateElementExit(disclaimerRef.value, 'disclaimer')
+  
+  // Wait for the last animation to fully complete
+  await new Promise(resolve => setTimeout(resolve, ANIMATION_DURATION * (1 - OVERLAP_PERCENTAGE)))
 }
 
 const onImageError = () => {
@@ -1007,6 +1040,7 @@ const onImageError = () => {
   margin-bottom: 0 !important;
   overflow: hidden;
   transition: max-height 0.4s ease-in, margin-bottom 0.4s ease-in;
+  max-height: 0 !important;
 }
 
 .logo-accent {
@@ -1073,6 +1107,7 @@ const onImageError = () => {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
   min-height: 0 !important;
+  max-height: 0 !important;
   overflow: hidden;
 }
 
@@ -1121,6 +1156,7 @@ const onImageError = () => {
   transition: max-height 0.4s ease-in, margin-bottom 0.4s ease-in, padding 0.4s ease-in;
   margin-bottom: 0 !important;
   padding: 0 !important;
+  max-height: 0 !important;
   overflow: hidden;
 }
 
@@ -1164,6 +1200,7 @@ const onImageError = () => {
   pointer-events: none;
   transition: max-height 0.4s ease-in, margin 0.4s ease-in;
   margin: 0 !important;
+  max-height: 0 !important;
   overflow: hidden;
 }
 
@@ -1331,6 +1368,7 @@ const onImageError = () => {
   pointer-events: none;
   transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
   margin-top: 0 !important;
+  max-height: 0 !important;
   overflow: hidden;
 }
 
@@ -1701,6 +1739,7 @@ const onImageError = () => {
   transition: max-height 0.4s ease-in, margin 0.4s ease-in, padding 0.4s ease-in;
   margin: 0 !important;
   padding: 0 !important;
+  max-height: 0 !important;
   overflow: hidden;
 }
 
