@@ -171,7 +171,7 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .splash-content {
   /* YektaYar Navy Seal gradient background */
   --background: linear-gradient(135deg, #01183a 0%, #012952 50%, #01183a 100%);

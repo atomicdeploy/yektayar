@@ -82,7 +82,7 @@ npm run dev  # Automatically loads ../../.env
 ```
 
 **Frontend Variables:**
-- `VITE_API_BASE_URL` - Backend API URL
+- `API_BASE_URL` - Backend API URL
 - `VITE_ENVIRONMENT` - Environment name (development/production)
 
 ### Environment-Specific Files
@@ -157,7 +157,7 @@ Priority order: `.env.local` > `.env.production` > `.env`
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `VITE_API_BASE_URL` | Yes | `http://localhost:3000` | Backend API base URL |
+| `API_BASE_URL` | Yes | `http://localhost:3000` | Backend API base URL |
 | `VITE_ENVIRONMENT` | Yes | `development` | Environment name |
 
 ### Optional API Keys
@@ -254,7 +254,7 @@ The `set` command allows you to update individual environment variables from the
 ### Production
 
 1. **Use different secrets** than development
-2. **Set production URLs** for frontend (`VITE_API_BASE_URL`)
+2. **Set production URLs** for frontend (`API_BASE_URL`)
 3. **Use production database** with strong password
 4. **Enable HTTPS** and update CORS origins
 5. **Review all settings** before deployment

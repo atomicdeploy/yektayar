@@ -166,7 +166,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/yektayar
 SESSION_SECRET=your_session_secret
 JWT_SECRET=your_jwt_secret
 CORS_ORIGIN=http://localhost:5173,http://localhost:8100
-VITE_API_BASE_URL=http://localhost:3000
+API_BASE_URL=http://localhost:3000
 VITE_ENVIRONMENT=development
 ```
 
