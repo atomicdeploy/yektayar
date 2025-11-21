@@ -738,8 +738,8 @@ const startApp = async () => {
       await new Promise(resolve => setTimeout(resolve, 600))
     }
     
-    // TODO: Navigate back to the previous screen (if present) instead of home
     // Navigate to intended destination (from query param or default to home)
+    // Supports dynamic routing via ?redirect=/intended/path query parameter
     router.replace(intendedDestination.value)
   } catch (error: any) {
     logger.error('Failed to save welcome preference to backend:', error)
