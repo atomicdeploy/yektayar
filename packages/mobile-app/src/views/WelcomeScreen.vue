@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true">
+    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true" :scrollEvents="true">
       <!-- 
         OverlayScrollbars temporarily disabled due to animation replay bug.
         
@@ -213,6 +213,8 @@ const showScrollReminder = ref(false)
 const userHasScrolled = ref(false)
 let scrollReminderTimeout: ReturnType<typeof setTimeout> | null = null
 let activityTimeout: ReturnType<typeof setTimeout> | null = null
+let scrollElement: HTMLElement | null = null
+let keydownHandler: ((e: KeyboardEvent) => void) | null = null
 
 // Welcome text height management
 const welcomeTextOuter = ref<HTMLElement | null>(null)
@@ -500,14 +502,38 @@ onMounted(async () => {
   await nextTick()
   const content = document.querySelector('ion-content')
   if (content) {
+    // Listen for Ionic scroll events (touch/swipe on mobile)
     content.addEventListener('ionScroll', handleScroll)
     logger.info('[WelcomeScreen] ionScroll event listener added to ion-content')
+    
+    // Get the actual scrollable element inside ion-content for wheel/keyboard events
+    scrollElement = await content.getScrollElement()
+    if (scrollElement) {
+      // Listen for wheel events (desktop mouse wheel)
+      scrollElement.addEventListener('wheel', handleScroll, { passive: true })
+      // Listen for scroll events (fallback for keyboard and other scroll methods)
+      scrollElement.addEventListener('scroll', handleScroll, { passive: true })
+      logger.info('[WelcomeScreen] wheel and scroll event listeners added to scroll element')
+    } else {
+      logger.warn('[WelcomeScreen] Scroll element not found inside ion-content')
+    }
   } else {
     logger.warn('[WelcomeScreen] ion-content not found - scroll listener not added')
   }
+  
+  // Listen for keyboard events (arrow keys, page up/down, etc.)
+  keydownHandler = (e: KeyboardEvent) => {
+    const scrollKeys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ']
+    if (scrollKeys.includes(e.key)) {
+      logger.debug('[WelcomeScreen] Scroll key pressed:', e.key)
+      handleUserActivity(e)
+    }
+  }
+  window.addEventListener('keydown', keydownHandler)
+  
   window.addEventListener('click', handleUserActivity)
   window.addEventListener('touchstart', handleUserActivity)
-  logger.info('[WelcomeScreen] Activity listeners (click, touchstart) added to window')
+  logger.info('[WelcomeScreen] Activity listeners (click, touchstart, keydown) added to window')
   
   // Set up ResizeObserver to watch inner container height (only if feature enabled)
   if (FEATURE_CONFIG.value.enableDynamicHeight && welcomeTextInner.value) {
@@ -739,8 +765,17 @@ onUnmounted(() => {
     content.removeEventListener('ionScroll', handleScroll)
     logger.info('[WelcomeScreen] Removed ionScroll event listener from ion-content')
   }
+  
+  if (scrollElement) {
+    scrollElement.removeEventListener('wheel', handleScroll)
+    scrollElement.removeEventListener('scroll', handleScroll)
+    logger.info('[WelcomeScreen] Removed wheel and scroll event listeners from scroll element')
+  }
+  
+  if (keydownHandler) {
+    window.removeEventListener('keydown', keydownHandler)
+  }
   window.removeEventListener('click', handleUserActivity)
-  window.removeEventListener('keydown', handleUserActivity)
   window.removeEventListener('touchstart', handleUserActivity)
   logger.info('[WelcomeScreen] Removed activity listeners from window')
 })
