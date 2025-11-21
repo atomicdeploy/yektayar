@@ -58,7 +58,7 @@ const { t } = useI18n({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .modern-tab-bar {
   padding: 8px 0 max(8px, env(safe-area-inset-bottom));
   height: auto;

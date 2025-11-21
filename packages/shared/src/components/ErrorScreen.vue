@@ -137,7 +137,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Web (non-mobile) styles */
 .error-screen {
   position: fixed;
