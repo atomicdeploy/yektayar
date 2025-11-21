@@ -256,28 +256,50 @@ sudo chmod 755 /var/www/yektayar/static
 ### "Vite WebSocket/HMR Connection Failed"
 **Problem:** Vite's Hot Module Replacement (HMR) WebSocket fails to connect when accessed through reverse proxy  
 
-**Solution:** This has been fixed in the Vite configuration using the `VITE_HMR_CLIENT_PORT` environment variable. The configuration in both `packages/mobile-app/vite.config.ts` and `packages/admin-panel/vite.config.ts` now supports both HTTP and HTTPS connections.
+**Solution:** This has been fixed with automatic HMR port detection from base URL configuration. Simply set the base URL in your `.env` file.
 
-**How to use:**
-- **For HTTPS** (recommended): `VITE_HMR_CLIENT_PORT=443 npm run dev:mobile`
-- **For HTTP**: `VITE_HMR_CLIENT_PORT=80 npm run dev:mobile`
-- **For local development**: Just `npm run dev:mobile` (no env var needed)
-- **For custom ports**: Set `VITE_HMR_CLIENT_PORT` to your custom port
+**How to configure:**
 
-**Example systemd service or PM2 config:**
-```bash
-# For HTTPS reverse proxy
-VITE_HMR_CLIENT_PORT=443 npm run dev:mobile
+1. **In `.env` file (recommended):**
+   ```bash
+   # For mobile app
+   MOBILE_APP_BASE_URL=https://app.yektayar.ir
+   
+   # For admin panel  
+   ADMIN_PANEL_BASE_URL=https://panel.yektayar.ir
+   ```
+   
+   HMR port is automatically detected:
+   - `https://` URLs → port 443
+   - `http://` URLs → port 80
+   - Custom port URLs (e.g., `https://app.yektayar.ir:8443`) → uses specified port
 
-# For HTTP reverse proxy
-VITE_HMR_CLIENT_PORT=80 npm run dev:mobile
+2. **For local development:**
+   No configuration needed! Leave base URLs empty and HMR will use dev server ports.
+
+3. **Manual override (optional):**
+   If you need to override the auto-detected port:
+   ```bash
+   VITE_HMR_CLIENT_PORT=443
+   ```
+
+**URL Validation:**
+The app now validates that the browser URL matches the configured base URL. If there's a mismatch, an error screen is displayed with clear instructions. This prevents deployment configuration mistakes.
+
+**Example PM2 config:**
+```javascript
+module.exports = {
+  apps: [{
+    name: 'mobile-app',
+    script: 'npm',
+    args: 'run dev',
+    env: {
+      MOBILE_APP_BASE_URL: 'https://app.yektayar.ir'
+      // HMR port (443) is auto-detected!
+    }
+  }]
+}
 ```
-
-**Note:** The HMR WebSocket will automatically:
-- Use the same protocol as the page (http/https)
-- Use the same hostname as the page
-- Use the port specified in `VITE_HMR_CLIENT_PORT` (or dev server port if not set)
-- Support subpaths if configured with the `base` option in vite.config.ts
 
 ---
 
