@@ -6,7 +6,7 @@ import App from './App.vue'
 import router from './router'
 import config from './config'
 import { ErrorScreen } from '@yektayar/shared/components'
-import { parseSolutionsMarkdown, findSolutionForError, validateApi } from '@yektayar/shared'
+import { parseSolutionsMarkdown, findSolutionForError, validateApi, getPackageVersion } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { logger } from '@yektayar/shared'
 import 'overlayscrollbars/overlayscrollbars.css'
@@ -34,11 +34,14 @@ import './theme/fonts.scss'
 /* Theme variables */
 import './theme/variables.scss'
 
+// Get version from environment variable
+const APP_VERSION = getPackageVersion()
+
 // Log startup information
 logger.startup('YektaYar Mobile App', {
   'API URL': config.apiBaseUrl,
   'Environment': import.meta.env.MODE || 'development',
-  'Version': '0.1.0',
+  'Version': APP_VERSION,
   'Platform': 'Ionic/Capacitor'
 })
 
