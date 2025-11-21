@@ -930,6 +930,10 @@ const onImageError = () => {
 .welcome-header.exit-header {
   animation: fadeOutUp 0.4s ease-in forwards;
   animation-delay: 0.45s;
+  pointer-events: none;
+  margin-bottom: 0 !important;
+  overflow: hidden;
+  max-height: 0;
 }
 
 .logo-accent {
@@ -992,6 +996,12 @@ const onImageError = () => {
 .hero-image-container.exit-hero {
   animation: fadeOutUp 0.4s ease-in forwards;
   animation-delay: 0.3s;
+  pointer-events: none;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  min-height: 0 !important;
+  max-height: 0;
+  overflow: hidden;
 }
 
 .hero-image-container :deep(.lazy-image) {
@@ -1036,6 +1046,11 @@ const onImageError = () => {
 .welcome-text.exit-text {
   animation: fadeOutUp 0.4s ease-in forwards;
   animation-delay: 0.15s;
+  pointer-events: none;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  max-height: 0;
+  overflow: hidden;
 }
 
 .welcome-text-inner {
@@ -1075,6 +1090,10 @@ const onImageError = () => {
 
 .terms-container.exit-terms {
   animation: fadeOutDown 0.4s ease-in forwards;
+  pointer-events: none;
+  margin: 0 !important;
+  max-height: 0;
+  overflow: hidden;
 }
 
 .terms-container-slide {
@@ -1238,6 +1257,10 @@ const onImageError = () => {
 
 .cta-button.exit-cta {
   animation: fadeOutDown 0.4s ease-in forwards;
+  pointer-events: none;
+  margin: 0 !important;
+  max-height: 0;
+  overflow: hidden;
 }
 
 .cta-button:not(.cta-button-disabled):not(.cta-button-loading) {
