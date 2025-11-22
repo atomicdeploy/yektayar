@@ -1,4 +1,5 @@
 import { validateSessionToken } from './sessionService'
+import { getDatabase } from './database'
 
 export interface UserPreferences {
   welcomeScreenShown?: boolean
@@ -8,25 +9,12 @@ export interface UserPreferences {
   [key: string]: any
 }
 
-// In-memory storage for preferences (will be replaced with database)
-const preferencesStore = new Map<string, UserPreferences>()
-
 /**
  * Get user preferences for a given session token
- * TODO: Implement with database
- * Database schema suggestion:
- * CREATE TABLE user_preferences (
- *   user_id VARCHAR(255) PRIMARY KEY,
- *   welcome_screen_shown BOOLEAN DEFAULT FALSE,
- *   language VARCHAR(10) DEFAULT 'fa',
- *   theme VARCHAR(20) DEFAULT 'auto',
- *   notifications BOOLEAN DEFAULT TRUE,
- *   preferences JSONB,
- *   created_at TIMESTAMP DEFAULT NOW(),
- *   updated_at TIMESTAMP DEFAULT NOW()
- * );
  */
 export async function getUserPreferences(token: string): Promise<UserPreferences> {
+  const db = getDatabase()
+  
   // Validate session first
   const session = await validateSessionToken(token)
   
@@ -34,29 +22,54 @@ export async function getUserPreferences(token: string): Promise<UserPreferences
     throw new Error('Invalid session')
   }
 
-  // Use token as key for now (in production, use user_id)
+  // Use user_id if logged in, otherwise use token as key
   const key = session.userId || token
   
-  // Return stored preferences or defaults
-  const preferences = preferencesStore.get(key) || {
-    welcomeScreenShown: false,
-    language: 'fa',
-    theme: 'auto',
-    notifications: true
+  try {
+    // Try to fetch from database
+    const result = await db`
+      SELECT welcome_screen_shown, language, theme, notifications
+      FROM user_preferences
+      WHERE user_id = ${key}
+    `
+    
+    if (result.length > 0) {
+      return {
+        welcomeScreenShown: result[0].welcome_screen_shown,
+        language: result[0].language,
+        theme: result[0].theme,
+        notifications: result[0].notifications,
+      }
+    }
+    
+    // Return defaults if not found
+    return {
+      welcomeScreenShown: false,
+      language: 'fa',
+      theme: 'auto',
+      notifications: true
+    }
+  } catch (error) {
+    console.error('Error fetching user preferences:', error)
+    // Return defaults on error
+    return {
+      welcomeScreenShown: false,
+      language: 'fa',
+      theme: 'auto',
+      notifications: true
+    }
   }
-
-  return preferences
 }
 
 /**
  * Update user preferences for a given session token
- * TODO: Implement with database
- * SQL: UPDATE user_preferences SET ... WHERE user_id = ?
  */
 export async function updateUserPreferences(
   token: string, 
   updates: Partial<UserPreferences>
 ): Promise<UserPreferences> {
+  const db = getDatabase()
+  
   // Validate session first
   const session = await validateSessionToken(token)
   
@@ -64,37 +77,64 @@ export async function updateUserPreferences(
     throw new Error('Invalid session')
   }
 
-  // Use token as key for now (in production, use user_id)
+  // Use user_id if logged in, otherwise use token as key
   const key = session.userId || token
   
-  // Get existing preferences
-  const currentPreferences = await getUserPreferences(token)
-  
-  // Merge updates
-  const updatedPreferences = {
-    ...currentPreferences,
-    ...updates
+  try {
+    // Get existing preferences
+    const currentPreferences = await getUserPreferences(token)
+    
+    // Merge updates
+    const updatedPreferences = {
+      ...currentPreferences,
+      ...updates
+    }
+    
+    // Upsert to database
+    const welcomeScreenShown = updatedPreferences.welcomeScreenShown ?? false
+    const language = updatedPreferences.language ?? 'fa'
+    const theme = updatedPreferences.theme ?? 'auto'
+    const notifications = updatedPreferences.notifications ?? true
+    
+    await db`
+      INSERT INTO user_preferences (
+        user_id, 
+        welcome_screen_shown, 
+        language, 
+        theme, 
+        notifications,
+        updated_at
+      )
+      VALUES (
+        ${key}, 
+        ${welcomeScreenShown}, 
+        ${language}, 
+        ${theme}, 
+        ${notifications},
+        CURRENT_TIMESTAMP
+      )
+      ON CONFLICT (user_id) 
+      DO UPDATE SET
+        welcome_screen_shown = EXCLUDED.welcome_screen_shown,
+        language = EXCLUDED.language,
+        theme = EXCLUDED.theme,
+        notifications = EXCLUDED.notifications,
+        updated_at = CURRENT_TIMESTAMP
+    `
+    
+    return updatedPreferences
+  } catch (error) {
+    console.error('Error updating user preferences:', error)
+    throw new Error('Failed to update user preferences')
   }
-  
-  // Store updated preferences
-  preferencesStore.set(key, updatedPreferences)
-  
-  // TODO: In production, save to database:
-  // await db.query(
-  //   'INSERT INTO user_preferences (user_id, welcome_screen_shown, ...) 
-  //    VALUES ($1, $2, ...) 
-  //    ON CONFLICT (user_id) DO UPDATE SET ...',
-  //   [key, updatedPreferences.welcomeScreenShown, ...]
-  // )
-
-  return updatedPreferences
 }
 
 /**
  * Delete user preferences
- * TODO: Implement with database
  */
 export async function deleteUserPreferences(token: string): Promise<void> {
+  const db = getDatabase()
+  
   const session = await validateSessionToken(token)
   
   if (!session) {
@@ -102,8 +142,11 @@ export async function deleteUserPreferences(token: string): Promise<void> {
   }
 
   const key = session.userId || token
-  preferencesStore.delete(key)
   
-  // TODO: In production:
-  // await db.query('DELETE FROM user_preferences WHERE user_id = $1', [key])
+  try {
+    await db`DELETE FROM user_preferences WHERE user_id = ${key}`
+  } catch (error) {
+    console.error('Error deleting user preferences:', error)
+    throw new Error('Failed to delete user preferences')
+  }
 }
