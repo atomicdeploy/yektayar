@@ -7,6 +7,7 @@ import api.yektayar.ir
 import panel.yektayar.ir
 import app.yektayar.ir
 import static.yektayar.ir
+import ws.yektayar.ir
 
 # Global options
 {

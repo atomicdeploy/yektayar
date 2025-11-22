@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { RouteRecordRaw } from 'vue-router'
 import TabsPage from '../views/TabsPage.vue'
 import SplashScreen from '../views/SplashScreen.vue'
+import SplashTester from '../views/SplashTester.vue'
 import WelcomeScreen from '../views/WelcomeScreen.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -15,9 +16,19 @@ const routes: Array<RouteRecordRaw> = [
     component: SplashScreen
   },
   {
+    path: '/splashTester',
+    name: 'SplashTester',
+    component: SplashTester
+  },
+  {
     path: '/welcome',
     name: 'Welcome',
     component: WelcomeScreen
+  },
+  {
+    path: '/icon-test',
+    name: 'IconTest',
+    component: () => import('@/views/IconTestPage.vue')
   },
   {
     path: '/tabs/',

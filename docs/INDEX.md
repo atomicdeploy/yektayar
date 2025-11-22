@@ -23,6 +23,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - **[Development Guide](../DEVELOPMENT.md)** - Detailed development practices, environment setup, and prototype sprint guide
 - **[Quick Reference](QUICK-REFERENCE.md)** - Essential code snippets and daily checklist
 - **[Quick Start](../QUICK-START.md)** - Fast setup for the current monorepo
+- **[Troubleshooting Dev Errors](TROUBLESHOOTING-DEV-ERRORS.md)** - Solutions for common development errors
 
 #### Architecture & Design
 - **[Architecture Overview](ARCHITECTURE.md)** - Complete system architecture including prototype/production phases and alternative approaches
@@ -64,6 +65,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - [Development Guide](../DEVELOPMENT.md) - Development practices and prototype sprint guide
 - [Getting Started Guide](GETTING-STARTED.md) - Onboarding guide
 - [Quick Reference](QUICK-REFERENCE.md) - Code snippets & patterns
+- [Troubleshooting Dev Errors](TROUBLESHOOTING-DEV-ERRORS.md) - Solutions for common development errors
 - [Socket.IO Guide](SOCKETIO-GUIDE.md) - Real-time WebSocket communication setup and usage
 - [OverlayScrollbars Guide](OVERLAYSCROLLBARS.md) - Custom scrollbar implementation and usage
 
@@ -96,6 +98,7 @@ yektayar/
     │
     ├── GETTING-STARTED.md         # New developer onboarding
     ├── QUICK-REFERENCE.md         # Code snippets & daily checklist
+    ├── TROUBLESHOOTING-DEV-ERRORS.md  # Common development errors & solutions
     │
     ├── ARCHITECTURE.md            # System architecture (all phases & alternatives)
     ├── REQUIREMENTS-REVIEW.md     # Requirements analysis
@@ -159,6 +162,9 @@ yektayar/
 - **WebSocket**: [Architecture](ARCHITECTURE.md), [Setup Guide](SETUP.md)
 - **Scrollbars/UI**: [OverlayScrollbars Guide](OVERLAYSCROLLBARS.md)
 - **Prototype Sprint**: [Development Guide](../DEVELOPMENT.md), [Roadmap](../ROADMAP.md)
+- **Errors/Troubleshooting**: [Troubleshooting Dev Errors](TROUBLESHOOTING-DEV-ERRORS.md)
+- **APP_VERSION**: [Troubleshooting Dev Errors](TROUBLESHOOTING-DEV-ERRORS.md)
+- **Pinia/Store**: [Troubleshooting Dev Errors](TROUBLESHOOTING-DEV-ERRORS.md)
 
 ---
 

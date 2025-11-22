@@ -78,6 +78,8 @@ const textDirection = computed(() => {
   return locale.value === 'fa' ? 'rtl' : 'ltr'
 })
 
+// const isTranslatedError = ... // Uses flags
+
 const displayDetails = computed(() => {
   if (!props.details) return ''
   // Use translated message for built-in errors, raw message otherwise
