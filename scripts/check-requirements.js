@@ -283,6 +283,7 @@ function printSummary() {
     print(icons.error, colors.red + colors.bold, 'REQUIREMENTS CHECK FAILED', 0);
     console.log('');
     print(icons.info, colors.yellow, 'Please install missing requirements and try again.', 0);
+    print(icons.info, colors.cyan, 'Run: bash ./scripts/install-dev-tools.sh', 0);
     process.exit(1);
   } else if (hasWarnings) {
     print(icons.warning, colors.yellow + colors.bold, 'REQUIREMENTS CHECK PASSED WITH WARNINGS', 0);
@@ -296,6 +297,24 @@ function printSummary() {
   }
   
   console.log('='.repeat(60));
+  
+  // Check if this looks like a fresh clone and suggest post-clone setup
+  const hasEnvFile = fs.existsSync(path.join(process.cwd(), '.env'));
+  if (!hasEnvFile && !hasErrors) {
+    console.log('');
+    print(icons.info, colors.cyan + colors.bold, 'First time here?', 0);
+    print(icons.info, colors.cyan, 'Run the post-clone setup for an enhanced experience:', 0);
+    console.log('');
+    console.log(colors.yellow + '  bash ./scripts/post-clone-setup.sh' + colors.reset);
+    console.log('');
+    print(icons.info, colors.cyan, 'This will:', 0);
+    print(icons.info, colors.cyan, '  • Install missing optional tools', 1);
+    print(icons.info, colors.cyan, '  • Enhance your bash configuration with git-aware prompt', 1);
+    print(icons.info, colors.cyan, '  • Add useful development aliases', 1);
+    print(icons.info, colors.cyan, '  • Set up npm completions', 1);
+    print(icons.info, colors.cyan, '  • Configure keyboard shortcuts (Ctrl-Backspace, Ctrl-Delete)', 1);
+  }
+  
   console.log('');
 }
 
