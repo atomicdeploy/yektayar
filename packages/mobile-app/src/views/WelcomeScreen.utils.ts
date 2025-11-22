@@ -34,7 +34,7 @@ export function skipCurrentParagraph(
 }
 
 /**
- * Skip all remaining typewriter paragraphs and persist preference
+ * Toggle skip typewriter preference and skip all remaining paragraphs if enabling
  */
 export function skipAllTypewriters(
   typewriters: TypewriterInstance[],
@@ -42,20 +42,23 @@ export function skipAllTypewriters(
 ): void {
   const configStore = useDebugConfigStore()
   
-  logger.info('[WelcomeScreen] Shift+F6: Skipping all typewriters and persisting preference')
+  // Toggle the skip flag
+  const newSkipValue = !configStore.welcomeConfig.skipTypewriter
+  configStore.setSkipTypewriter(newSkipValue)
   
-  // Set persistent skip flag
-  configStore.setSkipTypewriter(true)
+  logger.info(`[WelcomeScreen] Shift+F6: Toggled skip typewriter to ${newSkipValue}`)
   
-  // Skip all remaining paragraphs
-  typewriters.forEach((tw, index) => {
-    if (!tw.isComplete.value) {
-      tw.reset()
-      tw.displayText.value = paragraphs[index]
-      tw.isComplete.value = true
-      tw.isTyping.value = false
-    }
-  })
+  // Only skip remaining paragraphs if enabling skip
+  if (newSkipValue) {
+    typewriters.forEach((tw, index) => {
+      if (!tw.isComplete.value) {
+        tw.reset()
+        tw.displayText.value = paragraphs[index]
+        tw.isComplete.value = true
+        tw.isTyping.value = false
+      }
+    })
+  }
 }
 
 /**
