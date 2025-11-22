@@ -538,7 +538,7 @@ onMounted(async () => {
   if (content) {
     // Listen for Ionic scroll events (touch/swipe on mobile)
     content.addEventListener('ionScroll', handleScroll)
-    logger.info('[WelcomeScreen] ionScroll event listener added to ion-content')
+    logger.debug('[WelcomeScreen] ionScroll event listener added to ion-content')
     
     // Get the actual scrollable element inside ion-content for wheel/keyboard events
     scrollElement = await content.getScrollElement()
@@ -547,7 +547,7 @@ onMounted(async () => {
       scrollElement.addEventListener('wheel', handleScroll, { passive: true })
       // Listen for scroll events (fallback for keyboard and other scroll methods)
       scrollElement.addEventListener('scroll', handleScroll, { passive: true })
-      logger.info('[WelcomeScreen] wheel and scroll event listeners added to scroll element')
+      logger.debug('[WelcomeScreen] wheel and scroll event listeners added to scroll element')
     } else {
       logger.warn('[WelcomeScreen] Scroll element not found inside ion-content')
     }
@@ -567,7 +567,7 @@ onMounted(async () => {
   
   window.addEventListener('click', handleUserActivity)
   window.addEventListener('touchstart', handleUserActivity)
-  logger.info('[WelcomeScreen] Activity listeners (click, touchstart, keydown) added to window')
+  logger.debug('[WelcomeScreen] Activity listeners (click, touchstart, keydown) added to window')
   
   // Set up ResizeObserver to watch inner container height (only if feature enabled)
   if (FEATURE_CONFIG.value.enableDynamicHeight && welcomeTextInner.value) {
@@ -694,7 +694,7 @@ onMounted(async () => {
 
 // Scroll reminder logic
 const handleScroll = (event?: any) => {
-  logger.info('[WelcomeScreen] handleScroll triggered', {
+  logger.debug('[WelcomeScreen] handleScroll triggered', {
     userHasScrolled: userHasScrolled.value,
     showScrollReminder: showScrollReminder.value,
     eventType: event?.type,
@@ -703,7 +703,7 @@ const handleScroll = (event?: any) => {
   
   if (!userHasScrolled.value) {
     userHasScrolled.value = true
-    logger.info('[WelcomeScreen] User has scrolled - hiding scroll reminder')
+    logger.debug('[WelcomeScreen] User has scrolled - hiding scroll reminder')
     hideScrollReminder()
   } else {
     logger.debug('[WelcomeScreen] Scroll event but user already scrolled')
@@ -725,13 +725,13 @@ const handleUserActivity = (event?: any) => {
   
   // If scroll reminder is showing and user clicks/types, hide it
   if (showScrollReminder.value) {
-    logger.info('[WelcomeScreen] Hiding scroll reminder due to user activity')
+    logger.debug('[WelcomeScreen] Hiding scroll reminder due to user activity')
     hideScrollReminder()
   }
 }
 
 const hideScrollReminder = () => {
-  logger.info('[WelcomeScreen] Hiding scroll reminder', {
+  logger.debug('[WelcomeScreen] Hiding scroll reminder', {
     wasShowing: showScrollReminder.value
   })
   
@@ -747,11 +747,11 @@ const hideScrollReminder = () => {
 }
 
 const scrollToBottom = () => {
-  logger.info('[WelcomeScreen] scrollToBottom triggered - auto-scrolling to bottom')
+  logger.debug('[WelcomeScreen] scrollToBottom triggered - auto-scrolling to bottom')
   const content = document.querySelector('ion-content')
   if (content) {
     content.scrollToBottom(500)
-    logger.info('[WelcomeScreen] Scroll to bottom initiated')
+    logger.debug('[WelcomeScreen] Scroll to bottom initiated')
   } else {
     logger.warn('[WelcomeScreen] ion-content element not found')
   }
@@ -760,22 +760,22 @@ const scrollToBottom = () => {
 
 // Watch for first paragraph completion to show scroll reminder
 watch(() => typewriters[0].isComplete.value, (isComplete) => {
-  logger.info('[WelcomeScreen] First paragraph completion watch triggered', {
+  logger.debug('[WelcomeScreen] First paragraph completion watch triggered', {
     isComplete,
     userHasScrolled: userHasScrolled.value,
     showScrollReminder: showScrollReminder.value
   })
   
   if (isComplete && !userHasScrolled.value && !showScrollReminder.value) {
-    logger.info('[WelcomeScreen] Setting 3-second timeout to show scroll reminder')
+    logger.debug('[WelcomeScreen] Setting 3-second timeout to show scroll reminder')
     // Wait 3 seconds of inactivity before showing reminder
     activityTimeout = setTimeout(() => {
       // Check if user still hasn't scrolled
       if (!userHasScrolled.value) {
         showScrollReminder.value = true
-        logger.info('[WelcomeScreen] Showing scroll reminder after timeout')
+        logger.debug('[WelcomeScreen] Showing scroll reminder after timeout')
       } else {
-        logger.info('[WelcomeScreen] User scrolled during timeout - not showing reminder')
+        logger.debug('[WelcomeScreen] User scrolled during timeout - not showing reminder')
       }
     }, 3000)
   } else {
@@ -789,7 +789,7 @@ watch(() => typewriters[0].isComplete.value, (isComplete) => {
 
 // Cleanup keyboard shortcuts and scroll reminder on unmount
 onUnmounted(() => {
-  logger.info('[WelcomeScreen] Component unmounting - cleaning up listeners')
+  logger.debug('[WelcomeScreen] Component unmounting - cleaning up listeners')
   window.removeEventListener('keydown', handleKeyPress)
   window.removeEventListener('keydown', handleDebugKey)
   hideScrollReminder()
@@ -798,13 +798,13 @@ onUnmounted(() => {
   const content = document.querySelector('ion-content')
   if (content) {
     content.removeEventListener('ionScroll', handleScroll)
-    logger.info('[WelcomeScreen] Removed ionScroll event listener from ion-content')
+    logger.debug('[WelcomeScreen] Removed ionScroll event listener from ion-content')
   }
   
   if (scrollElement) {
     scrollElement.removeEventListener('wheel', handleScroll)
     scrollElement.removeEventListener('scroll', handleScroll)
-    logger.info('[WelcomeScreen] Removed wheel and scroll event listeners from scroll element')
+    logger.debug('[WelcomeScreen] Removed wheel and scroll event listeners from scroll element')
   }
   
   if (keydownHandler) {
@@ -812,7 +812,7 @@ onUnmounted(() => {
   }
   window.removeEventListener('click', handleUserActivity)
   window.removeEventListener('touchstart', handleUserActivity)
-  logger.info('[WelcomeScreen] Removed activity listeners from window')
+  logger.debug('[WelcomeScreen] Removed activity listeners from window')
 })
 
 const showTerms = () => {
