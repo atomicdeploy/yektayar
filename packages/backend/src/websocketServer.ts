@@ -1,6 +1,6 @@
 import { setupBunSocketIO } from './websocket/socketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
-import { SOCKET_IO_PATH } from '@yektayar/shared'
+import { SOCKET_IO_PATH, getWebSocketPathFromEnv } from '@yektayar/shared'
 import { initializeDatabase } from './services/database'
 
 /**
@@ -12,6 +12,7 @@ import { initializeDatabase } from './services/database'
 // Server configuration
 const wsPort = Number(process.env.WEBSOCKET_PORT) || 3500
 const hostname = process.env.HOST || 'localhost'
+const WEBSOCKET_PATH = getWebSocketPathFromEnv()
 
 // Initialize database
 initializeDatabase().catch(error => {
@@ -76,8 +77,8 @@ const wsServer = Bun.serve({
         }
       },
       usage: {
-        socketio: `Connect to ${url.origin}${SOCKET_IO_PATH} with Socket.IO client`,
-        websocket: `Connect to ${url.origin}/?token=YOUR_TOKEN with native WebSocket client`
+        socketio: `Connect to ${url.origin}${WEBSOCKET_PATH} with Socket.IO client`,
+        websocket: `Connect to ${url.origin}${WEBSOCKET_PATH}?token=YOUR_TOKEN with native WebSocket client (or use Authorization header)`
       }
     }), {
       headers: {

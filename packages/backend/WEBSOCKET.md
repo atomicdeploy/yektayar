@@ -148,7 +148,7 @@ socket1.emit('ai:chat', {
 
 ```javascript
 // Connect to dedicated WebSocket server
-const ws = new WebSocket('ws://localhost:3500/?token=YOUR_SESSION_TOKEN');
+const ws = new WebSocket('ws://localhost:3500/ws?token=YOUR_SESSION_TOKEN');
 
 // Or use Authorization header
 const ws2 = new WebSocket('ws://localhost:3500/', {
@@ -189,7 +189,7 @@ ws.onclose = () => {
 npm install -g wscat
 
 # Connect with token
-wscat -c "ws://localhost:3500/?token=YOUR_SESSION_TOKEN"
+wscat -c "ws://localhost:3500/ws?token=YOUR_SESSION_TOKEN"
 
 # Or use header (requires wscat with header support)
 wscat -c "ws://localhost:3500/" -H "Authorization: Bearer YOUR_SESSION_TOKEN"
@@ -229,7 +229,7 @@ const socket = io('http://localhost:3500?token=' + sessionToken);
 
 ```javascript
 // Browser - must use query parameter
-const ws = new WebSocket('ws://localhost:3500/?token=' + sessionToken);
+const ws = new WebSocket('ws://localhost:3500/ws?token=' + sessionToken);
 
 // Node.js with ws library - can use headers
 const WebSocket = require('ws');
@@ -274,7 +274,7 @@ npm run socketio:test -- http://localhost:3000
 npm run socketio:test -- http://localhost:3500
 
 # 4. Test native WebSocket
-wscat -c "ws://localhost:3500/?token=YOUR_TOKEN"
+wscat -c "ws://localhost:3500/ws?token=YOUR_TOKEN"
 ```
 
 ## Reverse Proxy Configuration

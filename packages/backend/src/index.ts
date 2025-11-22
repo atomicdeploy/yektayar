@@ -20,11 +20,14 @@ import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
 import { initializeDatabase } from './services/database'
-import { SOCKET_IO_PATH, WEBSOCKET_PATH, getVersionFromPackageJson } from '@yektayar/shared'
+import { SOCKET_IO_PATH, getWebSocketPathFromEnv, getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../package.json'
 
 // Get version from package.json
 const APP_VERSION = getVersionFromPackageJson(packageJson)
+
+// Get WebSocket path from environment or use default
+const WEBSOCKET_PATH = getWebSocketPathFromEnv()
 
 // Configure CORS based on environment
 // When behind a reverse proxy (like Apache), disable application-level CORS

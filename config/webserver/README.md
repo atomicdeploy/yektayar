@@ -311,7 +311,7 @@ Connect to: `wss://ws.yektayar.ir/socket.io/`
 - Same authentication and events as main server
 
 #### Native WebSocket
-Connect to: `wss://ws.yektayar.ir/?token=YOUR_TOKEN`
+Connect to: `wss://ws.yektayar.ir/ws?token=YOUR_TOKEN`
 - Standard WebSocket protocol (RFC 6455)
 - Authentication via query parameter or Authorization header
 - JSON message format: `{"event": "eventName", "data": {...}}`
@@ -325,7 +325,7 @@ curl https://ws.yektayar.ir/socket.io/
 
 # Test native WebSocket (requires wscat)
 npm install -g wscat
-wscat -c "wss://ws.yektayar.ir/?token=YOUR_TOKEN"
+wscat -c "wss://ws.yektayar.ir/ws?token=YOUR_TOKEN"
 
 # Send a ping message (native WebSocket)
 > {"event":"ping"}

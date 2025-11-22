@@ -182,7 +182,7 @@ Both protocols use the same authentication mechanism:
 io('http://localhost:3500', { auth: { token: 'TOKEN' } })
 
 // Native WebSocket
-new WebSocket('ws://localhost:3500/?token=TOKEN')
+new WebSocket('ws://localhost:3500/ws?token=TOKEN')
 ```
 
 ## Usage
@@ -209,7 +209,7 @@ npm run test:websocket
 npm run socketio:test -- http://localhost:3500
 
 # Test native WebSocket
-wscat -c "ws://localhost:3500/?token=TOKEN"
+wscat -c "ws://localhost:3500/ws?token=TOKEN"
 ```
 
 ### Deployment
