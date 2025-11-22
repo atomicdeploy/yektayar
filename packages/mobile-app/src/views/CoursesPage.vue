@@ -73,9 +73,10 @@
                 @click="viewCourse(enrollment.course.id)"
               >
                 <div class="course-thumbnail">
-                  <img
+                  <LazyImage
                     :src="enrollment.course.thumbnailUrl || '/placeholder-course.jpg'"
                     :alt="enrollment.course.title"
+                    image-class="course-thumbnail-image"
                   />
                   <div class="progress-overlay">
                     <ion-progress-bar :value="enrollment.progress / 100"></ion-progress-bar>
@@ -114,7 +115,11 @@
                 @click="viewCourse(course.id)"
               >
                 <div class="course-image">
-                  <img :src="course.thumbnailUrl || '/placeholder-course.jpg'" :alt="course.title" />
+                  <LazyImage
+                    :src="course.thumbnailUrl || '/placeholder-course.jpg'"
+                    :alt="course.title"
+                    image-class="course-main-image"
+                  />
                   <div class="course-badge" v-if="course.isFree">
                     <ion-badge color="success">{{ t('courses.free') }}</ion-badge>
                   </div>
@@ -198,6 +203,7 @@ import {
   IonSkeletonText
 } from '@ionic/vue'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
+import LazyImage from '@/components/LazyImage.vue'
 import {
   funnel,
   chevronForward,
@@ -349,8 +355,8 @@ onMounted(() => {
 }
 
 ion-chip {
-  --background: var(--ion-color-light);
-  --color: var(--ion-text-color);
+  --background: var(--ion-color-step-150, var(--ion-color-light));
+  --color: var(--ion-color-step-850, var(--ion-text-color));
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -358,6 +364,14 @@ ion-chip {
   &.active {
     --background: var(--ion-color-primary);
     --color: var(--ion-color-primary-contrast);
+  }
+}
+
+// Dark mode support for chips
+@media (prefers-color-scheme: dark) {
+  ion-chip {
+    --background: var(--ion-color-step-150);
+    --color: var(--ion-color-step-850);
   }
 }
 
@@ -409,12 +423,21 @@ ion-chip {
     position: relative;
     width: 100%;
     height: 140px;
+    overflow: hidden;
 
-    img {
+    :deep(.lazy-image-wrapper) {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-secondary-tint));
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .image-error {
+        background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-secondary-tint));
+      }
     }
 
     .progress-overlay {
@@ -485,12 +508,21 @@ ion-chip {
     position: relative;
     width: 100%;
     height: 180px;
+    overflow: hidden;
 
-    img {
+    :deep(.lazy-image-wrapper) {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-secondary-tint));
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .image-error {
+        background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-secondary-tint));
+      }
     }
 
     .course-badge {

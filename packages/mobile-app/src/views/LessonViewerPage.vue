@@ -576,7 +576,7 @@ onUnmounted(() => {
 .resources-section,
 .notes-section {
   padding: 24px;
-  background: var(--ion-color-light);
+  background: var(--ion-color-step-50, var(--ion-color-light));
   border-radius: 16px;
   margin-bottom: 24px;
 
@@ -585,6 +585,14 @@ onUnmounted(() => {
     font-size: 18px;
     font-weight: 700;
     color: var(--ion-text-color);
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .resources-section,
+  .notes-section {
+    background: var(--ion-color-step-100);
   }
 }
 
