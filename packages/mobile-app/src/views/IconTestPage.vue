@@ -81,7 +81,7 @@
                 <code>&lt;ion-icon src="/logo-simple.svg"&gt;</code>
               </div>
               <div class="icon-item">
-                <img src="/logo-simple.svg" alt="Direct img tag" style="width: 64px; height: 64px;" />
+                <img src="/logo-simple.svg" alt="Direct img tag" class="direct-img-icon" />
                 <p>Direct IMG Tag</p>
                 <code>&lt;img src="/logo-simple.svg"&gt;</code>
               </div>
@@ -297,22 +297,29 @@ async function testIcon(id: string, name: string): Promise<{ name: string; passe
       return { name, passed: false, error: 'SVG element not found in icon-inner' }
     }
     
-    console.log(`✓ ${name}: Passed all checks`, {
-      shadowRoot: !!shadowRoot,
-      iconInner: !!iconInner,
-      children: iconInner.children.length,
-      svg: !!svg
-    })
+    // Log for development/debugging only
+    if (import.meta.env.DEV) {
+      console.log(`✓ ${name}: Passed all checks`, {
+        shadowRoot: !!shadowRoot,
+        iconInner: !!iconInner,
+        children: iconInner.children.length,
+        svg: !!svg
+      })
+    }
     
     return { name, passed: true }
   } catch (error) {
-    console.error(`✗ ${name}: Failed`, error)
+    if (import.meta.env.DEV) {
+      console.error(`✗ ${name}: Failed`, error)
+    }
     return { name, passed: false, error: (error as Error).message }
   }
 }
 
 onMounted(async () => {
-  console.log('=== Starting Icon Tests ===')
+  if (import.meta.env.DEV) {
+    console.log('=== Starting Icon Tests ===')
+  }
   
   // Wait a bit for all icons to render
   await new Promise(resolve => setTimeout(resolve, 500))
@@ -329,9 +336,11 @@ onMounted(async () => {
   const results = await Promise.all(tests)
   testResults.value = results
   
-  console.log('=== Test Results ===')
-  console.log(`Passed: ${results.filter(r => r.passed).length}/${results.length}`)
-  console.table(results)
+  if (import.meta.env.DEV) {
+    console.log('=== Test Results ===')
+    console.log(`Passed: ${results.filter(r => r.passed).length}/${results.length}`)
+    console.table(results)
+  }
 })
 </script>
 
@@ -515,5 +524,10 @@ ion-note {
   width: 50px;
   height: 50px;
   filter: brightness(0) invert(1);
+}
+
+.direct-img-icon {
+  width: 64px;
+  height: 64px;
 }
 </style>

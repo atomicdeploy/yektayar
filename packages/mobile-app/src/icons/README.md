@@ -211,6 +211,6 @@ For `<ion-icon>` with `src`:
 
 ---
 
-**Last Updated:** 2025-11-22  
+**Last Updated:** November 2024  
 **Status:** Production-ready, using simple `<img>` tag approach  
 **Test Page:** `/icon-test` for live verification
