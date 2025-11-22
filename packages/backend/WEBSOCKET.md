@@ -210,20 +210,43 @@ wscat -c "ws://localhost:3500/" -H "Authorization: Bearer YOUR_SESSION_TOKEN"
 Both protocols require authentication via session token:
 
 ### Socket.IO
-- Pass token in `auth.token` option when connecting
-- Or pass as query parameter: `/socket.io/?token=YOUR_TOKEN`
+- **Preferred**: Pass token in `auth.token` option when connecting (uses Socket.IO's authentication mechanism)
+- Alternative: Pass as query parameter: `/socket.io/?token=YOUR_TOKEN`
+
+```javascript
+// Preferred method - uses Socket.IO auth
+const socket = io('http://localhost:3500', {
+  auth: { token: sessionToken }
+});
+
+// Alternative - query parameter
+const socket = io('http://localhost:3500?token=' + sessionToken);
+```
 
 ### Native WebSocket
-- Pass token as query parameter: `/?token=YOUR_TOKEN`
-- Or use Authorization header: `Authorization: Bearer YOUR_TOKEN`
+- **Browser**: Pass token as query parameter: `/?token=YOUR_TOKEN` (WebSocket API doesn't support custom headers)
+- **Server-side/CLI tools**: Use Authorization header: `Authorization: Bearer YOUR_TOKEN`
+
+```javascript
+// Browser - must use query parameter
+const ws = new WebSocket('ws://localhost:3500/?token=' + sessionToken);
+
+// Node.js with ws library - can use headers
+const WebSocket = require('ws');
+const ws = new WebSocket('ws://localhost:3500', {
+  headers: { 'Authorization': '******' }
+});
+```
+
+**Note**: While the backend supports both query parameters and Authorization headers for native WebSocket, browser implementations can only use query parameters due to WebSocket API limitations.
 
 ### Getting a Session Token
 
 ```bash
 # 1. Acquire anonymous session
-curl -X POST http://localhost:3000/api/auth/session/acquire
+curl -X POST http://localhost:3000/api/auth/acquire-session
 
-# Response: { "token": "...", "userId": null }
+# Response: { "success": true, "data": { "token": "...", "expiresAt": "..." } }
 
 # 2. Use the token for WebSocket connection
 ```
