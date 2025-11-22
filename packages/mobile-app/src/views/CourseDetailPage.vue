@@ -439,8 +439,8 @@ const getLessonIcon = (contentType: string) => {
 
 const lessonCompleted = (lessonId: string) => {
   // TODO: Check from actual progress data
-  console.log('Checking lesson completion:', lessonId)
-  return false
+  // This will be populated from enrollment progress API
+  return lessonId === '1-1' // Mock: mark first lesson as completed for demo
 }
 
 const getDifficultyColor = (difficulty: string) => {
