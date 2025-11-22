@@ -44,7 +44,8 @@
         <!-- Header with Title and Logo -->
         <div ref="headerRef" class="welcome-header" :class="{ 'exit-header': exitStates.header }">
           <div class="logo-accent">
-            <ion-icon :icon="heartOutline" class="heart-icon"></ion-icon>
+            <!-- <ion-icon name="yektayar" :icon="yektayar" class="yektayar-icon"></ion-icon> -->
+            <img src="/logo-simple.svg" alt="YektaYar Logo" class="yektayar-icon" />
           </div>
           <h1 class="welcome-title">خوش آمدید!</h1>
           <div class="title-underline"></div>
@@ -187,6 +188,7 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
+import { useRouter } from 'vue-router'
 import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -1062,9 +1064,11 @@ const onImageError = () => {
   animation: scaleIn 0.5s ease-out;
 }
 
-.heart-icon {
-  font-size: 32px;
-  color: white;
+.yektayar-icon {
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+  filter: brightness(0) invert(1);
   animation: heartbeat 2s ease-in-out infinite;
 }
 

@@ -20,6 +20,11 @@ const routes: Array<RouteRecordRaw> = [
     component: WelcomeScreen
   },
   {
+    path: '/icon-test',
+    name: 'IconTest',
+    component: () => import('@/views/IconTestPage.vue')
+  },
+  {
     path: '/tabs/',
     component: TabsPage,
     children: [
