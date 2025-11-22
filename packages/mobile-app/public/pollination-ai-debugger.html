@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+  />
+  <title>YektaYar AI — Compassionate Mental Health Support</title>
+  <style>
+    :root {
+      --bg: #0f172a;          /* slate-900 */
+      --panel: #111827;       /* gray-900 */
+      --muted: #9ca3af;       /* gray-400 */
+      --text: #e5e7eb;        /* gray-200 */
+      --accent: #60a5fa;      /* blue-400 */
+      --accent-strong: #3b82f6; /* blue-500 */
+      --danger: #f87171;      /* red-400 */
+      --success: #34d399;     /* green-400 */
+      --bubble-user: #1f2937; /* gray-800 */
+      --bubble-ai: #0b1220;   /* custom dark */
+      --border: #374151;      /* gray-700 */
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: radial-gradient(1200px at 20% 0%, #0b1220 0%, var(--bg) 40%, #0a0f1f 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      margin: 0;
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 16px;
+      background: rgba(17,24,39,0.6);
+      backdrop-filter: blur(6px);
+    }
+    header .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .container {
+      padding: 16px;
+      max-width: 920px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 12px;
+    }
+
+    .msg {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      background: #0a0f1f;
+      color: var(--accent);
+    }
+
+    .bubble {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bubble-ai);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      line-height: 1.5;
+    }
+
+    .msg.user .bubble {
+      background: var(--bubble-user);
+      border-color: #2b3645;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .rtl {
+      direction: rtl;
+      text-align: right;
+    }
+
+    .composer {
+      border-top: 1px solid var(--border);
+      background: rgba(17,24,39,0.6);
+      backdrop-filter: blur(6px);
+    }
+
+    .composer .inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 12px 16px;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      max-height: 200px;
+      resize: vertical;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+      color: var(--text);
+      outline: none;
+    }
+    textarea::placeholder { color: #73839c; }
+
+    .actions {
+      display: flex; align-items: end; gap: 8px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--accent-strong);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+    }
+    button:disabled {
+      opacity: 0.6; cursor: not-allowed;
+    }
+
+    .status {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--muted);
+      padding: 8px 0;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.6); opacity: 0.4; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(17,24,39,0.6);
+      backdrop-filter: blur(6px);
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .toolbar button {
+      background: transparent; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="container title">
+        <div class="avatar" aria-hidden="true">Y</div>
+        <div>
+          <div style="font-weight:700;">YektaYar AI</div>
+          <div class="badge">Compassionate, professional mental health support — not a replacement for therapy</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="toolbar">
+        <button id="resetBtn" title="Start a new conversation">New chat</button>
+        <button id="exportBtn" title="Export chat history">Export</button>
+        <button id="importBtn" title="Import chat history">Import</button>
+        <input type="file" id="fileInput" accept="application/json" style="display:none;" />
+      </div>
+
+      <div id="status" class="status" aria-live="polite"></div>
+
+      <div id="chat" class="chat" aria-live="polite" aria-label="Conversation with YektaYar AI"></div>
+    </main>
+
+    <section class="composer">
+      <div class="inner">
+        <textarea id="input" placeholder="Share what's on your mind. Example: سلام شوهرم بهم خیانت کرده..." aria-label="Message"></textarea>
+        <div class="actions">
+          <button id="sendBtn">Send</button>
+          <button id="stopBtn" class="secondary">Stop</button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      YektaYar AI offers general mental wellness guidance. It doesn’t diagnose conditions or prescribe medication. If you’re struggling or feel unsafe, consider reaching out to trusted people and professional support in your area.
+    </footer>
+  </div>
+
+  <script>
+    // ----- Configuration -----
+    const API_URL = 'https://text.pollinations.ai/';
+    const MODEL = 'openai';  // Adjust if your provider expects a specific model name
+    const STORAGE_KEY = 'yektaYar.chat.v1';
+
+    // System prompt to enforce role and safety boundaries
+    const SYSTEM_PROMPT = `
+You are a compassionate and professional mental health AI counselor named YektaYar AI. Your role is to provide supportive, empathetic, and helpful guidance to users seeking mental health support.
+
+Guidelines:
+1. Always be empathetic, warm, and non-judgmental
+2. Provide practical, evidence-based advice for mental wellness
+3. Encourage professional help when needed (you are not a replacement for professional therapy)
+4. Maintain confidentiality and respect privacy
+5. Use simple, clear language that's easy to understand
+6. Be culturally sensitive and respectful
+7. Focus on positive psychology and solution-oriented approaches
+8. Validate users' feelings and experiences
+9. Provide coping strategies and self-care techniques
+10. Never give medical diagnoses or prescribe medication
+
+Your responses should be:
+- Supportive and understanding
+- Practical and actionable
+- Brief but comprehensive (2-4 paragraphs typically)
+- Encouraging and hopeful
+- Focused on the user's wellbeing
+
+Remember: You are here to support, guide, and encourage users on their mental wellness journey.
+`.trim();
+
+    // ----- State management -----
+    let messages = loadMessages() ?? [
+      { role: 'system', content: SYSTEM_PROMPT },
+      {
+        role: 'assistant',
+        content:
+          'Thank you for reaching out. I’ll do my best to support you with care and respect. ' +
+          'When you’re ready, share a bit about what you’re going through—any details that feel safe to share.'
+      }
+    ];
+    let controller = null; // for aborting requests
+
+    // ----- Utility functions -----
+    function saveMessages() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(messages)); } catch {}
+    }
+    function loadMessages() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch { return null; }
+    }
+
+    function isRTLText(text) {
+      // Basic detection: if it has Arabic/Persian characters, mark RTL
+      const rtlRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+      return rtlRegex.test(text);
+    }
+
+    function setStatus(text, type = 'info') {
+      const el = document.getElementById('status');
+      el.innerHTML = '';
+      if (!text) return;
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      if (type === 'error') dot.style.background = 'var(--danger)';
+      if (type === 'success') dot.style.background = 'var(--success)';
+      el.appendChild(dot);
+      const span = document.createElement('span');
+      span.textContent = text;
+      el.appendChild(span);
+    }
+
+    function render() {
+      const chat = document.getElementById('chat');
+      chat.innerHTML = '';
+
+      messages
+        .filter(m => m.role !== 'system') // hide system message from UI
+        .forEach(m => {
+          const msg = document.createElement('div');
+          msg.className = `msg ${m.role}`;
+
+          const avatar = document.createElement('div');
+          avatar.className = 'avatar';
+          avatar.textContent = m.role === 'assistant' ? 'Y' : 'U';
+
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble';
+          bubble.textContent = m.content;
+
+          if (isRTLText(m.content)) bubble.classList.add('rtl');
+
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = m.role === 'assistant' ? 'YektaYar AI' : 'You';
+
+          msg.appendChild(avatar);
+          msg.appendChild(bubble);
+          msg.appendChild(meta);
+
+          chat.appendChild(msg);
+        });
+
+      chat.scrollTop = chat.scrollHeight;
+      saveMessages();
+    }
+
+    function addMessage(role, content) {
+      messages.push({ role, content });
+      render();
+    }
+
+    function enforceSoftGuardrails(text) {
+      // Non-invasive, light-touch formatting to keep replies brief and supportive.
+      // We do NOT add diagnoses or medical advice.
+      const trimmed = text.trim();
+
+      // Limit to ~800 characters to keep 2–4 paragraphs feel.
+      const maxChars = 800;
+      let final = trimmed.length > maxChars ? trimmed.slice(0, maxChars) + '…' : trimmed;
+
+      // Ensure no explicit medication instructions are present.
+      const medRegex = /\b(mg|milligram|dose|dosage|prescribe|دارو|قرص)\b/i;
+      if (medRegex.test(final)) {
+        final += '\n\nI cannot provide medication instructions. If you’re considering treatment, a licensed professional can guide you safely.';
+      }
+
+      return final;
+    }
+
+    // ----- Network layer -----
+    async function callAPI(history, { retries = 2 } = {}) {
+      const payload = {
+        messages: history,
+        model: MODEL,
+        private: true
+      };
+
+      let attempt = 0;
+      let lastError = null;
+
+      while (attempt <= retries) {
+        attempt++;
+        controller = new AbortController();
+        const signal = controller.signal;
+
+        try {
+          setStatus(attempt === 1 ? 'YektaYar AI is reflecting…' : `Retrying (attempt ${attempt})…`);
+          const resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal
+          });
+
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+          // API returns plain text; if not, try JSON.
+          const ct = resp.headers.get('content-type') || '';
+          let text;
+          if (ct.includes('application/json')) {
+            const data = await resp.json();
+            text = typeof data === 'string' ? data : JSON.stringify(data);
+          } else {
+            text = await resp.text();
+          }
+          return text;
+        } catch (err) {
+          lastError = err;
+          // Simple backoff
+          await new Promise(r => setTimeout(r, 400 * attempt));
+        } finally {
+          controller = null;
+        }
+      }
+
+      throw lastError ?? new Error('Request failed');
+    }
+
+    // ----- Event handlers -----
+    async function onSend() {
+      const input = document.getElementById('input');
+      let content = (input.value || '').trim();
+      if (!content) return;
+
+      addMessage('user', content);
+      input.value = '';
+
+      // Typing indicator
+      const thinking = '…';
+      addMessage('assistant', thinking);
+      const idx = messages.length - 1; // position of temp indicator
+
+      try {
+        const reply = await callAPI(messages, { retries: 2 });
+        const safeReply = enforceSoftGuardrails(reply);
+        messages[idx] = { role: 'assistant', content: safeReply };
+        render();
+        setStatus('Response received', 'success');
+      } catch (err) {
+        messages[idx] = { role: 'assistant', content: 'I ran into a problem processing that. You can try again in a moment.' };
+        render();
+        setStatus('Network or server error. Please try again.', 'error');
+      }
+    }
+
+    function onStop() {
+      if (controller) {
+        controller.abort();
+        setStatus('Stopped');
+      }
+    }
+
+    function onReset() {
+      if (!confirm('Start a new chat? This will clear the current conversation.')) return;
+      messages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        {
+          role: 'assistant',
+          content:
+            'I’m here to listen and support you. Share what feels most important right now, and we’ll take it step by step.'
+        }
+      ];
+      render();
+      setStatus('New conversation started', 'success');
+    }
+
+    function onExport() {
+      const blob = new Blob([JSON.stringify(messages, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `yektaYar-chat-${new Date().toISOString()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setStatus('Chat exported', 'success');
+    }
+
+    function onImport() {
+      document.getElementById('fileInput').click();
+    }
+
+    function handleFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!Array.isArray(data) || !data[0] || !data[0].role) throw new Error('Invalid format');
+          messages = data;
+          render();
+          setStatus('Chat imported', 'success');
+        } catch {
+          setStatus('Invalid file', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ----- Initialize -----
+    window.addEventListener('online', () => setStatus('Back online', 'success'));
+    window.addEventListener('offline', () => setStatus('You are offline', 'error'));
+    document.getElementById('sendBtn').addEventListener('click', onSend);
+    document.getElementById('stopBtn').addEventListener('click', onStop);
+    document.getElementById('resetBtn').addEventListener('click', onReset);
+    document.getElementById('exportBtn').addEventListener('click', onExport);
+    document.getElementById('importBtn').addEventListener('click', onImport);
+    document.getElementById('fileInput').addEventListener('change', handleFile);
+    document.getElementById('input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) onSend();
+    });
+
+    render();
+  </script>
+</body>
+</html>
