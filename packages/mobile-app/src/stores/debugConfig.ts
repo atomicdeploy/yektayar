@@ -171,7 +171,6 @@ function getStoreOrError() {
     const msg = '[yektayarDebug] Pinia store is not yet initialized. ' +
                 'The app is still loading. Please wait for the app to fully mount, ' +
                 'or call this after the page has loaded.'
-    console.error(msg)
     throw new Error(msg)
   }
 }

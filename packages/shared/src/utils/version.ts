@@ -56,17 +56,19 @@ export function getVersionFromPackageJson(
  * @returns The package version string
  */
 export function getPackageVersion(fallback: string = 'dev'): string {
-  // Type guard for bundler environment
   const meta = import.meta as any
-  if (typeof meta !== 'undefined' && 
-      meta.env && 
-      'APP_VERSION' in meta.env &&
-      meta.env.APP_VERSION) {
+  const hasValidVersion = typeof meta !== 'undefined' && 
+                          meta.env && 
+                          'APP_VERSION' in meta.env &&
+                          meta.env.APP_VERSION
+  
+  if (hasValidVersion) {
     return meta.env.APP_VERSION as string
   }
   
   // In development mode, log a warning but don't throw
-  if (typeof meta !== 'undefined' && meta.env && meta.env.DEV) {
+  const isDevelopment = typeof meta !== 'undefined' && meta.env && meta.env.DEV
+  if (isDevelopment) {
     console.warn(
       '[Version] APP_VERSION not found in import.meta.env. Using fallback version.',
       '\nThis is normal in development mode if the dev server was just started.',
