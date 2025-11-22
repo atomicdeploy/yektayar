@@ -2,8 +2,11 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <title>WebSocket Client — YektaYar</title>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="color-scheme" content="dark light" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M5 3h14a2 2 0 0 1 2 2v14l-4-4H7a2 2 0 0 1-2-2z'/%3E%3C/svg%3E" />
   <style>
@@ -599,7 +602,9 @@
       },
       copyAll() {
         const text = qsa(".logline", el.body).map((n) => n.innerText).join("\n");
-        navigator.clipboard.writeText(text).then(() => api.info("Logs copied to clipboard"));
+        navigator.clipboard.writeText(text).then(() => api.info("Logs copied to clipboard")).catch((e) => {
+          api.error("Failed to copy to clipboard: " + e.message + ". Try using Ctrl+C to copy manually or check browser permissions.");
+        });
       },
       clear() {
         el.body.innerHTML = "";
@@ -782,7 +787,43 @@
       }
     }
 
-    _connectSocketIO(url) {
+    async _generateGuestToken(baseUrl) {
+      try {
+        Log.ws('Attempting to generate guest session token...');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch(baseUrl + '/api/auth/guest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.sessionToken) {
+            Log.ws('Generated guest session token');
+            return data.sessionToken;
+          }
+        }
+        
+        Log.ws('Could not generate guest token, connecting without authentication', 'warn');
+        return null;
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          Log.ws('Guest token request timed out', 'warn');
+        } else {
+          Log.ws('Failed to generate guest token: ' + error.message, 'warn');
+        }
+        return null;
+      }
+    }
+
+    async _connectSocketIO(url) {
       try {
         let ioUrl = url;
         if (url.startsWith('ws://')) {
@@ -801,7 +842,12 @@
           return;
         }
 
-        const token = UI.elements.sessionToken.value.trim();
+        let token = UI.elements.sessionToken.value.trim();
+        
+        // If no token provided, try to generate a guest token
+        if (!token) {
+          token = await this._generateGuestToken(baseUrl);
+        }
         
         const socketOptions = {
           reconnection: false,
