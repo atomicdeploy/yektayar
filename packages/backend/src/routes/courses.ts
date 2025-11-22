@@ -689,7 +689,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       description: 'Update lesson details (admin only)'
     }
   })
-  .post('/:courseId/enroll/:userId/progress', async ({ params: { courseId, userId }, body }) => {
+  .post('/:id/enroll/:userId/progress', async ({ params: { id, userId }, body }) => {
     try {
       const db = getDatabase()
       const { lessonId, completed, timeSpent, lastPosition } = body as any
@@ -697,7 +697,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       // Get enrollment
       const enrollments = await db`
         SELECT id FROM course_enrollments
-        WHERE user_id = ${userId} AND course_id = ${courseId}
+        WHERE user_id = ${userId} AND course_id = ${id}
       `
 
       if (enrollments.length === 0) {
@@ -746,7 +746,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         FROM course_lessons cl
         JOIN course_modules cm ON cl.module_id = cm.id
         LEFT JOIN lesson_progress lp ON lp.lesson_id = cl.id AND lp.enrollment_id = ${enrollmentId}
-        WHERE cm.course_id = ${courseId}
+        WHERE cm.course_id = ${id}
       `
 
       const totalLessons = parseInt(progressStats[0].total_lessons)
@@ -786,14 +786,14 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       description: 'Update progress for a specific lesson'
     }
   })
-  .get('/:courseId/enroll/:userId/progress', async ({ params: { courseId, userId } }) => {
+  .get('/:id/enroll/:userId/progress', async ({ params: { id, userId } }) => {
     try {
       const db = getDatabase()
 
       // Get enrollment
       const enrollments = await db`
         SELECT * FROM course_enrollments
-        WHERE user_id = ${userId} AND course_id = ${courseId}
+        WHERE user_id = ${userId} AND course_id = ${id}
       `
 
       if (enrollments.length === 0) {
@@ -822,7 +822,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         FROM course_lessons cl
         JOIN course_modules cm ON cl.module_id = cm.id
         LEFT JOIN lesson_progress lp ON lp.lesson_id = cl.id AND lp.enrollment_id = ${enrollment.id}
-        WHERE cm.course_id = ${courseId}
+        WHERE cm.course_id = ${id}
         ORDER BY cm.order, cl.order
       `
 
@@ -848,7 +848,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       description: 'Get detailed progress for a user in a course'
     }
   })
-  .post('/:courseId/reviews', async ({ params: { courseId }, body }) => {
+  .post('/:id/reviews', async ({ params: { id }, body }) => {
     try {
       const db = getDatabase()
       const { userId, rating, comment } = body as any
@@ -872,7 +872,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       // Check if user is enrolled
       const enrollments = await db`
         SELECT id FROM course_enrollments
-        WHERE user_id = ${userId} AND course_id = ${courseId}
+        WHERE user_id = ${userId} AND course_id = ${id}
       `
 
       if (enrollments.length === 0) {
@@ -886,7 +886,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       // Check if already reviewed
       const existing = await db`
         SELECT id FROM course_reviews
-        WHERE user_id = ${userId} AND course_id = ${courseId}
+        WHERE user_id = ${userId} AND course_id = ${id}
       `
 
       let result
@@ -902,7 +902,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         // Create new review
         result = await db`
           INSERT INTO course_reviews (course_id, user_id, rating, comment)
-          VALUES (${courseId}, ${userId}, ${rating}, ${comment || null})
+          VALUES (${id}, ${userId}, ${rating}, ${comment || null})
           RETURNING *
         `
       }
@@ -927,7 +927,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       description: 'Submit or update a review for a course'
     }
   })
-  .get('/:courseId/reviews', async ({ params: { courseId }, query }) => {
+  .get('/:id/reviews', async ({ params: { id }, query }) => {
     try {
       const db = getDatabase()
       const page = parseInt(query.page as string) || 1
@@ -935,12 +935,12 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       const offset = (page - 1) * limit
 
       const [countResult, reviews] = await Promise.all([
-        db`SELECT COUNT(*) FROM course_reviews WHERE course_id = ${courseId}`,
+        db`SELECT COUNT(*) FROM course_reviews WHERE course_id = ${id}`,
         db`
           SELECT cr.*, u.name as user_name, u.avatar as user_avatar
           FROM course_reviews cr
           JOIN users u ON cr.user_id = u.id
-          WHERE cr.course_id = ${courseId}
+          WHERE cr.course_id = ${id}
           ORDER BY cr.created_at DESC
           LIMIT ${limit} OFFSET ${offset}
         `
@@ -952,7 +952,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
       const avgResult = await db`
         SELECT AVG(rating) as avg_rating, COUNT(*) as total_reviews
         FROM course_reviews
-        WHERE course_id = ${courseId}
+        WHERE course_id = ${id}
       `
 
       return {
