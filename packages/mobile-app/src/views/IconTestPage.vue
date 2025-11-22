@@ -132,6 +132,29 @@
           </ion-card-content>
         </ion-card>
         
+        <!-- Welcome Screen Style Context -->
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Welcome Screen Style Context</ion-card-title>
+            <ion-card-subtitle>Icon in circle container matching WelcomeScreen.vue</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div style="display: flex; justify-content: center; padding: 2rem 0;">
+              <div class="logo-accent">
+                <img src="/logo-simple.svg" alt="YektaYar Logo" class="welcome-style-icon" />
+              </div>
+            </div>
+            <div class="code-block" style="margin-top: 1rem;">
+&lt;div class="logo-accent"&gt;
+  &lt;img src="/logo-simple.svg" class="welcome-style-icon" /&gt;
+&lt;/div&gt;
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--ion-color-medium);">
+              This replicates the exact styling used in the Welcome Screen with the golden circle background.
+            </p>
+          </ion-card-content>
+        </ion-card>
+        
         <!-- In Buttons -->
         <ion-card>
           <ion-card-header>
@@ -474,5 +497,23 @@ ion-note {
   padding: 0.75rem;
   border-radius: 8px;
   background: rgba(239, 68, 68, 0.1);
+}
+
+/* Welcome Screen Style */
+.logo-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #d4a43e 0%, #c99433 100%);
+  box-shadow: 0 4px 20px rgba(212, 164, 62, 0.3);
+}
+
+.welcome-style-icon {
+  width: 50px;
+  height: 50px;
+  filter: brightness(0) invert(1);
 }
 </style>
