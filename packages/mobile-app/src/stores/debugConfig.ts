@@ -163,37 +163,56 @@ export const useDebugConfigStore = defineStore('debugConfig', () => {
 // CONSOLE API
 // ==========================================
 
+// Helper to get store with error handling
+function getStoreOrError() {
+  try {
+    return useDebugConfigStore()
+  } catch (error) {
+    const msg = '[yektayarDebug] Pinia store is not yet initialized. ' +
+                'The app is still loading. Please wait for the app to fully mount, ' +
+                'or call this after the page has loaded.'
+    throw new Error(msg)
+  }
+}
+
 // Expose to window for console access
 if (typeof window !== 'undefined') {
   // Use a getter to always access the current store instance
   Object.defineProperty(window, 'yektayarDebug', {
     get() {
-      const store = useDebugConfigStore()
       return {
         // Get entire config
         getConfig: () => {
+          const store = getStoreOrError()
           return JSON.parse(JSON.stringify(store.config))
         },
         
         // Welcome screen controls
         welcome: {
           getConfig: () => {
+            const store = getStoreOrError()
             return { ...store.welcomeConfig }
           },
           
           setConfig: (updates: Partial<WelcomeScreenConfig>) => {
+            const store = getStoreOrError()
             store.setWelcomeConfig(updates)
             return { ...store.welcomeConfig }
           },
           
-          getSkipAll: () => store.welcomeConfig.skipTypewriter,
+          getSkipAll: () => {
+            const store = getStoreOrError()
+            return store.welcomeConfig.skipTypewriter
+          },
           
           setSkipAll: (skip: boolean) => {
+            const store = getStoreOrError()
             store.setSkipTypewriter(skip)
             return store.welcomeConfig.skipTypewriter
           },
           
           reset: () => {
+            const store = getStoreOrError()
             store.config.welcome = { ...DEFAULT_WELCOME_CONFIG }
             return { ...store.welcomeConfig }
           }
@@ -201,11 +220,13 @@ if (typeof window !== 'undefined') {
         
         // Global controls
         reset: () => {
+          const store = getStoreOrError()
           store.resetConfig()
           return JSON.parse(JSON.stringify(store.config))
         },
         
         clearStorage: () => {
+          const store = getStoreOrError()
           store.clearStorage()
           return 'All storage cleared'
         },
