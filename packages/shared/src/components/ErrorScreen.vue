@@ -132,15 +132,15 @@ onBeforeUnmount(() => {
   /* CSS Variables for theming */
   --error-bg: #f8f9fa;
   --error-text: #495057;
-  --error-title-color: #dc3545;
+  --error-title-color: #c82333; /* Darkened for WCAG AA compliance (4.5:1 contrast) */
   --error-border: #dee2e6;
   --error-card-bg: #fff;
   --error-detail-text: #6c757d;
   --error-section-title: #343a40;
-  --error-button-bg: #007bff;
+  --error-button-bg: #0069d9; /* Darkened for WCAG AA compliance (4.5:1 contrast) */
   --error-button-hover: #0056b3;
   --error-code-bg: #f8f9fa;
-  --error-code-text: #e83e8c;
+  --error-code-text: #c73580; /* Darkened for WCAG AA compliance (4.5:1 contrast) */
   
   position: fixed;
   inset: 0;
