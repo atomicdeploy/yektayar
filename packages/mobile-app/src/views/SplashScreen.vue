@@ -5,7 +5,7 @@
         <!-- Logo -->
         <div class="logo-container" :class="{ 'fade-in': fontsLoaded }">
           <div class="logo-circle">
-            <img src="/logo-simple.svg" alt="YektaYar Logo" class="logo-svg" />
+            <ion-icon src="/logo-simple.svg" class="logo-svg"></ion-icon>
           </div>
           <h1 class="app-title">یکتایار</h1>
           <p class="app-subtitle">همراه شما در مسیر سلامت روان</p>
@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { IonPage, IonContent, IonSpinner } from '@ionic/vue'
+import { IonPage, IonContent, IonSpinner, IonIcon } from '@ionic/vue'
 import { useSessionStore } from '../stores/session'
 import { logger, getPackageVersion } from '@yektayar/shared'
 import apiClient from '@/api'
@@ -215,6 +215,7 @@ onMounted(async () => {
 }
 
 .logo-svg {
+  font-size: 90px;
   width: 90px;
   height: 90px;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));

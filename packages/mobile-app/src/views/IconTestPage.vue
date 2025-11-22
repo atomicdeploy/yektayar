@@ -81,9 +81,9 @@
                 <code>&lt;ion-icon src="/logo-simple.svg"&gt;</code>
               </div>
               <div class="icon-item">
-                <img src="/logo-simple.svg" alt="Direct img tag" class="direct-img-icon" />
-                <p>Direct IMG Tag</p>
-                <code>&lt;img src="/logo-simple.svg"&gt;</code>
+                <ion-icon src="/logo-simple.svg" class="direct-img-icon"></ion-icon>
+                <p>YektaYar (styled)</p>
+                <code>&lt;ion-icon (with CSS)&gt;</code>
               </div>
             </div>
           </ion-card-content>
@@ -141,12 +141,12 @@
           <ion-card-content>
             <div style="display: flex; justify-content: center; padding: 2rem 0;">
               <div class="logo-accent">
-                <img src="/logo-simple.svg" alt="YektaYar Logo" class="welcome-style-icon" />
+                <ion-icon src="/logo-simple.svg" class="welcome-style-icon"></ion-icon>
               </div>
             </div>
             <div class="code-block" style="margin-top: 1rem;">
 &lt;div class="logo-accent"&gt;
-  &lt;img src="/logo-simple.svg" class="welcome-style-icon" /&gt;
+  &lt;ion-icon src="/logo-simple.svg" class="welcome-style-icon"&gt;&lt;/ion-icon&gt;
 &lt;/div&gt;
             </div>
             <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--ion-color-medium);">
@@ -194,10 +194,13 @@
               <li>✓ No need to register icons in code</li>
             </ul>
             
-            <h3 style="margin-top: 1.5rem;">❌ Incorrect Approach (Using name with addIcons)</h3>
+            <h3 style="margin-top: 1.5rem;">❌ Incorrect Approach (Using name with addIcons - Deprecated)</h3>
             <div class="code-block">
-// In custom-icons.ts
-addIcons({ 'yektayar': svgString })
+// This approach is deprecated and no longer used
+
+// Previous attempt:
+// import { addIcons } from 'ionicons'
+// addIcons({ 'yektayar': svgString })
 
 // In template
 &lt;ion-icon name="yektayar"&gt;&lt;/ion-icon&gt;
@@ -521,12 +524,14 @@ ion-note {
 }
 
 .welcome-style-icon {
+  font-size: 50px;
   width: 50px;
   height: 50px;
   filter: brightness(0) invert(1);
 }
 
 .direct-img-icon {
+  font-size: 64px;
   width: 64px;
   height: 64px;
 }

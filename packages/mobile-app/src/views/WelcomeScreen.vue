@@ -44,8 +44,7 @@
         <!-- Header with Title and Logo -->
         <div ref="headerRef" class="welcome-header" :class="{ 'exit-header': exitStates.header }">
           <div class="logo-accent">
-            <!-- <ion-icon name="yektayar" :icon="yektayar" class="yektayar-icon"></ion-icon> -->
-            <img src="/logo-simple.svg" alt="YektaYar Logo" class="yektayar-icon" />
+            <ion-icon src="/logo-simple.svg" class="yektayar-icon"></ion-icon>
           </div>
           <h1 class="welcome-title">خوش آمدید!</h1>
           <div class="title-underline"></div>
@@ -189,7 +188,7 @@
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
 import { useRouter, useRoute } from 'vue-router'
-import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
+import { lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
@@ -1064,6 +1063,7 @@ const onImageError = () => {
 }
 
 .yektayar-icon {
+  font-size: 50px;
   width: 50px;
   height: 50px;
   padding: 10px;

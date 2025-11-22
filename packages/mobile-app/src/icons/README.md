@@ -2,19 +2,20 @@
 
 ## ✅ Correct Approach (Currently Used)
 
-The YektaYar app uses **simple `<img>` tags** to display custom icons (the app logo). This is the recommended and working approach.
+The YektaYar app uses **`<ion-icon>` with the `src` attribute** to display custom icons (the app logo). This is the recommended and working approach that leverages Ionic's icon system while supporting custom SVG files.
 
 ### Example
 
 ```vue
-<!-- In WelcomeScreen.vue and HomePage.vue -->
-<img src="/logo-simple.svg" alt="YektaYar Logo" class="yektayar-icon" />
+<!-- In WelcomeScreen.vue, HomePage.vue, and SplashScreen.vue -->
+<ion-icon src="/logo-simple.svg" class="yektayar-icon"></ion-icon>
 ```
 
 ### CSS Styling
 
 ```css
 .yektayar-icon {
+  font-size: 50px;
   width: 50px;
   height: 50px;
   filter: brightness(0) invert(1); /* Makes gold icon appear white */
@@ -23,14 +24,31 @@ The YektaYar app uses **simple `<img>` tags** to display custom icons (the app l
 
 ### Why This Works
 
-- ✅ Simple and reliable
-- ✅ No registration or configuration needed
+- ✅ Leverages Ionic's icon system with proper shadow DOM
 - ✅ SVG files served from `/public` directory
+- ✅ Can use Ionic's size and color props when needed
 - ✅ Can easily control size and color with CSS
 - ✅ Works consistently across all browsers and frameworks
-- ✅ Same approach used successfully in SplashScreen
+- ✅ Supports CSS filters for color transformations
+- ✅ Properly integrates with Ionic components
 
-## ❌ Incorrect Approach (Attempted but Failed)
+## ❌ Deprecated Approaches
+
+### Approach 1: Using `<img>` tags (Old)
+
+Previously used simple img tags:
+
+```vue
+<!-- OLD - Don't use -->
+<img src="/logo-simple.svg" alt="Logo" class="yektayar-icon" />
+```
+
+**Why we moved away:**
+- ❌ Doesn't integrate with Ionic's icon system
+- ❌ Can't use Ionic's built-in color/size props
+- ❌ Less semantic in an Ionic app context
+
+### Approach 2: Custom icon registration with addIcons() (Attempted but Failed)
 
 We initially tried using Ionic's custom icon registration with `addIcons()`:
 
@@ -46,8 +64,7 @@ addIcons({ 'yektayar': yektayarIcon })
 <ion-icon name="yektayar"></ion-icon>
 ```
 
-### Why This Doesn't Work
-
+**Why This Doesn't Work:**
 - ❌ Results in **empty `icon-inner`** in shadow-root
 - ❌ Icon doesn't display at all
 - ❌ Complex registration process
@@ -97,36 +114,38 @@ For icons to render properly, the following must be true:
 ```
 public/
 ├── logo-simple.svg      # Main logo file (used in app)
-├── logo.svg             # Full logo with text
-└── icon.svg             # App icon
+├── icon.svg             # App icon (light theme with background)
+└── icon-dark.svg        # App icon (dark theme with background)
 
 src/icons/
-├── custom-icons.ts      # ⚠️ NOT USED - kept for reference only
-├── logo.svg             # ⚠️ Duplicate - not needed
-└── README.md            # This file
+└── README.md            # This file (documentation only)
 ```
 
-## 🧹 Cleanup Recommendations
+## 🧹 Changes Made
 
-The following files can be removed as they're not used:
-- `src/icons/custom-icons.ts` - The addIcons() approach doesn't work
-- `src/icons/logo.svg` - Duplicate of `/public/logo-simple.svg`
-- Remove `registerCustomIcons()` call from `main.ts`
-- Remove import statement from `main.ts`
-
-However, they're kept temporarily for:
-1. Reference and documentation purposes
-2. Testing and comparison in `/icon-test` page
-3. Future investigation if needed
+- ✅ Removed `custom-icons.ts` - The addIcons() approach doesn't work reliably
+- ✅ Removed duplicate `logo.svg` files
+- ✅ Removed `registerCustomIcons()` call from `main.ts`
+- ✅ Updated all icon usage to use `<ion-icon src="...">` instead of `<img>`
 
 ## 🎯 Best Practices
 
-### For Custom Logos/Branding
+### For Custom Logos/Branding (Recommended)
 
-Use simple `<img>` tags:
+Use `<ion-icon>` with `src` attribute:
 
 ```vue
-<img src="/logo-simple.svg" alt="Logo" class="logo-icon" />
+<ion-icon src="/logo-simple.svg" class="logo-icon"></ion-icon>
+```
+
+**Styling:**
+```css
+.logo-icon {
+  font-size: 50px; /* Controls icon size */
+  width: 50px;
+  height: 50px;
+  filter: brightness(0) invert(1); /* Color transformation */
+}
 ```
 
 ### For Built-in Ionicons
@@ -143,15 +162,27 @@ import { star, heart, rocket } from 'ionicons/icons'
 </template>
 ```
 
-### For SVG Files as ion-icons
+### Color Control
 
-If you need to use an SVG file with `ion-icon` (e.g., for color props), use the `src` attribute:
+For `<ion-icon src="...">`, use CSS filters for color:
 
-```vue
-<ion-icon src="/logo-simple.svg" size="large" color="warning"></ion-icon>
+```css
+/* Make any color icon appear white */
+.white-icon {
+  filter: brightness(0) invert(1);
+}
+
+/* Make any color icon appear black */
+.black-icon {
+  filter: brightness(0);
+}
 ```
 
-**Note:** This works better than `addIcons()` and renders properly in shadow-root.
+Or use Ionic's color prop (may have limited effect on custom SVGs):
+
+```vue
+<ion-icon src="/logo-simple.svg" color="primary"></ion-icon>
+```
 
 ## 📚 Resources
 
@@ -167,7 +198,7 @@ If you need to use an SVG file with `ion-icon` (e.g., for color props), use the 
 1. **Check file exists**: Verify SVG file is in `/public` directory
 2. **Check path**: Use absolute path starting with `/`
 3. **Check browser console**: Look for 404 errors
-4. **Use img tag**: Instead of ion-icon, use `<img src="/path/to/icon.svg">`
+4. **Use ion-icon with src**: `<ion-icon src="/path/to/icon.svg">`
 
 ### Icon Wrong Color
 
@@ -192,25 +223,26 @@ Use CSS filters:
 
 ### Icon Wrong Size
 
-For `<img>` tags:
+For `<ion-icon>` with `src`:
 
 ```css
 .icon {
-  width: 50px;
-  height: 50px;
+  font-size: 50px; /* Primary size control */
+  width: 50px;     /* Explicit width */
+  height: 50px;    /* Explicit height */
 }
 ```
 
-For `<ion-icon>` with `src`:
+Or use Ionic's size attribute:
 
 ```vue
 <ion-icon src="/icon.svg" size="large"></ion-icon>
-<!-- or -->
+<!-- or custom size -->
 <ion-icon src="/icon.svg" style="font-size: 64px;"></ion-icon>
 ```
 
 ---
 
 **Last Updated:** November 2024  
-**Status:** Production-ready, using simple `<img>` tag approach  
+**Status:** Production-ready, using `<ion-icon src="...">` approach  
 **Test Page:** `/icon-test` for live verification
