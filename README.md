@@ -255,11 +255,12 @@ This mono repo addresses all requirements from the issue:
 
 ### Root-level Scripts
 - `npm run sync` - **Sync with remote, update deps, and verify setup** ⭐
+- `npm run cleanup` - **Clean Vite cache and temporary files** 🧹
 - `npm run dev` - Start all packages in development
 - `npm run build` - Build all packages
 - `npm run lint` - Lint all packages
 - `npm run test` - Test all packages
-- `npm run clean` - Clean all build artifacts
+- `npm run clean` - Clean all build artifacts (node_modules, dist)
 - `npm run install:deps` - Install/update all dependencies
 - `npm run check:requirements` - Check system requirements
 - `npm run db:cli` - Connect to database using pgcli or psql

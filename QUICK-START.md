@@ -48,7 +48,10 @@ npm run dev:mobile     # Mobile app only
 # Build all
 npm run build
 
-# Clean everything
+# Clean Vite cache and temporary files
+npm run cleanup
+
+# Clean everything (node_modules, dist)
 npm run clean
 
 # Daily workflow - sync with remote and update everything
@@ -57,6 +60,8 @@ npm run sync          # (alternative, works without setup)
 ```
 
 > **🚀 Pro Tip:** Use `npm run sync` or `git sync` to fetch latest changes, update dependencies, and ensure everything is up to date in one command. See [Git Sync Guide](docs/GIT-SYNC.md) for details.
+> 
+> **🧹 Cleanup Tip:** If you encounter build issues after pulling changes, try `npm run cleanup` to clear Vite cache, then rebuild.
 
 ---
 

@@ -71,6 +71,45 @@ Sets up the `git sync` alias for the repository.
 
 **Note:** The npm script `npm run sync` works immediately without running this setup.
 
+#### `cleanup.sh`
+
+Cleans up Vite cache and temporary files that may cause build issues after updates or pulls.
+
+**Usage:**
+```bash
+./scripts/cleanup.sh
+# Or via npm:
+npm run cleanup
+```
+
+**What it does:**
+1. Removes Vite cache directories (`node_modules/.vite`) in all packages
+2. Reports on dist folders (info only)
+3. Cleans temporary files (*.log, *.tmp, .DS_Store, etc.)
+4. Provides summary of cleanup actions
+
+**Features:**
+- ✅ Safe operation - only removes cache and temp files
+- ✅ Finds Vite cache in all workspace packages
+- ✅ Clears common temporary files
+- ✅ Informative output with colored status messages
+
+**When to use:**
+```bash
+# After pulling changes and experiencing build issues
+npm run cleanup
+npm run build
+
+# Before starting fresh development
+npm run cleanup
+npm run dev
+
+# When Vite reports cache-related errors
+npm run cleanup
+```
+
+**Note:** For complete cleanup including node_modules and dist, use `npm run clean` instead.
+
 ### Route Management
 
 #### `list-routes.mjs`
