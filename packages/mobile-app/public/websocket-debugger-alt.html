@@ -536,8 +536,20 @@
       // Connect WebSocket
       const connectWebSocket = async (url) => {
         try {
+          // Add token to URL as query parameter if provided
+          // Note: Browser WebSocket API doesn't support custom headers
+          let wsUrl = url;
+          const token = ui.token.value.trim();
+          if (token) {
+            const separator = url.includes('?') ? '&' : '?';
+            wsUrl = `${url}${separator}token=${encodeURIComponent(token)}`;
+            log('info', 'Using authentication token (query parameter)');
+          } else {
+            log('warn', 'No token provided, connecting without authentication');
+          }
+          
           log('info', 'Connecting via WebSocket to ' + url);
-          const ws = new WebSocket(url);
+          const ws = new WebSocket(wsUrl);
           connection = ws;
           connectionType = 'websocket';
           ui.connType.textContent = 'Native WebSocket';
