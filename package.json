@@ -11,6 +11,8 @@
     "postinstall": "npm run build -w @yektayar/shared && node scripts/check-requirements.js",
     "check:requirements": "node scripts/check-requirements.js",
     "install:deps": "node scripts/install-dependencies.js",
+    "sync": "bash scripts/git-sync.sh",
+    "cleanup": "bash scripts/cleanup.sh",
     "dev": "npm run dev --workspaces --if-present",
     "dev:backend": "npm run dev -w @yektayar/backend",
     "dev:admin": "npm run dev -w @yektayar/admin-panel",
