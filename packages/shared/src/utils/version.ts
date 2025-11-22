@@ -52,17 +52,28 @@ export function getVersionFromPackageJson(
  * })
  * ```
  * 
+ * @param fallback - Optional fallback version string if APP_VERSION is not set (default: 'dev')
  * @returns The package version string
- * @throws Error if APP_VERSION is not set in environment
  */
-export function getPackageVersion(): string {
+export function getPackageVersion(fallback: string = 'dev'): string {
   // Type guard for bundler environment
   const meta = import.meta as any
   if (typeof meta !== 'undefined' && 
       meta.env && 
-      'APP_VERSION' in meta.env) {
+      'APP_VERSION' in meta.env &&
+      meta.env.APP_VERSION) {
     return meta.env.APP_VERSION as string
   }
-  throw new Error('APP_VERSION not found in import.meta.env. Ensure build config defines it.')
+  
+  // In development mode, log a warning but don't throw
+  if (typeof meta !== 'undefined' && meta.env && meta.env.DEV) {
+    console.warn(
+      '[Version] APP_VERSION not found in import.meta.env. Using fallback version.',
+      '\nThis is normal in development mode if the dev server was just started.',
+      '\nThe version is set via Vite config define: import.meta.env.APP_VERSION'
+    )
+  }
+  
+  return fallback
 }
 
