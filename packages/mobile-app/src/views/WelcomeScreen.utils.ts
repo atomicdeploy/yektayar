@@ -34,7 +34,7 @@ export function skipCurrentParagraph(
 }
 
 /**
- * Toggle skip typewriter preference and skip all remaining paragraphs if enabling
+ * Toggle skip typewriter preference and skip incomplete paragraphs if enabling
  */
 export function skipAllTypewriters(
   typewriters: TypewriterInstance[],
