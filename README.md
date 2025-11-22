@@ -54,7 +54,7 @@ YektaYar is a comprehensive mental health care platform that connects users with
 
 ### Prerequisites
 
-- **Node.js** >= 18.0.0
+- **Node.js** >= 20.19.0
 - **npm** >= 9.0.0
 - **Bun** >= 1.0.0 (optional for backend, both Bun and Node.js fully supported)
 - **PostgreSQL** 15+ (for database)
@@ -262,6 +262,7 @@ This mono repo addresses all requirements from the issue:
 - `npm run clean` - Clean all build artifacts
 - `npm run install:deps` - Install/update all dependencies
 - `npm run check:requirements` - Check system requirements
+- `npm run db:cli` - Connect to database using pgcli or psql
 
 ### Package-specific Scripts
 - `npm run dev:backend` - Backend only

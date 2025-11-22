@@ -58,7 +58,7 @@ const { t } = useI18n({
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .modern-tab-bar {
   padding: 8px 0 max(8px, env(safe-area-inset-bottom));
   height: auto;
@@ -84,11 +84,25 @@ ion-tab-button ion-label {
   margin-top: 2px;
 }
 
+ion-tab-button.tab-selected {
+  font-weight: 600;
+  position: relative;
+}
+
 ion-tab-button.tab-selected ion-icon {
   transform: translateY(-2px) scale(1.1);
 }
 
-ion-tab-button.tab-selected {
-  font-weight: 600;
+ion-tab-button.tab-selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background: var(--secondary-gradient);
+  border-radius: 0 0 3px 3px;
+  box-shadow: var(--secondary-glow);
 }
 </style>

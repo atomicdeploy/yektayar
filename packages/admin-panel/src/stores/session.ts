@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
 import config from '@/config'
-import { logger } from '@yektayar/shared'
+import { logger, getWebSocketPathFromEnv } from '@yektayar/shared'
 import apiClient from '@/api'
 
 const API_URL = config.apiBaseUrl
@@ -147,6 +147,7 @@ export const useSessionStore = defineStore('session', () => {
       
       // Create socket with autoConnect disabled to ensure we have full control
       socket.value = io(API_URL, {
+        path: getWebSocketPathFromEnv(),
         auth: {
           token: session.value.token
         },

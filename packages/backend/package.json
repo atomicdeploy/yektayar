@@ -7,10 +7,12 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
+    "dev:ws": "bun run --watch src/websocketServer.ts",
     "build": "tsc",
     "start": "bun run dist/index.js",
+    "start:ws": "bun run dist/websocketServer.js",
     "lint": "eslint src --ext .ts",
-    "test": "echo \"Tests not yet implemented\" && exit 0"
+    "test": "npx tsx src/__tests__/swaggerAuth.manual.test.js"
   },
   "dependencies": {
     "@elysiajs/cookie": "^0.8.0",
@@ -28,7 +30,9 @@
     "@sinclair/typebox": "^0.34.41",
     "@types/bcrypt": "^6.0.0",
     "@types/node": "^24.10.1",
-    "bun-types": "^1.3.2",
+    "@types/ws": "^8.18.1",
+    "bun-types": "^1.3.3",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }

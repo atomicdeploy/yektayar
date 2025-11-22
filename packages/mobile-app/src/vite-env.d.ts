@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string
   readonly API_BASE_URL: string
   readonly VITE_ENVIRONMENT: string
   readonly MODE: string
@@ -13,4 +12,10 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv
+}
+
+// Allow importing SVG files as raw strings
+declare module '*.svg?raw' {
+  const content: string
+  export default content
 }

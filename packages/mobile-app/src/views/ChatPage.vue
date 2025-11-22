@@ -70,7 +70,7 @@
             </div>
             <div class="conversation-content">
               <div class="conversation-header">
-                <h3 class="conversation-name">{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</h3>
+                <h3 class="conversation-name">{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
                 <span class="conversation-time">{{ locale === 'fa' ? '۲ ساعت' : '2 hours' }}</span>
               </div>
               <div class="conversation-preview">
@@ -196,7 +196,7 @@ const router = useRouter()
 const navigateToAIChat = () => router.push('/tabs/chat/ai')
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;

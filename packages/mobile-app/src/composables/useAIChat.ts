@@ -6,6 +6,8 @@
 import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
 import config from '@/config'
+import apiClient from '@/api'
+import { getWebSocketPathFromEnv } from '@yektayar/shared'
 
 export interface ChatMessage {
   id: string
@@ -44,6 +46,7 @@ export function useAIChat() {
 
       // Initialize Socket.IO client
       socket.value = io(config.apiBaseUrl, {
+        path: getWebSocketPathFromEnv(),
         auth: {
           token: sessionToken
         },
@@ -205,13 +208,9 @@ export function useAIChat() {
     isTyping.value = true
 
     try {
-      const response = await fetch(`${config.apiBaseUrl}/api/ai/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('yektayar_session_token')}`
-        },
-        body: JSON.stringify({
+      const response = await apiClient.post<{ response?: string; message?: string }>(
+        '/api/ai/chat',
+        {
           message: content,
           conversationHistory: messages.value
             .filter(m => !m.streaming)
@@ -220,14 +219,14 @@ export function useAIChat() {
               role: m.role,
               content: m.content
             }))
-        })
-      })
+        }
+      )
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+      if (!response.success || !response.data) {
+        throw new Error(response.error || 'Failed to get AI response')
       }
 
-      const data = await response.json()
+      const data = response.data
       
       // Add AI response
       messages.value.push({

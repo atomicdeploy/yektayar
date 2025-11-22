@@ -89,7 +89,7 @@ Enhanced `scripts/README.md` with comprehensive documentation:
 
 ### Prerequisites
 
-- Node.js >= 18.0.0
+- Node.js >= 20.19.0
 - npm >= 9.0.0
 - Java JDK 17 (for Android builds)
 - Android SDK (installed automatically in CI/CD)
@@ -224,7 +224,7 @@ The mobile app package already includes these scripts:
 
 ### Build Steps
 1. Checkout code
-2. Setup Node.js 18
+2. Setup Node.js 20.19
 3. Setup Java 17
 4. Install dependencies (`npm ci --legacy-peer-deps`)
 5. Build web assets (`npm run build:production`)
@@ -236,7 +236,7 @@ The mobile app package already includes these scripts:
 11. **Post analysis in PR comment** (NEW)
 
 ### Environment Variables
-- `VITE_API_BASE_URL`: Backend API URL (default: https://api.yektayar.ir)
+- `API_BASE_URL`: Backend API URL (default: https://api.yektayar.ir)
 - `VITE_ENVIRONMENT`: Environment mode (production)
 
 ### Artifacts

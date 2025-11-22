@@ -27,7 +27,7 @@ withDefaults(defineProps<Props>(), {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .loading-spinner {
   display: inline-block;
   animation: rotate 2s linear infinite;
