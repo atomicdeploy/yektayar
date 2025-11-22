@@ -188,9 +188,8 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
-import { useRouter } from 'vue-router'
-import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
 import { useRouter, useRoute } from 'vue-router'
+import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
