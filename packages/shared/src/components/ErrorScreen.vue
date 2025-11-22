@@ -90,7 +90,7 @@ const direction = computed(() => {
 const isTranslatedError = computed(() => {
   if (!props.details) return false
   // Check if this error will be translated
-  return props.details.includes('API_BASE_URL') || props.details.includes('VITE_API_BASE_URL')
+  return props.details.includes('API_BASE_URL')
 })
 
 const translatedDetails = computed(() => {
