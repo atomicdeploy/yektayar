@@ -20,7 +20,7 @@ import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
 import { initializeDatabase } from './services/database'
-import { SOCKET_IO_PATH, getWebSocketPathFromEnv, getVersionFromPackageJson } from '@yektayar/shared'
+import { getWebSocketPathFromEnv, getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../package.json'
 
 // Get version from package.json
@@ -91,7 +91,7 @@ app
           { name: 'WebSocket', description: 'Real-time communication via Socket.IO' }
         ],
         externalDocs: {
-          description: `Socket.IO WebSocket endpoint available at ${SOCKET_IO_PATH}`,
+          description: `WebSocket endpoint (Socket.IO and native WebSocket) available at ${WEBSOCKET_PATH}`,
           url: 'https://socket.io/docs/v4/'
         }
       }
@@ -118,10 +118,11 @@ app
     timestamp: new Date().toISOString()
   }))
   .get('/websocket-info', () => ({
-    path: SOCKET_IO_PATH,
-    description: 'Socket.IO WebSocket endpoint for real-time communication',
+    path: WEBSOCKET_PATH,
+    description: 'Unified WebSocket endpoint for Socket.IO and native WebSocket with auto-detection',
     documentation: 'https://socket.io/docs/v4/',
-    authentication: 'Required - Pass session token in auth.token',
+    authentication: 'Required - Pass session token in auth.token (Socket.IO) or query/header (native WebSocket)',
+    protocols: ['Socket.IO', 'Native WebSocket (RFC 6455)'],
     transports: ['websocket', 'polling'],
     events: {
       client: ['ping', 'status', 'echo', 'info', 'message', 'ai:chat'],
@@ -189,11 +190,6 @@ if (isBun) {
         }
         // Otherwise, handle as native WebSocket
         return nativeWSHandler.upgrade(req, server)
-      }
-      
-      // Legacy Socket.IO path support
-      if (url.pathname.startsWith(SOCKET_IO_PATH)) {
-        return engine.handleRequest(req, server)
       }
       
       // Handle regular Elysia app requests

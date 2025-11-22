@@ -17,12 +17,6 @@ const DEFAULT_WEBSOCKET_PATH = '/ws'
 export const WEBSOCKET_PATH = DEFAULT_WEBSOCKET_PATH
 
 /**
- * Socket.IO path configuration (legacy, for backward compatibility)
- * New implementations should use WEBSOCKET_PATH
- */
-export const SOCKET_IO_PATH = '/socket.io/'
-
-/**
  * Get the WebSocket path from environment or use default
  * This function checks for environment variable on server-side
  * @returns WebSocket path

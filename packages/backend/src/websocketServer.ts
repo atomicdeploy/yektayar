@@ -1,6 +1,6 @@
 import { setupBunSocketIO } from './websocket/socketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
-import { SOCKET_IO_PATH, getWebSocketPathFromEnv } from '@yektayar/shared'
+import { getWebSocketPathFromEnv } from '@yektayar/shared'
 import { initializeDatabase } from './services/database'
 
 /**
@@ -50,12 +50,12 @@ const wsServer = Bun.serve({
     const isWebSocketUpgrade = upgradeHeader === 'websocket'
     
     if (isWebSocketUpgrade) {
-      // Socket.IO requests go to Socket.IO path
-      if (url.pathname.startsWith(SOCKET_IO_PATH)) {
+      // Check if this is a Socket.IO request (has EIO parameter)
+      if (url.searchParams.has('EIO')) {
         return engine.handleRequest(req, server)
       }
       
-      // Native WebSocket requests (any other path with WebSocket upgrade)
+      // Native WebSocket requests (WebSocket upgrade without EIO parameter)
       return nativeWSHandler.upgrade(req, server)
     }
     
@@ -66,12 +66,12 @@ const wsServer = Bun.serve({
       status: 'running',
       protocols: {
         socketio: {
-          path: SOCKET_IO_PATH,
-          description: 'Socket.IO endpoint with authentication',
+          path: WEBSOCKET_PATH,
+          description: 'Socket.IO endpoint with authentication (auto-detected via EIO parameter)',
           transports: ['websocket', 'polling']
         },
         websocket: {
-          path: '/',
+          path: WEBSOCKET_PATH,
           description: 'Native WebSocket endpoint with authentication',
           authentication: 'Required - Pass token in query parameter or Authorization header'
         }
@@ -133,9 +133,9 @@ const wsServer = Bun.serve({
 })
 
 console.log(`🚀 YektaYar WebSocket Server running at ws://${hostname}:${wsPort}`)
-console.log(`✅ Socket.IO available at ws://${hostname}:${wsPort}${SOCKET_IO_PATH}`)
-console.log(`✅ Native WebSocket available at ws://${hostname}:${wsPort}/`)
-console.log(`📡 Both protocols support authentication and the same events`)
+console.log(`✅ Unified WebSocket endpoint: ws://${hostname}:${wsPort}${WEBSOCKET_PATH}`)
+console.log(`📡 Supports both Socket.IO and native WebSocket (auto-detected)`)
+console.log(`🔐 Authentication required for all connections`)
 console.log(`💡 Configure your reverse proxy to route ws.yektayar.ir to this port`)
 
 // Check environment

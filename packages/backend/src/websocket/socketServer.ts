@@ -2,7 +2,7 @@ import { Server as SocketIOServer } from 'socket.io'
 import type { Server as HTTPServer } from 'http'
 import type { Socket } from 'socket.io'
 import { validateSessionToken } from '../services/sessionService'
-import { SOCKET_IO_PATH, getVersionFromPackageJson } from '@yektayar/shared'
+import { getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../../package.json'
 
 // Get version from package.json
