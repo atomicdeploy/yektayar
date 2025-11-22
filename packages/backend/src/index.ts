@@ -192,6 +192,11 @@ if (isBun) {
         return nativeWSHandler.upgrade(req, server)
       }
       
+      // Handle Socket.IO polling requests (non-upgrade HTTP requests to /ws with EIO parameter)
+      if (url.pathname.startsWith(WEBSOCKET_PATH) && url.searchParams.has('EIO')) {
+        return engine.handleRequest(req, server)
+      }
+      
       // Handle regular Elysia app requests
       return app.fetch(req)
     },

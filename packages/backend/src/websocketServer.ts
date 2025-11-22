@@ -59,6 +59,11 @@ const wsServer = Bun.serve({
       return nativeWSHandler.upgrade(req, server)
     }
     
+    // Handle Socket.IO polling requests (non-upgrade HTTP requests with EIO parameter)
+    if (url.searchParams.has('EIO')) {
+      return engine.handleRequest(req, server)
+    }
+    
     // Non-WebSocket requests - return info
     return new Response(JSON.stringify({
       message: 'YektaYar WebSocket Server',
