@@ -8,6 +8,11 @@
           <ion-label>{{ t('home') }}</ion-label>
         </ion-tab-button>
 
+        <ion-tab-button tab="courses" href="/tabs/courses">
+          <ion-icon :icon="school" />
+          <ion-label>{{ t('courses') }}</ion-label>
+        </ion-tab-button>
+
         <ion-tab-button tab="chat" href="/tabs/chat">
           <ion-icon :icon="chatbubbles" />
           <ion-label>{{ t('chat') }}</ion-label>
@@ -37,19 +42,21 @@ import {
   IonPage,
   IonRouterOutlet,
 } from '@ionic/vue'
-import { home, chatbubbles, calendar, person } from 'ionicons/icons'
+import { home, chatbubbles, calendar, person, school } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n({
   messages: {
     fa: {
       home: 'خانه',
+      courses: 'دوره‌ها',
       chat: 'گفتگو',
       appointments: 'نوبت‌ها',
       profile: 'پروفایل'
     },
     en: {
       home: 'Home',
+      courses: 'Courses',
       chat: 'Chat',
       appointments: 'Appointments',
       profile: 'Profile'
