@@ -3,9 +3,9 @@ import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
-import './assets/main.css'
+import './assets/main.scss'
 import config from './config'
-import { ErrorScreen } from '@yektayar/shared'
+import { ErrorScreen } from '@yektayar/shared/components'
 import { parseSolutionsMarkdown, findSolutionForError, validateApi } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
@@ -51,8 +51,9 @@ async function initializeApp() {
       title: 'API Configuration Error',
       message: 'Cannot start the admin panel due to API configuration issues.',
       details: validationResult.error,
-      solution: solution,
-      errorType: validationResult.errorType
+      solution: import.meta.env.DEV ? solution : null, // Don't send solution in production
+      errorType: validationResult.errorType,
+      isBuiltInError: true
     })
     
     errorApp.use(i18n)

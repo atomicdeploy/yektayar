@@ -76,8 +76,7 @@ Expected output:
 🚀 YektaYar API Server running at http://localhost:3000
 📚 API Documentation available at http://localhost:3000/api-docs
 🔒 Documentation protected with Basic Auth
-✅ Socket.IO enabled on same port (3000)
-```
+✅ Socket.IO enabled
 
 ### Bun Runtime
 
@@ -96,7 +95,7 @@ Expected output:
 🚀 YektaYar API Server running at http://localhost:3000
 📚 API Documentation available at http://localhost:3000/api-docs
 🔒 Documentation protected with Basic Auth
-✅ Socket.IO enabled on same port (3000)
+✅ Socket.IO enabled
 ```
 
 **Note:** Both Bun and Node.js runtimes provide full Socket.IO functionality. Bun uses the native `@socket.io/bun-engine` for optimal performance.

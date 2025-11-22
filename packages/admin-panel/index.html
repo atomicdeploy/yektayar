@@ -7,10 +7,26 @@
       :root {
         color-scheme: light dark;
       }
+      * {
+        /* Remove tap highlights on mobile devices */
+        -webkit-tap-highlight-color: transparent;
+        tap-highlight-color: transparent;
+      }
       body {
         margin: 0;
         background-color: #fafbfc;
         color: #1a1a1a;
+      }
+      /* Prevent text selection and callouts on interactive elements */
+      button,
+      a,
+      [role="button"],
+      [onclick] {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
       }
       @media (prefers-color-scheme: dark) {
         body {

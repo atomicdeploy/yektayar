@@ -136,7 +136,7 @@ export function findSolutionForError(solutions: SolutionsData, errorDetails: str
   }
   
   // Fallback: Check for API_BASE_URL related errors in details
-  if (errorDetails.includes('API_BASE_URL') || errorDetails.includes('VITE_API_BASE_URL')) {
+  if (errorDetails.includes('API_BASE_URL') || errorDetails.includes('API_BASE_URL')) {
     return getSolution(solutions, 'CONFIG_ERROR')
   }
   

@@ -20,12 +20,12 @@ The mobile app supports environment-based configuration for the backend API URL 
 Create a `.env` file in `packages/mobile-app/` (or use `.env.production` for production builds):
 
 ```bash
-VITE_API_BASE_URL=https://api.yektayar.ir
+API_BASE_URL=https://api.yektayar.ir
 VITE_ENVIRONMENT=production
 ```
 
 Available environment variables:
-- `VITE_API_BASE_URL` - Backend API endpoint URL (default: `http://localhost:3000`)
+- `API_BASE_URL` - Backend API endpoint URL (default: `http://localhost:3000`)
 - `VITE_ENVIRONMENT` - Environment mode: `development`, `staging`, or `production` (default: `development`)
 
 ### Using Environment Configuration in Code
@@ -127,10 +127,10 @@ The repository includes a GitHub Actions workflow (`.github/workflows/build-andr
 
 ### Configure API URL for CI/CD
 
-Set the `VITE_API_BASE_URL` secret in your GitHub repository:
+Set the `API_BASE_URL` secret in your GitHub repository:
 
 1. Go to **Settings** > **Secrets and variables** > **Actions**
-2. Add a new repository secret: `VITE_API_BASE_URL`
+2. Add a new repository secret: `API_BASE_URL`
 3. Value: Your production API URL (e.g., `https://api.yektayar.ir`)
 
 ## Native Android Code

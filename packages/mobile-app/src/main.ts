@@ -5,7 +5,7 @@ import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
 import config from './config'
-import { ErrorScreenMobile } from '@yektayar/shared'
+import { ErrorScreen } from '@yektayar/shared/components'
 import { parseSolutionsMarkdown, findSolutionForError, validateApi } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
@@ -30,10 +30,10 @@ import '@ionic/vue/css/flex-utils.css'
 import '@ionic/vue/css/display.css'
 
 /* Sahel Font */
-import './theme/fonts.css'
+import './theme/fonts.scss'
 
 /* Theme variables */
-import './theme/variables.css'
+import './theme/variables.scss'
 
 // Log startup information
 logger.startup('YektaYar Mobile App', {
@@ -168,12 +168,13 @@ async function initializeApp() {
       }
       
     // Create and mount error screen
-      const errorApp = createApp(ErrorScreenMobile, {
+      const errorApp = createApp(ErrorScreen, {
         title: 'API Configuration Error',
         message: 'Cannot start the application due to API configuration issues.',
         details: validationResult.error,
-        solution: solution,
-        errorType: validationResult.errorType
+        solution: import.meta.env.DEV ? solution : null, // Don't send solution in production
+        errorType: validationResult.errorType,
+        isBuiltInError: true
       })
       
       errorApp.use(IonicVue)
