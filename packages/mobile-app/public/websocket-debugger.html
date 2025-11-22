@@ -500,12 +500,18 @@
           const url = ui.serverUrl.value.trim();
           const baseUrl = url.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:').replace(/\/ws$/, '');
           
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+          
           const response = await fetch(baseUrl + '/api/auth/guest', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
-            }
+            },
+            signal: controller.signal
           });
+          
+          clearTimeout(timeoutId);
           
           if (response.ok) {
             const data = await response.json();
@@ -518,7 +524,11 @@
           log('warn', 'Could not generate guest token, connecting without authentication');
           return null;
         } catch (error) {
-          log('warn', 'Failed to generate guest token: ' + error.message);
+          if (error.name === 'AbortError') {
+            log('warn', 'Guest token request timed out');
+          } else {
+            log('warn', 'Failed to generate guest token: ' + error.message);
+          }
           return null;
         }
       };
@@ -764,25 +774,13 @@
       // Quick actions
       const actions = {
         ping: () => {
-          if (connectionType === 'socketio') {
-            send('ping');
-          } else {
-            send('ping');
-          }
+          send('ping');
         },
         status: () => {
-          if (connectionType === 'socketio') {
-            send('status');
-          } else {
-            send('status');
-          }
+          send('status');
         },
         info: () => {
-          if (connectionType === 'socketio') {
-            send('info');
-          } else {
-            send('info');
-          }
+          send('info');
         },
         echo: () => {
           if (connectionType === 'socketio') {
@@ -832,7 +830,7 @@
           await navigator.clipboard.writeText(text);
           log('info', 'Logs copied to clipboard');
         } catch(e) {
-          log('err', 'Failed to copy: ' + e.message);
+          log('err', 'Failed to copy to clipboard: ' + e.message + '. Try using Ctrl+C to copy manually or check browser permissions.');
         }
       });
       ui.sendCustomBtn.addEventListener('click', () => actions.custom());
