@@ -36,13 +36,13 @@
         }"
         defer
       > -->
-      <div class="welcome-container">
+      <div class="welcome-container" :class="{ 'exiting': isExiting }">
         <!-- Decorative background elements -->
         <div class="bg-decoration bg-decoration-1"></div>
         <div class="bg-decoration bg-decoration-2"></div>
         
         <!-- Header with Title and Logo -->
-        <div ref="headerRef" class="welcome-header" :class="{ 'exit-header': exitStates.header }">
+        <div ref="headerRef" class="welcome-header">
           <div class="logo-accent">
             <!-- <ion-icon name="yektayar" :icon="yektayar" class="yektayar-icon"></ion-icon> -->
             <img src="/logo-simple.svg" alt="YektaYar Logo" class="yektayar-icon" />
@@ -55,7 +55,6 @@
         <div 
           ref="heroContainerRef"
           class="hero-image-container"
-          :class="{ 'exit-hero': exitStates.hero }"
         >
           <LazyImage
             src="/welcome-hero.jpg"
@@ -72,8 +71,7 @@
         <!-- Welcome Text Content with Card Style -->
         <div 
           ref="welcomeTextOuter" 
-          class="welcome-text" 
-          :class="{ 'exit-text': exitStates.text }"
+          class="welcome-text"
           :style="{ height: welcomeTextHeight }"
         >
           <div ref="welcomeTextInner" class="welcome-text-inner">
@@ -96,8 +94,7 @@
           ref="termsContainerRef"
           class="terms-container" 
           :class="{ 
-            'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations,
-            'exit-terms': exitStates.terms 
+            'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations
           }"
           v-if="allTypewritersComplete"
         >
@@ -129,8 +126,7 @@
           :class="{ 
             'cta-button-disabled': !termsAccepted || isLoading,
             'cta-button-slide-down': FEATURE_CONFIG.enableSmoothAnimations && !ctaHasBeenShown,
-            'cta-button-loading': isLoading,
-            'exit-cta': exitStates.cta
+            'cta-button-loading': isLoading
           }"
           @click="startApp"
         >
@@ -174,7 +170,7 @@
         </transition>
 
         <!-- Disclaimer with Icon -->
-        <div ref="disclaimerRef" class="disclaimer-container" :class="{ 'exit-disclaimer': exitStates.disclaimer }">
+        <div ref="disclaimerRef" class="disclaimer-container">
           <ion-icon :icon="lockClosedOutline" class="disclaimer-icon"></ion-icon>
           <p class="disclaimer-text">
             اطلاعات شما محرمانه است، و تنها برای کمک به شما استفاده می‌شود.
@@ -189,7 +185,7 @@
 <script setup lang="ts">
 import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue'
 import { useRouter, useRoute } from 'vue-router'
-import { heartOutline, lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
+import { lockClosedOutline, checkmarkOutline, alertCircleOutline, chevronDownOutline } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { logger } from '@yektayar/shared'
 import apiClient from '@/api'
@@ -219,16 +215,8 @@ const termsAccepted = ref(false)
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 
-// Exit animation state - removed simple boolean approach
-// Individual element exit states for event-based control
-const exitStates = ref({
-  cta: false,
-  terms: false,
-  text: false,
-  hero: false,
-  header: false,
-  disclaimer: false
-})
+// Exit animation state - simple flag for whole-screen fade
+const isExiting = ref(false)
 
 // Refs for elements that need to exit
 const ctaButtonRef = ref<HTMLElement | null>(null)
@@ -270,7 +258,7 @@ const paragraphs = [
 // Initialize typewriter effects using a loop
 const typewriters = paragraphs.map((text) => {
   const config = FEATURE_CONFIG.value
-  const shouldSkip = configStore.skipTypewriter
+  const shouldSkip = config.skipTypewriter
   
   return useTypewriter(text, {
     speed: (config.enableTypewriter && !shouldSkip) ? 20 : 0,
@@ -330,7 +318,7 @@ const startTypewriterWithConditions = (
 // Set up intersection observers for each paragraph manually
 const setupParagraphObservers = () => {
   const config = FEATURE_CONFIG.value
-  const shouldSkip = configStore.skipTypewriter
+  const shouldSkip = config.skipTypewriter
   
   // If typewriter is disabled or should be skipped, mark all as complete
   if (!config.enableTypewriter || shouldSkip) {
@@ -439,18 +427,9 @@ const handleDebugKey = (event: KeyboardEvent) => {
     event.preventDefault()
     logger.info('[WelcomeScreen] Debug hotkey pressed - toggling exit animation')
     
-    // Toggle loading state
-    isLoading.value = !isLoading.value
-    
-    if (isLoading.value) {
-      // Simulate exit animation
-      exitElementsSequentially().catch(error => {
-        logger.error('[WelcomeScreen] Debug exit animation error:', error)
-      })
-    } else {
-      // Reset exit states to restore elements
-      resetExitStates()
-    }
+    // Toggle exit state
+    isExiting.value = !isExiting.value
+    isLoading.value = isExiting.value
   }
 }
 
@@ -499,11 +478,12 @@ onMounted(async () => {
     
     if (hasTransition || hasAnimation) {
       // Set up event listeners with additional filtering
-      const handleTransitionEnd = (event: TransitionEvent) => {
+      const handleTransitionEnd = (event: Event) => {
+        const transitionEvent = event as TransitionEvent
         // Only respond to events from the container itself, not children or OverlayScrollbars elements
-        if (event.target === welcomeContainer && !containerReady.value) {
+        if (transitionEvent.target === welcomeContainer && !containerReady.value) {
           // Check that the target is not an OverlayScrollbars internal element
-          const target = event.target as HTMLElement
+          const target = transitionEvent.target as HTMLElement
           if (!target.classList.contains('os-scrollbar') && !target.closest('.os-scrollbar')) {
             containerReady.value = true
             logger.info('[WelcomeScreen] Container transition complete, ready for typewriter')
@@ -512,11 +492,12 @@ onMounted(async () => {
         }
       }
       
-      const handleAnimationEnd = (event: AnimationEvent) => {
+      const handleAnimationEnd = (event: Event) => {
+        const animationEvent = event as AnimationEvent
         // Only respond to events from the container itself, not children or OverlayScrollbars elements
-        if (event.target === welcomeContainer && !containerReady.value) {
+        if (animationEvent.target === welcomeContainer && !containerReady.value) {
           // Check that the target is not an OverlayScrollbars internal element
-          const target = event.target as HTMLElement
+          const target = animationEvent.target as HTMLElement
           if (!target.classList.contains('os-scrollbar') && !target.closest('.os-scrollbar')) {
             containerReady.value = true
             logger.info('[WelcomeScreen] Container animation complete, ready for typewriter')
@@ -866,16 +847,19 @@ const startApp = async () => {
     })
     logger.info('Welcome screen preference saved to backend')
     
-    // Success! Now trigger exit animations
-    await exitElementsSequentially()
+    // Success! Now trigger elegant exit animation
+    isExiting.value = true
     
-    // Navigate to intended destination after animations complete
+    // Wait for animation to complete (800ms for smooth fade)
+    await new Promise(resolve => setTimeout(resolve, 800))
+    
+    // Navigate to intended destination after animation completes
     // Supports dynamic routing via ?redirect=/intended/path query parameter
     router.replace(intendedDestination.value)
   } catch (error: any) {
     logger.error('Failed to save welcome preference to backend:', error)
     
-    // Don't trigger exit animations on error - keep elements visible
+    // Don't trigger exit animation on error - keep elements visible
     // Set error message based on the error type using i18n
     if (error.response?.status === 401) {
       errorMessage.value = t('welcome_screen.auth_required')
@@ -898,79 +882,6 @@ const startApp = async () => {
       errorMessageRef.value.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }
   }
-}
-
-// Helper to reset all exit states
-const resetExitStates = () => {
-  exitStates.value = {
-    cta: false,
-    terms: false,
-    text: false,
-    hero: false,
-    header: false,
-    disclaimer: false
-  }
-}
-
-// Sequential exit animation with proper height calculation and overlapping transitions
-const exitElementsSequentially = async () => {
-  const ANIMATION_DURATION = 400 // Animation duration in ms
-  const OVERLAP_PERCENTAGE = 0.7 // Start next animation when previous is 70% complete
-  const overlapDelay = ANIMATION_DURATION * (1 - OVERLAP_PERCENTAGE) // ~120ms
-  
-  // Helper function to animate a single element
-  const animateElementExit = (element: HTMLElement | null, stateName: keyof typeof exitStates.value): Promise<void> => {
-    return new Promise((resolve) => {
-      if (!element) {
-        resolve()
-        return
-      }
-      
-      // Calculate and set current height before collapsing
-      const currentHeight = element.offsetHeight
-      element.style.maxHeight = `${currentHeight}px`
-      
-      // Force reflow to ensure maxHeight is applied
-      element.offsetHeight
-      
-      // Wait a frame, then apply exit class
-      requestAnimationFrame(() => {
-        exitStates.value[stateName] = true
-        
-        // Resolve when animation is mostly complete (for overlapping)
-        setTimeout(() => {
-          resolve()
-        }, ANIMATION_DURATION * OVERLAP_PERCENTAGE)
-      })
-    })
-  }
-  
-  // Exit elements with overlapping animations (bottom to top, reverse of entry)
-  // 1. CTA button - start immediately
-  const ctaPromise = animateElementExit(ctaButtonRef.value?.$el || ctaButtonRef.value, 'cta')
-  
-  // 2. Terms checkbox - start when CTA is 70% complete
-  await ctaPromise
-  const termsPromise = animateElementExit(termsContainerRef.value, 'terms')
-  
-  // 3. Welcome text - start when terms is 70% complete
-  await termsPromise
-  const textPromise = animateElementExit(welcomeTextOuter.value, 'text')
-  
-  // 4. Hero image - start when text is 70% complete
-  await textPromise
-  const heroPromise = animateElementExit(heroContainerRef.value, 'hero')
-  
-  // 5. Header - start when hero is 70% complete
-  await heroPromise
-  const headerPromise = animateElementExit(headerRef.value, 'header')
-  
-  // 6. Disclaimer - start when header is 70% complete
-  await headerPromise
-  await animateElementExit(disclaimerRef.value, 'disclaimer')
-  
-  // Wait for the last animation to fully complete
-  await new Promise(resolve => setTimeout(resolve, ANIMATION_DURATION * (1 - OVERLAP_PERCENTAGE)))
 }
 
 const onImageError = () => {
@@ -1004,6 +915,15 @@ const onImageError = () => {
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Elegant exit animation - fade entire screen */
+.welcome-container.exiting {
+  opacity: 0;
+  transform: scale(0.98);
+  pointer-events: none;
 }
 
 /* Decorative background elements */
@@ -1038,16 +958,6 @@ const onImageError = () => {
   text-align: center;
   margin-bottom: 2rem;
   position: relative;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.welcome-header.exit-header {
-  animation: fadeOutUp 0.4s ease-in forwards;
-  pointer-events: none;
-  margin-bottom: 0 !important;
-  overflow: hidden;
-  transition: max-height 0.4s ease-in, margin-bottom 0.4s ease-in;
-  max-height: 0 !important;
 }
 
 .logo-accent {
@@ -1106,18 +1016,6 @@ const onImageError = () => {
   position: relative;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   min-height: 280px;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hero-image-container.exit-hero {
-  animation: fadeOutUp 0.4s ease-in forwards;
-  pointer-events: none;
-  transition: max-height 0.4s ease-in, margin 0.4s ease-in, min-height 0.4s ease-in;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  min-height: 0 !important;
-  max-height: 0 !important;
-  overflow: hidden;
 }
 
 .hero-image-container :deep(.lazy-image) {
@@ -1155,17 +1053,7 @@ const onImageError = () => {
   border: 1px solid rgba(212, 164, 62, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.8s ease-out 0.5s both;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s ease-out;
-  overflow: hidden;
-}
-
-.welcome-text.exit-text {
-  animation: fadeOutUp 0.4s ease-in forwards;
-  pointer-events: none;
-  transition: max-height 0.4s ease-in, margin-bottom 0.4s ease-in, padding 0.4s ease-in;
-  margin-bottom: 0 !important;
-  padding: 0 !important;
-  max-height: 0 !important;
+  transition: height 0.3s ease-out;
   overflow: hidden;
 }
 
@@ -1201,16 +1089,6 @@ const onImageError = () => {
 /* Terms Acceptance Checkbox styling */
 .terms-container {
   margin: 0; /* 2rem 0 1rem 0; */
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.terms-container.exit-terms {
-  animation: fadeOutDown 0.4s ease-in forwards;
-  pointer-events: none;
-  transition: max-height 0.4s ease-in, margin 0.4s ease-in;
-  margin: 0 !important;
-  max-height: 0 !important;
-  overflow: hidden;
 }
 
 .terms-container-slide {
@@ -1367,18 +1245,9 @@ const onImageError = () => {
   /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
   background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
   background-size: 200% 100%;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s ease-out;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: var(--border-radius);
   --background: transparent; /* Fix for the `button-native` inside; otherwise it'll mask the actual cta-button */
-}
-
-.cta-button.exit-cta {
-  animation: fadeOutDown 0.4s ease-in forwards;
-  pointer-events: none;
-  transition: max-height 0.4s ease-in, margin-top 0.4s ease-in;
-  margin-top: 0 !important;
-  max-height: 0 !important;
-  overflow: hidden;
 }
 
 .cta-button:not(.cta-button-disabled):not(.cta-button-loading) {
@@ -1740,17 +1609,6 @@ const onImageError = () => {
   border-radius: 16px;
   animation: fadeIn 0.8s ease-out 0.8s both;
   border: 1px solid rgba(108, 117, 125, 0.1);
-  transition: all 0.4s ease-in;
-}
-
-.disclaimer-container.exit-disclaimer {
-  animation: fadeOutDown 0.4s ease-in forwards;
-  pointer-events: none;
-  transition: max-height 0.4s ease-in, margin 0.4s ease-in, padding 0.4s ease-in;
-  margin: 0 !important;
-  padding: 0 !important;
-  max-height: 0 !important;
-  overflow: hidden;
 }
 
 .disclaimer-icon {
@@ -1847,29 +1705,6 @@ const onImageError = () => {
   }
   50% {
     transform: translateY(-5px);
-  }
-}
-
-/* Exit animations - Reverse of entry animations */
-@keyframes fadeOutUp {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-}
-
-@keyframes fadeOutDown {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(30px);
   }
 }
 
