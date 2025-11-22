@@ -18,7 +18,11 @@ import { aiRoutes } from './routes/ai'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
 import { initializeDatabase } from './services/database'
-import { SOCKET_IO_PATH } from '@yektayar/shared'
+import { SOCKET_IO_PATH, getVersionFromPackageJson } from '@yektayar/shared'
+import packageJson from '../package.json'
+
+// Get version from package.json
+const APP_VERSION = getVersionFromPackageJson(packageJson)
 
 // Configure CORS based on environment
 // When behind a reverse proxy (like Apache), disable application-level CORS
@@ -26,29 +30,46 @@ import { SOCKET_IO_PATH } from '@yektayar/shared'
 const corsEnabled = process.env.DISABLE_CORS !== 'true'
 const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:8100']
 
+// Create base app
 const app = new Elysia()
   .use(cookie())
-  .use(corsEnabled ? cors({
+  // Prettify JSON responses
+  .onAfterHandle(({ response }) => {
+    // Only prettify JSON object responses
+    if (typeof response === 'object' && response !== null && !(response instanceof Response)) {
+      return new Response(
+        JSON.stringify(response, null, 2),
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+    }
+    return response
+  })
+
+// Conditionally add CORS middleware
+if (corsEnabled) {
+  app.use(cors({
     origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     exposeHeaders: ['Content-Length', 'Content-Type'],
     maxAge: 86400 // 24 hours
-  }) : (app) => app)
-  // Even when CORS is disabled at app level, we need to handle OPTIONS for reverse proxy
-  .options('/*', ({ set }) => {
-    set.status = 204
-    return ''
-  })
-  .use(swaggerAuth)
+  }))
+}
+
+// Continue with the rest of the middleware
+app
   .use(
     swagger({
       path: '/api-docs',
       documentation: {
         info: {
           title: 'YektaYar API',
-          version: '0.1.0',
+          version: APP_VERSION,
           description: 'Mental Health Care Platform API'
         },
         tags: [
@@ -71,9 +92,15 @@ const app = new Elysia()
       }
     })
   )
+  .use(swaggerAuth)
+  // Even when CORS is disabled at app level, handle OPTIONS for reverse proxy
+  .options('/*', ({ set }) => {
+    set.status = 204
+    return ''
+  })
   .get('/', () => ({
     message: 'YektaYar API Server',
-    version: '0.1.0',
+    version: APP_VERSION,
     status: 'running',
     features: {
       rest: true,
@@ -166,7 +193,8 @@ if (isBun) {
     console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
   }
   
-  console.log(`✅ Socket.IO enabled on same port (${port})`)
+  // TODO: these are also duplicated below, refactor later
+  console.log(`✅ Socket.IO enabled`)
 
   // TODO: complete custom startup logs
   // console.log(`⚠️ WARNING: `)
@@ -245,7 +273,8 @@ if (isBun) {
       console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
     }
     
-    console.log(`✅ Socket.IO enabled on same port (${port})`)
+    // TODO: these are duplicate logs from above, refactor later
+    console.log(`✅ Socket.IO enabled`)
     // TODO: complete custom startup logs
   })
 }

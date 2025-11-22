@@ -137,12 +137,12 @@ CORS_ORIGIN=http://localhost:5173,http://localhost:8100
 
 ### Mobile App (.env)
 ```env
-VITE_API_URL=http://localhost:3000
+API_BASE_URL=http://localhost:3000
 ```
 
 ### Admin Panel (.env)
 ```env
-VITE_API_URL=http://localhost:3000
+API_BASE_URL=http://localhost:3000
 ```
 
 ## API Examples
@@ -270,7 +270,7 @@ CREATE INDEX idx_sessions_expires_at ON sessions(expires_at);
 
 ### Session not acquired
 - Check backend is running on correct port
-- Check VITE_API_URL in frontend .env
+- Check API_BASE_URL in frontend .env
 - Check CORS settings in backend .env
 - Check browser console for errors
 

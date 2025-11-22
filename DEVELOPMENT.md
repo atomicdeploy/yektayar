@@ -69,7 +69,7 @@ This document provides detailed information for developers working on the YektaY
 
 ### Required Tools
 
-- **Node.js**: >= 18.0.0
+- **Node.js**: >= 20.19.0
 - **npm**: >= 9.0.0
 - **Bun**: >= 1.0.0 (for backend runtime)
 - **PostgreSQL**: >= 15.0

@@ -4,7 +4,7 @@ This guide helps you quickly test the session acquisition functionality.
 
 ## Prerequisites
 
-- Node.js >= 18.0.0
+- Node.js >= 20.19.0
 - npm >= 9.0.0
 - Bun >= 1.0.0 (for backend, or use Node.js)
 
@@ -31,12 +31,12 @@ CORS_ORIGIN=http://localhost:5173,http://localhost:8100
 
 **Mobile App** (`packages/mobile-app/.env`):
 ```env
-VITE_API_URL=http://localhost:3000
+API_BASE_URL=http://localhost:3000
 ```
 
 **Admin Panel** (`packages/admin-panel/.env`):
 ```env
-VITE_API_URL=http://localhost:3000
+API_BASE_URL=http://localhost:3000
 ```
 
 ## Running the System
@@ -247,7 +247,7 @@ sessionStore.socket.emit('ping')
   - Check backend is running and reachable
   - Check browser console for errors
   - Check Network tab for failed requests
-  - Verify VITE_API_URL is correct
+  - Verify API_BASE_URL is correct
 
 ### Session not persisting
 - **Issue**: Session re-acquired on every page reload

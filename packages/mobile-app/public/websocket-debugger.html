@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <title>WebSocket Client — YektaYar</title>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M5 3h14a2 2 0 0 1 2 2v14l-4-4H7a2 2 0 0 1-2-2z'/%3E%3C/svg%3E" />
+  <style>
+    /* =============== CSS VARIABLES =============== */
+    :root {
+      --bg: #0b0e13;
+      --bg-elev: #121622;
+      --bg-elev-2: #171c2b;
+      --bg-glass: rgba(255,255,255,0.04);
+      --card: #0f1420;
+      --card-2: #0d111a;
+      --text: #e7ecf6;
+      --muted: #9aa5b1;
+      --link: #8ab4ff;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --info: #38bdf8;
+      --accent: #7c3aed;
+      --accent-2: #22d3ee;
+      --border: #1f2637;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.02);
+      --radius-xl: 18px;
+      --radius-lg: 14px;
+      --radius: 12px;
+      --radius-sm: 10px;
+      --pad: 14px;
+      --pad-lg: 18px;
+      --ring: 0 0 0 2px rgba(124,58,237,.35), 0 8px 25px rgba(124,58,237,.25);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    @media (prefers-color-scheme: light) {
+      html[data-theme="auto"] {
+        --bg: #f6f7fb;
+        --bg-elev: #ffffff;
+        --bg-elev-2: #f2f4f8;
+        --bg-glass: rgba(0,0,0,0.04);
+        --card: #ffffff;
+        --card-2: #fafbfe;
+        --text: #0c1222;
+        --muted: #5e6a78;
+        --border: #e6e9ef;
+        --shadow: 0 10px 30px rgba(13,17,26,0.08);
+      }
+    }
+
+    /* =============== RESET / BASE =============== */
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 100% -20%, rgba(124,58,237,.12), transparent 60%),
+        radial-gradient(900px 600px at -10% 120%, rgba(34,211,238,.09), transparent 60%),
+        var(--bg);
+      letter-spacing: 0.2px;
+    }
+
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    code, pre, kbd, samp { font-family: var(--mono); }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100svh;
+    }
+
+    /* =============== HEADER =============== */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: saturate(140%) blur(10px);
+      background: linear-gradient(180deg, rgba(12,16,26,0.8), rgba(12,16,26,0.6));
+      border-bottom: 1px solid var(--border);
+    }
+    .header__inner {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      padding: 14px min(3vw, 28px);
+      align-items: center;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .brand__logo {
+      width: 38px; height: 38px;
+      border-radius: 14px;
+      background:
+        conic-gradient(from 210deg at 50% 50%, var(--accent), var(--accent-2), var(--accent));
+      box-shadow: var(--shadow);
+      position: relative; isolation: isolate;
+    }
+    .brand__logo::after {
+      content:""; position:absolute; inset:2px;
+      border-radius: 12px; background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0));
+    }
+    .brand__title { font-size: 20px; font-weight: 700; letter-spacing: .3px; }
+    .hint { font-size: 12px; color: var(--muted); }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 999px; background: var(--bg-elev-2);
+      border: 1px solid var(--border); font-size: 12px; color: var(--muted);
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--warn); box-shadow: 0 0 0 2px rgba(245,158,11,.15);
+    }
+    .dot.is-ok { background: var(--ok); box-shadow: 0 0 0 2px rgba(34,197,94,.18); }
+    .dot.is-err { background: var(--err); box-shadow: 0 0 0 2px rgba(239,68,68,.18); }
+
+    .toolbar {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+      padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg-elev), var(--bg-elev-2));
+      box-shadow: var(--shadow);
+      transition: transform .08s ease, box-shadow .2s ease, border-color .15s ease, background .15s ease;
+      cursor: pointer; user-select: none;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn--primary {
+      background: linear-gradient(180deg, rgba(124,58,237,.85), rgba(124,58,237,.7));
+      border-color: rgba(124,58,237,.45);
+      box-shadow: var(--ring);
+    }
+    .btn--ghost {
+      background: transparent;
+    }
+    .btn[disabled] { opacity: .6; cursor: not-allowed; }
+    .icon { width: 18px; height: 18px; display: inline-block; }
+
+    /* =============== LAYOUT =============== */
+    .main {
+      padding: 20px min(3vw, 28px) 24px;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 1100px) {
+      .main { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card), var(--card-2));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: clip;
+    }
+    .card__head {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: linear-gradient(180deg, var(--bg-glass), transparent);
+    }
+    .card__title { font-weight: 700; letter-spacing: .3px; }
+    .card__body { padding: 14px; display: grid; gap: 12px; }
+    .card__row { display: grid; gap: 10px; }
+    .row {
+      display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 700px) {
+      .row, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    /* =============== FORM CONTROLS =============== */
+    .field {
+      display: grid; gap: 6px;
+    }
+    .label {
+      font-size: 12px; color: var(--muted); letter-spacing: .3px; display: inline-flex; gap: 8px; align-items: center;
+    }
+    .input, .select, .textarea {
+      padding: 12px 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: linear-gradient(180deg, var(--bg-elev), var(--bg-elev-2));
+      outline: none; width: 100%;
+      transition: border-color .15s ease, box-shadow .2s ease, background .15s ease;
+    }
+    .textarea { min-height: 120px; resize: vertical; }
+    .select { appearance: none; background-image: linear-gradient(180deg, var(--bg-elev), var(--bg-elev-2)); }
+    .input:focus, .select:focus, .textarea:focus { border-color: rgba(124,58,237,.6); box-shadow: var(--ring); }
+    .invalid, .input[aria-invalid="true"], .select[aria-invalid="true"], .textarea[aria-invalid="true"] {
+      border-color: rgba(239,68,68,.7)!important; box-shadow: 0 0 0 2px rgba(239,68,68,.25)!important;
+    }
+    .error { font-size: 12px; color: var(--err); display: none; }
+    .error.show { display: block; }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 10px; border-radius: 999px; border: 1px solid var(--border);
+      background: var(--bg-elev-2); color: var(--muted); font-size: 12px;
+    }
+
+    /* =============== LOGS =============== */
+    .logs {
+      display: grid; grid-template-rows: auto 1fr;
+      height: 100%;
+    }
+    .logs__body {
+      overflow: auto;
+      scroll-behavior: smooth;
+      background:
+        linear-gradient(180deg, rgba(124,58,237,.05), transparent 30%),
+        linear-gradient(0deg, rgba(34,211,238,.05), transparent 30%),
+        linear-gradient(180deg, var(--bg-elev), var(--bg-elev-2));
+    }
+    .logline {
+      display: grid; grid-template-columns: 120px auto 90px; gap: 12px; align-items: start;
+      padding: 10px 14px;
+      border-bottom: 1px dashed var(--border);
+      font-family: var(--mono); font-size: 12.5px;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .logline:hover { background: rgba(255,255,255,0.02); }
+    .log--rx { background: rgba(34, 211, 238, 0.03); }
+    .log--tx { background: rgba(124, 58, 237, 0.03); }
+    .log--err { background: rgba(239, 68, 68, 0.03); }
+    .log--warn { background: rgba(245, 158, 11, 0.03); }
+    .logline__ts { color: var(--muted); }
+    .logline__msg { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .logline__tag { text-align: right; color: var(--muted); }
+    .log--ok .logline__tag { color: var(--ok); }
+    .log--warn .logline__tag { color: var(--warn); }
+    .log--err .logline__tag { color: var(--err); }
+    .log--rx .logline__tag { color: var(--accent-2); }
+    .log--tx .logline__tag { color: var(--accent); }
+    
+    /* Log badges for RX/TX */
+    .log-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .log-badge--rx {
+      background: rgba(34, 211, 238, 0.15);
+      color: var(--accent-2);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+    }
+    .log-badge--tx {
+      background: rgba(124, 58, 237, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+    }
+    .log-badge--http {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--ok);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .log-badge--ws {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    
+    .sticky-tools {
+      position: sticky; top: 0; z-index: 2;
+      display: flex; align-items: center; gap: 8px; padding: 8px;
+      background: linear-gradient(180deg, var(--card), transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .kebab {
+      min-width: 44px; aspect-ratio: 1/1; display: inline-grid; place-items: center;
+      border-radius: 10px; border: 1px solid var(--border); background: var(--bg-glass);
+      cursor: pointer;
+    }
+    .menu {
+      position: absolute; margin-top: 6px; right: 8px; min-width: 220px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow);
+      padding: 6px; display: none;
+    }
+    .menu.show { display: block; }
+    .menu button { width: 100%; text-align: left; }
+
+    /* =============== ACTIONS =============== */
+    .actions { display: grid; gap: 10px; }
+    .action-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+    @media (max-width: 1200px) { .action-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .action-grid { grid-template-columns: 1fr; } }
+    .action {
+      display: flex; align-items: center; gap: 10px; padding: 12px;
+      border: 1px solid var(--border); border-radius: 14px; background: var(--bg-elev);
+      cursor: pointer;
+    }
+    .action:hover { border-color: rgba(124,58,237,.5); box-shadow: var(--ring); }
+    .action .icon { opacity: .85; }
+
+    /* =============== INSTANCE INFO TABLE =============== */
+    .kv {
+      display: grid; grid-template-columns: 140px 1fr; gap: 8px 14px; font-family: var(--mono); font-size: 13px;
+    }
+    .kv__k { color: var(--muted); }
+    .kv__v { color: var(--text); overflow-wrap: anywhere; }
+
+    /* =============== FOOTER =============== */
+    .footer {
+      padding: 10px min(3vw, 28px);
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--border);
+      background: linear-gradient(0deg, rgba(12,16,26,0.8), rgba(12,16,26,0.4));
+    }
+
+    /* =============== UTILITIES =============== */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .hide { display: none!important; }
+    .flex { display: flex; }
+    .gap-8 { gap: 8px; }
+    .gap-10 { gap: 10px; }
+    .space-between { justify-content: space-between; }
+    .center { align-items: center; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <!-- SVG ICONS (reusable) -->
+  <svg width="0" height="0" class="sr-only" aria-hidden="true">
+    <symbol id="i-plug" viewBox="0 0 24 24"><path fill="currentColor" d="M7 6v6a5 5 0 0 0 5 5h1v3h2v-3h2V6zM6 2h2v4H6zm10 0h2v4h-2z"/></symbol>
+    <symbol id="i-power" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2h2v10h-2z"/><path fill="currentColor" d="M7.05 4.05A8 8 0 1 0 20 12h-2a6 6 0 1 1-10.24-4.24z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path fill="currentColor" d="M7 21q-0.825 0-1.412-.587T5 19V7H4V5h4V4h8v1h4v2h-1v12q0 .825-.587 1.413T17 21zM7 7v12h10V7z"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8a2 2 0 1 1 .001-3.999A2 2 0 0 1 12 8m0 6a2 2 0 1 1 .001-4.001A2 2 0 0 1 12 14m0 6a2 2 0 1 1 .001-4.001A2 2 0 0 1 12 20"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path fill="currentColor" d="M2 21L23 12L2 3v7l15 2l-15 2z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4V1L7 6l5 5V7a5 5 0 1 1-5 5H5a7 7 0 1 0 12.65-5"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path fill="currentColor" d="M3.9 12a5 5 0 0 1 5-5H12v2H8.9a3 3 0 1 0 0 6H12v2H8.9a5 5 0 0 1-5-5m10.1-3H15a3 3 0 1 1 0 6h-1a1 1 0 0 1 0-2h1a1 1 0 1 0 0-2h-1a1 1 0 0 1 0-2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="currentColor" d="m10 17l-5-5l1.4-1.4L10 14.2l7.6-7.6L19 8z"/></symbol>
+    <symbol id="i-type" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v2H4zm3 5h10v2H7zm-3 5h16v2H4zm3 5h10v2H7z"/></symbol>
+  </svg>
+
+  <!-- HEADER -->
+  <header class="header" role="banner">
+    <div class="header__inner">
+      <div class="brand">
+        <div class="brand__logo" aria-hidden="true"></div>
+        <div>
+          <div class="brand__title">WebSocket Client — YektaYar</div>
+          <div class="hint">Connect & control via WebSocket/Socket.IO</div>
+        </div>
+      </div>
+
+      <div class="status-pill" id="connectionStatus" aria-live="polite">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Disconnected</span>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn--primary" id="connectBtn">
+          <svg class="icon"><use href="#i-plug"></use></svg>
+          <span>Connect</span>
+        </button>
+        <button class="btn" id="disconnectBtn" disabled>
+          <svg class="icon"><use href="#i-power"></use></svg>
+          <span>Disconnect</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main" id="mainContent">
+    <!-- LEFT COLUMN: Connection & Actions -->
+    <section class="card" aria-labelledby="connTitle">
+      <div class="card__head">
+        <div class="card__title" id="connTitle">Connection</div>
+        <div class="flex gap-8 center">
+          <label class="chip">
+            <input type="checkbox" id="autoReconnect" checked />
+            Auto-reconnect
+          </label>
+        </div>
+      </div>
+      <div class="card__body">
+        <div class="field">
+          <label for="serverUrl" class="label">Server Address (ws://, wss://, http://, or https://) <span class="hint">Supports WebSocket & Socket.IO</span></label>
+          <div class="row">
+            <input
+              class="input"
+              id="serverUrl"
+              name="serverUrl"
+              type="url"
+              inputmode="url"
+              placeholder="ws://localhost:80/ws or http://localhost:3000"
+              required
+              aria-invalid="false"
+              aria-describedby="serverUrlErr"
+            />
+          </div>
+          <div class="error" id="serverUrlErr">Please enter a valid WebSocket URL.</div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="sessionToken">Session Token (Optional)</label>
+          <input
+            id="sessionToken"
+            class="input"
+            type="password"
+            placeholder="Leave empty for auto-generated guest session"
+          />
+          <div class="hint">If empty, a guest session will be auto-generated</div>
+        </div>
+
+        <div class="card">
+          <div class="card__head">
+            <div class="card__title">Connected Instance</div>
+            <div class="chip">
+              <svg class="icon"><use href="#i-check"></use></svg>
+              <span id="instanceStateChip">No instance</span>
+            </div>
+          </div>
+          <div class="card__body">
+            <div class="kv" id="instanceInfo">
+              <div class="kv__k">Type</div><div class="kv__v" data-k="type">—</div>
+              <div class="kv__k">State</div><div class="kv__v" data-k="state">—</div>
+              <div class="kv__k">Socket ID</div><div class="kv__v" data-k="socketId">—</div>
+              <div class="kv__k">Transport</div><div class="kv__v" data-k="transport">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="label">Actions</div>
+          <div class="action-grid" id="actionsGrid">
+            <button class="action" data-action="ws:ping">
+              <svg class="icon"><use href="#i-send"></use></svg> <span>Ping</span>
+            </button>
+            <button class="action" data-action="ws:status">
+              <svg class="icon"><use href="#i-refresh"></use></svg> <span>Status</span>
+            </button>
+            <button class="action" data-action="ws:info">
+              <svg class="icon"><use href="#i-type"></use></svg> <span>Info</span>
+            </button>
+            <button class="action" data-action="ws:echo">
+              <svg class="icon"><use href="#i-send"></use></svg> <span>Echo</span>
+            </button>
+            <button class="action" data-action="ws:message">
+              <svg class="icon"><use href="#i-type"></use></svg> <span>Message</span>
+            </button>
+            <button class="action" data-action="app:clear-logs">
+              <svg class="icon"><use href="#i-trash"></use></svg> <span>Clear Logs</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Custom Message</label>
+          <input
+            id="customEvent"
+            class="input"
+            type="text"
+            placeholder="Event name (e.g., message, ai:chat)"
+            value="message"
+          />
+          <textarea
+            id="customData"
+            class="textarea"
+            placeholder='Message data (JSON or string, e.g., {"test": "data"})'
+            rows="3"
+          >Hello from debugger</textarea>
+          <button class="btn btn--primary" id="sendCustomBtn">
+            <svg class="icon"><use href="#i-send"></use></svg>
+            Send Custom Message
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: Logs -->
+    <section class="card logs" aria-labelledby="logsTitle">
+      <div class="card__head sticky-tools">
+        <div class="card__title" id="logsTitle">Logs</div>
+        <div class="flex gap-8">
+          <button class="btn" id="copyLogsBtn" title="Copy logs">
+            <svg class="icon"><use href="#i-link"></use></svg>
+            Copy
+          </button>
+          <button class="btn" id="clearLogsBtn" title="Clear logs">
+            <svg class="icon"><use href="#i-trash"></use></svg>
+            Clear
+          </button>
+        </div>
+      </div>
+      <div class="logs__body" id="logsBody" role="log" aria-live="polite" aria-relevant="additions text">
+        <!-- Log lines appended here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="flex center gap-10">
+      <span class="chip">Rx: <b id="rxCount">0</b></span>
+      <span class="chip">Tx: <b id="txCount">0</b></span>
+      <span class="chip">Errors: <b id="errCount">0</b></span>
+    </div>
+    <div class="hint">All states, actions, and errors are logged. Built for testing WebSocket and Socket.IO connections with YektaYar backend.</div>
+  </footer>
+</div>
+
+<!-- Socket.IO Client Library -->
+<script src="./socket.io.min.js"></script>
+
+<script>
+(function(){
+  'use strict';
+
+  /*****************************
+   * Utilities
+   *****************************/
+  const qs = (sel, el = document) => el.querySelector(sel);
+  const qsa = (sel, el = document) => Array.from(el.querySelectorAll(sel));
+  const now = () => new Date();
+  const fmtTime = (d = now()) =>
+    `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(
+      d.getSeconds()
+    ).padStart(2, "0")}.${String(d.getMilliseconds()).padStart(3, "0")}`;
+
+  /*****************************
+   * Storage (localStorage wrapper)
+   *****************************/
+  const Storage = {
+    get(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw === null ? fallback : JSON.parse(raw);
+      } catch {
+        return fallback;
+      }
+    },
+    set(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    },
+    del(key) {
+      localStorage.removeItem(key);
+    },
+  };
+
+  /*****************************
+   * Logger (UI + counters)
+   *****************************/
+  const Log = (() => {
+    const el = {
+      body: qs("#logsBody"),
+      rx: qs("#rxCount"),
+      tx: qs("#txCount"),
+      err: qs("#errCount"),
+      copyBtn: qs("#copyLogsBtn"),
+      clearBtn: qs("#clearLogsBtn"),
+    };
+
+    let counters = { rx: 0, tx: 0, err: 0 };
+    
+    const api = {
+      info(msg) {
+        append("ok", msg);
+      },
+      warn(msg) {
+        append("warn", msg);
+      },
+      error(msg) {
+        counters.err++;
+        updateCounters();
+        append("err", msg);
+      },
+      rx(msg) {
+        counters.rx++;
+        updateCounters();
+        append("rx", msg);
+      },
+      tx(msg) {
+        counters.tx++;
+        updateCounters();
+        append("tx", msg);
+      },
+      http(msg, status) {
+        const badge = status ? `HTTP ${status}` : 'HTTP';
+        appendWithBadge("ok", badge, msg, "http");
+      },
+      ws(msg, status = "info") {
+        const levelMap = { info: "ok", warn: "warn", error: "err" };
+        appendWithBadge(levelMap[status] || "ok", "WS", msg, "ws");
+      },
+      raw(line, level = "ok") {
+        append(level, line);
+      },
+      copyAll() {
+        const text = qsa(".logline", el.body).map((n) => n.innerText).join("\n");
+        navigator.clipboard.writeText(text).then(() => api.info("Logs copied to clipboard")).catch((e) => {
+          api.error("Failed to copy to clipboard: " + e.message + ". Try using Ctrl+C to copy manually or check browser permissions.");
+        });
+      },
+      clear() {
+        el.body.innerHTML = "";
+        counters = { rx: 0, tx: 0, err: 0 };
+        updateCounters();
+      },
+    };
+
+    function append(level, msg) {
+      let badge = "";
+      if (level === "rx") {
+        badge = '<span class="log-badge log-badge--rx">RX</span>';
+      } else if (level === "tx") {
+        badge = '<span class="log-badge log-badge--tx">TX</span>';
+      }
+      addLogLine(level, badge, msg);
+    }
+
+    function appendWithBadge(level, badgeText, msg, badgeType = "info") {
+      const badge = `<span class="log-badge log-badge--${badgeType}">${escapeHTML(badgeText)}</span>`;
+      addLogLine(level, badge, msg);
+    }
+
+    function addLogLine(level, badge, msg) {
+      const line = document.createElement("div");
+      line.className = `logline log--${level}`;
+      
+      line.innerHTML = `
+        <div class="logline__ts">${fmtTime()}</div>
+        <div class="logline__msg">${badge}${escapeHTML(String(msg))}</div>
+        <div class="logline__tag">${tagName(level)}</div>
+      `;
+      el.body.appendChild(line);
+      if (el.body.childElementCount > 2000) {
+        el.body.removeChild(el.body.firstElementChild);
+      }
+      el.body.scrollTop = el.body.scrollHeight + 1000;
+    }
+
+    function updateCounters() {
+      el.rx.textContent = counters.rx;
+      el.tx.textContent = counters.tx;
+      el.err.textContent = counters.err;
+    }
+
+    function tagName(level) {
+      if (level === "ok") return "info";
+      if (level === "warn") return "warn";
+      if (level === "err") return "error";
+      if (level === "rx") return "recv";
+      if (level === "tx") return "sent";
+      return level;
+    }
+
+    function escapeHTML(s) {
+      return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]));
+    }
+
+    el.copyBtn.addEventListener("click", api.copyAll);
+    el.clearBtn.addEventListener("click", api.clear);
+
+    return api;
+  })();
+
+  /*****************************
+   * HTTP Client
+   *****************************/
+  const HTTPClient = {
+    async get(url, path = "/") {
+      const httpUrl = toHttpBase(url) + path;
+      Log.http(`GET ${httpUrl}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      try {
+        const r = await fetch(httpUrl, { cache: "no-store", signal: controller.signal });
+        clearTimeout(timeoutId);
+        const txt = await r.text();
+        Log.http(`Response from ${path}`, r.status);
+        return { status: r.status, text: txt };
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+    },
+  };
+  
+  function toHttpBase(wsUrl) {
+    try {
+      const u = new URL(wsUrl);
+      const proto = u.protocol === "wss:" ? "https:" : "http:";
+      return `${proto}//${u.host}`;
+    } catch {
+      return wsUrl;
+    }
+  }
+
+  /*****************************
+   * Unified Connection Client (WebSocket + Socket.IO)
+   *****************************/
+  class ConnectionClient {
+    constructor({ onOpen, onClose, onMessage, onError, getUrl, getDelay }) {
+      this.onOpen = onOpen;
+      this.onClose = onClose;
+      this.onMessage = onMessage;
+      this.onError = onError;
+      this.getUrl = getUrl;
+      this.getDelay = getDelay;
+      this.connection = null;
+      this.connectionType = null;
+      this._reconnectTimer = null;
+      this._manualClose = false;
+      this._attempt = 0;
+    }
+
+    _detectConnectionType(url) {
+      try {
+        const urlObj = new URL(url);
+        const protocol = urlObj.protocol;
+        
+        if (protocol === 'http:' || protocol === 'https:') {
+          return 'socketio';
+        } else if (protocol === 'ws:' || protocol === 'wss:') {
+          return 'websocket';
+        }
+        
+        return 'websocket';
+      } catch (e) {
+        Log.ws(`Failed to parse URL, defaulting to WebSocket: ${e.message}`, "warn");
+        return 'websocket';
+      }
+    }
+
+    connect() {
+      const url = this.getUrl();
+      if (!url) return Log.ws("No URL configured", "warn");
+      this._manualClose = false;
+      
+      this.connectionType = this._detectConnectionType(url);
+      
+      if (this.connectionType === 'socketio') {
+        this._connectSocketIO(url);
+      } else {
+        this._connectWebSocket(url);
+      }
+    }
+
+    _connectWebSocket(url) {
+      try {
+        Log.ws(`Connecting via WebSocket to ${url}`);
+        const ws = new WebSocket(url);
+        this.connection = ws;
+
+        ws.addEventListener("open", () => {
+          this._attempt = 0;
+          Log.ws(`Connected via WebSocket to ${url}`);
+          this.onOpen?.();
+        });
+
+        ws.addEventListener("message", (ev) => {
+          const text = String(ev.data || "");
+          Log.rx(text);
+          this.onMessage?.(text);
+        });
+
+        ws.addEventListener("error", (ev) => {
+          Log.ws(`Error: ${ev.message || "unknown"}`, "error");
+          this.onError?.(ev);
+        });
+
+        ws.addEventListener("close", (ev) => {
+          Log.ws(`Closed (code=${ev.code}, reason=${ev.reason || "none"})`, "warn");
+          this.onClose?.(ev);
+          if (!this._manualClose && App.state.autoReconnect) {
+            this.scheduleReconnect();
+          }
+        });
+      } catch (e) {
+        Log.ws(`Connection failed: ${e.message}`, "error");
+        this.scheduleReconnect();
+      }
+    }
+
+    async _generateGuestToken(baseUrl) {
+      try {
+        Log.ws('Attempting to generate guest session token...');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        
+        const response = await fetch(baseUrl + '/api/auth/guest', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.sessionToken) {
+            Log.ws('Generated guest session token');
+            return data.sessionToken;
+          }
+        }
+        
+        Log.ws('Could not generate guest token, connecting without authentication', 'warn');
+        return null;
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          Log.ws('Guest token request timed out', 'warn');
+        } else {
+          Log.ws('Failed to generate guest token: ' + error.message, 'warn');
+        }
+        return null;
+      }
+    }
+
+    async _connectSocketIO(url) {
+      try {
+        let ioUrl = url;
+        if (url.startsWith('ws://')) {
+          ioUrl = url.replace('ws://', 'http://');
+        } else if (url.startsWith('wss://')) {
+          ioUrl = url.replace('wss://', 'https://');
+        }
+        
+        const urlObj = new URL(ioUrl);
+        const baseUrl = `${urlObj.protocol}//${urlObj.host}`;
+        
+        Log.ws(`Connecting via Socket.IO to ${baseUrl}`);
+        
+        if (typeof io === 'undefined') {
+          Log.ws("Socket.IO library not loaded", "error");
+          return;
+        }
+
+        let token = UI.elements.sessionToken.value.trim();
+        
+        // If no token provided, try to generate a guest token
+        if (!token) {
+          token = await this._generateGuestToken(baseUrl);
+        }
+        
+        const socketOptions = {
+          reconnection: false,
+          transports: ['websocket', 'polling']
+        };
+        
+        if (token) {
+          socketOptions.auth = { token };
+          Log.info('Using authentication token');
+        } else {
+          Log.info('No token provided, connecting without authentication');
+        }
+        
+        const socket = io(baseUrl, socketOptions);
+        this.connection = socket;
+        this.connectionType = 'socketio';
+
+        socket.on('connect', () => {
+          this._attempt = 0;
+          Log.ws(`Connected via Socket.IO (id: ${socket.id})`);
+          this.onOpen?.();
+        });
+
+        socket.on('message', (data) => {
+          const text = typeof data === 'string' ? data : JSON.stringify(data);
+          Log.rx(text);
+          this.onMessage?.(text);
+        });
+
+        socket.onAny((eventName, ...args) => {
+          if (eventName !== 'connect' && eventName !== 'disconnect' && eventName !== 'message' && 
+              eventName !== 'error' && eventName !== 'connect_error') {
+            const data = args.length === 1 ? args[0] : args;
+            const text = typeof data === 'string' ? data : JSON.stringify(data);
+            Log.rx(eventName + ': ' + text);
+            this.onMessage?.(text);
+          }
+        });
+
+        socket.on('error', (err) => {
+          Log.ws(`Error: ${err.message || "unknown"}`, "error");
+          this.onError?.(err);
+        });
+
+        socket.on('disconnect', (reason) => {
+          Log.ws(`Disconnected (reason: ${reason})`, "warn");
+          this.onClose?.({ reason });
+          if (!this._manualClose && App.state.autoReconnect) {
+            this.scheduleReconnect();
+          }
+        });
+
+        socket.on('connect_error', (err) => {
+          Log.ws(`Connection error: ${err.message}`, "error");
+          if (!this._manualClose && App.state.autoReconnect) {
+            this.scheduleReconnect();
+          }
+        });
+      } catch (e) {
+        Log.ws(`Connection failed: ${e.message}`, "error");
+        this.scheduleReconnect();
+      }
+    }
+
+    scheduleReconnect() {
+      clearTimeout(this._reconnectTimer);
+      const base = Number(App.state.reconnectDelay) || 1500;
+      const jitter = Math.random() * 250;
+      const backoff = Math.min(8000, this._attempt * 300);
+      const delay = base + jitter + backoff;
+      this._attempt++;
+      Log.ws(`Reconnecting in ${Math.round(delay)}ms`, "warn");
+      this._reconnectTimer = setTimeout(() => this.connect(), delay);
+    }
+
+    disconnect() {
+      this._manualClose = true;
+      clearTimeout(this._reconnectTimer);
+      
+      if (this.connection) {
+        if (this.connectionType === 'socketio') {
+          this.connection.disconnect();
+        } else if (this.connectionType === 'websocket') {
+          if (this.connection.readyState === WebSocket.OPEN || this.connection.readyState === WebSocket.CONNECTING) {
+            this.connection.close(1000, "client-close");
+          }
+        }
+      }
+      this.connection = null;
+    }
+
+    send(text) {
+      if (!this.connection) {
+        Log.ws("Send failed: not connected", "warn");
+        return false;
+      }
+
+      if (this.connectionType === 'socketio') {
+        if (this.connection.connected) {
+          try {
+            const data = JSON.parse(text);
+            if (data.event) {
+              this.connection.emit(data.event, data.data || data);
+            } else {
+              this.connection.emit('message', text);
+            }
+          } catch {
+            this.connection.emit('message', text);
+          }
+          Log.tx(text);
+          return true;
+        } else {
+          Log.ws("Send failed: Socket.IO not connected", "warn");
+          return false;
+        }
+      } else if (this.connectionType === 'websocket') {
+        if (this.connection.readyState === WebSocket.OPEN) {
+          this.connection.send(text);
+          Log.tx(text);
+          return true;
+        } else {
+          Log.ws("Send failed: connection not open", "warn");
+          return false;
+        }
+      }
+      return false;
+    }
+
+    isOpen() {
+      if (!this.connection) return false;
+      if (this.connectionType === 'socketio') {
+        return this.connection.connected;
+      } else if (this.connectionType === 'websocket') {
+        return this.connection.readyState === WebSocket.OPEN;
+      }
+      return false;
+    }
+  }
+
+  /*****************************
+   * Actions Registry
+   *****************************/
+  const Actions = (() => {
+    const registry = new Map();
+
+    function define(name, handler) {
+      registry.set(name, handler);
+    }
+
+    async function run(name, ctx, el) {
+      const fn = registry.get(name);
+      if (!fn) return Log.warn(`Unknown action: ${name}`);
+      try {
+        await fn(ctx, el);
+      } catch (e) {
+        Log.error(`Error in ${name}: ${e.message}`);
+      }
+    }
+
+    define("ws:ping", (ctx) => {
+      ctx.ws.send('ping');
+    });
+
+    define("ws:status", (ctx) => {
+      ctx.ws.send('status');
+    });
+
+    define("ws:info", (ctx) => {
+      ctx.ws.send('info');
+    });
+
+    define("ws:echo", (ctx) => {
+      const data = { message: 'Hello from debugger', timestamp: new Date().toISOString() };
+      ctx.ws.send(JSON.stringify({ event: 'echo', data }));
+    });
+
+    define("ws:message", (ctx) => {
+      ctx.ws.send('Test message from debugger');
+    });
+
+    define("app:clear-logs", () => Log.clear());
+
+    return { define, run };
+  })();
+
+  /*****************************
+   * UI & State
+   *****************************/
+  const UI = (() => {
+    const el = {
+      statusDot: qs("#statusDot"),
+      statusText: qs("#statusText"),
+      connectBtn: qs("#connectBtn"),
+      disconnectBtn: qs("#disconnectBtn"),
+      serverUrl: qs("#serverUrl"),
+      sessionToken: qs("#sessionToken"),
+      autoReconnect: qs("#autoReconnect"),
+      instanceInfo: qs("#instanceInfo"),
+      instanceStateChip: qs("#instanceStateChip"),
+      actionsGrid: qs("#actionsGrid"),
+      customEvent: qs("#customEvent"),
+      customData: qs("#customData"),
+      sendCustomBtn: qs("#sendCustomBtn"),
+    };
+
+    function init() {
+      populateFromState();
+
+      el.connectBtn.addEventListener("click", App.connect);
+      el.disconnectBtn.addEventListener("click", App.disconnect);
+
+      el.autoReconnect.addEventListener("input", () => {
+        App.state.autoReconnect = el.autoReconnect.checked;
+        App.persist();
+      });
+
+      el.actionsGrid.addEventListener("click", (e) => {
+        const btn = e.target.closest(".action");
+        if (!btn) return;
+        const name = btn.getAttribute("data-action");
+        Actions.run(name, App.ctx(), btn);
+      });
+
+      el.sendCustomBtn.addEventListener("click", () => {
+        const event = el.customEvent.value.trim() || 'message';
+        let data = el.customData.value.trim();
+        
+        try {
+          data = JSON.parse(data);
+        } catch (e) {
+          // Keep as string if not valid JSON
+        }
+        
+        const msg = JSON.stringify({ event, data });
+        App.ws.send(msg);
+      });
+
+      el.serverUrl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          el.connectBtn.click();
+        }
+      });
+    }
+
+    function populateFromState() {
+      const s = App.state;
+      el.serverUrl.value = s.serverUrl || 'http://localhost:3000';
+      el.autoReconnect.checked = s.autoReconnect !== false;
+    }
+
+    function setStatus(kind, text) {
+      el.statusText.textContent = text;
+      el.statusDot.classList.remove("is-ok", "is-err");
+      if (kind === "ok") el.statusDot.classList.add("is-ok");
+      if (kind === "err") el.statusDot.classList.add("is-err");
+    }
+
+    function updateButtons(connected) {
+      el.connectBtn.disabled = connected;
+      el.disconnectBtn.disabled = !connected;
+    }
+
+    function setInstanceInfo(type, state, socketId, transport) {
+      qs('[data-k="type"]', el.instanceInfo).textContent = type || "—";
+      qs('[data-k="state"]', el.instanceInfo).textContent = state || "—";
+      qs('[data-k="socketId"]', el.instanceInfo).textContent = socketId || "—";
+      qs('[data-k="transport"]', el.instanceInfo).textContent = transport || "—";
+      el.instanceStateChip.textContent = socketId ? `Connected` : "No instance";
+    }
+
+    function clearInstanceInfo() {
+      qsa(".kv__v", el.instanceInfo).forEach((n) => (n.textContent = "—"));
+      el.instanceStateChip.textContent = "No instance";
+    }
+
+    return {
+      init,
+      setStatus,
+      updateButtons,
+      setInstanceInfo,
+      clearInstanceInfo,
+      elements: el,
+    };
+  })();
+
+  /*****************************
+   * App Core
+   *****************************/
+  const App = {
+    state: {
+      serverUrl: Storage.get("serverUrl", "http://localhost:3000"),
+      autoReconnect: Storage.get("autoReconnect", true),
+      reconnectDelay: Storage.get("reconnectDelay", 1500),
+    },
+    persist() {
+      Storage.set("serverUrl", App.state.serverUrl);
+      Storage.set("autoReconnect", App.state.autoReconnect);
+      Storage.set("reconnectDelay", App.state.reconnectDelay);
+    },
+    ctx() {
+      return {
+        ws: App.ws,
+        url: () => App.state.serverUrl,
+        log: Log,
+      };
+    },
+    async connect() {
+      const url = UI.elements.serverUrl.value.trim();
+      if (!url) {
+        return Log.error("Enter a valid URL (WebSocket or Socket.IO)");
+      }
+      App.state.serverUrl = url;
+      App.persist();
+      UI.updateButtons(true);
+      UI.setStatus("warn", "Connecting…");
+      UI.clearInstanceInfo();
+
+      App.ws.connect();
+    },
+    disconnect() {
+      App.ws.disconnect();
+      UI.updateButtons(false);
+      UI.setStatus("err", "Disconnected");
+    },
+    handleWSMessage(text) {
+      // Just log the message, backend will send structured events
+      Log.info(text);
+    },
+  };
+
+  // Instantiate Connection client
+  App.ws = new ConnectionClient({
+    getUrl: () => App.state.serverUrl,
+    getDelay: () => App.state.reconnectDelay,
+    onOpen: () => {
+      UI.setStatus("ok", "Connected");
+      UI.updateButtons(true);
+      const type = App.ws.connectionType === 'socketio' ? 'Socket.IO' : 'WebSocket';
+      const socketId = App.ws.connection?.id || '—';
+      const transport = App.ws.connection?.io?.engine?.transport?.name || '—';
+      UI.setInstanceInfo(type, 'connected', socketId, transport);
+    },
+    onClose: () => {
+      UI.setStatus("err", "Disconnected");
+      UI.updateButtons(false);
+      UI.clearInstanceInfo();
+    },
+    onMessage: (txt) => App.handleWSMessage(txt),
+    onError: (ev) => {
+      UI.setStatus("err", "Error");
+    },
+  });
+
+  /*****************************
+   * Boot
+   *****************************/
+  document.addEventListener("DOMContentLoaded", () => {
+    UI.init();
+    Log.info("WebSocket client initialized");
+  });
+})();
+</script>
+</body>
+</html>

@@ -5,12 +5,12 @@ import { Elysia } from 'elysia'
  * Protects API documentation endpoints with username/password authentication
  * Only enabled in development environment - completely disabled in production
  */
-export const swaggerAuth = new Elysia()
+export const swaggerAuth = new Elysia({ name: 'swagger-auth' })
   .onRequest(({ request, set }) => {
     // Get path from request URL
     const url = new URL(request.url)
     const path = url.pathname
-    
+
     // Only protect swagger/api-docs routes
     if (!path.startsWith('/api-docs')) {
       return
@@ -20,18 +20,11 @@ export const swaggerAuth = new Elysia()
     const isProduction = process.env.NODE_ENV === 'production'
     if (isProduction) {
       set.status = 404
-      return new Response(
-        JSON.stringify({
-          error: 'Not Found',
-          message: 'API documentation is not available in production'
-        }),
-        {
-          status: 404,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      )
+      set.headers['Content-Type'] = 'application/json'
+      return {
+        error: 'Not Found',
+        message: 'API documentation is not available in production'
+      }
     }
 
     // Get authorization header
@@ -41,19 +34,11 @@ export const swaggerAuth = new Elysia()
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       set.status = 401
       set.headers['WWW-Authenticate'] = 'Basic realm="Swagger Documentation"'
-      return new Response(
-        JSON.stringify({
-          error: 'Unauthorized',
-          message: 'Authentication required to access API documentation'
-        }),
-        {
-          status: 401,
-          headers: {
-            'Content-Type': 'application/json',
-            'WWW-Authenticate': 'Basic realm="Swagger Documentation"'
-          }
-        }
-      )
+      set.headers['Content-Type'] = 'application/json'
+      return {
+        error: 'Unauthorized',
+        message: 'Authentication required to access API documentation'
+      }
     }
 
     try {
@@ -72,35 +57,19 @@ export const swaggerAuth = new Elysia()
       if (!isValid) {
         set.status = 401
         set.headers['WWW-Authenticate'] = 'Basic realm="Swagger Documentation"'
-        return new Response(
-          JSON.stringify({
-            error: 'Unauthorized',
-            message: 'Invalid credentials'
-          }),
-          {
-            status: 401,
-            headers: {
-              'Content-Type': 'application/json',
-              'WWW-Authenticate': 'Basic realm="Swagger Documentation"'
-            }
-          }
-        )
+        set.headers['Content-Type'] = 'application/json'
+        return {
+          error: 'Unauthorized',
+          message: 'Invalid credentials'
+        }
       }
     } catch (error) {
       set.status = 401
       set.headers['WWW-Authenticate'] = 'Basic realm="Swagger Documentation"'
-      return new Response(
-        JSON.stringify({
-          error: 'Unauthorized',
-          message: 'Invalid authorization format'
-        }),
-        {
-          status: 401,
-          headers: {
-            'Content-Type': 'application/json',
-            'WWW-Authenticate': 'Basic realm="Swagger Documentation"'
-          }
-        }
-      )
+      set.headers['Content-Type'] = 'application/json'
+      return {
+        error: 'Unauthorized',
+        message: 'Invalid authorization format'
+      }
     }
   })

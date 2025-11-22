@@ -115,6 +115,15 @@
     <!-- Message Input Footer -->
     <ion-footer>
       <div class="message-input-container">
+        <ion-button
+          @click="toggleVoiceInput"
+          :disabled="!isVoiceSupported"
+          class="voice-button"
+          fill="clear"
+          :class="{ 'recording': isListening }"
+        >
+          <ion-icon slot="icon-only" :icon="isListening ? micOff : mic"></ion-icon>
+        </ion-button>
         <ion-textarea
           v-model="messageText"
           :placeholder="locale === 'fa' ? 'پیام خود را بنویسید...' : 'Type your message...'"
@@ -133,12 +142,16 @@
           <ion-icon slot="icon-only" :icon="send"></ion-icon>
         </ion-button>
       </div>
+      <div v-if="isListening" class="voice-indicator">
+        <div class="pulse"></div>
+        <span>{{ locale === 'fa' ? 'در حال گوش دادن...' : 'Listening...' }}</span>
+      </div>
     </ion-footer>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import {
   IonContent,
   IonHeader,
@@ -166,9 +179,12 @@ import {
   happy,
   sad,
   heart,
+  mic,
+  micOff,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useAIChat } from '@/composables/useAIChat'
+import { useSpeechRecognition } from '@/composables/useSpeechRecognition'
 
 const { locale } = useI18n()
 
@@ -188,6 +204,38 @@ const {
   connect,
   disconnect 
 } = useAIChat()
+
+// Speech Recognition composable
+const {
+  isSupported: isVoiceSupported,
+  isListening,
+  fullTranscript,
+  start: startVoice,
+  stop: stopVoice,
+  reset: resetVoice,
+} = useSpeechRecognition({
+  lang: locale.value === 'fa' ? 'fa-IR' : 'en-US',
+  continuous: false,
+  interimResults: true,
+  autoRestart: false,
+})
+
+// Watch for voice transcript changes
+watch(fullTranscript, (newTranscript) => {
+  if (newTranscript) {
+    messageText.value = newTranscript
+  }
+})
+
+// Toggle voice input
+const toggleVoiceInput = () => {
+  if (isListening.value) {
+    stopVoice()
+  } else {
+    resetVoice()
+    startVoice()
+  }
+}
 
 // Quick suggestions for first-time users
 const quickSuggestions = [
@@ -284,7 +332,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;
@@ -621,6 +669,51 @@ onUnmounted(() => {
 
 .send-button:disabled ion-icon {
   color: var(--ion-color-medium);
+}
+
+/* Voice Button */
+.voice-button {
+  --padding-start: 0.75rem;
+  --padding-end: 0.75rem;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.voice-button ion-icon {
+  font-size: 24px;
+  color: var(--ion-color-primary);
+}
+
+.voice-button:disabled ion-icon {
+  color: var(--ion-color-medium);
+}
+
+.voice-button.recording ion-icon {
+  color: var(--ion-color-danger);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Voice Indicator */
+.voice-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface-1);
+  border-top: 1px solid var(--ion-border-color);
+  font-size: 0.875rem;
+  color: var(--ion-color-primary);
+}
+
+.voice-indicator .pulse {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--ion-color-danger);
+  animation: pulse 1.5s ease-in-out infinite;
 }
 
 /* Animations */
