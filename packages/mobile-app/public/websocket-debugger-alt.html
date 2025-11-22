@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>WebSocket/Socket.IO Debugger — YektaYar</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b1220;
+      --card: #111827cc;
+      --card-strong: #0f172acc;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --brand: #7c3aed;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --err: #ef4444;
+      --border: #27324a;
+      --chip: #1f2937;
+    }
+    *{box-sizing:border-box;
+      -webkit-tap-highlight-color: transparent;
+      tap-highlight-color: transparent;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #1e293b 0%, transparent 55%),
+        radial-gradient(1200px 800px at 110% 0%, #0ea5e980 0%, transparent 40%),
+        linear-gradient(180deg, #0b1220 0%, #0b1220 100%);
+      background-color:var(--bg);
+    }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:32px 20px 56px;
+    }
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:20px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:12px;
+      background: conic-gradient(from 160deg, #8b5cf6, #06b6d4, #22d3ee, #8b5cf6);
+      box-shadow:0 0 0 2px #a78bfa30, 0 10px 30px #7c3aed40 inset;
+      flex-shrink: 0;
+    }
+    h1{font-size:20px;margin:0;font-weight:700;letter-spacing:0.2px}
+    .sub{font-size:12px;color:var(--muted)}
+    .card{
+      background:linear-gradient(180deg, var(--card) 0%, var(--card-strong) 100%);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 10px 30px #0006;
+      overflow:hidden;
+    }
+    .grid{display:grid;grid-template-columns:1fr 1.2fr;gap:16px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr;}}
+    .section{padding:16px;}
+    .section + .section{border-top:1px solid var(--border)}
+    .controls{display:flex;flex-wrap:wrap;gap:12px}
+    .control{
+      background:var(--chip);border:1px solid var(--border);
+      border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      position:relative;
+    }
+    .control:hover{
+      border-color:#475569;
+      box-shadow:0 0 15px rgba(124,58,237,0.2);
+    }
+    label{font-size:12px;color:var(--muted)}
+    input[type="text"],input[type="url"],input[type="password"]{
+      background:#0b1324;border:1px solid var(--border);color:var(--text);
+      padding:8px 10px;border-radius:10px;outline:none;width:100%;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    input[type="text"]:hover,input[type="url"]:hover,input[type="password"]:hover{
+      border-color:#475569;
+      box-shadow:0 0 10px rgba(124,58,237,0.15);
+    }
+    input[type="text"]:focus,input[type="url"]:focus,input[type="password"]:focus{
+      border-color:#7c3aed;
+      box-shadow:0 0 0 4px rgba(124,58,237,0.15), 0 0 20px rgba(124,58,237,0.3);
+    }
+    .tog{
+      display:inline-flex;gap:8px;align-items:center;background:#0b1324;border:1px solid var(--border);padding:6px 10px;border-radius:10px;
+      cursor:pointer;user-select:none;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    .tog:hover{
+      border-color:#475569;
+      box-shadow:0 0 15px rgba(124,58,237,0.2);
+    }
+    .tog input{
+      appearance:none;width:16px;height:16px;border-radius:4px;border:1px solid #475569;background:#0b1324;
+      display:inline-block;vertical-align:middle;position:relative;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tog input:checked{
+      background:linear-gradient(135deg, #22d3ee, #7c3aed);
+      border-color:#7c3aed;
+      box-shadow:0 0 15px rgba(124,58,237,0.6), 0 0 30px rgba(124,58,237,0.3);
+    }
+    .btnbar{display:flex;gap:10px;flex-wrap:wrap}
+    .btn{
+      background:#111827;border:1px solid var(--border);color:var(--text);
+      padding:12px 16px;border-radius:12px;font-weight:600;cursor:pointer;
+      position:relative;overflow:hidden;
+      transition:all .4s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    .btn::before{
+      content:'';position:absolute;top:50%;left:50%;
+      width:0;height:0;border-radius:50%;
+      background:rgba(255,255,255,0.1);
+      transform:translate(-50%,-50%);
+      transition:width .6s ease, height .6s ease;
+    }
+    .btn:hover{
+      border-color:#475569;background:#1a1f2e;
+      box-shadow:0 0 30px rgba(124,58,237,0.3), 0 10px 40px rgba(0,0,0,0.4);
+    }
+    .btn:hover::before{
+      width:300px;height:300px;
+    }
+    .btn:active{
+      transition:all .1s ease;
+    }
+    .btn.primary{
+      background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);
+      border-color:#8b5cf6;
+      box-shadow:0 0 20px rgba(124,58,237,0.4), 0 8px 20px rgba(124,58,237,0.3) inset;
+    }
+    .btn.primary:hover{
+      box-shadow:0 0 40px rgba(124,58,237,0.8), 0 0 60px rgba(124,58,237,0.4), 0 8px 20px rgba(124,58,237,0.3) inset;
+      background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);
+    }
+    .btn.danger{
+      background:linear-gradient(135deg,#dc2626 0%,#b91c1c 100%);
+      border-color:#ef4444;
+      color:#fecaca;
+      box-shadow:0 0 20px rgba(220,38,38,0.4), 0 8px 20px rgba(220,38,38,0.3) inset;
+    }
+    .btn.danger:hover{
+      box-shadow:0 0 40px rgba(220,38,38,0.8), 0 0 60px rgba(220,38,38,0.4), 0 8px 20px rgba(220,38,38,0.3) inset;
+      background:linear-gradient(135deg,#ef4444 0%,#dc2626 100%);
+    }
+    .btn:disabled{
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+    .status{
+      display:flex;gap:8px;align-items:center;justify-content:flex-start;font-size:14px;
+      color:var(--muted);padding:12px;margin-top:12px;
+      background:rgba(17,24,39,0.5);border:1px solid var(--border);
+      border-radius:12px;transition:all .3s ease;
+    }
+    .dot{
+      width:12px;height:12px;border-radius:50%;background:#64748b;
+      border:2px solid #334155;
+      box-shadow:0 0 0 3px rgba(100,116,139,0.2);
+      transition:all .4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .dot.connected{
+      background:#10b981;
+      border-color:#10b981;
+      box-shadow:0 0 20px rgba(16,185,129,0.8), 0 0 40px rgba(16,185,129,0.4);
+      animation:pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .dot.err{
+      background:#ef4444;
+      border-color:#ef4444;
+      box-shadow:0 0 20px rgba(239,68,68,0.8), 0 0 40px rgba(239,68,68,0.4);
+    }
+    @keyframes pulse-glow {
+      0%, 100% { 
+        transform: scale(1); 
+        box-shadow:0 0 20px rgba(16,185,129,0.8), 0 0 40px rgba(16,185,129,0.4);
+      }
+      50% { 
+        transform: scale(1.2); 
+        box-shadow:0 0 30px rgba(16,185,129,1), 0 0 60px rgba(16,185,129,0.6);
+      }
+    }
+    .panel-title{font-size:13px;color:#a5b4fc;margin:0 0 8px;font-weight:700;letter-spacing:.3px}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;font-size:12px;
+      padding:6px 10px;border-radius:999px;background:#0b1324;border:1px solid var(--border);color:var(--muted)
+    }
+    .kv{display:grid;grid-template-columns:120px 1fr;gap:8px;font-size:12px;color:var(--muted)}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12px}
+    .log{
+      background:#070d1a;border:1px solid var(--border);border-radius:12px;padding:8px;max-height:400px;overflow:auto
+    }
+    .log .row{display:flex;gap:8px;padding:6px 6px;border-bottom:1px dashed #1f2937}
+    .log .row:last-child{border-bottom:none}
+    .log .t{color:#6ee7b7;min-width:110px}
+    .log .k{color:#60a5fa}
+    .log .v{color:#e5e7eb;word-break:break-word}
+    .log .rx{color:#22d3ee}
+    .log .tx{color:#8b5cf6}
+    .log .err{color:#ef4444}
+    .small{font-size:12px;color:var(--muted)}
+    footer{margin-top:16px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .warn{color:#fbbf24}
+    .errtxt{color:#fecaca}
+    .success{color:#a7f3d0}
+    .copy{
+      background:#0b1324;border:1px solid var(--border);color:#93c5fd;font-size:12px;padding:8px 10px;border-radius:8px;cursor:pointer;
+      transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);
+      position:relative;overflow:hidden;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    .copy::before{
+      content:'';position:absolute;top:50%;left:50%;
+      width:0;height:0;border-radius:50%;
+      background:rgba(147,197,253,0.1);
+      transform:translate(-50%,-50%);
+      transition:width .5s ease, height .5s ease;
+    }
+    .copy:hover{
+      border-color:#60a5fa;
+      background:#111827;
+      box-shadow:0 0 20px rgba(147,197,253,0.3);
+    }
+    .copy:hover::before{
+      width:200px;height:200px;
+    }
+    .grow{flex:1}
+    .action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+    @media(max-width:700px){.action-grid{grid-template-columns:repeat(2,1fr);}}
+    .action{
+      background:var(--chip);border:1px solid var(--border);
+      border-radius:10px;padding:10px;font-size:12px;cursor:pointer;
+      transition:all .3s ease;text-align:center;
+    }
+    .action:hover{
+      border-color:#7c3aed;
+      box-shadow:0 0 15px rgba(124,58,237,0.3);
+      background:#1f2937;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>WebSocket/Socket.IO Debugger</h1>
+          <div class="sub">Test WebSocket and Socket.IO connections (YektaYar Backend)</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="section grid">
+        <div class="left">
+          <div class="controls" aria-label="Connection controls">
+            <div class="control" style="width:100%">
+              <label for="serverUrl">Server URL</label>
+              <input type="url" id="serverUrl" placeholder="http://localhost:3000 or ws://localhost:3000" 
+                     title="Server URL (http://, https://, ws://, or wss://)" />
+            </div>
+            <div class="control" style="width:100%">
+              <label for="authToken">Session Token (Optional)</label>
+              <input type="password" id="authToken" placeholder="Leave empty for auto-generated guest session" 
+                     title="Authentication token for Socket.IO" />
+            </div>
+            <label class="tog"><input type="checkbox" id="autoReconnect" checked /> Auto-reconnect</label>
+          </div>
+
+          <div style="height:12px"></div>
+          <div class="btnbar">
+            <button class="btn primary" id="connectBtn">Connect</button>
+            <button class="btn danger" id="disconnectBtn" disabled>Disconnect</button>
+            <button class="btn" id="clearBtn">Clear Logs</button>
+            <button class="copy" id="copyBtn" title="Copy logs">Copy Logs</button>
+          </div>
+
+          <div class="status" id="status">
+            <span>Status:</span>
+            <span class="dot" id="dot"></span>
+            <span id="stateText">Disconnected</span>
+          </div>
+
+          <div style="height:16px"></div>
+          <div>
+            <p class="panel-title">Quick Actions</p>
+            <div class="action-grid" id="actionsGrid">
+              <button class="action" data-action="ping">Ping</button>
+              <button class="action" data-action="status">Status</button>
+              <button class="action" data-action="info">Info</button>
+              <button class="action" data-action="echo">Echo</button>
+              <button class="action" data-action="message">Message</button>
+              <button class="action" data-action="custom">Custom</button>
+            </div>
+          </div>
+
+          <div style="height:16px"></div>
+          <div>
+            <p class="panel-title">Custom Message</p>
+            <div class="controls">
+              <div class="control" style="width:100%">
+                <label for="customEvent">Event Name</label>
+                <input type="text" id="customEvent" placeholder="message" value="message" />
+              </div>
+              <div class="control" style="width:100%">
+                <label for="customData">Data (JSON or String)</label>
+                <input type="text" id="customData" placeholder='{"test": "data"}' value="Hello from debugger" />
+              </div>
+            </div>
+            <div style="height:8px"></div>
+            <button class="btn" id="sendCustomBtn">Send Custom Message</button>
+          </div>
+        </div>
+
+        <div class="right">
+          <div class="kv">
+            <div>Type</div><div id="connType" class="mono">—</div>
+            <div>State</div><div id="state" class="mono">disconnected</div>
+            <div>Socket ID</div><div id="socketId" class="mono">—</div>
+            <div>Messages</div><div class="mono"><span id="rxCount">0</span> received, <span id="txCount">0</span> sent</div>
+          </div>
+          <div style="height:12px"></div>
+          <p class="panel-title">Event Log</p>
+          <div class="log mono" id="log" role="log" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <div class="section small">
+        Notes:
+        <ul>
+          <li>Supports both native WebSocket (ws://, wss://) and Socket.IO (http://, https://) connections.</li>
+          <li>For YektaYar backend, use http://localhost:3000 for Socket.IO connection.</li>
+          <li>Session token is optional - if empty, a guest session will be auto-generated.</li>
+          <li>Auto-reconnect will attempt to reconnect on disconnection with exponential backoff.</li>
+          <li>Quick actions send predefined events to test backend responses.</li>
+          <li>Use custom message section to send arbitrary events with JSON or string data.</li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      <div>Built for testing WebSocket and Socket.IO connections with YektaYar backend.</div>
+      <div id="supportMsg"></div>
+    </footer>
+  </div>
+
+  <!-- Socket.IO Client Library -->
+  <script src="./socket.io.min.js"></script>
+
+  <script>
+    (function(){
+      'use strict';
+
+      // UI Elements
+      const ui = {
+        dot: document.getElementById('dot'),
+        stateText: document.getElementById('stateText'),
+        connType: document.getElementById('connType'),
+        state: document.getElementById('state'),
+        socketId: document.getElementById('socketId'),
+        rxCount: document.getElementById('rxCount'),
+        txCount: document.getElementById('txCount'),
+        log: document.getElementById('log'),
+        supportMsg: document.getElementById('supportMsg'),
+        connectBtn: document.getElementById('connectBtn'),
+        disconnectBtn: document.getElementById('disconnectBtn'),
+        clearBtn: document.getElementById('clearBtn'),
+        copyBtn: document.getElementById('copyBtn'),
+        serverUrl: document.getElementById('serverUrl'),
+        authToken: document.getElementById('authToken'),
+        autoReconnect: document.getElementById('autoReconnect'),
+        actionsGrid: document.getElementById('actionsGrid'),
+        customEvent: document.getElementById('customEvent'),
+        customData: document.getElementById('customData'),
+        sendCustomBtn: document.getElementById('sendCustomBtn'),
+      };
+
+      // State
+      let connection = null;
+      let connectionType = null; // 'websocket' or 'socketio'
+      let isConnected = false;
+      let rxMessages = 0;
+      let txMessages = 0;
+      let reconnectTimer = null;
+      let reconnectAttempt = 0;
+      const MAX_RECONNECT_DELAY = 30000;
+      const BASE_RECONNECT_DELAY = 1000;
+
+      // Default server URL from environment or localhost
+      const defaultServerUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+        ? 'http://localhost:3000'
+        : window.location.origin;
+      
+      ui.serverUrl.value = defaultServerUrl;
+
+      // Logging
+      const log = (type, data) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const t = document.createElement('div');
+        t.className = 't';
+        t.textContent = '[' + new Date().toLocaleTimeString() + '] ';
+        const k = document.createElement('div');
+        k.className = type === 'rx' ? 'rx' : type === 'tx' ? 'tx' : type === 'err' ? 'err' : 'k';
+        k.textContent = type.toUpperCase() + ': ';
+        const v = document.createElement('div');
+        v.className = 'v';
+        v.textContent = data || '';
+        row.appendChild(t);
+        row.appendChild(k);
+        row.appendChild(v);
+        ui.log.appendChild(row);
+        ui.log.scrollTop = ui.log.scrollHeight;
+        
+        // Limit log entries
+        while (ui.log.children.length > 500) {
+          ui.log.removeChild(ui.log.firstChild);
+        }
+      };
+
+      const setState = (state, text) => {
+        ui.state.textContent = state;
+        ui.stateText.textContent = text;
+        
+        if (state === 'connected') {
+          ui.dot.classList.remove('err');
+          ui.dot.classList.add('connected');
+          ui.connectBtn.disabled = true;
+          ui.disconnectBtn.disabled = false;
+        } else if (state === 'disconnected') {
+          ui.dot.classList.remove('connected', 'err');
+          ui.connectBtn.disabled = false;
+          ui.disconnectBtn.disabled = true;
+        } else if (state === 'error') {
+          ui.dot.classList.remove('connected');
+          ui.dot.classList.add('err');
+          ui.connectBtn.disabled = false;
+          ui.disconnectBtn.disabled = true;
+        }
+      };
+
+      const updateCounts = () => {
+        ui.rxCount.textContent = rxMessages;
+        ui.txCount.textContent = txMessages;
+      };
+
+      // Detect connection type from URL
+      const detectConnectionType = (url) => {
+        try {
+          const urlObj = new URL(url);
+          const protocol = urlObj.protocol;
+          
+          if (protocol === 'http:' || protocol === 'https:') {
+            return 'socketio';
+          } else if (protocol === 'ws:' || protocol === 'wss:') {
+            return 'websocket';
+          }
+          
+          return 'websocket';
+        } catch (e) {
+          log('err', 'Failed to parse URL: ' + e.message);
+          return 'websocket';
+        }
+      };
+
+      // Generate a guest session token
+      const generateGuestToken = async () => {
+        try {
+          // Try to get a guest token from the backend
+          const url = ui.serverUrl.value.trim();
+          const baseUrl = url.replace(/^ws:/, 'http:').replace(/^wss:/, 'https:').replace(/\/ws$/, '');
+          
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+          
+          const response = await fetch(baseUrl + '/api/auth/guest', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            signal: controller.signal
+          });
+          
+          clearTimeout(timeoutId);
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.sessionToken) {
+              log('info', 'Generated guest session token');
+              return data.sessionToken;
+            }
+          }
+          
+          log('warn', 'Could not generate guest token, connecting without authentication');
+          return null;
+        } catch (error) {
+          if (error.name === 'AbortError') {
+            log('warn', 'Guest token request timed out');
+          } else {
+            log('warn', 'Failed to generate guest token: ' + error.message);
+          }
+          return null;
+        }
+      };
+
+      // Connect WebSocket
+      const connectWebSocket = async (url) => {
+        try {
+          log('info', 'Connecting via WebSocket to ' + url);
+          const ws = new WebSocket(url);
+          connection = ws;
+          connectionType = 'websocket';
+          ui.connType.textContent = 'Native WebSocket';
+
+          ws.addEventListener('open', () => {
+            reconnectAttempt = 0;
+            isConnected = true;
+            setState('connected', 'Connected');
+            log('info', 'WebSocket connected');
+          });
+
+          ws.addEventListener('message', (ev) => {
+            rxMessages++;
+            updateCounts();
+            const text = String(ev.data || '');
+            log('rx', text);
+          });
+
+          ws.addEventListener('error', (ev) => {
+            log('err', 'WebSocket error: ' + (ev.message || 'unknown'));
+            setState('error', 'Error');
+          });
+
+          ws.addEventListener('close', (ev) => {
+            isConnected = false;
+            setState('disconnected', 'Disconnected');
+            log('info', 'WebSocket closed (code=' + ev.code + ', reason=' + (ev.reason || 'none') + ')');
+            
+            if (ui.autoReconnect.checked) {
+              scheduleReconnect();
+            }
+          });
+        } catch (e) {
+          log('err', 'Connection failed: ' + e.message);
+          setState('error', 'Connection failed');
+          if (ui.autoReconnect.checked) {
+            scheduleReconnect();
+          }
+        }
+      };
+
+      // Connect Socket.IO
+      const connectSocketIO = async (url) => {
+        try {
+          // Convert ws:// or wss:// URLs to http:// or https://
+          let ioUrl = url;
+          if (url.startsWith('ws://')) {
+            ioUrl = url.replace('ws://', 'http://');
+          } else if (url.startsWith('wss://')) {
+            ioUrl = url.replace('wss://', 'https://');
+          }
+          
+          // Get or generate auth token
+          let token = ui.authToken.value.trim();
+          if (!token) {
+            token = await generateGuestToken();
+          }
+          
+          log('info', 'Connecting via Socket.IO to ' + ioUrl);
+          
+          // Check if Socket.IO is loaded
+          if (typeof io === 'undefined') {
+            log('err', 'Socket.IO library not loaded');
+            setState('error', 'Socket.IO not available');
+            return;
+          }
+          
+          const socketOptions = {
+            reconnection: false, // We handle reconnection manually
+            transports: ['websocket', 'polling']
+          };
+          
+          // Add auth token if available
+          if (token) {
+            socketOptions.auth = { token };
+            log('info', 'Using authentication token');
+          }
+          
+          const socket = io(ioUrl, socketOptions);
+          connection = socket;
+          connectionType = 'socketio';
+          ui.connType.textContent = 'Socket.IO';
+
+          socket.on('connect', () => {
+            reconnectAttempt = 0;
+            isConnected = true;
+            ui.socketId.textContent = socket.id;
+            setState('connected', 'Connected');
+            log('info', 'Socket.IO connected (id: ' + socket.id + ')');
+          });
+
+          // Listen for standard message event
+          socket.on('message', (data) => {
+            rxMessages++;
+            updateCounts();
+            const text = typeof data === 'string' ? data : JSON.stringify(data);
+            log('rx', text);
+          });
+
+          // Listen for any events
+          socket.onAny((eventName, ...args) => {
+            if (eventName !== 'connect' && eventName !== 'disconnect' && eventName !== 'message' && 
+                eventName !== 'error' && eventName !== 'connect_error') {
+              rxMessages++;
+              updateCounts();
+              const data = args.length === 1 ? args[0] : args;
+              const text = typeof data === 'string' ? data : JSON.stringify(data);
+              log('rx', eventName + ': ' + text);
+            }
+          });
+
+          socket.on('error', (err) => {
+            log('err', 'Socket.IO error: ' + (err.message || 'unknown'));
+            setState('error', 'Error');
+          });
+
+          socket.on('disconnect', (reason) => {
+            isConnected = false;
+            ui.socketId.textContent = '—';
+            setState('disconnected', 'Disconnected');
+            log('info', 'Socket.IO disconnected (reason: ' + reason + ')');
+            
+            if (ui.autoReconnect.checked) {
+              scheduleReconnect();
+            }
+          });
+
+          socket.on('connect_error', (err) => {
+            log('err', 'Connection error: ' + err.message);
+            setState('error', 'Connection failed');
+            if (ui.autoReconnect.checked) {
+              scheduleReconnect();
+            }
+          });
+        } catch (e) {
+          log('err', 'Connection failed: ' + e.message);
+          setState('error', 'Connection failed');
+          if (ui.autoReconnect.checked) {
+            scheduleReconnect();
+          }
+        }
+      };
+
+      // Schedule reconnect with exponential backoff
+      const scheduleReconnect = () => {
+        clearTimeout(reconnectTimer);
+        const delay = Math.min(BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttempt), MAX_RECONNECT_DELAY);
+        reconnectAttempt++;
+        log('info', 'Reconnecting in ' + Math.round(delay / 1000) + 's (attempt ' + reconnectAttempt + ')');
+        reconnectTimer = setTimeout(() => {
+          connect();
+        }, delay);
+      };
+
+      // Connect
+      const connect = async () => {
+        const url = ui.serverUrl.value.trim();
+        if (!url) {
+          log('err', 'Please enter a server URL');
+          return;
+        }
+
+        // Disconnect if already connected
+        if (connection) {
+          disconnect();
+        }
+
+        connectionType = detectConnectionType(url);
+        
+        if (connectionType === 'socketio') {
+          await connectSocketIO(url);
+        } else {
+          await connectWebSocket(url);
+        }
+      };
+
+      // Disconnect
+      const disconnect = () => {
+        clearTimeout(reconnectTimer);
+        reconnectAttempt = 0;
+        
+        if (connection) {
+          if (connectionType === 'socketio') {
+            connection.disconnect();
+          } else if (connectionType === 'websocket') {
+            if (connection.readyState === WebSocket.OPEN || connection.readyState === WebSocket.CONNECTING) {
+              connection.close(1000, 'client-close');
+            }
+          }
+        }
+        
+        connection = null;
+        isConnected = false;
+        ui.socketId.textContent = '—';
+        setState('disconnected', 'Disconnected');
+        log('info', 'Disconnected by user');
+      };
+
+      // Send message
+      const send = (eventOrData, data) => {
+        if (!connection || !isConnected) {
+          log('err', 'Not connected');
+          return false;
+        }
+
+        try {
+          if (connectionType === 'socketio') {
+            if (data !== undefined) {
+              // Event with data
+              connection.emit(eventOrData, data);
+              txMessages++;
+              updateCounts();
+              log('tx', eventOrData + ': ' + (typeof data === 'string' ? data : JSON.stringify(data)));
+            } else {
+              // Just data (use 'message' event)
+              connection.emit('message', eventOrData);
+              txMessages++;
+              updateCounts();
+              log('tx', 'message: ' + (typeof eventOrData === 'string' ? eventOrData : JSON.stringify(eventOrData)));
+            }
+          } else if (connectionType === 'websocket') {
+            connection.send(eventOrData);
+            txMessages++;
+            updateCounts();
+            log('tx', eventOrData);
+          }
+          return true;
+        } catch (e) {
+          log('err', 'Send failed: ' + e.message);
+          return false;
+        }
+      };
+
+      // Quick actions
+      const actions = {
+        ping: () => {
+          send('ping');
+        },
+        status: () => {
+          send('status');
+        },
+        info: () => {
+          send('info');
+        },
+        echo: () => {
+          if (connectionType === 'socketio') {
+            send('echo', { message: 'Hello from debugger', timestamp: new Date().toISOString() });
+          } else {
+            send(JSON.stringify({ event: 'echo', message: 'Hello from debugger' }));
+          }
+        },
+        message: () => {
+          if (connectionType === 'socketio') {
+            send('message', 'Test message from debugger');
+          } else {
+            send('Test message from debugger');
+          }
+        },
+        custom: () => {
+          const event = ui.customEvent.value.trim() || 'message';
+          let data = ui.customData.value.trim();
+          
+          // Try to parse as JSON
+          try {
+            data = JSON.parse(data);
+          } catch (e) {
+            // Keep as string if not valid JSON
+          }
+          
+          if (connectionType === 'socketio') {
+            send(event, data);
+          } else {
+            send(typeof data === 'string' ? data : JSON.stringify(data));
+          }
+        }
+      };
+
+      // Event listeners
+      ui.connectBtn.addEventListener('click', connect);
+      ui.disconnectBtn.addEventListener('click', disconnect);
+      ui.clearBtn.addEventListener('click', () => {
+        ui.log.innerHTML = '';
+        rxMessages = 0;
+        txMessages = 0;
+        updateCounts();
+      });
+      ui.copyBtn.addEventListener('click', async () => {
+        try {
+          const text = Array.from(ui.log.children).map(n => n.innerText).join('\n');
+          await navigator.clipboard.writeText(text);
+          log('info', 'Logs copied to clipboard');
+        } catch(e) {
+          log('err', 'Failed to copy to clipboard: ' + e.message + '. Try using Ctrl+C to copy manually or check browser permissions.');
+        }
+      });
+      ui.sendCustomBtn.addEventListener('click', () => actions.custom());
+      
+      ui.actionsGrid.addEventListener('click', (e) => {
+        const btn = e.target.closest('.action');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        if (actions[action]) {
+          actions[action]();
+        }
+      });
+
+      ui.serverUrl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          ui.connectBtn.click();
+        }
+      });
+
+      ui.customData.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && e.ctrlKey) {
+          e.preventDefault();
+          ui.sendCustomBtn.click();
+        }
+      });
+
+      // Feature detection
+      if (typeof WebSocket === 'undefined') {
+        ui.supportMsg.innerHTML = '<span class="warn">WebSocket not supported in this browser.</span>';
+      } else {
+        ui.supportMsg.innerHTML = '<span class="success">WebSocket supported.</span>';
+      }
+
+      if (typeof io === 'undefined') {
+        ui.supportMsg.innerHTML += ' <span class="warn">Socket.IO library not loaded.</span>';
+      } else {
+        ui.supportMsg.innerHTML += ' <span class="success">Socket.IO available.</span>';
+      }
+
+      // Initialize
+      setState('disconnected', 'Disconnected');
+      updateCounts();
+      log('info', 'Debugger initialized');
+    })();
+  </script>
+</body>
+</html>
