@@ -25,6 +25,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/IconTestPage.vue')
   },
   {
+    path: '/icon-test-new',
+    name: 'IconTestNew',
+    component: () => import('@/views/IconTestPageNew.vue')
+  },
+  {
     path: '/tabs/',
     component: TabsPage,
     children: [
