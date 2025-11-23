@@ -597,7 +597,7 @@ onMounted(() => {
       }
 
       ion-progress-bar {
-        --background: var(--ion-color-light);
+        --background: var(--ion-color-step-150, var(--ion-color-light));
         --progress-background: var(--ion-color-success);
         height: 8px;
         border-radius: 4px;
@@ -677,7 +677,7 @@ onMounted(() => {
       display: flex;
       gap: 16px;
       padding: 16px;
-      background: var(--ion-color-light);
+      background: var(--ion-color-step-50, var(--ion-color-light));
       border-radius: 12px;
 
       .instructor-avatar {
@@ -716,7 +716,7 @@ onMounted(() => {
     display: flex;
     justify-content: space-around;
     padding: 20px;
-    background: var(--ion-color-light);
+    background: var(--ion-color-step-50, var(--ion-color-light));
 
     .stat {
       text-align: center;
@@ -743,7 +743,7 @@ onMounted(() => {
         transition: background 0.3s ease;
 
         &:hover {
-          background: var(--ion-color-light);
+          background: var(--ion-color-step-50, var(--ion-color-light));
         }
 
         .module-title {
@@ -771,7 +771,7 @@ onMounted(() => {
       }
 
       .lessons-list {
-        background: var(--ion-color-light);
+        background: var(--ion-color-step-50, var(--ion-color-light));
 
         .lesson-item {
           display: flex;
@@ -850,7 +850,7 @@ onMounted(() => {
 
   .write-review-section {
     padding: 16px 20px;
-    background: var(--ion-color-light);
+    background: var(--ion-color-step-50, var(--ion-color-light));
   }
 
   .reviews-list {
@@ -899,6 +899,43 @@ onMounted(() => {
         line-height: 1.6;
         color: var(--ion-color-step-600);
       }
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .curriculum-content {
+    .curriculum-stats {
+      background: var(--ion-color-step-100);
+    }
+
+    .module-header {
+      &:hover {
+        background: var(--ion-color-step-100);
+      }
+    }
+
+    .lessons-list {
+      background: var(--ion-color-step-100);
+    }
+  }
+
+  .overview-content {
+    .instructor-card {
+      background: var(--ion-color-step-100);
+    }
+  }
+
+  .reviews-content {
+    .write-review-section {
+      background: var(--ion-color-step-100);
+    }
+  }
+
+  .enrollment-section {
+    ion-progress-bar {
+      --background: var(--ion-color-step-150);
     }
   }
 }
