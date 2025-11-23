@@ -79,6 +79,11 @@ export interface Course {
   duration: number
   difficulty: CourseDifficulty
   thumbnailUrl?: string
+  isPublished: boolean
+  instructorId?: string
+  tags?: string[]
+  rating?: number
+  enrollmentCount?: number
   createdAt: Date
   updatedAt: Date
 }
@@ -87,6 +92,69 @@ export enum CourseDifficulty {
   BEGINNER = 'beginner',
   INTERMEDIATE = 'intermediate',
   ADVANCED = 'advanced'
+}
+
+export interface CourseModule {
+  id: string
+  courseId: string
+  title: string
+  description?: string
+  order: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface CourseLesson {
+  id: string
+  moduleId: string
+  title: string
+  description?: string
+  content: string
+  contentType: LessonContentType
+  mediaUrl?: string
+  duration?: number
+  order: number
+  isFree: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export enum LessonContentType {
+  VIDEO = 'video',
+  TEXT = 'text',
+  IMAGE = 'image',
+  QUIZ = 'quiz',
+  DOCUMENT = 'document'
+}
+
+export interface CourseEnrollment {
+  id: string
+  userId: string
+  courseId: string
+  progress: number
+  completed: boolean
+  enrolledAt: Date
+  completedAt?: Date
+}
+
+export interface LessonProgress {
+  id: string
+  enrollmentId: string
+  lessonId: string
+  completed: boolean
+  timeSpent: number
+  lastPosition?: number
+  completedAt?: Date
+}
+
+export interface CourseReview {
+  id: string
+  courseId: string
+  userId: string
+  rating: number
+  comment?: string
+  createdAt: Date
+  updatedAt: Date
 }
 
 // Assessment types

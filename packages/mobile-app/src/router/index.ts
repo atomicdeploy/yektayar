@@ -43,6 +43,18 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/HomePage.vue')
       },
       {
+        path: 'courses',
+        component: () => import('@/views/CoursesPage.vue')
+      },
+      {
+        path: 'courses/:id',
+        component: () => import('@/views/CourseDetailPage.vue')
+      },
+      {
+        path: 'courses/:id/lessons/:lessonId',
+        component: () => import('@/views/LessonViewerPage.vue')
+      },
+      {
         path: 'chat',
         component: () => import('@/views/ChatPage.vue')
       },

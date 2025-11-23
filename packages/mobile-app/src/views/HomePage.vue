@@ -81,6 +81,17 @@
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
 
+          <div class="action-card" @click="navigateToCourses">
+            <div class="action-icon-wrapper tertiary">
+              <ion-icon :icon="school" class="action-icon"></ion-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ locale === 'fa' ? 'دوره‌های آموزشی' : 'Learning Courses' }}</h3>
+              <p>{{ locale === 'fa' ? 'دسترسی به محتوای آموزشی' : 'Access educational content' }}</p>
+            </div>
+            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+          </div>
+
           <div class="action-card" @click="navigateToProfile">
             <div class="action-icon-wrapper warning">
               <ion-icon :icon="person" class="action-icon"></ion-icon>
@@ -192,6 +203,7 @@ import {
   sparkles,
   moon,
   sunny,
+  school,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -204,6 +216,7 @@ const { isDark, toggleTheme } = useTheme()
 const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')
 const navigateToAppointments = () => router.push('/tabs/appointments')
+const navigateToCourses = () => router.push('/tabs/courses')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
@@ -359,6 +372,10 @@ const navigateToProfile = () => router.push('/tabs/profile')
 
 .action-icon-wrapper.success {
   background: linear-gradient(135deg, var(--ion-color-success) 0%, var(--ion-color-success-tint) 100%);
+}
+
+.action-icon-wrapper.tertiary {
+  background: linear-gradient(135deg, var(--ion-color-tertiary) 0%, var(--ion-color-tertiary-tint) 100%);
 }
 
 .action-icon-wrapper.warning {

@@ -52,5 +52,30 @@ export const courseSchema = z.object({
   category: z.string(),
   duration: z.number().min(1),
   difficulty: z.enum(['beginner', 'intermediate', 'advanced']),
-  thumbnailUrl: z.string().url().optional()
+  thumbnailUrl: z.string().url().optional(),
+  instructorId: z.string().uuid().optional(),
+  tags: z.array(z.string()).optional(),
+  isPublished: z.boolean().optional()
+})
+
+export const courseModuleSchema = z.object({
+  title: z.string().min(3).max(200),
+  description: z.string().max(1000).optional(),
+  order: z.number().min(0)
+})
+
+export const courseLessonSchema = z.object({
+  title: z.string().min(3).max(200),
+  description: z.string().max(1000).optional(),
+  content: z.string(),
+  contentType: z.enum(['video', 'text', 'image', 'quiz', 'document']),
+  mediaUrl: z.string().url().optional(),
+  duration: z.number().min(0).optional(),
+  order: z.number().min(0),
+  isFree: z.boolean().optional()
+})
+
+export const courseReviewSchema = z.object({
+  rating: z.number().min(1).max(5),
+  comment: z.string().max(1000).optional()
 })
