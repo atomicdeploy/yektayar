@@ -69,11 +69,13 @@ This document provides detailed information for developers working on the YektaY
 
 ### Required Tools
 
-- **Node.js**: >= 20.19.0
-- **npm**: >= 9.0.0
+- **Node.js**: >= 20.19.0 (preferably 20.19.5 - see `.nvmrc`)
+- **npm**: >= 9.0.0 (npm 10.8.2 recommended for consistency)
 - **Bun**: >= 1.0.0 (for backend runtime)
 - **PostgreSQL**: >= 15.0
 - **Git**: Latest version
+
+> **📝 Important**: To avoid package-lock.json inconsistencies, use the Node.js version specified in `.nvmrc`. See [PACKAGE-LOCK-CONSISTENCY.md](./PACKAGE-LOCK-CONSISTENCY.md) for details.
 
 ### Recommended Tools
 

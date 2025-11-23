@@ -54,12 +54,14 @@ YektaYar is a comprehensive mental health care platform that connects users with
 
 ### Prerequisites
 
-- **Node.js** >= 20.19.0
-- **npm** >= 9.0.0
+- **Node.js** >= 20.19.0 (preferably 20.19.5 - see `.nvmrc`)
+- **npm** >= 9.0.0 (npm 10.8.2 recommended)
 - **Bun** >= 1.0.0 (optional for backend, both Bun and Node.js fully supported)
 - **PostgreSQL** 15+ (for database)
 
 > **Note:** The backend supports both Bun and Node.js runtimes with full Socket.IO support. Bun uses the native `@socket.io/bun-engine` for Socket.IO. The backend automatically detects the runtime and configures itself accordingly.
+
+> **📝 Important for Contributors**: This project uses specific Node.js and npm versions to ensure consistent `package-lock.json` across different machines. Please use `nvm use` (if you have nvm) to switch to the correct Node version. See [PACKAGE-LOCK-CONSISTENCY.md](./PACKAGE-LOCK-CONSISTENCY.md) for details.
 
 ### Installation
 
