@@ -11,7 +11,7 @@ import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
-import { pageRoutes } from './routes/pages'
+import { logger } from '@yektayar/shared'
 import { settingsRoutes } from './routes/settings'
 import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
@@ -159,6 +159,10 @@ initializeDatabase().catch(error => {
 // Detect runtime automatically
 const isBun = typeof Bun !== 'undefined'
 const isNode = !isBun
+
+logger.custom('🚀', `YektaYar API Server running at http://${hostname}:${port}`, 'cyan')
+logger.custom('📚', `API Documentation available at http://${hostname}:${port}/swagger`, 'cyan')
+logger.custom('⚡', `Runtime: Bun ${Bun.version}`, 'cyan')
 
 let httpServer: any
 let io: SocketIOServer | undefined
