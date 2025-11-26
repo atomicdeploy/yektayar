@@ -236,7 +236,7 @@ The mobile app package already includes these scripts:
 11. **Post analysis in PR comment** (NEW)
 
 ### Environment Variables
-- `VITE_API_BASE_URL`: Backend API URL (default: https://api.yektayar.ir)
+- `API_BASE_URL`: Backend API URL (default: https://api.yektayar.ir)
 - `VITE_ENVIRONMENT`: Environment mode (production)
 
 ### Artifacts

@@ -7,7 +7,7 @@ import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
 import config from '@/config'
 import apiClient from '@/api'
-import { SOCKET_IO_PATH } from '@yektayar/shared'
+import { getWebSocketPathFromEnv } from '@yektayar/shared'
 
 export interface ChatMessage {
   id: string
@@ -46,7 +46,7 @@ export function useAIChat() {
 
       // Initialize Socket.IO client
       socket.value = io(config.apiBaseUrl, {
-        path: SOCKET_IO_PATH,
+        path: getWebSocketPathFromEnv(),
         auth: {
           token: sessionToken
         },

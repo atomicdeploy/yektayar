@@ -36,7 +36,7 @@
         <div class="hero-content">
           <div class="logo-container">
             <div class="logo-circle">
-              <ion-icon :icon="heart" class="hero-icon"></ion-icon>
+              <ion-icon src="/logo-simple.svg" class="hero-icon"></ion-icon>
             </div>
           </div>
           <h1 class="hero-title">{{ t('welcome') }}</h1>
@@ -181,7 +181,6 @@ import {
   IonButtons,
 } from '@ionic/vue'
 import { 
-  heart, 
   chatbubbles, 
   calendar, 
   person, 
@@ -208,7 +207,7 @@ const navigateToAppointments = () => router.push('/tabs/appointments')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;
@@ -264,8 +263,10 @@ const navigateToProfile = () => router.push('/tabs/profile')
 }
 
 .hero-icon {
-  font-size: 48px;
-  color: white;
+  font-size: 70px;
+  width: 70px;
+  height: 70px;
+  filter: brightness(0) invert(1);
 }
 
 .hero-title {
@@ -432,7 +433,7 @@ const navigateToProfile = () => router.push('/tabs/profile')
 ion-card-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
 }
 
 ion-card-content {

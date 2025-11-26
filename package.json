@@ -22,6 +22,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:deps": "node scripts/test-dependencies.js",
+    "test:websocket": "node scripts/test-websocket.js",
     "socketio:test": "node scripts/socketio-tui.js",
     "ai:test": "node scripts/pollination-ai-tui.js",
     "db:cli": "bash scripts/db-cli.sh",

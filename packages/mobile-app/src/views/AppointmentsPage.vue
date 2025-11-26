@@ -257,7 +257,7 @@ import { useI18n } from 'vue-i18n'
 const { locale } = useI18n()
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;

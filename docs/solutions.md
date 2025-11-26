@@ -6,7 +6,7 @@ These solutions are only included in development builds.
 ## CONFIG_ERROR
 
 ### Problem
-The application cannot start because the API_BASE_URL or VITE_API_BASE_URL environment variable is not configured correctly.
+The application cannot start because the API_BASE_URL environment variable is not configured correctly.
 
 ### Solution
 
