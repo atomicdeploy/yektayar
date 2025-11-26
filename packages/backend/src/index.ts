@@ -16,9 +16,19 @@ import { settingsRoutes } from './routes/settings'
 import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
+import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
+import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
 import { initializeDatabase } from './services/database'
-import { SOCKET_IO_PATH } from '@yektayar/shared'
+import { getWebSocketPathFromEnv, getVersionFromPackageJson } from '@yektayar/shared'
+import packageJson from '../package.json'
+
+// Get version from package.json
+const APP_VERSION = getVersionFromPackageJson(packageJson)
+
+// Get WebSocket path from environment or use default
+const WEBSOCKET_PATH = getWebSocketPathFromEnv()
+
 // Configure CORS based on environment
 // When behind a reverse proxy (like Apache), disable application-level CORS
 // to avoid duplicate headers
@@ -28,6 +38,21 @@ const corsOrigins = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:51
 // Create base app
 const app = new Elysia()
   .use(cookie())
+  // Prettify JSON responses
+  .onAfterHandle(({ response }) => {
+    // Only prettify JSON object responses
+    if (typeof response === 'object' && response !== null && !(response instanceof Response)) {
+      return new Response(
+        JSON.stringify(response, null, 2),
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+    }
+    return response
+  })
 
 // Conditionally add CORS middleware
 if (corsEnabled) {
@@ -49,7 +74,7 @@ app
       documentation: {
         info: {
           title: 'YektaYar API',
-          version: '0.1.0',
+          version: APP_VERSION,
           description: 'Mental Health Care Platform API'
         },
         tags: [
@@ -66,7 +91,7 @@ app
           { name: 'WebSocket', description: 'Real-time communication via Socket.IO' }
         ],
         externalDocs: {
-          description: `Socket.IO WebSocket endpoint available at ${SOCKET_IO_PATH}`,
+          description: `WebSocket endpoint (Socket.IO and native WebSocket) available at ${WEBSOCKET_PATH}`,
           url: 'https://socket.io/docs/v4/'
         }
       }
@@ -80,7 +105,7 @@ app
   })
   .get('/', () => ({
     message: 'YektaYar API Server',
-    version: '0.1.0',
+    version: APP_VERSION,
     status: 'running',
     features: {
       rest: true,
@@ -93,10 +118,11 @@ app
     timestamp: new Date().toISOString()
   }))
   .get('/websocket-info', () => ({
-    path: SOCKET_IO_PATH,
-    description: 'Socket.IO WebSocket endpoint for real-time communication',
+    path: WEBSOCKET_PATH,
+    description: 'Unified WebSocket endpoint for Socket.IO and native WebSocket with auto-detection',
     documentation: 'https://socket.io/docs/v4/',
-    authentication: 'Required - Pass session token in auth.token',
+    authentication: 'Required - Pass session token in auth.token (Socket.IO) or query/header (native WebSocket)',
+    protocols: ['Socket.IO', 'Native WebSocket (RFC 6455)'],
     transports: ['websocket', 'polling'],
     events: {
       client: ['ping', 'status', 'echo', 'info', 'message', 'ai:chat'],
@@ -146,24 +172,66 @@ if (isBun) {
   console.log(`⚡ Detected runtime: Bun ${Bun.version}`)
   
   // Setup Socket.IO with Bun engine
-  const { engine, ioInstance } = setupBunSocketIO()
+  const { engine, ioInstance } = setupBunSocketIO(WEBSOCKET_PATH)
   io = ioInstance
   
   const handler = engine.handler()
+  const nativeWSHandler = setupNativeWebSocket()
   
   httpServer = Bun.serve({
     port,
     hostname,
     fetch: async (req, server) => {
       const url = new URL(req.url)
-      // Handle Socket.IO requests
-      if (url.pathname.startsWith(SOCKET_IO_PATH)) {
-        return engine.handleRequest(req, server)
+      const upgradeHeader = req.headers.get('upgrade')?.toLowerCase()
+      const isWebSocketUpgrade = upgradeHeader === 'websocket'
+      
+      // Handle WebSocket upgrade requests on /ws path
+      if (isWebSocketUpgrade && url.pathname.startsWith(WEBSOCKET_PATH)) {
+        // Check if this is a Socket.IO request (has EIO parameter)
+        if (url.searchParams.has('EIO')) {
+          return engine.handleRequest(req, server)
+        }
+        // Otherwise, handle as native WebSocket
+        return nativeWSHandler.upgrade(req, server)
       }
+      
       // Handle regular Elysia app requests
       return app.fetch(req)
     },
-    websocket: handler.websocket
+    websocket: {
+      message(ws: any, message: string | Buffer) {
+        // Route to appropriate protocol handler
+        if (ws.data?.socketId?.startsWith('ws-')) {
+          // Native WebSocket
+          nativeWSHandler.websocket.message(ws, message)
+        } else if (handler.websocket.message) {
+          // Socket.IO
+          handler.websocket.message(ws, message)
+        }
+      },
+      open(ws: any) {
+        if (ws.data?.socketId?.startsWith('ws-')) {
+          nativeWSHandler.websocket.open(ws)
+        } else if (handler.websocket.open) {
+          handler.websocket.open(ws)
+        }
+      },
+      close(ws: any, code: number, reason: string) {
+        if (ws.data?.socketId?.startsWith('ws-')) {
+          nativeWSHandler.websocket.close(ws, code, reason)
+        } else if (handler.websocket.close) {
+          handler.websocket.close(ws, code, reason)
+        }
+      },
+      drain(ws: any) {
+        if (ws.data?.socketId?.startsWith('ws-')) {
+          nativeWSHandler.websocket.drain(ws)
+        } else if (handler.websocket.drain) {
+          handler.websocket.drain(ws)
+        }
+      }
+    }
   })
   
   console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
@@ -177,12 +245,8 @@ if (isBun) {
     console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
   }
   
-  // TODO: these are also duplicated below, refactor later
-  console.log(`✅ Socket.IO enabled`)
-
-  // TODO: complete custom startup logs
-  // console.log(`⚠️ WARNING: `)
-  // console.log(`💡 Tip: `)
+  console.log(`✅ Socket.IO and Native WebSocket enabled on ${WEBSOCKET_PATH}`)
+  console.log(`📡 Both protocols auto-detected and authenticated`)
 
   // check if development mode
   if (Bun.env.NODE_ENV === 'development') {
@@ -241,8 +305,11 @@ if (isBun) {
     }
   })
   
-  // Initialize Socket.IO with the HTTP server
-  io = setupSocketIO(httpServer)
+  // Initialize Socket.IO with the HTTP server on /ws path
+  io = setupSocketIO(httpServer, WEBSOCKET_PATH)
+  
+  // Initialize native WebSocket server on /ws path (auto-detection)
+  setupNodeWebSocket(httpServer, WEBSOCKET_PATH)
   
   // Start the server
   httpServer.listen(port, hostname, () => {
@@ -257,9 +324,8 @@ if (isBun) {
       console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
     }
     
-    // TODO: these are duplicate logs from above, refactor later
-    console.log(`✅ Socket.IO enabled`)
-    // TODO: complete custom startup logs
+    console.log(`✅ Socket.IO and Native WebSocket enabled on ${WEBSOCKET_PATH}`)
+    console.log(`📡 Both protocols auto-detected and authenticated`)
   })
 }
 

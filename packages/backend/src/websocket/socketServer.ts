@@ -3,7 +3,11 @@ import type { Server as HTTPServer } from 'http'
 import type { Socket } from 'socket.io'
 import { validateSessionToken } from '../services/sessionService'
 import { logger } from '@yektayar/shared'
-import { SOCKET_IO_PATH } from '@yektayar/shared'
+import { getVersionFromPackageJson } from '@yektayar/shared'
+import packageJson from '../../package.json'
+
+// Get version from package.json
+const APP_VERSION = getVersionFromPackageJson(packageJson)
 
 // Conditionally import Bun engine only when running on Bun
 let BunEngine: any
@@ -88,7 +92,7 @@ function setupConnectionHandlers(io: SocketIOServer) {
       socket.emit('status_response', {
         server: {
           name: 'YektaYar API Server',
-          version: '0.1.0',
+          version: APP_VERSION,
           status: 'running',
           timestamp: new Date().toISOString()
         },
@@ -117,7 +121,7 @@ function setupConnectionHandlers(io: SocketIOServer) {
       socket.emit('info_response', {
         server: {
           name: 'YektaYar API',
-          version: '0.1.0',
+          version: APP_VERSION,
           description: 'Backend API with Socket.IO real-time communication',
           features: {
             rest: true,
@@ -206,8 +210,9 @@ function setupConnectionHandlers(io: SocketIOServer) {
 /**
  * Setup and configure Socket.IO server
  */
-export function setupSocketIO(httpServer: HTTPServer) {
+export function setupSocketIO(httpServer: HTTPServer, path: string = '/socket.io') {
   const io = new SocketIOServer(httpServer, {
+    path,
     cors: {
       origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST'],
@@ -250,7 +255,7 @@ export function broadcastEvent(io: SocketIOServer, event: string, data: any) {
  * Setup Socket.IO with Bun engine
  * Bun natively supports Socket.IO via @socket.io/bun-engine
  */
-export function setupBunSocketIO() {
+export function setupBunSocketIO(path: string = '/socket.io') {
   if (!BunEngine) {
     throw new Error('@socket.io/bun-engine not available')
   }
@@ -258,7 +263,7 @@ export function setupBunSocketIO() {
   const io = new SocketIOServer()
 
   const engine = new BunEngine({
-    path: SOCKET_IO_PATH,
+    path,
     cors: {
       origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST'],

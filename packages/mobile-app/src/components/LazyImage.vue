@@ -104,7 +104,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .lazy-image-wrapper {
   display: flex;
   position: relative;
