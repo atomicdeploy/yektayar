@@ -61,33 +61,32 @@ export default [
         sourceType: 'module'
       },
       globals: {
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        navigator: 'readonly',
-        HTMLElement: 'readonly',
-        HTMLCanvasElement: 'readonly',
+        // Browser globals (alphabetically ordered)
+        alert: 'readonly',
+        AnimationEvent: 'readonly',
         clearInterval: 'readonly',
-        setInterval: 'readonly',
-        setTimeout: 'readonly',
         clearTimeout: 'readonly',
+        confirm: 'readonly',
         console: 'readonly',
-        // Additional browser globals
-        KeyboardEvent: 'readonly',
+        CSSStyleDeclaration: 'readonly',
+        CustomEvent: 'readonly',
+        customElements: 'readonly',
+        document: 'readonly',
+        Event: 'readonly',
+        HTMLCanvasElement: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLImageElement: 'readonly',
+        Image: 'readonly',
         IntersectionObserver: 'readonly',
         IntersectionObserverEntry: 'readonly',
-        ResizeObserver: 'readonly',
-        Event: 'readonly',
-        TransitionEvent: 'readonly',
-        AnimationEvent: 'readonly',
-        CSSStyleDeclaration: 'readonly',
-        alert: 'readonly',
-        confirm: 'readonly',
+        KeyboardEvent: 'readonly',
         localStorage: 'readonly',
-        customElements: 'readonly',
-        Image: 'readonly',
-        HTMLImageElement: 'readonly',
-        CustomEvent: 'readonly'
+        navigator: 'readonly',
+        ResizeObserver: 'readonly',
+        setInterval: 'readonly',
+        setTimeout: 'readonly',
+        TransitionEvent: 'readonly',
+        window: 'readonly'
       }
     },
     rules: {
