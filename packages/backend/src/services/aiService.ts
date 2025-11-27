@@ -3,6 +3,8 @@
  * Provides AI-powered chat responses for mental health counseling
  */
 
+import { logger } from '@yektayar/shared'
+
 const POLLINATIONS_API_URL = 'https://text.pollinations.ai'
 
 interface ConversationMessage {
@@ -123,7 +125,7 @@ export async function streamAIResponse(
 
     return aiResponse.trim()
   } catch (error) {
-    console.error('Error in streamAIResponse:', error)
+    logger.error('Error in streamAIResponse:', error)
     
     // Provide a fallback response
     return generateFallbackResponse(message)
@@ -156,7 +158,7 @@ export async function* streamAIResponseChunks(
       await new Promise(resolve => setTimeout(resolve, 50))
     }
   } catch (error) {
-    console.error('Error in streamAIResponseChunks:', error)
+    logger.error('Error in streamAIResponseChunks:', error)
     yield generateFallbackResponse(message)
   }
 }
@@ -197,7 +199,7 @@ export async function checkAIServiceHealth(): Promise<boolean> {
     })
     return response.ok
   } catch (error) {
-    console.error('AI service health check failed:', error)
+    logger.error('AI service health check failed:', error)
     return false
   }
 }

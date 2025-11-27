@@ -13,6 +13,7 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ApiClientConfig, ApiResponse, ApiError, RequestOptions, TokenDeliveryMethod } from './types'
+import { logger } from '../utils/logger'
 import { TokenStorage } from './storage'
 
 export class ApiClient {
@@ -93,7 +94,7 @@ export class ApiClient {
         }
 
         if (this.debug) {
-          console.log('[ApiClient] Request:', {
+          logger.debug('[ApiClient] Request:', {
             method: config.method,
             url: config.url,
             headers: config.headers,
@@ -105,7 +106,7 @@ export class ApiClient {
       },
       (error) => {
         if (this.debug) {
-          console.error('[ApiClient] Request error:', error)
+          logger.error('[ApiClient] Request error:', error)
         }
         return Promise.reject(error)
       }
@@ -115,7 +116,7 @@ export class ApiClient {
     this.axiosInstance.interceptors.response.use(
       (response) => {
         if (this.debug) {
-          console.log('[ApiClient] Response:', {
+          logger.debug('[ApiClient] Response:', {
             status: response.status,
             data: response.data,
           })
@@ -124,7 +125,7 @@ export class ApiClient {
       },
       (error) => {
         if (this.debug) {
-          console.error('[ApiClient] Response error:', error)
+          logger.error('[ApiClient] Response error:', error)
         }
 
         // Handle different error scenarios

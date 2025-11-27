@@ -238,6 +238,7 @@ import {
   IonNote
 } from '@ionic/vue'
 import { arrowBack, star, heart, rocket } from 'ionicons/icons'
+import { logger } from '@yektayar/shared'
 
 const router = useRouter()
 const testResults = ref<Array<{ name: string; passed: boolean; error?: string }>>([])
@@ -302,7 +303,7 @@ async function testIcon(id: string, name: string): Promise<{ name: string; passe
     
     // Log for development/debugging only
     if (import.meta.env.DEV) {
-      console.log(`✓ ${name}: Passed all checks`, {
+      logger.debug(`✓ ${name}: Passed all checks`, {
         shadowRoot: !!shadowRoot,
         iconInner: !!iconInner,
         children: iconInner.children.length,
@@ -313,7 +314,7 @@ async function testIcon(id: string, name: string): Promise<{ name: string; passe
     return { name, passed: true }
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.error(`✗ ${name}: Failed`, error)
+      logger.error(`✗ ${name}: Failed`, error)
     }
     return { name, passed: false, error: (error as Error).message }
   }
@@ -321,7 +322,7 @@ async function testIcon(id: string, name: string): Promise<{ name: string; passe
 
 onMounted(async () => {
   if (import.meta.env.DEV) {
-    console.log('=== Starting Icon Tests ===')
+    logger.debug('=== Starting Icon Tests ===')
   }
   
   // Wait a bit for all icons to render
@@ -340,8 +341,8 @@ onMounted(async () => {
   testResults.value = results
   
   if (import.meta.env.DEV) {
-    console.log('=== Test Results ===')
-    console.log(`Passed: ${results.filter(r => r.passed).length}/${results.length}`)
+    logger.debug('=== Test Results ===')
+    logger.debug(`Passed: ${results.filter(r => r.passed).length}/${results.length}`)
     console.table(results)
   }
 })

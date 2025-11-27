@@ -625,10 +625,10 @@ onMounted(async () => {
       const calculatedMax = virtualElement.scrollHeight
       
       if (debugMode) {
-        console.log('[WelcomeScreen] Height calculation debug:')
-        console.log(`  Outer: ${welcomeTextOuter.value.offsetWidth}px wide, padding: ${paddingTop}/${paddingBottom}`)
-        console.log(`  Virtual: ${calculatedMax}px, Inner: ${virtualInner.scrollHeight}px`)
-        console.log(`  Actual inner: ${welcomeTextInner.value.scrollHeight}px`)
+        logger.debug('[WelcomeScreen] Height calculation debug:')
+        logger.debug(`  Outer: ${welcomeTextOuter.value.offsetWidth}px wide, padding: ${paddingTop}/${paddingBottom}`)
+        logger.debug(`  Virtual: ${calculatedMax}px, Inner: ${virtualInner.scrollHeight}px`)
+        logger.debug(`  Actual inner: ${welcomeTextInner.value.scrollHeight}px`)
       }
       
       document.body.removeChild(virtualElement)

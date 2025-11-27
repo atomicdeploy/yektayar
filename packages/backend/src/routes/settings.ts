@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
 import { getDatabase } from '../services/database'
+import { logger } from '@yektayar/shared'
 
 export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
   .get('/', async ({ set }) => {
@@ -25,7 +26,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
           try {
             value = JSON.parse(value)
           } catch (_e) {
-            console.error(`Failed to parse JSON for setting ${setting.key}`)
+            logger.error(`Failed to parse JSON for setting ${setting.key}`)
           }
         }
         
@@ -37,7 +38,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
         data: settingsObj
       }
     } catch (error) {
-      console.error('Error fetching settings:', error)
+      logger.error('Error fetching settings:', error)
       set.status = 500
       return {
         success: false,
@@ -76,7 +77,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
         try {
           value = JSON.parse(value)
         } catch (_e) {
-          console.error(`Failed to parse JSON for setting ${key}`)
+          logger.error(`Failed to parse JSON for setting ${key}`)
         }
       }
 
@@ -89,7 +90,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
         }
       }
     } catch (error) {
-      console.error('Error fetching setting:', error)
+      logger.error('Error fetching setting:', error)
       set.status = 500
       return {
         success: false,
@@ -133,7 +134,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
         message: 'Setting created successfully'
       }
     } catch (error: any) {
-      console.error('Error creating setting:', error)
+      logger.error('Error creating setting:', error)
       
       if (error.code === '23505') { // Unique constraint violation
         set.status = 409
@@ -202,7 +203,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
         message: 'Setting updated successfully'
       }
     } catch (error) {
-      console.error('Error updating setting:', error)
+      logger.error('Error updating setting:', error)
       set.status = 500
       return {
         success: false,
@@ -234,7 +235,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
         message: 'Setting deleted successfully'
       }
     } catch (error) {
-      console.error('Error deleting setting:', error)
+      logger.error('Error deleting setting:', error)
       set.status = 500
       return {
         success: false,

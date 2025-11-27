@@ -1,3 +1,4 @@
+import { logger } from '@yektayar/shared'
 import type { ServerWebSocket } from 'bun'
 import { validateSessionToken } from '../services/sessionService'
 import { 
@@ -54,7 +55,7 @@ export function setupNativeWebSocket() {
         
         return new Response('WebSocket upgrade failed', { status: 500 })
       } catch (error) {
-        console.error('WebSocket authentication error:', error)
+        logger.error('WebSocket authentication error:', error)
         return new Response('Authentication failed', { status: 401 })
       }
     },
@@ -75,7 +76,7 @@ export function setupNativeWebSocket() {
           const send = (msg: any) => ws.send(JSON.stringify(msg))
           routeEvent(parsed.event, parsed.data, send, data, 'native-websocket')
         } catch (error) {
-          console.error('WebSocket message handling error:', error)
+          logger.error('WebSocket message handling error:', error)
           ws.send(JSON.stringify({
             event: 'error',
             data: { error: 'Failed to process message' }
@@ -85,7 +86,7 @@ export function setupNativeWebSocket() {
       
       open(ws: ServerWebSocket<WebSocketSessionData>) {
         const data = ws.data
-        console.log(`Native WebSocket connected: ${data.socketId}`, {
+        logger.info(`Native WebSocket connected: ${data.socketId}`, {
           sessionToken: data.sessionToken,
           userId: data.userId,
           isLoggedIn: data.isLoggedIn
@@ -97,12 +98,12 @@ export function setupNativeWebSocket() {
       
       close(ws: ServerWebSocket<WebSocketSessionData>, code: number, reason: string) {
         const data = ws.data
-        console.log(`Native WebSocket disconnected: ${data.socketId}`, { code, reason })
+        logger.info(`Native WebSocket disconnected: ${data.socketId}`, { code, reason })
       },
       
       drain(ws: ServerWebSocket<WebSocketSessionData>) {
         // Handle backpressure
-        console.log('WebSocket drain', ws.data.socketId)
+        logger.info('WebSocket drain', ws.data.socketId)
       }
     }
   }

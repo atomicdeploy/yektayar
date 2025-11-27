@@ -5,6 +5,7 @@
 
 import postgres from 'postgres'
 import bcrypt from 'bcrypt'
+import { logger } from '@yektayar/shared'
 
 // Initialize PostgreSQL connection
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar'
@@ -222,7 +223,7 @@ export async function initializeDatabase() {
       )
     `
 
-    console.log('✅ Database tables initialized successfully')
+    logger.success('Database tables initialized successfully')
 
     // Insert default data
     await insertDefaultAboutUsPage(db)
@@ -230,7 +231,7 @@ export async function initializeDatabase() {
     await insertDefaultUsers(db)
 
   } catch (error) {
-    console.error('❌ Failed to initialize database:', error)
+    logger.error('Failed to initialize database:', error)
     throw error
   }
 }
@@ -293,10 +294,10 @@ async function insertDefaultAboutUsPage(db: ReturnType<typeof postgres>) {
           })}
         )
       `
-      console.log('✅ Default about-us page created')
+      logger.success('Default about-us page created')
     }
   } catch (error) {
-    console.error('❌ Failed to create default about-us page:', error)
+    logger.error('Failed to create default about-us page:', error)
   }
 }
 
@@ -326,9 +327,9 @@ async function insertDefaultContactSettings(db: ReturnType<typeof postgres>) {
         `
       }
     }
-    console.log('✅ Default contact settings created')
+    logger.success('Default contact settings created')
   } catch (error) {
-    console.error('❌ Failed to create default contact settings:', error)
+    logger.error('Failed to create default contact settings:', error)
   }
 }
 
@@ -352,10 +353,10 @@ async function insertDefaultUsers(db: ReturnType<typeof postgres>) {
           ('psychologist@yektayar.com', 'Dr. Sara Mohammadi', ${await bcrypt.hash('psych123', 10)}, 'psychologist', 'Licensed Clinical Psychologist with 10 years of experience'),
           ('patient@yektayar.com', 'Ali Ahmadi', ${await bcrypt.hash('patient123', 10)}, 'patient', NULL)
       `
-      console.log('✅ Default users created (admin@yektayar.com / admin123, psychologist@yektayar.com / psych123, patient@yektayar.com / patient123)')
+      logger.success('Default users created (admin@yektayar.com / admin123, psychologist@yektayar.com / psych123, patient@yektayar.com / patient123)')
     }
   } catch (error) {
-    console.error('❌ Failed to create default users:', error)
+    logger.error('Failed to create default users:', error)
   }
 }
 

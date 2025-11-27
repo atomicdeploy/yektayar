@@ -141,7 +141,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         message: 'User registered successfully'
       }
     } catch (error) {
-      console.error('Error during registration:', error)
+      logger.error('Error during registration:', error)
       return {
         success: false,
         error: 'Registration failed',
@@ -244,7 +244,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         message: 'Login successful'
       }
     } catch (error) {
-      console.error('Error during login:', error)
+      logger.error('Error during login:', error)
       return {
         success: false,
         error: 'Login failed',
@@ -289,7 +289,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       // In production, generate and send OTP via SMS/email
       // For now, just return success
       const mockOtp = Math.floor(100000 + Math.random() * 900000).toString()
-      console.log(`📱 Mock OTP for ${identifier}: ${mockOtp}`)
+      logger.info(`📱 Mock OTP for ${identifier}: ${mockOtp}`)
 
       return {
         success: true,
@@ -298,7 +298,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         ...(process.env.NODE_ENV === 'development' && { otp: mockOtp })
       }
     } catch (error) {
-      console.error('Error sending OTP:', error)
+      logger.error('Error sending OTP:', error)
       return {
         success: false,
         error: 'Failed to send OTP',
@@ -392,7 +392,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         message: 'OTP verified successfully'
       }
     } catch (error) {
-      console.error('Error verifying OTP:', error)
+      logger.error('Error verifying OTP:', error)
       return {
         success: false,
         error: 'OTP verification failed',

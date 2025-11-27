@@ -1,3 +1,4 @@
+import { logger } from '@yektayar/shared'
 import { WebSocketServer, WebSocket } from 'ws'
 import type { IncomingMessage } from 'http'
 import type { Duplex } from 'stream'
@@ -66,7 +67,7 @@ export function setupNodeWebSocket(server: any, path: string = '/ws') {
         wss.emit('connection', ws, request, wsData)
       })
     } catch (error) {
-      console.error('WebSocket authentication error:', error)
+      logger.error('WebSocket authentication error:', error)
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\nAuthentication failed')
       socket.destroy()
     }
@@ -74,7 +75,7 @@ export function setupNodeWebSocket(server: any, path: string = '/ws') {
 
   // Setup connection handlers
   wss.on('connection', (ws: WebSocket, request: IncomingMessage, wsData: WebSocketSessionData) => {
-    console.log(`Native WebSocket connected: ${wsData.socketId}`, {
+    logger.info(`Native WebSocket connected: ${wsData.socketId}`, {
       sessionToken: wsData.sessionToken,
       userId: wsData.userId,
       isLoggedIn: wsData.isLoggedIn
@@ -93,7 +94,7 @@ export function setupNodeWebSocket(server: any, path: string = '/ws') {
         const send = (msg: any) => ws.send(JSON.stringify(msg))
         routeEvent(parsed.event, parsed.data, send, wsData, 'native-websocket')
       } catch (error) {
-        console.error('WebSocket message handling error:', error)
+        logger.error('WebSocket message handling error:', error)
         ws.send(JSON.stringify({
           event: 'error',
           data: { error: 'Failed to process message' }
@@ -103,12 +104,12 @@ export function setupNodeWebSocket(server: any, path: string = '/ws') {
 
     // Handle close
     ws.on('close', (code, reason) => {
-      console.log(`Native WebSocket disconnected: ${wsData.socketId}`, { code, reason: reason.toString() })
+      logger.info(`Native WebSocket disconnected: ${wsData.socketId}`, { code, reason: reason.toString() })
     })
 
     // Handle errors
     ws.on('error', (error) => {
-      console.error(`Native WebSocket error for ${wsData.socketId}:`, error)
+      logger.error(`Native WebSocket error for ${wsData.socketId}:`, error)
     })
   })
 

@@ -1,6 +1,6 @@
 import { setupBunSocketIO } from './websocket/socketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
-import { getWebSocketPathFromEnv } from '@yektayar/shared'
+import { getWebSocketPathFromEnv, logger } from '@yektayar/shared'
 import { initializeDatabase } from './services/database'
 
 /**
@@ -16,20 +16,20 @@ const WEBSOCKET_PATH = getWebSocketPathFromEnv()
 
 // Initialize database
 initializeDatabase().catch(error => {
-  console.error('Failed to initialize database:', error)
-  console.log('⚠️  WebSocket server will continue running, but database features may not work')
+  logger.error('Failed to initialize database:', error)
+  logger.info('⚠️  WebSocket server will continue running, but database features may not work')
 })
 
 // Detect runtime
 const isBun = typeof Bun !== 'undefined'
 
 if (!isBun) {
-  console.error('❌ Dedicated WebSocket server requires Bun runtime')
-  console.log('💡 Use Node.js with the main server (index.ts) for Socket.IO support')
+  logger.error('❌ Dedicated WebSocket server requires Bun runtime')
+  logger.info('💡 Use Node.js with the main server (index.ts) for Socket.IO support')
   process.exit(1)
 }
 
-console.log(`⚡ Starting dedicated WebSocket server on Bun ${Bun.version}`)
+logger.info(`⚡ Starting dedicated WebSocket server on Bun ${Bun.version}`)
 
 // Setup Socket.IO with Bun engine
 const { engine, ioInstance } = setupBunSocketIO()
@@ -132,17 +132,17 @@ const wsServer = Bun.serve({
   }
 })
 
-console.log(`🚀 YektaYar WebSocket Server running at ws://${hostname}:${wsPort}`)
-console.log(`✅ Unified WebSocket endpoint: ws://${hostname}:${wsPort}${WEBSOCKET_PATH}`)
-console.log(`📡 Supports both Socket.IO and native WebSocket (auto-detected)`)
-console.log(`🔐 Authentication required for all connections`)
-console.log(`💡 Configure your reverse proxy to route ws.yektayar.ir to this port`)
+logger.info(`🚀 YektaYar WebSocket Server running at ws://${hostname}:${wsPort}`)
+logger.info(`✅ Unified WebSocket endpoint: ws://${hostname}:${wsPort}${WEBSOCKET_PATH}`)
+logger.info(`📡 Supports both Socket.IO and native WebSocket (auto-detected)`)
+logger.info(`🔐 Authentication required for all connections`)
+logger.info(`💡 Configure your reverse proxy to route ws.yektayar.ir to this port`)
 
 // Check environment
 if (Bun.env.NODE_ENV === 'development') {
-  console.log(`🔧 Running in development mode`)
+  logger.info(`🔧 Running in development mode`)
 } else if (Bun.env.NODE_ENV === 'production') {
-  console.log(`🚀 Running in production mode`)
+  logger.info(`🚀 Running in production mode`)
 }
 
 export default wsServer

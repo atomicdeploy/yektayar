@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
 import { getDatabase } from '../services/database'
+import { logger } from '@yektayar/shared'
 
 export const supportRoutes = new Elysia({ prefix: '/api/support' })
   // Create a new support ticket
@@ -41,7 +42,7 @@ export const supportRoutes = new Elysia({ prefix: '/api/support' })
         message: 'Support ticket created successfully'
       }
     } catch (error) {
-      console.error('Error creating support ticket:', error)
+      logger.error('Error creating support ticket:', error)
       set.status = 500
       return {
         success: false,
@@ -91,7 +92,7 @@ export const supportRoutes = new Elysia({ prefix: '/api/support' })
         data: tickets
       }
     } catch (error) {
-      console.error('Error fetching support tickets:', error)
+      logger.error('Error fetching support tickets:', error)
       set.status = 500
       return {
         success: false,
@@ -137,7 +138,7 @@ export const supportRoutes = new Elysia({ prefix: '/api/support' })
         data: ticket
       }
     } catch (error) {
-      console.error('Error fetching support ticket:', error)
+      logger.error('Error fetching support ticket:', error)
       set.status = 500
       return {
         success: false,
@@ -195,7 +196,7 @@ export const supportRoutes = new Elysia({ prefix: '/api/support' })
         message: 'Message added successfully'
       }
     } catch (error) {
-      console.error('Error adding message to ticket:', error)
+      logger.error('Error adding message to ticket:', error)
       set.status = 500
       return {
         success: false,
@@ -235,7 +236,7 @@ export const supportRoutes = new Elysia({ prefix: '/api/support' })
         message: 'Ticket updated successfully'
       }
     } catch (error) {
-      console.error('Error updating ticket:', error)
+      logger.error('Error updating ticket:', error)
       set.status = 500
       return {
         success: false,
@@ -268,7 +269,7 @@ export const supportRoutes = new Elysia({ prefix: '/api/support' })
         message: 'Ticket deleted successfully'
       }
     } catch (error) {
-      console.error('Error deleting ticket:', error)
+      logger.error('Error deleting ticket:', error)
       set.status = 500
       return {
         success: false,

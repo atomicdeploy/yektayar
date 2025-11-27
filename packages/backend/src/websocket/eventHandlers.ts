@@ -1,3 +1,4 @@
+import { logger } from '@yektayar/shared'
 /**
  * Shared WebSocket event handlers
  * This module contains DRY implementations of all WebSocket events
@@ -98,7 +99,7 @@ export function handleInfo(send: MessageSender, sessionData: WebSocketSessionDat
  * Handle message event
  */
 export function handleMessage(send: MessageSender, sessionData: WebSocketSessionData, data: any) {
-  console.log(`Message received from ${sessionData.socketId}:`, data)
+  logger.info(`Message received from ${sessionData.socketId}:`, data)
   send({
     event: 'message_received',
     data: {
@@ -118,7 +119,7 @@ export async function handleAIChat(send: MessageSender, sessionData: WebSocketSe
     const { message, conversationHistory } = chatData
     const messageId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-    console.log(`AI chat request from ${sessionData.socketId}:`, message)
+    logger.info(`AI chat request from ${sessionData.socketId}:`, message)
 
     // Emit start event
     send({
@@ -145,9 +146,9 @@ export async function handleAIChat(send: MessageSender, sessionData: WebSocketSe
       data: { messageId, fullResponse }
     })
 
-    console.log(`AI response completed for ${sessionData.socketId}`)
+    logger.info(`AI response completed for ${sessionData.socketId}`)
   } catch (error) {
-    console.error('AI chat error:', error)
+    logger.error('AI chat error:', error)
     send({
       event: 'ai:response:error',
       data: { error: 'Failed to generate response. Please try again.' }
