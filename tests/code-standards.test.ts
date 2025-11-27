@@ -28,10 +28,13 @@ describe('Code Standards', () => {
         if (
           !file.endsWith('.test.ts') &&
           !file.endsWith('.spec.ts') &&
+          !file.endsWith('.test.js') &&
           !file.endsWith('.config.ts') &&
           !file.endsWith('.config.js') &&
           !filePath.includes('logger.ts') &&
-          !filePath.includes('usage.ts') // Example/demo files are allowed
+          !filePath.includes('usage.ts') && // Example/demo files are allowed
+          !filePath.includes('debugConfig.ts') && // Developer debug console with formatted help
+          !filePath.includes('__tests__') // Test directories are allowed
         ) {
           fileList.push(filePath)
         }
@@ -41,10 +44,7 @@ describe('Code Standards', () => {
     return fileList
   }
 
-  // These tests are temporarily skipped as the codebase has pre-existing 
-  // console.* usages that need to be migrated to logger utility.
-  // TODO: Enable these tests after migrating console.* calls to logger
-  it.skip('should use logger utility instead of direct console.* calls', () => {
+  it('should use logger utility instead of direct console.* calls', () => {
     const files = findTypeScriptFiles(packagesDir)
     const violations: Array<{ file: string; line: number; content: string }> = []
     
@@ -55,7 +55,8 @@ describe('Code Standards', () => {
         
         lines.forEach((line, index) => {
           // Check for console.log, console.error, console.warn, console.info, console.debug
-          const consoleMatch = line.match(/console\.(log|error|warn|info|debug|trace|table|group|groupEnd|groupCollapsed|time|timeEnd)/)
+          // Allow console.table as it's used for debugging table output which logger doesn't support
+          const consoleMatch = line.match(/console\.(log|error|warn|info|debug|trace|group|groupEnd|groupCollapsed|time|timeEnd)\(/)
           
           if (consoleMatch && !line.trim().startsWith('//')) {
             violations.push({
@@ -65,7 +66,7 @@ describe('Code Standards', () => {
             })
           }
         })
-      } catch (error) {
+      } catch (_error) {
         // Skip files that can't be read
       }
     })
@@ -74,13 +75,11 @@ describe('Code Standards', () => {
       const message = `Found ${violations.length} direct console usage(s). Please use the logger utility instead:\n\n` +
         violations.map(v => `  ${v.file}:${v.line}\n    ${v.content}`).join('\n\n')
       
-      console.error(message)
-      expect(violations).toHaveLength(0)
+      throw new Error(message)
     }
   })
 
-  // Temporarily skipped - see note above
-  it.skip('should import logger from @yektayar/shared when using it', () => {
+  it('should import logger from @yektayar/shared when using it', () => {
     const files = findTypeScriptFiles(packagesDir)
     const violations: Array<{ file: string; reason: string }> = []
     
@@ -90,12 +89,17 @@ describe('Code Standards', () => {
         
         // Check if file uses logger but doesn't import it
         if (content.includes('logger.')) {
+          // Check for various import patterns
           const hasImport = 
             content.includes("import { logger }") ||
             content.includes("import {logger}") ||
+            content.includes("{ logger,") || // destructured import with logger first
+            content.includes(", logger }") || // destructured import with logger last
+            content.includes(", logger,") || // destructured import with logger in middle
             content.includes('from "./utils/logger"') ||
             content.includes('from "../utils/logger"') ||
-            content.includes('from "@yektayar/shared"')
+            content.includes("logger } from '@yektayar/shared'") ||
+            content.includes('logger } from "@yektayar/shared"')
           
           if (!hasImport) {
             violations.push({
@@ -104,7 +108,7 @@ describe('Code Standards', () => {
             })
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip files that can't be read
       }
     })
@@ -113,8 +117,7 @@ describe('Code Standards', () => {
       const message = `Found ${violations.length} file(s) using logger without importing:\n\n` +
         violations.map(v => `  ${v.file}\n    ${v.reason}`).join('\n\n')
       
-      console.error(message)
-      expect(violations).toHaveLength(0)
+      throw new Error(message)
     }
   })
 })
