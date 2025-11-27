@@ -1,5 +1,6 @@
 import { Elysia, t } from 'elysia'
 import { streamAIResponse } from '../services/aiService'
+import { logger } from '@yektayar/shared'
 
 export const aiRoutes = new Elysia({ prefix: '/api/ai' })
   .post('/chat', async ({ body, set }) => {
@@ -26,7 +27,7 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
         timestamp: new Date().toISOString()
       }
     } catch (error) {
-      console.error('AI chat error:', error)
+      logger.error('AI chat error:', error)
       set.status = 500
       return {
         success: false,

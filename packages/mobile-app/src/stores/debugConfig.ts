@@ -167,7 +167,7 @@ export const useDebugConfigStore = defineStore('debugConfig', () => {
 function getStoreOrError() {
   try {
     return useDebugConfigStore()
-  } catch (error) {
+  } catch (_error) {
     const msg = '[yektayarDebug] Pinia store is not yet initialized. ' +
                 'The app is still loading. Please wait for the app to fully mount, ' +
                 'or call this after the page has loaded.'

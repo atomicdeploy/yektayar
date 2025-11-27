@@ -147,7 +147,7 @@ function setupConnectionHandlers(io: SocketIOServer) {
 
     // Handle custom message command
     socket.on('message', (data) => {
-      console.log(`Message received from ${socket.id}:`, data)
+      logger.info(`Message received from ${socket.id}:`, data)
       socket.emit('message_received', {
         success: true,
         message: 'Message received successfully',
@@ -162,7 +162,7 @@ function setupConnectionHandlers(io: SocketIOServer) {
         const { message, conversationHistory } = data
         const messageId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-        console.log(`AI chat request from ${socket.id}:`, message)
+        logger.info(`AI chat request from ${socket.id}:`, message)
 
         // Emit start event
         socket.emit('ai:response:start', { messageId })
@@ -180,9 +180,9 @@ function setupConnectionHandlers(io: SocketIOServer) {
         // Emit completion event
         socket.emit('ai:response:complete', { messageId, fullResponse })
 
-        console.log(`AI response completed for ${socket.id}`)
+        logger.info(`AI response completed for ${socket.id}`)
       } catch (error) {
-        console.error('AI chat error:', error)
+        logger.error('AI chat error:', error)
         socket.emit('ai:response:error', {
           error: 'Failed to generate response. Please try again.'
         })

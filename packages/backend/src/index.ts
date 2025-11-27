@@ -3,7 +3,7 @@ import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
 import { cookie } from '@elysiajs/cookie'
 import { createServer } from 'http'
-import type { Server as HTTPServer } from 'http'
+import type { Server as _HTTPServer } from 'http'
 import type { Server as SocketIOServer } from 'socket.io'
 import { authRoutes } from './routes/auth'
 import { userRoutes } from './routes/users'
@@ -11,6 +11,7 @@ import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
+import { pageRoutes } from './routes/pages'
 import { logger } from '@yektayar/shared'
 import { settingsRoutes } from './routes/settings'
 import { supportRoutes } from './routes/support'
@@ -152,8 +153,8 @@ const hostname = process.env.HOST || 'localhost'
 
 // Initialize database
 initializeDatabase().catch(error => {
-  console.error('Failed to initialize database:', error)
-  console.log('⚠️  Server will continue running, but database features may not work')
+  logger.error('Failed to initialize database:', error)
+  logger.warn('Server will continue running, but database features may not work')
 })
 
 // Detect runtime automatically
@@ -169,7 +170,7 @@ let io: SocketIOServer | undefined
 
 if (isBun) {
   // Bun runtime: Bun natively supports Socket.IO via @socket.io/bun-engine
-  console.log(`⚡ Detected runtime: Bun ${Bun.version}`)
+  logger.custom('⚡', `Detected runtime: Bun ${Bun.version}`, 'cyan')
   
   // Setup Socket.IO with Bun engine
   const { engine, ioInstance } = setupBunSocketIO(WEBSOCKET_PATH)
@@ -234,33 +235,33 @@ if (isBun) {
     }
   })
   
-  console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
+  logger.custom('🚀', `YektaYar API Server running at http://${hostname}:${port}`, 'cyan')
   
   // Show authentication status based on environment
   const isProduction = Bun.env.NODE_ENV === 'production'
   if (isProduction) {
-    console.log(`🚫 API Documentation is disabled in production mode`)
+    logger.info('API Documentation is disabled in production mode')
   } else {
-    console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
-    console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
+    logger.custom('📚', `API Documentation available at http://${hostname}:${port}/api-docs`, 'cyan')
+    logger.custom('🔒', 'Documentation protected with Basic Auth (development mode)', 'cyan')
   }
   
-  console.log(`✅ Socket.IO and Native WebSocket enabled on ${WEBSOCKET_PATH}`)
-  console.log(`📡 Both protocols auto-detected and authenticated`)
+  logger.success(`Socket.IO and Native WebSocket enabled on ${WEBSOCKET_PATH}`)
+  logger.custom('📡', 'Both protocols auto-detected and authenticated', 'cyan')
 
   // check if development mode
   if (Bun.env.NODE_ENV === 'development') {
-    console.log(`🔧 Running in development mode`)
+    logger.custom('🔧', 'Running in development mode', 'yellow')
   }
 
   // check if production mode
   if (Bun.env.NODE_ENV === 'production') {
-    console.log(`🚀 Running in production mode`)
+    logger.custom('🚀', 'Running in production mode', 'green')
   }
   
 } else if (isNode) {
   // Node.js runtime: Use traditional HTTP server with Socket.IO
-  console.log(`⚡ Detected runtime: Node.js ${process.version}`)
+  logger.custom('⚡', `Detected runtime: Node.js ${process.version}`, 'cyan')
   
   // Create HTTP server that wraps the Elysia app
   httpServer = createServer(async (req, res) => {
@@ -299,7 +300,7 @@ if (isBun) {
       const responseBody = await response.text()
       res.end(responseBody)
     } catch (error) {
-      console.error('Request handling error:', error)
+      logger.error('Request handling error:', error)
       res.writeHead(500)
       res.end('Internal Server Error')
     }
@@ -313,19 +314,19 @@ if (isBun) {
   
   // Start the server
   httpServer.listen(port, hostname, () => {
-    console.log(`🚀 YektaYar API Server running at http://${hostname}:${port}`)
+    logger.custom('🚀', `YektaYar API Server running at http://${hostname}:${port}`, 'cyan')
     
     // Show authentication status based on environment
     const isProduction = process.env.NODE_ENV === 'production'
     if (isProduction) {
-      console.log(`🚫 API Documentation is disabled in production mode`)
+      logger.info('API Documentation is disabled in production mode')
     } else {
-      console.log(`📚 API Documentation available at http://${hostname}:${port}/api-docs`)
-      console.log(`🔒 Documentation protected with Basic Auth (development mode)`)
+      logger.custom('📚', `API Documentation available at http://${hostname}:${port}/api-docs`, 'cyan')
+      logger.custom('🔒', 'Documentation protected with Basic Auth (development mode)', 'cyan')
     }
     
-    console.log(`✅ Socket.IO and Native WebSocket enabled on ${WEBSOCKET_PATH}`)
-    console.log(`📡 Both protocols auto-detected and authenticated`)
+    logger.success(`Socket.IO and Native WebSocket enabled on ${WEBSOCKET_PATH}`)
+    logger.custom('📡', 'Both protocols auto-detected and authenticated', 'cyan')
   })
 }
 

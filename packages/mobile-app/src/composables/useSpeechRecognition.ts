@@ -9,6 +9,7 @@
  */
 
 import { ref, computed, onUnmounted } from 'vue'
+import { logger } from '@yektayar/shared'
 
 // Type definitions for Web Speech API (may not be in all TypeScript versions)
 interface SpeechRecognitionEvent extends Event {
@@ -205,7 +206,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
     if (!rec) return
 
     if (isListening.value) {
-      console.warn('Speech recognition is already running')
+      logger.warn('Speech recognition is already running')
       return
     }
 
@@ -215,7 +216,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
       rec.start()
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to start speech recognition'
-      console.error('Error starting speech recognition:', err)
+      logger.error('Error starting speech recognition:', err)
     }
   }
 
@@ -234,7 +235,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
       try {
         recognition.stop()
       } catch (err) {
-        console.error('Error stopping speech recognition:', err)
+        logger.error('Error stopping speech recognition:', err)
       }
     }
   }
@@ -255,7 +256,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
         recognition.abort()
         isListening.value = false
       } catch (err) {
-        console.error('Error aborting speech recognition:', err)
+        logger.error('Error aborting speech recognition:', err)
       }
     }
   }

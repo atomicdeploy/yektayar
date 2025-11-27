@@ -7,7 +7,7 @@ import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
 import config from '@/config'
 import apiClient from '@/api'
-import { getWebSocketPathFromEnv } from '@yektayar/shared'
+import { getWebSocketPathFromEnv, logger } from '@yektayar/shared'
 
 export interface ChatMessage {
   id: string
@@ -32,7 +32,7 @@ export function useAIChat() {
    */
   const connect = async () => {
     if (socket.value?.connected) {
-      console.log('Socket already connected')
+      logger.debug('Socket already connected')
       return
     }
 
@@ -41,7 +41,7 @@ export function useAIChat() {
       const sessionToken = localStorage.getItem('yektayar_session_token')
       
       if (!sessionToken) {
-        console.warn('No session token found, connecting without auth')
+        logger.warn('No session token found, connecting without auth')
       }
 
       // Initialize Socket.IO client
@@ -59,23 +59,23 @@ export function useAIChat() {
 
       // Connection handlers
       socket.value.on('connect', () => {
-        console.log('Socket connected:', socket.value?.id)
+        logger.debug('Socket connected:', socket.value?.id)
         isConnected.value = true
       })
 
       socket.value.on('disconnect', (reason) => {
-        console.log('Socket disconnected:', reason)
+        logger.debug('Socket disconnected:', reason)
         isConnected.value = false
       })
 
       socket.value.on('connect_error', (error) => {
-        console.error('Socket connection error:', error)
+        logger.error('Socket connection error:', error)
         isConnected.value = false
       })
 
       // AI Chat event handlers
       socket.value.on('ai:response:start', (data: { messageId: string }) => {
-        console.log('AI response started:', data.messageId)
+        logger.debug('AI response started:', data.messageId)
         isTyping.value = true
         
         // Create a new streaming message
@@ -90,7 +90,7 @@ export function useAIChat() {
       })
 
       socket.value.on('ai:response:chunk', (data: { messageId: string, chunk: string }) => {
-        console.log('AI response chunk:', data.chunk)
+        logger.debug('AI response chunk:', data.chunk)
         
         // Append chunk to current streaming message
         if (currentStreamingMessage.value && currentStreamingMessage.value.id === data.messageId) {
@@ -99,7 +99,7 @@ export function useAIChat() {
       })
 
       socket.value.on('ai:response:complete', (data: { messageId: string, fullResponse: string }) => {
-        console.log('AI response complete:', data.messageId)
+        logger.debug('AI response complete:', data.messageId)
         isTyping.value = false
         
         // Finalize the streaming message
@@ -111,7 +111,7 @@ export function useAIChat() {
       })
 
       socket.value.on('ai:response:error', (data: { error: string }) => {
-        console.error('AI response error:', data.error)
+        logger.error('AI response error:', data.error)
         isTyping.value = false
         isSending.value = false
         
@@ -126,9 +126,9 @@ export function useAIChat() {
         currentStreamingMessage.value = null
       })
 
-      console.log('Socket.IO client initialized')
+      logger.debug('Socket.IO client initialized')
     } catch (error) {
-      console.error('Error connecting to socket:', error)
+      logger.error('Error connecting to socket:', error)
       isConnected.value = false
     }
   }
@@ -181,12 +181,12 @@ export function useAIChat() {
         userMessage.sent = true
       } else {
         // Fallback to REST API if socket not connected
-        console.warn('Socket not connected, using REST API fallback')
+        logger.warn('Socket not connected, using REST API fallback')
         await sendMessageViaREST(content)
         userMessage.sent = true
       }
     } catch (error) {
-      console.error('Error sending message:', error)
+      logger.error('Error sending message:', error)
       userMessage.sent = false
       
       // Add error message
@@ -236,7 +236,7 @@ export function useAIChat() {
         timestamp: new Date()
       })
     } catch (error) {
-      console.error('Error in REST API fallback:', error)
+      logger.error('Error in REST API fallback:', error)
       throw error
     } finally {
       isTyping.value = false

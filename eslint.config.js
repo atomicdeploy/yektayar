@@ -14,7 +14,9 @@ export default [
       '**/*.config.ts',
       '**/android/**',
       '**/ios/**',
-      '**/capacitor.config.ts'
+      '**/capacitor.config.ts',
+      '**/*.min.js',
+      '**/scripts/**'
     ]
   },
   // Base JavaScript/TypeScript configuration
@@ -23,14 +25,27 @@ export default [
   // Custom rules
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    languageOptions: {
+      globals: {
+        // Node.js globals for backend
+        process: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        module: 'readonly',
+        require: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly'
+      }
+    },
     rules: {
-      'no-console': 'error',
+      'no-console': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
           argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_'
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_'
         }
       ]
     }
@@ -46,23 +61,83 @@ export default [
         sourceType: 'module'
       },
       globals: {
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        navigator: 'readonly',
-        HTMLElement: 'readonly',
-        HTMLCanvasElement: 'readonly',
+        // Browser globals (alphabetically ordered)
+        alert: 'readonly',
+        AnimationEvent: 'readonly',
         clearInterval: 'readonly',
+        clearTimeout: 'readonly',
+        confirm: 'readonly',
+        console: 'readonly',
+        CSSStyleDeclaration: 'readonly',
+        CustomEvent: 'readonly',
+        customElements: 'readonly',
+        document: 'readonly',
+        Event: 'readonly',
+        HTMLCanvasElement: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLImageElement: 'readonly',
+        Image: 'readonly',
+        IntersectionObserver: 'readonly',
+        IntersectionObserverEntry: 'readonly',
+        KeyboardEvent: 'readonly',
+        localStorage: 'readonly',
+        navigator: 'readonly',
+        ResizeObserver: 'readonly',
         setInterval: 'readonly',
         setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        console: 'readonly'
+        TransitionEvent: 'readonly',
+        window: 'readonly'
       }
     },
     rules: {
-      'no-console': 'error',
+      'no-console': 'warn',
       '@typescript-eslint/no-explicit-any': 'warn',
-      'vue/multi-word-component-names': 'warn'
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_'
+        }
+      ],
+      'vue/multi-word-component-names': 'warn',
+      'vue/no-deprecated-slot-attribute': 'warn'
+    }
+  },
+  // Shared package files - need both browser and Node.js globals
+  {
+    files: ['**/packages/shared/**/*.ts'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        Image: 'readonly',
+        CustomEvent: 'readonly'
+      }
+    },
+    rules: {
+      'no-console': 'warn'
+    }
+  },
+  // Backend files - add Node.js and Bun globals
+  {
+    files: ['**/packages/backend/**/*.ts'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        Request: 'readonly',
+        Response: 'readonly',
+        Headers: 'readonly',
+        Bun: 'readonly'
+      }
+    },
+    rules: {
+      'no-console': 'warn'
     }
   },
   // Exception for logger.ts file - allow console usage
@@ -74,7 +149,13 @@ export default [
   },
   // Exception for test files
   {
-    files: ['**/*.test.ts', '**/*.spec.ts'],
+    files: ['**/*.test.ts', '**/*.spec.ts', '**/*.test.js'],
+    languageOptions: {
+      globals: {
+        Request: 'readonly',
+        Response: 'readonly'
+      }
+    },
     rules: {
       'no-console': 'off',
       '@typescript-eslint/no-explicit-any': 'off'

@@ -176,6 +176,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 interface Page {
   id?: number
@@ -205,7 +206,7 @@ async function loadPages() {
       pages.value = response.data || []
     }
   } catch (error) {
-    console.error('Error loading pages:', error)
+    logger.error('Error loading pages:', error)
   } finally {
     loading.value = false
   }
@@ -247,7 +248,7 @@ async function savePage() {
     showModal.value = false
     await loadPages()
   } catch (error: any) {
-    console.error('Error saving page:', error)
+    logger.error('Error saving page:', error)
     alert('خطا در ذخیره صفحه: ' + (error.message || 'خطای نامشخص'))
   } finally {
     saving.value = false
@@ -263,7 +264,7 @@ async function deletePage(page: Page) {
     await apiClient.delete(`/api/pages/${page.slug}`, { skipAuth: true })
     await loadPages()
   } catch (error) {
-    console.error('Error deleting page:', error)
+    logger.error('Error deleting page:', error)
     alert('خطا در حذف صفحه')
   }
 }

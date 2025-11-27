@@ -270,6 +270,7 @@ import {
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 const { locale } = useI18n()
 
@@ -297,7 +298,7 @@ async function loadTickets() {
       tickets.value = response.data || []
     }
   } catch (error) {
-    console.error('Error loading tickets:', error)
+    logger.error('Error loading tickets:', error)
   } finally {
     loading.value = false
   }
@@ -315,7 +316,7 @@ async function submitTicket() {
       await loadTickets()
     }
   } catch (error) {
-    console.error('Error submitting ticket:', error)
+    logger.error('Error submitting ticket:', error)
   } finally {
     submitting.value = false
   }
@@ -329,7 +330,7 @@ async function openTicket(ticket: any) {
       showTicketModal.value = true
     }
   } catch (error) {
-    console.error('Error loading ticket details:', error)
+    logger.error('Error loading ticket details:', error)
   }
 }
 
@@ -353,7 +354,7 @@ async function sendReply() {
       await openTicket(selectedTicket.value)
     }
   } catch (error) {
-    console.error('Error sending reply:', error)
+    logger.error('Error sending reply:', error)
   } finally {
     sendingReply.value = false
   }

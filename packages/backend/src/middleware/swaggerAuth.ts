@@ -63,7 +63,7 @@ export const swaggerAuth = new Elysia({ name: 'swagger-auth' })
           message: 'Invalid credentials'
         }
       }
-    } catch (error) {
+    } catch (_error) {
       set.status = 401
       set.headers['WWW-Authenticate'] = 'Basic realm="Swagger Documentation"'
       set.headers['Content-Type'] = 'application/json'

@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
 import { getDatabase } from '../services/database'
+import { logger } from '@yektayar/shared'
 
 export const courseRoutes = new Elysia({ prefix: '/api/courses' })
   .get('/', async ({ query }) => {
@@ -79,7 +80,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         }
       }
     } catch (error) {
-      console.error('Error fetching courses:', error)
+      logger.error('Error fetching courses:', error)
       return {
         success: false,
         error: 'Failed to fetch courses',
@@ -124,7 +125,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Course created successfully'
       }
     } catch (error) {
-      console.error('Error creating course:', error)
+      logger.error('Error creating course:', error)
       return {
         success: false,
         error: 'Failed to create course',
@@ -171,7 +172,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         data: course
       }
     } catch (error) {
-      console.error('Error fetching course:', error)
+      logger.error('Error fetching course:', error)
       return {
         success: false,
         error: 'Failed to fetch course',
@@ -233,7 +234,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Course updated successfully'
       }
     } catch (error) {
-      console.error('Error updating course:', error)
+      logger.error('Error updating course:', error)
       return {
         success: false,
         error: 'Failed to update course',
@@ -269,7 +270,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Course deleted successfully'
       }
     } catch (error) {
-      console.error('Error deleting course:', error)
+      logger.error('Error deleting course:', error)
       return {
         success: false,
         error: 'Failed to delete course',
@@ -336,7 +337,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Successfully enrolled in course'
       }
     } catch (error) {
-      console.error('Error enrolling in course:', error)
+      logger.error('Error enrolling in course:', error)
       return {
         success: false,
         error: 'Failed to enroll',
@@ -379,7 +380,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         }
       }
     } catch (error) {
-      console.error('Error fetching assessments:', error)
+      logger.error('Error fetching assessments:', error)
       return {
         success: false,
         error: 'Failed to fetch assessments',
@@ -439,7 +440,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Assessment submitted successfully'
       }
     } catch (error) {
-      console.error('Error submitting assessment:', error)
+      logger.error('Error submitting assessment:', error)
       return {
         success: false,
         error: 'Failed to submit assessment',

@@ -6,6 +6,8 @@
  * This file provides helper utilities to make that consistent across the monorepo.
  */
 
+import { logger } from './logger'
+
 /**
  * Helper type for package.json structure
  */
@@ -69,7 +71,7 @@ export function getPackageVersion(fallback: string = 'dev'): string {
   // In development mode, log a warning but don't throw
   const isDevelopment = typeof meta !== 'undefined' && meta.env && meta.env.DEV
   if (isDevelopment) {
-    console.warn(
+    logger.warn(
       '[Version] APP_VERSION not found in import.meta.env. Using fallback version.',
       '\nThis is normal in development mode if the dev server was just started.',
       '\nThe version is set via Vite config define: import.meta.env.APP_VERSION'

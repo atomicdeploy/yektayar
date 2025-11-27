@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { getDatabase } from './database'
+import { logger } from '@yektayar/shared'
 
 export interface Session {
   token: string
@@ -52,7 +53,7 @@ export async function createAnonymousSession(metadata: Record<string, any> = {})
       expiresAt
     }
   } catch (error) {
-    console.error('Error creating session:', error)
+    logger.error('Error creating session:', error)
     throw error
   }
 }
@@ -89,7 +90,7 @@ export async function validateSessionToken(token: string): Promise<Session | nul
       lastActivityAt: new Date(session.last_activity_at)
     }
   } catch (error) {
-    console.error('Error validating session:', error)
+    logger.error('Error validating session:', error)
     return null
   }
 }
@@ -107,7 +108,7 @@ export async function updateSessionActivity(token: string): Promise<void> {
       WHERE token = ${token}
     `
   } catch (error) {
-    console.error('Error updating session activity:', error)
+    logger.error('Error updating session activity:', error)
   }
 }
 
@@ -124,7 +125,7 @@ export async function linkUserToSession(token: string, userId: string): Promise<
       WHERE token = ${token}
     `
   } catch (error) {
-    console.error('Error linking user to session:', error)
+    logger.error('Error linking user to session:', error)
     throw error
   }
 }
@@ -141,7 +142,7 @@ export async function invalidateSession(token: string): Promise<void> {
       WHERE token = ${token}
     `
   } catch (error) {
-    console.error('Error invalidating session:', error)
+    logger.error('Error invalidating session:', error)
     throw error
   }
 }
@@ -160,7 +161,7 @@ export async function cleanupExpiredSessions(): Promise<number> {
     `
     return result.length
   } catch (error) {
-    console.error('Error cleaning up expired sessions:', error)
+    logger.error('Error cleaning up expired sessions:', error)
     return 0
   }
 }
