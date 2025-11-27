@@ -24,7 +24,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
         } else if (setting.type === 'json') {
           try {
             value = JSON.parse(value)
-          } catch (e) {
+          } catch (_e) {
             console.error(`Failed to parse JSON for setting ${setting.key}`)
           }
         }
@@ -75,7 +75,7 @@ export const settingsRoutes = new Elysia({ prefix: '/api/settings' })
       } else if (type === 'json') {
         try {
           value = JSON.parse(value)
-        } catch (e) {
+        } catch (_e) {
           console.error(`Failed to parse JSON for setting ${key}`)
         }
       }

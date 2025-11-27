@@ -6,7 +6,7 @@ import { extractToken } from '../middleware/tokenExtractor'
 import { logger } from '@yektayar/shared'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
-  .post('/acquire-session', async ({ headers, request }) => {
+  .post('/acquire-session', async ({ headers, request: _request }) => {
     try {
       // Extract metadata from request
       const userAgent = headers['user-agent'] || 'unknown'

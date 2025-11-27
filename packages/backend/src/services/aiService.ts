@@ -164,7 +164,7 @@ export async function* streamAIResponseChunks(
 /**
  * Generate a fallback response when AI service is unavailable
  */
-function generateFallbackResponse(message: string): string {
+function generateFallbackResponse(_message: string): string {
   const responses = [
     "Thank you for reaching out. I'm here to support you. While I'm experiencing some technical difficulties at the moment, I want you to know that what you're feeling is valid and important. Could you tell me more about what's on your mind?",
     

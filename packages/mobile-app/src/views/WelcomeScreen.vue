@@ -450,7 +450,7 @@ const fetchUserPreferences = async () => {
       termsAccepted.value = true
       logger.info('[WelcomeScreen] User has previously accepted terms')
     }
-  } catch (error) {
+  } catch (_error) {
     // If fetch fails, default to unchecked (false)
     logger.debug('[WelcomeScreen] Could not fetch user preferences, defaulting to unchecked')
   }

@@ -369,7 +369,7 @@ export const messageRoutes = new Elysia({ prefix: '/api/messages' })
       description: 'Update thread status (open/closed)'
     }
   })
-  .post('/chat', async ({ body }) => {
+  .post('/chat', async ({ body: _body }) => {
     // AI chat endpoint - placeholder for now
     return {
       success: true,
