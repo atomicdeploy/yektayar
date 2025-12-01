@@ -6,7 +6,7 @@ import App from './App.vue'
 import router from './router'
 import config from './config'
 import { ErrorScreen } from '@yektayar/shared/components'
-import { parseSolutionsMarkdown, findSolutionForError, validateApi, getPackageVersion } from '@yektayar/shared'
+import { parseSolutionsMarkdown, findSolutionForError, validateApi, getPackageVersion, missingHandler, installMissingKeyHandler } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { logger } from '@yektayar/shared'
 import 'overlayscrollbars/overlayscrollbars.css'
@@ -45,11 +45,12 @@ logger.startup('YektaYar Mobile App', {
   'Platform': 'Ionic/Capacitor'
 })
 
-// i18n configuration
+// i18n configuration with missing key handler
 const i18n = createI18n({
   legacy: false,
   locale: 'fa',
   fallbackLocale: 'en',
+  missing: missingHandler,
   messages: {
     fa: {
       app_title: 'یکتایار',
@@ -157,6 +158,11 @@ const i18n = createI18n({
     }
   }
 })
+
+// Install missing key handler for development
+if (import.meta.env.DEV) {
+  installMissingKeyHandler()
+}
 
 // Validate API configuration and reachability before mounting the app
 async function initializeApp() {
