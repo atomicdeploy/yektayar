@@ -10,6 +10,7 @@
 
 import { Elysia } from 'elysia'
 import { swaggerAuth } from '../middleware/swaggerAuth.js'
+import { logger } from '@yektayar/shared'
 
 // Color codes for terminal output
 const colors = {
@@ -24,7 +25,18 @@ let passedTests = 0
 let failedTests = 0
 
 function log(message, color = colors.reset) {
-  console.log(`${color}${message}${colors.reset}`)
+  // Map color codes to logger methods
+  if (color === colors.green) {
+    logger.success(message)
+  } else if (color === colors.red) {
+    logger.error(message)
+  } else if (color === colors.yellow) {
+    logger.warn(message)
+  } else if (color === colors.blue) {
+    logger.info(message)
+  } else {
+    logger.info(message)
+  }
 }
 
 function assert(condition, testName) {
@@ -142,6 +154,6 @@ async function runTests() {
 
 runTests().catch(err => {
   log(`\nTest execution error: ${err.message}`, colors.red)
-  console.error(err)
+  logger.error(err)
   process.exit(1)
 })
