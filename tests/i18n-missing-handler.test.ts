@@ -68,7 +68,7 @@ describe('i18n Missing Handler', () => {
     
     printMissingKeysSummary()
     
-    // Should not print anything when there are no missing keys
+    // Should print a success message when there are no missing keys
     expect(consoleLogSpy).toHaveBeenCalled()
   })
 
