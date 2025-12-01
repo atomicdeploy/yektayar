@@ -2,7 +2,7 @@
   <ion-page>
     <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
-      <ion-tab-bar slot="bottom" class="modern-tab-bar">
+      <ion-tab-bar slot="bottom" class="app-tab-bar">
         <ion-tab-button tab="home" href="/tabs/home">
           <ion-icon :icon="home" />
           <ion-label>{{ t('home') }}</ion-label>
@@ -59,11 +59,6 @@ const { t } = useI18n({
 </script>
 
 <style scoped lang="scss">
-.modern-tab-bar {
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  height: auto;
-}
-
 ion-tab-button {
   --color: var(--text-secondary);
   --color-selected: var(--ion-color-primary);
