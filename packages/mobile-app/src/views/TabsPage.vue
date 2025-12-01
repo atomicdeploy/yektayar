@@ -60,8 +60,40 @@ const { t } = useI18n({
 
 <style scoped lang="scss">
 .modern-tab-bar {
-  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-  height: auto;
+  /* 
+   * COMMENTED OUT: padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+   * 
+   * Issue: This padding rule causes unnecessary 8px padding on desktop browsers.
+   * 
+   * Explanation:
+   * - env(safe-area-inset-bottom) is a CSS environment variable for devices with 
+   *   notches/home indicators (iPhone X and later)
+   * - On desktop browsers, env(safe-area-inset-bottom) defaults to 0
+   * - This leaves a constant 8px padding on top and 8px on bottom
+   * - Ionic's default tab bar styling already handles padding appropriately
+   * 
+   * Safe to remove because:
+   * - Ionic handles safe area insets automatically in its core CSS
+   * - The framework applies appropriate padding for mobile devices
+   * - Removing this doesn't affect mobile device safe areas
+   */
+  
+  /* 
+   * COMMENTED OUT: height: auto;
+   * 
+   * Issue: Setting height to auto causes the tab bar to collapse to 0 height.
+   * 
+   * Explanation:
+   * - Ionic's ion-tab-bar uses flexbox layout internally with fixed height
+   * - Setting height: auto conflicts with Ionic's internal CSS calculations
+   * - The flexbox container cannot determine proper height, causing collapse
+   * - Tab buttons have defined heights, but parent container height becomes 0
+   * 
+   * Safe to remove because:
+   * - Ionic's default CSS already calculates height based on content
+   * - The framework handles tab bar height responsively
+   * - Removing this allows proper height calculation
+   */
 }
 
 ion-tab-button {
