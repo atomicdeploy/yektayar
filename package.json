@@ -21,6 +21,8 @@
     "build:mobile": "npm run build -w @yektayar/mobile-app",
     "lint": "eslint packages --ext .ts,.js,.vue && npm run lint --workspaces --if-present",
     "lint:fix": "eslint packages --ext .ts,.js,.vue --fix && npm run lint --workspaces --if-present",
+    "validate:i18n": "node scripts/validate-i18n-keys.mjs",
+    "validate:i18n:strict": "node scripts/validate-i18n-keys.mjs --strict --show-unused",
     "test": "vitest run && npm run test --workspaces --if-present",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

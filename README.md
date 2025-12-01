@@ -170,6 +170,10 @@ This project enforces strict code quality standards:
 npm run lint              # Check for issues
 npm run lint:fix          # Auto-fix issues
 
+# Validate i18n translations
+npm run validate:i18n           # Check for missing translation keys
+npm run validate:i18n:strict    # Strict mode (includes unused keys)
+
 # Run tests
 npm run test              # Run all tests
 npm run test:watch        # Watch mode
@@ -179,9 +183,11 @@ npm run test:coverage     # Generate coverage report
 
 **Important:** 
 - ⚠️ Always use `logger` utility instead of `console.*`
+- ⚠️ Validate i18n keys before committing new translations
 - ✅ All tests must pass before committing
 - ✅ ESLint checks must pass
 - 📖 See [.github/copilot-instructions.md](.github/copilot-instructions.md) for coding standards
+- 📖 See [docs/I18N-VALIDATION.md](docs/I18N-VALIDATION.md) for i18n validation guide
 
 ### Start All Services
 

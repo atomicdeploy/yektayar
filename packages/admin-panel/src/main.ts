@@ -6,7 +6,7 @@ import router from './router'
 import './assets/main.scss'
 import config from './config'
 import { ErrorScreen } from '@yektayar/shared/components'
-import { parseSolutionsMarkdown, findSolutionForError, validateApi, getPackageVersion } from '@yektayar/shared'
+import { parseSolutionsMarkdown, findSolutionForError, validateApi, getPackageVersion, missingHandler, installMissingKeyHandler } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
 import { messages } from './locales'
@@ -24,13 +24,19 @@ logger.startup('YektaYar Admin Panel', {
   'Version': APP_VERSION
 })
 
-// i18n configuration
+// i18n configuration with missing key handler
 const i18n = createI18n({
   legacy: false,
   locale: 'fa',
   fallbackLocale: 'en',
   messages,
+  missing: missingHandler,
 })
+
+// Install missing key handler for development
+if (import.meta.env.DEV) {
+  installMissingKeyHandler()
+}
 
 // Validate API configuration and reachability before mounting the app
 async function initializeApp() {
