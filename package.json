@@ -79,6 +79,9 @@
   },
   "overrides": {
     "cookie": ">=0.7.0",
-    "tmp": ">=0.2.4"
+    "tmp": ">=0.2.4",
+    "eslint-plugin-vitest": {
+      "@typescript-eslint/utils": "^8.0.0"
+    }
   }
 }
