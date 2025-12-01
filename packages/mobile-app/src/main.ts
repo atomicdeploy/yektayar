@@ -9,6 +9,7 @@ import { ErrorScreen } from '@yektayar/shared/components'
 import { parseSolutionsMarkdown, findSolutionForError, validateApi, getPackageVersion, missingHandler, installMissingKeyHandler } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { logger } from '@yektayar/shared'
+import translations from '@yektayar/shared/i18n/translations.json'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 
@@ -53,6 +54,7 @@ const i18n = createI18n({
   missing: missingHandler,
   messages: {
     fa: {
+      ...translations.fa,
       app_title: 'یکتایار',
       tagline: 'پلتفرم مراقبت سلامت روان',
       welcome: 'خوش آمدید به یکتایار',
@@ -105,6 +107,7 @@ const i18n = createI18n({
       }
     },
     en: {
+      ...translations.en,
       app_title: 'YektaYar',
       tagline: 'Mental Health Care Platform',
       welcome: 'Welcome to YektaYar',

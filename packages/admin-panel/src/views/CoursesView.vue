@@ -2,7 +2,7 @@
   <div class="courses-view">
     <div class="view-header">
       <div class="header-content">
-        <h1>{{ t('navigation.courses') }}</h1>
+        <h1>{{ t('nav.courses') }}</h1>
         <p class="subtitle">مدیریت دوره‌های آموزشی</p>
       </div>
       <div class="header-actions">
