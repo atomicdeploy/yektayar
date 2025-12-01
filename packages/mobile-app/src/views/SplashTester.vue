@@ -1,24 +1,61 @@
 <template>
   <ion-page>
-    <ion-content class="splash-content" :fullscreen="true" :style="contentStyle">
+    <ion-content
+      class="splash-content"
+      :fullscreen="true"
+      :style="contentStyle"
+    >
       <div class="splash-container">
         <!-- Logo -->
         <div class="logo-container fade-in">
-          <div class="logo-circle" :style="logoCircleStyle">
-            <img src="/logo-simple.svg" alt="YektaYar Logo" class="logo-svg" />
+          <div
+            class="logo-circle"
+            :style="logoCircleStyle"
+          >
+            <img
+              src="/logo-simple.svg"
+              alt="YektaYar Logo"
+              class="logo-svg"
+            >
           </div>
-          <h1 class="app-title" :style="titleStyle">یکتایار</h1>
-          <p class="app-subtitle" :style="subtitleStyle">همراه شما در مسیر سلامت روان</p>
-          <p class="app-tagline" :style="taglineStyle">«تا خانواده با عشق و آرامش پابرجا بماند»</p>
-          <p class="app-version" :style="versionStyle">
+          <h1
+            class="app-title"
+            :style="titleStyle"
+          >
+            یکتایار
+          </h1>
+          <p
+            class="app-subtitle"
+            :style="subtitleStyle"
+          >
+            همراه شما در مسیر سلامت روان
+          </p>
+          <p
+            class="app-tagline"
+            :style="taglineStyle"
+          >
+            «تا خانواده با عشق و آرامش پابرجا بماند»
+          </p>
+          <p
+            class="app-version"
+            :style="versionStyle"
+          >
             YektaYar v0.1.0 – Color Tester
           </p>
         </div>
 
         <!-- Loading indicator -->
         <div class="loading-container fade-in">
-          <ion-spinner name="crescent" :style="spinnerStyle"></ion-spinner>
-          <p class="loading-text" :style="loadingTextStyle">در حال آماده‌سازی...</p>
+          <ion-spinner
+            name="crescent"
+            :style="spinnerStyle"
+          />
+          <p
+            class="loading-text"
+            :style="loadingTextStyle"
+          >
+            در حال آماده‌سازی...
+          </p>
         </div>
       </div>
 
@@ -29,14 +66,30 @@
             <ion-label>Select Color Scheme (Hotkeys 1-5)</ion-label>
           </ion-list-header>
           
-          <ion-radio-group :value="selectedScheme" @ionChange="onSchemeChange">
-            <ion-item v-for="(scheme, index) in colorSchemes" :key="index" lines="none" :button="true" @click="selectedScheme = index">
-              <ion-radio :value="index" slot="start"></ion-radio>
+          <ion-radio-group
+            :value="selectedScheme"
+            @ion-change="onSchemeChange"
+          >
+            <ion-item
+              v-for="(scheme, index) in colorSchemes"
+              :key="index"
+              lines="none"
+              :button="true"
+              @click="selectedScheme = index"
+            >
+              <template #start>
+                <ion-radio :value="index" />
+              </template>
               <ion-label>
                 <h3>Scheme {{ index + 1 }} (Key: {{ index + 1 }})</h3>
                 <p>BG: {{ scheme.background }} / FG: {{ scheme.foreground }}</p>
               </ion-label>
-              <div class="color-preview" :style="{ background: scheme.background }" slot="end"></div>
+              <template #end>
+                <div
+                  class="color-preview"
+                  :style="{ background: scheme.background }"
+                />
+              </template>
             </ion-item>
           </ion-radio-group>
         </ion-list>

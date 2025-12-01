@@ -1,42 +1,82 @@
 <template>
-  <component :is="isMobile ? 'ion-page' : 'div'" :class="isMobile ? '' : 'error-screen'">
+  <component
+    :is="isMobile ? 'ion-page' : 'div'"
+    :class="isMobile ? '' : 'error-screen'"
+  >
     <component 
       :is="isMobile ? 'ion-content' : 'div'" 
       :class="[isMobile ? 'error-content' : '', { 'dark-mode': isDarkMode }]"
     >
-      <div class="error-container" :dir="direction">
-        <div class="error-icon">❌</div>
-        <h1 class="error-title">{{ t('error_screen.api_config_error') }}</h1>
-        <p class="error-message">{{ t('error_screen.cannot_start') }}</p>
+      <div
+        class="error-container"
+        :dir="direction"
+      >
+        <div class="error-icon">
+          ❌
+        </div>
+        <h1 class="error-title">
+          {{ t('error_screen.api_config_error') }}
+        </h1>
+        <p class="error-message">
+          {{ t('error_screen.cannot_start') }}
+        </p>
         
-        <div v-if="isDevelopment && details" class="error-section">
-          <h3 class="section-title">{{ t('error_screen.details') }}</h3>
-          <div class="error-details" :dir="errorDetailsDirection">
+        <div
+          v-if="isDevelopment && details"
+          class="error-section"
+        >
+          <h3 class="section-title">
+            {{ t('error_screen.details') }}
+          </h3>
+          <div
+            class="error-details"
+            :dir="errorDetailsDirection"
+          >
             <p>{{ translatedDetails }}</p>
           </div>
         </div>
 
-        <div v-if="isDevelopment && showSolution" class="error-section">
+        <div
+          v-if="isDevelopment && showSolution"
+          class="error-section"
+        >
           <component 
             :is="isMobile ? 'ion-button' : 'button'"
             :expand="isMobile ? 'block' : undefined"
-            @click="toggleSolution" 
-            class="solution-toggle"
+            class="solution-toggle" 
+            @click="toggleSolution"
           >
             {{ solutionExpanded ? t('error_screen.hide_solution') : t('error_screen.show_solution') }}
             <span class="toggle-icon">{{ solutionExpanded ? '▲' : '▼' }}</span>
           </component>
           
-          <div v-if="solutionExpanded && currentSolution" class="solution-content">
-            <h3 class="section-title">{{ t('error_screen.solution') }}</h3>
+          <div
+            v-if="solutionExpanded && currentSolution"
+            class="solution-content"
+          >
+            <h3 class="section-title">
+              {{ t('error_screen.solution') }}
+            </h3>
 
-            <p v-if="currentSolution && currentSolution?.solution" class="solution-text">{{ currentSolution.solution }}</p>
+            <p
+              v-if="currentSolution && currentSolution?.solution"
+              class="solution-text"
+            >
+              {{ currentSolution.solution }}
+            </p>
 
-            <div v-for="(step, index) in (currentSolution?.steps || [])" :key="index" class="code-block">
+            <div
+              v-for="(step, index) in (currentSolution?.steps || [])"
+              :key="index"
+              class="code-block"
+            >
               <code>{{ step }}</code>
             </div>
 
-            <p v-if="currentSolution && currentSolution?.note" class="solution-note">
+            <p
+              v-if="currentSolution && currentSolution?.note"
+              class="solution-note"
+            >
               <span class="info-icon">ℹ️</span>
               <span class="note-text">{{ currentSolution.note }}</span>
             </p>

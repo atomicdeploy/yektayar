@@ -3,18 +3,22 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>Custom Icon Test - Comprehensive</ion-title>
-        <ion-buttons slot="start">
-          <ion-button @click="goBack">
-            <ion-icon :icon="arrowBack"></ion-icon>
-          </ion-button>
-        </ion-buttons>
+        <template #start>
+          <ion-buttons>
+            <ion-button @click="goBack">
+              <ion-icon :icon="arrowBack" />
+            </ion-button>
+          </ion-buttons>
+        </template>
       </ion-toolbar>
     </ion-header>
     
     <ion-content :fullscreen="true">
       <div class="test-container">
         <h1>YektaYar Custom Icon Test</h1>
-        <p class="subtitle">Comprehensive shadow-root verification</p>
+        <p class="subtitle">
+          Comprehensive shadow-root verification
+        </p>
         
         <!-- Test Results Summary -->
         <ion-card v-if="testResults.length > 0">
@@ -34,7 +38,10 @@
               >
                 <span class="test-icon">{{ result.passed ? '✓' : '✗' }}</span>
                 <span class="test-name">{{ result.name }}</span>
-                <span v-if="!result.passed" class="test-error">{{ result.error }}</span>
+                <span
+                  v-if="!result.passed"
+                  class="test-error"
+                >{{ result.error }}</span>
               </div>
             </div>
           </ion-card-content>
@@ -49,17 +56,32 @@
           <ion-card-content>
             <div class="icon-showcase">
               <div class="icon-item">
-                <ion-icon :icon="star" id="builtin-star" size="large" color="warning"></ion-icon>
+                <ion-icon
+                  id="builtin-star"
+                  :icon="star"
+                  size="large"
+                  color="warning"
+                />
                 <p>Built-in Star</p>
                 <code>&lt;ion-icon :icon="star"&gt;</code>
               </div>
               <div class="icon-item">
-                <ion-icon :icon="heart" id="builtin-heart" size="large" color="danger"></ion-icon>
+                <ion-icon
+                  id="builtin-heart"
+                  :icon="heart"
+                  size="large"
+                  color="danger"
+                />
                 <p>Built-in Heart</p>
                 <code>&lt;ion-icon :icon="heart"&gt;</code>
               </div>
               <div class="icon-item">
-                <ion-icon :icon="rocket" id="builtin-rocket" size="large" color="primary"></ion-icon>
+                <ion-icon
+                  id="builtin-rocket"
+                  :icon="rocket"
+                  size="large"
+                  color="primary"
+                />
                 <p>Built-in Rocket</p>
                 <code>&lt;ion-icon :icon="rocket"&gt;</code>
               </div>
@@ -76,12 +98,20 @@
           <ion-card-content>
             <div class="icon-showcase">
               <div class="icon-item">
-                <ion-icon src="/logo-simple.svg" id="custom-logo" size="large" color="warning"></ion-icon>
+                <ion-icon
+                  id="custom-logo"
+                  src="/logo-simple.svg"
+                  size="large"
+                  color="warning"
+                />
                 <p>YektaYar Logo</p>
                 <code>&lt;ion-icon src="/logo-simple.svg"&gt;</code>
               </div>
               <div class="icon-item">
-                <ion-icon src="/logo-simple.svg" class="direct-img-icon"></ion-icon>
+                <ion-icon
+                  src="/logo-simple.svg"
+                  class="direct-img-icon"
+                />
                 <p>YektaYar (styled)</p>
                 <code>&lt;ion-icon (with CSS)&gt;</code>
               </div>
@@ -98,7 +128,12 @@
           <ion-card-content>
             <div class="icon-showcase">
               <div class="icon-item">
-                <ion-icon name="yektayar" id="custom-yektayar-old" size="large" color="warning"></ion-icon>
+                <ion-icon
+                  id="custom-yektayar-old"
+                  name="yektayar"
+                  size="large"
+                  color="warning"
+                />
                 <p>YektaYar (old approach)</p>
                 <code>&lt;ion-icon name="yektayar"&gt;</code>
               </div>
@@ -117,15 +152,21 @@
           <ion-card-content>
             <div class="size-showcase">
               <div class="size-item">
-                <ion-icon src="/logo-simple.svg" size="small"></ion-icon>
+                <ion-icon
+                  src="/logo-simple.svg"
+                  size="small"
+                />
                 <p>Small</p>
               </div>
               <div class="size-item">
-                <ion-icon src="/logo-simple.svg"></ion-icon>
+                <ion-icon src="/logo-simple.svg" />
                 <p>Default</p>
               </div>
               <div class="size-item">
-                <ion-icon src="/logo-simple.svg" size="large"></ion-icon>
+                <ion-icon
+                  src="/logo-simple.svg"
+                  size="large"
+                />
                 <p>Large</p>
               </div>
             </div>
@@ -141,13 +182,19 @@
           <ion-card-content>
             <div style="display: flex; justify-content: center; padding: 2rem 0;">
               <div class="logo-accent">
-                <ion-icon src="/logo-simple.svg" class="welcome-style-icon"></ion-icon>
+                <ion-icon
+                  src="/logo-simple.svg"
+                  class="welcome-style-icon"
+                />
               </div>
             </div>
-            <div class="code-block" style="margin-top: 1rem;">
-&lt;div class="logo-accent"&gt;
-  &lt;ion-icon src="/logo-simple.svg" class="welcome-style-icon"&gt;&lt;/ion-icon&gt;
-&lt;/div&gt;
+            <div
+              class="code-block"
+              style="margin-top: 1rem;"
+            >
+              &lt;div class="logo-accent"&gt;
+              &lt;ion-icon src="/logo-simple.svg" class="welcome-style-icon"&gt;&lt;/ion-icon&gt;
+              &lt;/div&gt;
             </div>
             <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--ion-color-medium);">
               This replicates the exact styling used in the Welcome Screen with the golden circle background.
@@ -163,15 +210,24 @@
           <ion-card-content>
             <div class="button-showcase">
               <ion-button>
-                <ion-icon slot="start" src="/logo-simple.svg"></ion-icon>
+                <template #start>
+                  <ion-icon src="/logo-simple.svg" />
+                </template>
                 Launch
               </ion-button>
               <ion-button color="warning">
-                <ion-icon slot="start" :icon="star"></ion-icon>
+                <template #start>
+                  <ion-icon :icon="star" />
+                </template>
                 Favorite
               </ion-button>
-              <ion-button fill="outline" color="primary">
-                <ion-icon slot="icon-only" src="/logo-simple.svg"></ion-icon>
+              <ion-button
+                fill="outline"
+                color="primary"
+              >
+                <template #icon-only>
+                  <ion-icon src="/logo-simple.svg" />
+                </template>
               </ion-button>
             </div>
           </ion-card-content>
@@ -185,7 +241,7 @@
           <ion-card-content>
             <h3>✅ Correct Approach (Using src attribute)</h3>
             <div class="code-block">
-&lt;ion-icon src="/logo-simple.svg"&gt;&lt;/ion-icon&gt;
+              &lt;ion-icon src="/logo-simple.svg"&gt;&lt;/ion-icon&gt;
             </div>
             <ul>
               <li>✓ Icon renders properly in shadow-root</li>
@@ -194,16 +250,18 @@
               <li>✓ No need to register icons in code</li>
             </ul>
             
-            <h3 style="margin-top: 1.5rem;">❌ Incorrect Approach (Using name with addIcons - Deprecated)</h3>
+            <h3 style="margin-top: 1.5rem;">
+              ❌ Incorrect Approach (Using name with addIcons - Deprecated)
+            </h3>
             <div class="code-block">
-// This approach is deprecated and no longer used
+              // This approach is deprecated and no longer used
 
-// Previous attempt:
-// import { addIcons } from 'ionicons'
-// addIcons({ 'yektayar': svgString })
+              // Previous attempt:
+              // import { addIcons } from 'ionicons'
+              // addIcons({ 'yektayar': svgString })
 
-// In template
-&lt;ion-icon name="yektayar"&gt;&lt;/ion-icon&gt;
+              // In template
+              &lt;ion-icon name="yektayar"&gt;&lt;/ion-icon&gt;
             </div>
             <ul>
               <li>✗ Results in empty icon-inner</li>

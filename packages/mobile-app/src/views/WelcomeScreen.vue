@@ -1,6 +1,11 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="welcome-content" :scroll-y="true" :scrollEvents="true">
+    <ion-content
+      :fullscreen="true"
+      class="welcome-content"
+      :scroll-y="true"
+      :scroll-events="true"
+    >
       <!-- 
         OverlayScrollbars temporarily disabled due to animation replay bug.
         
@@ -36,18 +41,29 @@
         }"
         defer
       > -->
-      <div class="welcome-container" :class="{ 'exiting': isExiting }">
+      <div
+        class="welcome-container"
+        :class="{ 'exiting': isExiting }"
+      >
         <!-- Decorative background elements -->
-        <div class="bg-decoration bg-decoration-1"></div>
-        <div class="bg-decoration bg-decoration-2"></div>
+        <div class="bg-decoration bg-decoration-1" />
+        <div class="bg-decoration bg-decoration-2" />
         
         <!-- Header with Title and Logo -->
-        <div ref="headerRef" class="welcome-header">
+        <div
+          ref="headerRef"
+          class="welcome-header"
+        >
           <div class="logo-accent">
-            <ion-icon src="/logo-simple.svg" class="yektayar-icon"></ion-icon>
+            <ion-icon
+              src="/logo-simple.svg"
+              class="yektayar-icon"
+            />
           </div>
-          <h1 class="welcome-title">خوش آمدید!</h1>
-          <div class="title-underline"></div>
+          <h1 class="welcome-title">
+            خوش آمدید!
+          </h1>
+          <div class="title-underline" />
         </div>
 
         <!-- Hero Image with Lazy Loading (above text) -->
@@ -64,7 +80,7 @@
             loading="eager"
             @error="onImageError"
           />
-          <div class="image-overlay"></div>
+          <div class="image-overlay" />
         </div>
 
         <!-- Welcome Text Content with Card Style -->
@@ -73,42 +89,55 @@
           class="welcome-text"
           :style="{ height: welcomeTextHeight }"
         >
-          <div ref="welcomeTextInner" class="welcome-text-inner">
+          <div
+            ref="welcomeTextInner"
+            class="welcome-text-inner"
+          >
             <p 
               v-for="(item, index) in typewriters" 
+              v-show="index === 0 || typewriters[index - 1].isComplete.value"
               :key="index"
               :ref="(el: unknown) => { paragraphRefs[index] = el as HTMLElement | null }"
-              v-show="index === 0 || typewriters[index - 1].isComplete.value"
               class="welcome-paragraph"
               :class="{ 'highlight-first': index === 0 }"
             >
-              <span v-html="item.displayText.value || '&nbsp;'"></span>
-              <span v-if="(item.isTyping.value || (index === 0 && !item.isComplete.value && FEATURE_CONFIG.showCursorInitially)) && item.showCursor.value" class="typewriter-cursor"></span>
+              <span v-html="item.displayText.value || '&nbsp;'" />
+              <span
+                v-if="(item.isTyping.value || (index === 0 && !item.isComplete.value && FEATURE_CONFIG.showCursorInitially)) && item.showCursor.value"
+                class="typewriter-cursor"
+              />
             </p>
           </div>
         </div>
 
         <!-- Terms Acceptance Checkbox -->
         <div 
-          ref="termsContainerRef"
-          class="terms-container" 
+          v-if="allTypewritersComplete"
+          ref="termsContainerRef" 
+          class="terms-container"
           :class="{ 
             'terms-container-slide': FEATURE_CONFIG.enableSmoothAnimations
           }"
-          v-if="allTypewritersComplete"
         >
           <label class="terms-checkbox">
             <input 
-              type="checkbox" 
               v-model="termsAccepted" 
+              type="checkbox" 
               :disabled="isLoading"
               class="checkbox-input"
-            />
+            >
             <span class="checkbox-custom">
-              <ion-icon :icon="checkmarkOutline" class="checkbox-icon"></ion-icon>
+              <ion-icon
+                :icon="checkmarkOutline"
+                class="checkbox-icon"
+              />
             </span>
             <span class="terms-text">
-              <a href="#terms" @click.prevent="showTerms" class="terms-link">شرایط و قوانین</a>
+              <a
+                href="#terms"
+                class="terms-link"
+                @click.prevent="showTerms"
+              >شرایط و قوانین</a>
               را خوانده‌ام و می‌پذیرم
             </span>
           </label>
@@ -116,8 +145,8 @@
 
         <!-- Enhanced CTA Button - Only show after all typewriter effects complete -->
         <ion-button 
-          ref="ctaButtonRef"
           v-if="allTypewritersComplete"
+          ref="ctaButtonRef"
           :disabled="!termsAccepted || isLoading"
           expand="block" 
           size="large" 
@@ -130,24 +159,30 @@
           @click="startApp"
         >
           <span class="button-content">
-            <span v-if="isLoading" class="button-spinner">
-              <ion-icon class="spinner-icon"></ion-icon>
+            <span
+              v-if="isLoading"
+              class="button-spinner"
+            >
+              <ion-icon class="spinner-icon" />
             </span>
             <template v-else>
               <span class="button-icon">✨</span>
               <span class="button-text">شروع گفتگو</span>
             </template>
           </span>
-          <div class="button-shine"></div>
+          <div class="button-shine" />
         </ion-button>
 
         <!-- Error Message -->
         <div 
-          ref="errorMessageRef"
-          v-if="errorMessage" 
+          v-if="errorMessage"
+          ref="errorMessageRef" 
           class="error-message"
         >
-          <ion-icon :icon="alertCircleOutline" class="error-icon"></ion-icon>
+          <ion-icon
+            :icon="alertCircleOutline"
+            class="error-icon"
+          />
           <span class="error-text">{{ errorMessage }}</span>
         </div>
 
@@ -160,17 +195,28 @@
           >
             <div class="scroll-reminder-content">
               <div class="scroll-reminder-icon">
-                <ion-icon :icon="chevronDownOutline" class="scroll-icon"></ion-icon>
+                <ion-icon
+                  :icon="chevronDownOutline"
+                  class="scroll-icon"
+                />
               </div>
-              <p class="scroll-reminder-text">برای مشاهده بیشتر به پایین بروید</p>
+              <p class="scroll-reminder-text">
+                برای مشاهده بیشتر به پایین بروید
+              </p>
             </div>
-            <div class="scroll-reminder-mask"></div>
+            <div class="scroll-reminder-mask" />
           </div>
         </transition>
 
         <!-- Disclaimer with Icon -->
-        <div ref="disclaimerRef" class="disclaimer-container">
-          <ion-icon :icon="lockClosedOutline" class="disclaimer-icon"></ion-icon>
+        <div
+          ref="disclaimerRef"
+          class="disclaimer-container"
+        >
+          <ion-icon
+            :icon="lockClosedOutline"
+            class="disclaimer-icon"
+          />
           <p class="disclaimer-text">
             اطلاعات شما محرمانه است، و تنها برای کمک به شما استفاده می‌شود.
           </p>

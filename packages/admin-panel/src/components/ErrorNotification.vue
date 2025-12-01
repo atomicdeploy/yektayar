@@ -20,13 +20,16 @@
           <p class="text-sm text-red-700 dark:text-red-400 break-words">
             {{ error.message }}
           </p>
-          <p v-if="error.details" class="text-xs text-red-600 dark:text-red-500 mt-1 font-mono">
+          <p
+            v-if="error.details"
+            class="text-xs text-red-600 dark:text-red-500 mt-1 font-mono"
+          >
             {{ error.details }}
           </p>
         </div>
         <button
-          @click="removeError(error.id)"
           class="text-red-400 hover:text-red-600 dark:text-red-500 dark:hover:text-red-300 flex-shrink-0"
+          @click="removeError(error.id)"
         >
           <XMarkIcon class="w-5 h-5" />
         </button>
