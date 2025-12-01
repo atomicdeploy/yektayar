@@ -163,7 +163,7 @@ onMounted(async () => {
         }
         
         router.replace(welcomeShown ? '/tabs/home' : '/welcome')
-      } catch (retryError) {
+      } catch (_retryError) {
         errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
       }
     }, 3000)

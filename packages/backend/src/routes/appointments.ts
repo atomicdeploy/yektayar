@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
 import { getDatabase } from '../services/database'
+import { logger } from '@yektayar/shared'
 
 export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
   .get('/', async ({ query }) => {
@@ -87,7 +88,7 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
         }
       }
     } catch (error) {
-      console.error('Error fetching appointments:', error)
+      logger.error('Error fetching appointments:', error)
       return {
         success: false,
         error: 'Failed to fetch appointments',
@@ -166,7 +167,7 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
         message: 'Appointment created successfully'
       }
     } catch (error) {
-      console.error('Error creating appointment:', error)
+      logger.error('Error creating appointment:', error)
       return {
         success: false,
         error: 'Failed to create appointment',
@@ -206,7 +207,7 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
         data: appointments[0]
       }
     } catch (error) {
-      console.error('Error fetching appointment:', error)
+      logger.error('Error fetching appointment:', error)
       return {
         success: false,
         error: 'Failed to fetch appointment',
@@ -268,7 +269,7 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
         message: 'Appointment updated successfully'
       }
     } catch (error) {
-      console.error('Error updating appointment:', error)
+      logger.error('Error updating appointment:', error)
       return {
         success: false,
         error: 'Failed to update appointment',
@@ -307,7 +308,7 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
         message: 'Appointment cancelled successfully'
       }
     } catch (error) {
-      console.error('Error cancelling appointment:', error)
+      logger.error('Error cancelling appointment:', error)
       return {
         success: false,
         error: 'Failed to cancel appointment',
@@ -384,7 +385,7 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
         }
       }
     } catch (error) {
-      console.error('Error fetching professionals:', error)
+      logger.error('Error fetching professionals:', error)
       return {
         success: false,
         error: 'Failed to fetch professionals',

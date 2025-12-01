@@ -2,7 +2,8 @@ import { Server as SocketIOServer } from 'socket.io'
 import type { Server as HTTPServer } from 'http'
 import type { Socket } from 'socket.io'
 import { validateSessionToken } from '../services/sessionService'
-import { SOCKET_IO_PATH, getVersionFromPackageJson } from '@yektayar/shared'
+import { logger } from '@yektayar/shared'
+import { getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../../package.json'
 
 // Get version from package.json
@@ -48,7 +49,7 @@ function createAuthMiddleware() {
 
       next()
     } catch (error) {
-      console.error('Socket authentication error:', error)
+      logger.error('Socket authentication error:', error)
       next(new Error('Authentication failed'))
     }
   }
@@ -60,7 +61,7 @@ function createAuthMiddleware() {
 function setupConnectionHandlers(io: SocketIOServer) {
   io.on('connection', (socket) => {
     const socketData = socket as any
-    console.log(`Socket connected: ${socket.id}`, {
+    logger.info(`Socket connected: ${socket.id}`, {
       sessionToken: socketData.sessionToken,
       userId: socketData.userId,
       isLoggedIn: socketData.isLoggedIn
@@ -146,7 +147,7 @@ function setupConnectionHandlers(io: SocketIOServer) {
 
     // Handle custom message command
     socket.on('message', (data) => {
-      console.log(`Message received from ${socket.id}:`, data)
+      logger.info(`Message received from ${socket.id}:`, data)
       socket.emit('message_received', {
         success: true,
         message: 'Message received successfully',
@@ -161,7 +162,7 @@ function setupConnectionHandlers(io: SocketIOServer) {
         const { message, conversationHistory } = data
         const messageId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-        console.log(`AI chat request from ${socket.id}:`, message)
+        logger.info(`AI chat request from ${socket.id}:`, message)
 
         // Emit start event
         socket.emit('ai:response:start', { messageId })
@@ -179,9 +180,9 @@ function setupConnectionHandlers(io: SocketIOServer) {
         // Emit completion event
         socket.emit('ai:response:complete', { messageId, fullResponse })
 
-        console.log(`AI response completed for ${socket.id}`)
+        logger.info(`AI response completed for ${socket.id}`)
       } catch (error) {
-        console.error('AI chat error:', error)
+        logger.error('AI chat error:', error)
         socket.emit('ai:response:error', {
           error: 'Failed to generate response. Please try again.'
         })
@@ -190,27 +191,28 @@ function setupConnectionHandlers(io: SocketIOServer) {
 
     // Handle disconnect
     socket.on('disconnect', (reason) => {
-      console.log(`Socket disconnected: ${socket.id}`, { reason })
+      logger.info(`Socket disconnected: ${socket.id}`, { reason })
     })
 
     // Handle errors
     socket.on('error', (error) => {
-      console.error(`Socket error for ${socket.id}:`, error)
+      logger.error(`Socket error for ${socket.id}:`, error)
     })
   })
 
   // Periodic cleanup (optional - for monitoring)
   setInterval(() => {
     const socketCount = io.sockets.sockets.size
-    console.log(`Active socket connections: ${socketCount}`)
+    logger.debug(`Active socket connections: ${socketCount}`)
   }, 60000) // Every minute
 }
 
 /**
  * Setup and configure Socket.IO server
  */
-export function setupSocketIO(httpServer: HTTPServer) {
+export function setupSocketIO(httpServer: HTTPServer, path: string = '/socket.io') {
   const io = new SocketIOServer(httpServer, {
+    path,
     cors: {
       origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST'],
@@ -253,7 +255,7 @@ export function broadcastEvent(io: SocketIOServer, event: string, data: any) {
  * Setup Socket.IO with Bun engine
  * Bun natively supports Socket.IO via @socket.io/bun-engine
  */
-export function setupBunSocketIO() {
+export function setupBunSocketIO(path: string = '/socket.io') {
   if (!BunEngine) {
     throw new Error('@socket.io/bun-engine not available')
   }
@@ -261,7 +263,7 @@ export function setupBunSocketIO() {
   const io = new SocketIOServer()
 
   const engine = new BunEngine({
-    path: SOCKET_IO_PATH,
+    path,
     cors: {
       origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST'],

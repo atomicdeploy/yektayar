@@ -3,9 +3,10 @@ import { getDatabase } from '../services/database'
 import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
+import { logger } from '@yektayar/shared'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
-  .post('/acquire-session', async ({ headers, request }) => {
+  .post('/acquire-session', async ({ headers, request: _request }) => {
     try {
       // Extract metadata from request
       const userAgent = headers['user-agent'] || 'unknown'
@@ -30,7 +31,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         }
       }
     } catch (error) {
-      console.error('Error acquiring session:', error)
+      logger.error('Error acquiring session:', error)
       return {
         success: false,
         error: 'Failed to acquire session',
@@ -77,7 +78,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         }
       }
     } catch (error) {
-      console.error('Error validating session:', error)
+      logger.error('Error validating session:', error)
       return {
         success: false,
         error: 'Failed to validate session',
@@ -140,7 +141,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         message: 'User registered successfully'
       }
     } catch (error) {
-      console.error('Error during registration:', error)
+      logger.error('Error during registration:', error)
       return {
         success: false,
         error: 'Registration failed',
@@ -243,7 +244,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         message: 'Login successful'
       }
     } catch (error) {
-      console.error('Error during login:', error)
+      logger.error('Error during login:', error)
       return {
         success: false,
         error: 'Login failed',
@@ -288,7 +289,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       // In production, generate and send OTP via SMS/email
       // For now, just return success
       const mockOtp = Math.floor(100000 + Math.random() * 900000).toString()
-      console.log(`📱 Mock OTP for ${identifier}: ${mockOtp}`)
+      logger.info(`📱 Mock OTP for ${identifier}: ${mockOtp}`)
 
       return {
         success: true,
@@ -297,7 +298,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         ...(process.env.NODE_ENV === 'development' && { otp: mockOtp })
       }
     } catch (error) {
-      console.error('Error sending OTP:', error)
+      logger.error('Error sending OTP:', error)
       return {
         success: false,
         error: 'Failed to send OTP',
@@ -391,7 +392,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         message: 'OTP verified successfully'
       }
     } catch (error) {
-      console.error('Error verifying OTP:', error)
+      logger.error('Error verifying OTP:', error)
       return {
         success: false,
         error: 'OTP verification failed',
@@ -424,7 +425,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         message: 'Logged out successfully'
       }
     } catch (error) {
-      console.error('Error during logout:', error)
+      logger.error('Error during logout:', error)
       return {
         success: false,
         error: 'Failed to logout'

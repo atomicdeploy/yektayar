@@ -3,6 +3,8 @@
  * Works in browser (localStorage), Node.js (in-memory), and React Native (AsyncStorage)
  */
 
+import { logger } from '../utils/logger'
+
 interface Storage {
   getItem(key: string): string | null | Promise<string | null>
   setItem(key: string, value: string): void | Promise<void>
@@ -55,7 +57,7 @@ export class TokenStorage {
       const token = await storage.getItem(this.storageKey)
       return token
     } catch (error) {
-      console.error('Error getting token from storage:', error)
+      logger.error('Error getting token from storage:', error)
       return null
     }
   }
@@ -67,7 +69,7 @@ export class TokenStorage {
     try {
       await storage.setItem(this.storageKey, token)
     } catch (error) {
-      console.error('Error setting token in storage:', error)
+      logger.error('Error setting token in storage:', error)
     }
   }
 
@@ -78,7 +80,7 @@ export class TokenStorage {
     try {
       await storage.removeItem(this.storageKey)
     } catch (error) {
-      console.error('Error removing token from storage:', error)
+      logger.error('Error removing token from storage:', error)
     }
   }
 

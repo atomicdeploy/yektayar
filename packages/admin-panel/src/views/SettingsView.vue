@@ -212,6 +212,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 const loading = ref(true)
 const saving = ref(false)
@@ -245,7 +246,7 @@ async function loadSettings() {
       }
     }
   } catch (error) {
-    console.error('Error loading settings:', error)
+    logger.error('Error loading settings:', error)
   } finally {
     loading.value = false
   }
@@ -273,7 +274,7 @@ async function saveSettings() {
 
     alert('تنظیمات با موفقیت ذخیره شد')
   } catch (error) {
-    console.error('Error saving settings:', error)
+    logger.error('Error saving settings:', error)
     alert('خطا در ذخیره تنظیمات')
   } finally {
     saving.value = false
@@ -288,7 +289,7 @@ async function loadTickets() {
       tickets.value = response.data || []
     }
   } catch (error) {
-    console.error('Error loading tickets:', error)
+    logger.error('Error loading tickets:', error)
   } finally {
     loadingTickets.value = false
   }
@@ -302,7 +303,7 @@ async function loadPages() {
       recentPages.value = response.data || []
     }
   } catch (error) {
-    console.error('Error loading pages:', error)
+    logger.error('Error loading pages:', error)
   } finally {
     loadingPages.value = false
   }
