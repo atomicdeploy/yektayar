@@ -33,7 +33,11 @@
           <!-- Hero Section -->
           <div class="course-hero">
             <div class="hero-image">
-              <img :src="course.thumbnailUrl || '/placeholder-course.jpg'" :alt="course.title" />
+              <LazyImage
+                :src="course.thumbnailUrl || '/placeholder-course.jpg'"
+                :alt="course.title"
+                image-class="hero-course-image"
+              />
               <div class="hero-overlay">
                 <div class="hero-badges">
                   <ion-badge :color="getDifficultyColor(course.difficulty)">
@@ -132,7 +136,11 @@
               <div class="section" v-if="course.instructor">
                 <h2>{{ t('courses.instructor') }}</h2>
                 <div class="instructor-card">
-                  <img :src="course.instructor.avatar" :alt="course.instructor.name" class="instructor-avatar" />
+                  <LazyImage
+                    :src="course.instructor.avatar || '/placeholder-avatar.jpg'"
+                    :alt="course.instructor.name"
+                    image-class="instructor-avatar"
+                  />
                   <div class="instructor-info">
                     <h3>{{ course.instructor.name }}</h3>
                     <p>{{ course.instructor.title }}</p>
@@ -277,6 +285,7 @@ import {
   IonProgressBar
 } from '@ionic/vue'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
+import LazyImage from '@/components/LazyImage.vue'
 import {
   shareSocial,
   heart,
@@ -517,11 +526,23 @@ onMounted(() => {
     width: 100%;
     height: 250px;
 
-    img {
+    :deep(.lazy-image-wrapper) {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-secondary-tint));
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .image-error {
+        background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-secondary-tint));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
 
     .hero-overlay {
@@ -676,16 +697,31 @@ onMounted(() => {
     .instructor-card {
       display: flex;
       gap: 16px;
+      align-items: flex-start;
       padding: 16px;
       background: var(--ion-color-step-50, var(--ion-color-light));
       border-radius: 12px;
 
-      .instructor-avatar {
+      :deep(.lazy-image-wrapper) {
         width: 80px;
         height: 80px;
+        flex-shrink: 0;
         border-radius: 50%;
-        object-fit: cover;
-        background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .image-error {
+          background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-tertiary-tint));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
       }
 
       .instructor-info {

@@ -106,7 +106,10 @@
       "your_review": "نظر شما",
       "submit_review": "ثبت نظر",
       "free": "رایگان",
-      "premium": "ویژه"
+      "premium": "ویژه",
+      "complete": "تکمیل شده",
+      "no_enrolled_courses": "دوره‌ی ثبت‌نام شده‌ای وجود ندارد",
+      "browse_courses": "مشاهده دوره‌ها"
     }
   },
   "en": {
@@ -216,7 +219,10 @@
       "your_review": "Your Review",
       "submit_review": "Submit Review",
       "free": "Free",
-      "premium": "Premium"
+      "premium": "Premium",
+      "complete": "Complete",
+      "no_enrolled_courses": "No enrolled courses",
+      "browse_courses": "Browse Courses"
     }
   }
 }

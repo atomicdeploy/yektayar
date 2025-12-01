@@ -59,18 +59,18 @@
           <div class="section" v-if="enrolledCourses.length > 0">
             <div class="section-header">
               <h2 class="section-title">{{ t('courses.my_courses') }}</h2>
-              <ion-button fill="clear" size="small" @click="goToMyCourses">
+              <ion-button fill="clear" size="small" router-link="/tabs/my-courses">
                 {{ locale === 'fa' ? 'مشاهده همه' : 'View All' }}
-                <ion-icon :icon="chevronForward" slot="end"></ion-icon>
+                <ion-icon :icon="locale === 'fa' ? chevronBack : chevronForward" slot="end"></ion-icon>
               </ion-button>
             </div>
 
             <div class="courses-horizontal-scroll">
-              <div
+              <router-link
                 v-for="enrollment in enrolledCourses"
                 :key="enrollment.course.id"
+                :to="`/tabs/courses/${enrollment.course.id}`"
                 class="course-card-mini"
-                @click="viewCourse(enrollment.course.id)"
               >
                 <div class="course-thumbnail">
                   <LazyImage
@@ -87,7 +87,7 @@
                   <h4>{{ enrollment.course.title }}</h4>
                   <p>{{ t('courses.continue_learning') }}</p>
                 </div>
-              </div>
+              </router-link>
             </div>
           </div>
 
@@ -108,52 +108,54 @@
             </div>
 
             <div class="courses-grid">
-              <div
+              <router-link
                 v-for="course in courses"
                 :key="course.id"
-                class="course-card"
-                @click="viewCourse(course.id)"
+                :to="`/tabs/courses/${course.id}`"
+                class="course-card-link"
               >
-                <div class="course-image">
-                  <LazyImage
-                    :src="course.thumbnailUrl || '/placeholder-course.jpg'"
-                    :alt="course.title"
-                    image-class="course-main-image"
-                  />
-                  <div class="course-badge" v-if="course.isFree">
-                    <ion-badge color="success">{{ t('courses.free') }}</ion-badge>
+                <div class="course-card">
+                  <div class="course-image">
+                    <LazyImage
+                      :src="course.thumbnailUrl || '/placeholder-course.jpg'"
+                      :alt="course.title"
+                      image-class="course-main-image"
+                    />
+                    <div class="course-badge" v-if="course.isFree">
+                      <ion-badge color="success">{{ t('courses.free') }}</ion-badge>
+                    </div>
+                    <div class="course-difficulty">
+                      <ion-badge :color="getDifficultyColor(course.difficulty)">
+                        {{ t(`courses.${course.difficulty}`) }}
+                      </ion-badge>
+                    </div>
                   </div>
-                  <div class="course-difficulty">
-                    <ion-badge :color="getDifficultyColor(course.difficulty)">
-                      {{ t(`courses.${course.difficulty}`) }}
-                    </ion-badge>
+                  <div class="course-content">
+                    <h3 class="course-title">{{ course.title }}</h3>
+                    <p class="course-description">{{ truncate(course.description, 80) }}</p>
+                    <div class="course-meta">
+                      <div class="meta-item">
+                        <ion-icon :icon="time"></ion-icon>
+                        <span>{{ course.duration }} {{ t('courses.minutes') }}</span>
+                      </div>
+                      <div class="meta-item" v-if="course.rating">
+                        <ion-icon :icon="star" color="warning"></ion-icon>
+                        <span>{{ course.rating.toFixed(1) }}</span>
+                      </div>
+                      <div class="meta-item" v-if="course.enrollmentCount">
+                        <ion-icon :icon="people"></ion-icon>
+                        <span>{{ course.enrollmentCount }}</span>
+                      </div>
+                    </div>
+                    <div class="course-footer">
+                      <div class="course-category">{{ course.category }}</div>
+                      <ion-button size="small" fill="outline" router-link="#">
+                        {{ locale === 'fa' ? 'مشاهده' : 'View' }}
+                      </ion-button>
+                    </div>
                   </div>
                 </div>
-                <div class="course-content">
-                  <h3 class="course-title">{{ course.title }}</h3>
-                  <p class="course-description">{{ truncate(course.description, 80) }}</p>
-                  <div class="course-meta">
-                    <div class="meta-item">
-                      <ion-icon :icon="time"></ion-icon>
-                      <span>{{ course.duration }} {{ t('courses.minutes') }}</span>
-                    </div>
-                    <div class="meta-item" v-if="course.rating">
-                      <ion-icon :icon="star" color="warning"></ion-icon>
-                      <span>{{ course.rating.toFixed(1) }}</span>
-                    </div>
-                    <div class="meta-item" v-if="course.enrollmentCount">
-                      <ion-icon :icon="people"></ion-icon>
-                      <span>{{ course.enrollmentCount }}</span>
-                    </div>
-                  </div>
-                  <div class="course-footer">
-                    <div class="course-category">{{ course.category }}</div>
-                    <ion-button size="small" fill="outline">
-                      {{ locale === 'fa' ? 'مشاهده' : 'View' }}
-                    </ion-button>
-                  </div>
-                </div>
-              </div>
+              </router-link>
             </div>
 
             <!-- Loading Skeleton -->
@@ -207,6 +209,7 @@ import LazyImage from '@/components/LazyImage.vue'
 import {
   funnel,
   chevronForward,
+  chevronBack,
   time,
   star,
   people,
@@ -383,7 +386,13 @@ ion-chip {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
+
+  ion-select {
+    max-width: fit-content;
+    min-width: 120px;
+  }
 }
 
 .section-title {
@@ -391,6 +400,10 @@ ion-chip {
   font-size: 20px;
   font-weight: 700;
   color: var(--ion-text-color);
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .courses-horizontal-scroll {
@@ -399,6 +412,7 @@ ion-chip {
   overflow-x: auto;
   padding-bottom: 8px;
   -webkit-overflow-scrolling: touch;
+  direction: ltr;
 
   &::-webkit-scrollbar {
     display: none;
@@ -411,7 +425,8 @@ ion-chip {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+  text-decoration: none;
+  display: block;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
@@ -491,12 +506,16 @@ ion-chip {
   }
 }
 
+.course-card-link {
+  text-decoration: none;
+  display: block;
+}
+
 .course-card {
   background: var(--ion-card-background);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
