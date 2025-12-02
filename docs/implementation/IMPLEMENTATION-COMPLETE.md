@@ -242,9 +242,9 @@ pm2 logs
 - `scripts/dev-runner.sh` - Core improvements (300+ lines added)
 
 ### Created
-- `scripts/test-process-tree-kill.sh` - Process tree tests
-- `scripts/test-port-checking.sh` - Port checking tests
-- `scripts/test-vite-simulation.sh` - Vite/ESBuild simulation
+- `tests/scripts/test-process-tree-kill.sh` - Process tree tests
+- `tests/scripts/test-port-checking.sh` - Port checking tests
+- `tests/scripts/test-vite-simulation.sh` - Vite/ESBuild simulation
 - `docs/PM2-INTEGRATION.md` - PM2 documentation
 - `docs/DEV-RUNNER-IMPROVEMENTS.md` - Technical docs
 - `docs/PROCESS-TREE-DIAGRAM.md` - Visual diagrams

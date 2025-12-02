@@ -6,11 +6,11 @@
  * This script demonstrates how to test the database health check endpoint.
  * 
  * Usage:
- *   node scripts/test-health-db.js [base-url]
+ *   node tests/scripts/test-health-db.js [base-url]
  * 
  * Examples:
- *   node scripts/test-health-db.js
- *   node scripts/test-health-db.js http://localhost:3000
+ *   node tests/scripts/test-health-db.js
+ *   node tests/scripts/test-health-db.js http://localhost:3000
  */
 
 const baseUrl = process.argv[2] || 'http://localhost:3000'

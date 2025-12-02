@@ -239,7 +239,7 @@ The `test-vite-simulation.sh` script proves the fix works by:
 
 ```bash
 # Run the test
-./scripts/test-vite-simulation.sh
+./tests/scripts/test-vite-simulation.sh
 
 # Output shows:
 # ✓ All processes in tree were killed!
