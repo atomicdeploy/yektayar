@@ -205,8 +205,6 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
       }
     }
     
-    let testRecordId: number | undefined
-    
     // Test 1: Database Connection
     logger.info('🔌 Test 1: Checking database connection...')
     const connectionTest = await testDatabaseConnection()
@@ -295,8 +293,7 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
       }
     }
     
-    // eslint-disable-next-line prefer-const
-    testRecordId = writeTest.recordId
+    const testRecordId = writeTest.recordId
     
     // Test 4: Database Read
     logger.info('📖 Test 4: Testing database read operation...')
