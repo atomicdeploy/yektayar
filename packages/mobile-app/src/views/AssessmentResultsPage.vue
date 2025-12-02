@@ -294,10 +294,14 @@ const fetchResult = async () => {
     const response = await apiClient.get(`/api/assessments/results/${resultId}?userId=${userId}`)
     if (response.data.success) {
       result.value = response.data.data
-      logger.success('Loaded test result')
+      logger.success('Loaded assessment result')
+    } else {
+      logger.error('Failed to fetch assessment result:', response.data.error || 'Unknown error')
+      router.back()
     }
   } catch (error) {
-    logger.error('Failed to fetch test result:', error)
+    logger.error('Failed to fetch assessment result:', error)
+    router.back()
   } finally {
     loading.value = false
   }

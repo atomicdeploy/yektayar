@@ -383,10 +383,13 @@ const fetchTest = async () => {
     const response = await apiClient.get(`/api/assessments/${testId}`)
     if (response.data.success) {
       test.value = response.data.data
-      logger.success(`Loaded test: ${test.value.title}`)
+      logger.success(`Loaded assessment: ${test.value.title}`)
+    } else {
+      logger.error('Failed to fetch assessment:', response.data.error || 'Unknown error')
+      router.back()
     }
   } catch (error) {
-    logger.error('Failed to fetch test:', error)
+    logger.error('Failed to fetch assessment:', error)
     router.back()
   }
 }
@@ -467,21 +470,31 @@ const submitTest = async () => {
     const response = await apiClient.post(`/api/assessments/${testId}/submit`, {
       answers: answersArray,
       demographicInfo: demographicInfo.value,
-      userId: 1, // Placeholder for development
+      userId: 1, // Placeholder for development,
     })
     
     if (response.data.success) {
-      logger.success('Test submitted successfully')
+      logger.success('Assessment submitted successfully')
       // Navigate to results page
       router.push(`/tabs/assessments/results/${response.data.data.id}`)
+    } else {
+      logger.error('Failed to submit assessment:', response.data.error || 'Unknown error')
+      const alert = await alertController.create({
+        header: locale.value === 'fa' ? 'خطا' : 'Error',
+        message: locale.value === 'fa' 
+          ? 'خطایی در ارسال آزمون رخ داد. لطفاً دوباره تلاش کنید.'
+          : 'An error occurred while submitting the assessment. Please try again.',
+        buttons: ['OK'],
+      })
+      await alert.present()
     }
   } catch (error) {
-    logger.error('Failed to submit test:', error)
+    logger.error('Failed to submit assessment:', error)
     const alert = await alertController.create({
       header: locale.value === 'fa' ? 'خطا' : 'Error',
       message: locale.value === 'fa' 
         ? 'خطایی در ارسال آزمون رخ داد. لطفاً دوباره تلاش کنید.'
-        : 'An error occurred while submitting the test. Please try again.',
+        : 'An error occurred while submitting the assessment. Please try again.',
       buttons: ['OK'],
     })
     await alert.present()

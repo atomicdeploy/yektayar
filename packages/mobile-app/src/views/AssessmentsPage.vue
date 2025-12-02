@@ -184,10 +184,16 @@ const fetchTests = async () => {
     const response = await apiClient.get('/api/assessments')
     if (response.data.success) {
       tests.value = response.data.data
-      logger.success(`Loaded ${tests.value.length} tests`)
+      logger.success(`Loaded ${tests.value.length} assessments`)
+    } else {
+      logger.error('Failed to fetch assessments:', response.data.error || 'Unknown error')
+      // Show error to user via empty state
+      tests.value = []
     }
   } catch (error) {
-    logger.error('Failed to fetch tests:', error)
+    logger.error('Failed to fetch assessments:', error)
+    // Show error to user via empty state
+    tests.value = []
   } finally {
     loading.value = false
   }
@@ -200,9 +206,13 @@ const fetchTestHistory = async () => {
     const response = await apiClient.get(`/api/assessments/user/history?userId=${userId}`)
     if (response.data.success) {
       testHistory.value = response.data.data
+    } else {
+      logger.error('Failed to fetch assessment history:', response.data.error || 'Unknown error')
+      testHistory.value = []
     }
   } catch (error) {
-    logger.error('Failed to fetch test history:', error)
+    logger.error('Failed to fetch assessment history:', error)
+    testHistory.value = []
   }
 }
 
