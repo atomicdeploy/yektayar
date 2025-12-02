@@ -894,23 +894,23 @@ onMounted(() => {
         gap: 12px;
         margin-bottom: 12px;
 
-        .review-avatar {
+        :deep(.lazy-image-wrapper) {
           width: 40px;
           height: 40px;
+          flex-shrink: 0;
           border-radius: 50%;
-          object-fit: cover;
-          background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
-          display: block;
+          overflow: hidden;
+          
+          .review-avatar {
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+          }
 
           .image-error {
             border-radius: 50%;
-            width: 100%;
-            height: 100%;
             background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-tertiary-tint));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
+            
             .error-text {
               display: none;
             }
