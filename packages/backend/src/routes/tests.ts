@@ -199,7 +199,8 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
       // Calculate score based on test type
       let score = 0
       let personalityType = null
-      let sectionScores: any = {}
+      let maxScore = 0
+      const sectionScores: Record<string, { title: string; titleEn: string; score: number; maxScore: number }> = {}
 
       // For personality tests, sum up all answers
       if (test.questions && Array.isArray(test.questions)) {
@@ -210,6 +211,7 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
           const answer = answers[index]
           if (typeof answer === 'number') {
             score += answer
+            maxScore += 5
             
             // Track section scores if sections exist
             if (question.section) {
@@ -229,9 +231,7 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
       }
 
       // Determine personality type based on score ranges
-      const totalQuestions = (test.questions as any[]).length
-      const maxScore = totalQuestions * 5
-      const percentage = (score / maxScore) * 100
+      const percentage = maxScore > 0 ? (score / maxScore) * 100 : 0
 
       if (percentage < 30) {
         personalityType = 'low'

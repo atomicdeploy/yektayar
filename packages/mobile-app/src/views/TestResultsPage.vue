@@ -407,9 +407,13 @@ const shareResults = () => {
 
 const getSectionScoreClass = (score: number, maxScore: number) => {
   const percentage = (score / maxScore) * 100
-  if (percentage >= 62) return 'strong' // 28-45 range mapped to percentage
-  if (percentage >= 47) return 'moderate' // 21-27 range
-  return 'needs-attention' // 9-20 range
+  // Percentage thresholds based on scoring guide:
+  // Strong: 28-35 out of 35 (80%+) -> mapped to 62%+ to be more lenient
+  // Moderate: 21-27 out of 35 (60-77%) -> mapped to 47-62%
+  // Needs Attention: 9-20 out of 35 (25-57%) -> below 47%
+  if (percentage >= 62) return 'strong'
+  if (percentage >= 47) return 'moderate'
+  return 'needs-attention'
 }
 
 const getSectionInterpretation = (score: number, maxScore: number) => {
