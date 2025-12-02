@@ -78,7 +78,7 @@
             </div>
 
             <!-- Tests List -->
-            <div v-else class="tests-list">
+            <div v-else-if="tests.length > 0" class="tests-list">
               <div 
                 v-for="test in tests" 
                 :key="test.id"
