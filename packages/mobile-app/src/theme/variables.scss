@@ -11,13 +11,13 @@
   --ion-color-primary-shade: #ba8b2d;
   --ion-color-primary-tint: #ddb156;
 
-  /** secondary (YektaYar Navy Seal - Brightened for better readability) **/
-  --ion-color-secondary: #2d4a6f;
-  --ion-color-secondary-rgb: 45, 74, 111;
+  /** secondary (YektaYar Navy Seal - #01183a) **/
+  --ion-color-secondary: #01183a;
+  --ion-color-secondary-rgb: 1, 24, 58;
   --ion-color-secondary-contrast: #ffffff;
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
-  --ion-color-secondary-shade: #284162;
-  --ion-color-secondary-tint: #42597d;
+  --ion-color-secondary-shade: #011433;
+  --ion-color-secondary-tint: #1a2f4e;
   
   /** tertiary (Beautiful Purple/Indigo) **/
   --ion-color-tertiary: #6366f1;
@@ -146,12 +146,12 @@
   --accent-soft: #fef3e2;
   --accent-light: #fffbf5;
   
-  /* Secondary Accent Variables */
-  --secondary-accent: #2d4a6f;
-  --secondary-accent-light: rgba(45, 74, 111, 0.08);
-  --secondary-accent-medium: rgba(45, 74, 111, 0.15);
-  --secondary-gradient: linear-gradient(135deg, #2d4a6f 0%, #42597d 100%);
-  --secondary-glow: 0 2px 8px rgba(45, 74, 111, 0.15);
+  /* Navy Seal (Secondary) Accent Variables - For Beautiful Accents */
+  --secondary-accent: #01183a;
+  --secondary-accent-light: rgba(1, 24, 58, 0.08);
+  --secondary-accent-medium: rgba(1, 24, 58, 0.15);
+  --secondary-gradient: linear-gradient(135deg, #01183a 0%, #1a2f4e 100%);
+  --secondary-glow: 0 2px 8px rgba(1, 24, 58, 0.2);
 }
 
 /* ========================================
@@ -201,12 +201,12 @@
   --accent-soft: #1e1810;
   --accent-light: #27210f;
   
-  /* Secondary Accent Variables - Brightened for readability */
-  --secondary-accent: #60a5fa;
-  --secondary-accent-light: rgba(96, 165, 250, 0.15);
-  --secondary-accent-medium: rgba(96, 165, 250, 0.25);
-  --secondary-gradient: linear-gradient(135deg, #60a5fa 0%, #93c5fd 100%);
-  --secondary-glow: 0 2px 12px rgba(96, 165, 250, 0.3);
+  /* Navy Seal (Secondary) Accent Variables - Dark Mode Overrides */
+  --secondary-accent: #8fa3c7;
+  --secondary-accent-light: rgba(143, 163, 199, 0.15);
+  --secondary-accent-medium: rgba(143, 163, 199, 0.25);
+  --secondary-gradient: linear-gradient(135deg, #7a8fbd 0%, #8fa3c7 100%);
+  --secondary-glow: 0 2px 8px rgba(143, 163, 199, 0.3);
 
   /* Adjust Ionic component colors for dark mode */
   --ion-color-step-50: #1a2332;
@@ -296,12 +296,12 @@
     --accent-soft: #1e1810;
     --accent-light: #27210f;
     
-    /* Secondary Accent Variables - Brightened for readability */
-    --secondary-accent: #60a5fa;
-    --secondary-accent-light: rgba(96, 165, 250, 0.15);
-    --secondary-accent-medium: rgba(96, 165, 250, 0.25);
-    --secondary-gradient: linear-gradient(135deg, #60a5fa 0%, #93c5fd 100%);
-    --secondary-glow: 0 2px 12px rgba(96, 165, 250, 0.3);
+    /* Navy Seal (Secondary) Accent Variables - Dark Mode Overrides */
+    --secondary-accent: #8fa3c7;
+    --secondary-accent-light: rgba(143, 163, 199, 0.15);
+    --secondary-accent-medium: rgba(143, 163, 199, 0.25);
+    --secondary-gradient: linear-gradient(135deg, #7a8fbd 0%, #8fa3c7 100%);
+    --secondary-glow: 0 2px 8px rgba(143, 163, 199, 0.3);
 
     /* Adjust Ionic component colors for dark mode */
     --ion-color-step-50: #1a2332;
