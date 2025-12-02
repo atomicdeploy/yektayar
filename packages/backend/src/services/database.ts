@@ -14,14 +14,15 @@ let sql: ReturnType<typeof postgres> | null = null
 
 /**
  * Get database connection instance
+ * Configured with timeouts and connection pooling for reliability
  */
 export function getDatabase() {
   if (!sql) {
     logger.info(`Initializing database connection to ${DATABASE_URL.replace(/:([^:@]+)@/, ':*****@')}`)
     sql = postgres(DATABASE_URL, {
-      max: 10, // Maximum connections
-      idle_timeout: 20,
-      connect_timeout: 10,
+      max: 10, // Maximum connections in pool
+      idle_timeout: 20, // Seconds before idle connection is closed
+      connect_timeout: 10, // Seconds to wait for connection
     })
     logger.info('Database connection pool initialized')
   }
