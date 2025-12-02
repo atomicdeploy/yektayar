@@ -50,7 +50,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
   async function fetchStats() {
     isLoading.value = true
     try {
-      const response = await apiClient.get<DashboardStats>('/api/dashboard/stats')
+      const response = await apiClient.get<DashboardStats>('/dashboard/stats')
       
       if (response.success && response.data) {
         stats.value = response.data
@@ -71,7 +71,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchUserGrowth() {
     try {
-      const response = await apiClient.get<{ labels: string[]; data: number[] }>('/api/dashboard/user-growth')
+      const response = await apiClient.get<{ labels: string[]; data: number[] }>('/dashboard/user-growth')
       
       if (response.success && response.data) {
         userGrowthData.value = response.data
@@ -88,7 +88,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchAppointmentStats() {
     try {
-      const response = await apiClient.get<{ labels: string[]; data: number[] }>('/api/dashboard/appointment-stats')
+      const response = await apiClient.get<{ labels: string[]; data: number[] }>('/dashboard/appointment-stats')
       
       if (response.success && response.data) {
         appointmentStatsData.value = response.data
@@ -105,7 +105,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchRecentActivities() {
     try {
-      const response = await apiClient.get<ActivityItem[]>('/api/dashboard/recent-activities')
+      const response = await apiClient.get<ActivityItem[]>('/dashboard/recent-activities')
       
       if (response.success && response.data) {
         recentActivities.value = response.data.map((item: any) => ({

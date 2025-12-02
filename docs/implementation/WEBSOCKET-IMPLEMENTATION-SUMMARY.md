@@ -112,7 +112,7 @@ We implemented a **dual-server architecture** that provides maximum flexibility:
    - Testing procedures
    - Troubleshooting guide
 
-7. **`scripts/test-websocket.js`** (101 lines)
+7. **`tests/scripts/test-websocket.mjs`** (101 lines)
    - Testing utility script
    - Server status checks
    - Usage instructions

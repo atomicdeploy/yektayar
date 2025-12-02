@@ -16,11 +16,12 @@ import { logger } from '@yektayar/shared'
 import { settingsRoutes } from './routes/settings'
 import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
+import { healthRoutes } from './routes/health-pg'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
-import { initializeDatabase } from './services/database'
+import { initializeDatabase } from './services/database-pg'
 import { getWebSocketPathFromEnv, getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../package.json'
 
@@ -79,6 +80,7 @@ app
           description: 'Mental Health Care Platform API'
         },
         tags: [
+          { name: 'Health', description: 'Health check and monitoring endpoints' },
           { name: 'Auth', description: 'Authentication endpoints' },
           { name: 'Users', description: 'User management endpoints' },
           { name: 'Messages', description: 'Messaging and chat endpoints' },
@@ -136,6 +138,7 @@ app
       description: 'Returns information about the Socket.IO WebSocket endpoint including path, authentication requirements, and available events'
     }
   })
+  .use(healthRoutes)
   .use(authRoutes)
   .use(userRoutes)
   .use(messageRoutes)
@@ -182,6 +185,7 @@ if (isBun) {
   httpServer = Bun.serve({
     port,
     hostname,
+    idleTimeout: 30, // Increase timeout for slow database queries (default is 10s)
     fetch: async (req, server) => {
       const url = new URL(req.url)
       const upgradeHeader = req.headers.get('upgrade')?.toLowerCase()

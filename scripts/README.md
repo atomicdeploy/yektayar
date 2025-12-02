@@ -905,13 +905,17 @@ The script is automatically used in the GitHub Actions workflow to analyze built
 
 ## Testing Scripts
 
+> **Note:** Test scripts have been moved to `tests/scripts/` directory. See [tests/scripts/](../tests/scripts/) for all testing utilities.
+
 ### `test-socketio.sh`
 
 An interactive TUI script for testing Socket.IO connectivity and functionality with the YektaYar backend server.
 
+**Location:** `tests/scripts/test-socketio.sh`
+
 **Usage:**
 ```bash
-./scripts/test-socketio.sh [backend-url]
+./tests/scripts/test-socketio.sh [backend-url]
 ```
 
 **Default backend URL:** `http://localhost:3000`
@@ -933,10 +937,10 @@ An interactive TUI script for testing Socket.IO connectivity and functionality w
 **Example:**
 ```bash
 # Test local backend
-./scripts/test-socketio.sh
+./tests/scripts/test-socketio.sh
 
 # Test remote backend
-./scripts/test-socketio.sh https://api.yektayar.com
+./tests/scripts/test-socketio.sh https://api.yektayar.com
 ```
 
 **Socket.IO Commands Tested:**
@@ -1382,7 +1386,7 @@ Automated installation script for all YektaYar development tools.
 
 **What it installs:**
 - **Core Tools**: git, curl, wget, jq, build-essential
-- **Node.js Ecosystem**: Node.js 18.x, npm, Bun 1.x
+- **Node.js Ecosystem**: Node.js 24.x, npm, Bun 1.x
 - **Database**: PostgreSQL client, libpq-dev, pgcli
 - **Optional**: GitHub CLI (gh), Docker, Docker Compose
 
@@ -1479,9 +1483,11 @@ pip3 install thefuck
 
 Automated test suite for bashrc enhancement scripts.
 
+**Location:** `tests/scripts/test-bashrc-features.sh`
+
 **Usage:**
 ```bash
-./scripts/test-bashrc-features.sh
+./tests/scripts/test-bashrc-features.sh
 ```
 
 **Tests:**
