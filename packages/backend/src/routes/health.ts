@@ -193,6 +193,18 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
     logger.info('🏥 Database Health Check - Starting')
     logger.info('======================================')
     
+    // Log environment configuration (masked)
+    const dbUrl = process.env.DATABASE_URL || 'not set'
+    const maskedUrl = dbUrl.replace(/:([^:@]+)@/, ':*****@')
+    logger.info('Database Configuration:')
+    logger.info(`  DATABASE_URL: ${maskedUrl}`)
+    logger.info(`  DB_HOST: ${process.env.DB_HOST || 'not set'}`)
+    logger.info(`  DB_PORT: ${process.env.DB_PORT || 'not set'}`)
+    logger.info(`  DB_NAME: ${process.env.DB_NAME || 'not set'}`)
+    logger.info(`  DB_USER: ${process.env.DB_USER || 'not set'}`)
+    logger.info(`  DB_PASSWORD: ${process.env.DB_PASSWORD ? '*****' : 'not set'}`)
+    logger.info('======================================')
+    
     const healthCheck = {
       timestamp: new Date().toISOString(),
       database: {
@@ -202,6 +214,13 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
         write: { status: 'unknown', duration: 0, error: undefined as string | undefined },
         read: { status: 'unknown', duration: 0, error: undefined as string | undefined },
         cleanup: { status: 'unknown', duration: 0, error: undefined as string | undefined }
+      },
+      config: {
+        databaseUrl: maskedUrl,
+        host: process.env.DB_HOST || 'not set',
+        port: process.env.DB_PORT || 'not set',
+        database: process.env.DB_NAME || 'not set',
+        user: process.env.DB_USER || 'not set'
       }
     }
     
@@ -217,17 +236,31 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
     if (!connectionTest.success) {
       logger.error('❌ Database connection test FAILED')
       logger.error('Error details:', connectionTest.error)
-      logger.error('Possible causes:')
-      logger.error('  - Database server is not running')
-      logger.error('  - DATABASE_URL environment variable is incorrect')
-      logger.error('  - Network connectivity issues')
-      logger.error('  - Firewall blocking database port')
+      logger.error('')
+      logger.error('Troubleshooting Steps:')
+      logger.error('  1. Check if PostgreSQL is installed and running:')
+      logger.error('     sudo systemctl status postgresql')
+      logger.error('')
+      logger.error('  2. Verify DATABASE_URL is correct:')
+      logger.error(`     Current: ${maskedUrl}`)
+      logger.error('')
+      logger.error('  3. Test direct database connection:')
+      logger.error(`     psql -h ${process.env.DB_HOST || 'localhost'} -U ${process.env.DB_USER || 'user'} -d ${process.env.DB_NAME || 'database'}`)
+      logger.error('')
+      logger.error('  4. Run database setup if not done:')
+      logger.error('     npm run db:setup')
+      logger.error('')
+      logger.error('  5. Initialize database tables:')
+      logger.error('     npm run db:init')
+      logger.error('')
+      logger.error('  6. Run comprehensive diagnostics:')
+      logger.error('     npm run db:debug')
       logger.info('======================================')
       
       healthCheck.database.overall = 'unhealthy'
       return {
         ...healthCheck,
-        message: 'Database connection failed - see logs for details'
+        message: 'Database connection failed - see logs for troubleshooting steps'
       }
     }
     
@@ -245,15 +278,19 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
     if (!tablesTest.success) {
       logger.error('❌ Database tables check FAILED')
       logger.error('Error details:', tablesTest.error)
-      logger.error('Possible causes:')
-      logger.error('  - Database schema has not been initialized')
-      logger.error('  - Insufficient permissions to query tables')
+      logger.error('')
+      logger.error('Troubleshooting Steps:')
+      logger.error('  1. Initialize database tables:')
+      logger.error('     npm run db:init')
+      logger.error('')
+      logger.error('  2. Check permissions:')
+      logger.error(`     psql -h ${process.env.DB_HOST || 'localhost'} -U ${process.env.DB_USER || 'user'} -d ${process.env.DB_NAME || 'database'} -c "\\dt"`)
       logger.info('======================================')
       
       healthCheck.database.overall = 'unhealthy'
       return {
         ...healthCheck,
-        message: 'Database tables check failed - see logs for details'
+        message: 'Database tables check failed - run npm run db:init'
       }
     }
     
@@ -264,6 +301,9 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
     if (missingTables.length > 0) {
       logger.warn('⚠️  Missing required tables:', missingTables.join(', '))
       logger.warn('The database may not be fully initialized')
+      logger.warn('')
+      logger.warn('Run database initialization:')
+      logger.warn('  npm run db:init')
       healthCheck.database.overall = 'degraded'
     }
     
