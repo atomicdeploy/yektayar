@@ -27,7 +27,8 @@ describe('ApiClient URL Normalization', () => {
     })
     
     const axiosInstance = client.getAxiosInstance()
-    expect(axiosInstance.defaults.headers['Content-Type']).toBe('application/json')
+    expect(axiosInstance.defaults.headers['Accept']).toBe('application/json')
+    expect(axiosInstance.defaults.headers['User-Agent']).toBe('@yektayar/shared/0.1.0')
     expect(axiosInstance.defaults.timeout).toBe(30000)
   })
 
@@ -53,6 +54,7 @@ describe('ApiClient URL Normalization', () => {
     
     const axiosInstance = client.getAxiosInstance()
     expect(axiosInstance.defaults.headers['X-Custom-Header']).toBe('test-value')
-    expect(axiosInstance.defaults.headers['Content-Type']).toBe('application/json')
+    expect(axiosInstance.defaults.headers['Accept']).toBe('application/json')
+    expect(axiosInstance.defaults.headers['User-Agent']).toBe('@yektayar/shared/0.1.0')
   })
 })

@@ -39,7 +39,8 @@ export class ApiClient {
       baseURL: config.baseURL,
       timeout: config.timeout || 30000,
       headers: {
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'User-Agent': '@yektayar/shared/0.1.0',
         ...config.headers,
       },
     })
@@ -172,14 +173,9 @@ export class ApiClient {
    * @returns Promise resolving to ApiResponse<T>
    */
   async get<T = any>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
-    // Content-Type is set here (not just in axios instance) to ensure it's always 'application/json'
-    // and cannot be overridden by custom headers passed in options.
     const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
       params: options?.params,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      headers: options?.headers,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
       tokenDeliveryMethod: options?.tokenDeliveryMethod,
@@ -302,10 +298,7 @@ export class ApiClient {
    */
   async delete<T = any>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
     const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      headers: options?.headers,
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
