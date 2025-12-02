@@ -154,6 +154,42 @@
               </div>
             </div>
 
+            <!-- Section Scores (for comprehensive tests) -->
+            <div v-if="result.answers?.sectionScores" class="sections-card">
+              <h3>{{ locale === 'fa' ? 'نمرات بخش‌ها' : 'Section Scores' }}</h3>
+              <p class="sections-subtitle">{{ locale === 'fa' 
+                ? 'نمره هر بخش از رابطه شما را نشان می‌دهد' 
+                : 'Shows your score in each relationship area' }}</p>
+              
+              <div class="sections-list">
+                <div 
+                  v-for="(section, key) in result.answers.sectionScores" 
+                  :key="key"
+                  class="section-item"
+                >
+                  <div class="section-header">
+                    <div class="section-title-wrapper">
+                      <span class="section-number">{{ key }}</span>
+                      <span class="section-title">{{ locale === 'fa' ? section.title : section.titleEn }}</span>
+                    </div>
+                    <span class="section-score">{{ section.score }}/{{ section.maxScore }}</span>
+                  </div>
+                  <div class="section-progress">
+                    <div 
+                      class="section-progress-bar"
+                      :class="getSectionScoreClass(section.score, section.maxScore)"
+                      :style="{ width: `${(section.score / section.maxScore) * 100}%` }"
+                    ></div>
+                  </div>
+                  <div class="section-interpretation">
+                    <span :class="['section-badge', getSectionScoreClass(section.score, section.maxScore)]">
+                      {{ getSectionInterpretation(section.score, section.maxScore) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Recommendations -->
             <div class="recommendations-card">
               <div class="recommendations-header">
@@ -367,6 +403,27 @@ const getRecommendations = () => {
 const shareResults = () => {
   // TODO: Implement sharing functionality
   logger.info('Share results')
+}
+
+const getSectionScoreClass = (score: number, maxScore: number) => {
+  const percentage = (score / maxScore) * 100
+  if (percentage >= 62) return 'strong' // 28-45 range mapped to percentage
+  if (percentage >= 47) return 'moderate' // 21-27 range
+  return 'needs-attention' // 9-20 range
+}
+
+const getSectionInterpretation = (score: number, maxScore: number) => {
+  const percentage = (score / maxScore) * 100
+  
+  if (locale.value === 'fa') {
+    if (percentage >= 62) return 'قوی' // Strong
+    if (percentage >= 47) return 'متوسط' // Moderate
+    return 'نیاز به توجه' // Needs attention
+  } else {
+    if (percentage >= 62) return 'Strong'
+    if (percentage >= 47) return 'Moderate'
+    return 'Needs Attention'
+  }
 }
 
 const retakeTest = () => {
@@ -692,6 +749,139 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Section Scores Card */
+.sections-card {
+  background: var(--surface-1);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 1.5rem;
+}
+
+.sections-card h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.sections-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem 0;
+}
+
+.sections-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.section-item {
+  padding: 1rem;
+  background: var(--surface-2);
+  border-radius: 12px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.section-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.section-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent-gradient);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.section-score {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  margin-left: 0.75rem;
+}
+
+.section-progress {
+  height: 8px;
+  background: var(--ion-border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.section-progress-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.section-progress-bar.strong {
+  background: linear-gradient(90deg, var(--ion-color-success) 0%, var(--ion-color-success-tint) 100%);
+}
+
+.section-progress-bar.moderate {
+  background: linear-gradient(90deg, var(--ion-color-warning) 0%, var(--ion-color-warning-tint) 100%);
+}
+
+.section-progress-bar.needs-attention {
+  background: linear-gradient(90deg, var(--ion-color-danger) 0%, var(--ion-color-danger-tint) 100%);
+}
+
+.section-interpretation {
+  text-align: center;
+}
+
+.section-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.section-badge.strong {
+  background: rgba(45, 211, 111, 0.1);
+  color: var(--ion-color-success);
+}
+
+.section-badge.moderate {
+  background: rgba(255, 196, 9, 0.1);
+  color: var(--ion-color-warning);
+}
+
+.section-badge.needs-attention {
+  background: rgba(235, 68, 90, 0.1);
+  color: var(--ion-color-danger);
 }
 
 /* Recommendations Card */
