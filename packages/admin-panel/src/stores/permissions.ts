@@ -11,8 +11,8 @@ export type Permission =
   | 'view_messages'
   | 'view_courses'
   | 'edit_courses'
-  | 'view_tests'
-  | 'edit_tests'
+  | 'view_assessments'
+  | 'edit_assessments'
   | 'view_pages'
   | 'edit_pages'
   | 'view_reports'
@@ -32,8 +32,8 @@ const rolePermissions: Record<Role, Permission[]> = {
     'view_messages',
     'view_courses',
     'edit_courses',
-    'view_tests',
-    'edit_tests',
+    'view_assessments',
+    'edit_assessments',
     'view_pages',
     'edit_pages',
     'view_reports',
@@ -46,7 +46,7 @@ const rolePermissions: Record<Role, Permission[]> = {
     'view_appointments',
     'view_messages',
     'view_courses',
-    'view_tests',
+    'view_assessments',
     'view_reports',
   ],
   psychologist: [
@@ -55,7 +55,7 @@ const rolePermissions: Record<Role, Permission[]> = {
     'edit_appointments',
     'view_messages',
     'view_courses',
-    'view_tests',
+    'view_assessments',
   ],
   user: [
     'view_dashboard',

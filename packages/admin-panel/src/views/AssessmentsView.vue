@@ -411,7 +411,7 @@ const filteredTests = computed(() => {
 const fetchTests = async () => {
   try {
     loading.value = true
-    const response = await axios.get('/api/tests')
+    const response = await axios.get('/api/assessments')
     if (response.data.success) {
       tests.value = response.data.data
     }
@@ -446,7 +446,7 @@ const manageQuestions = async (test: any) => {
   
   // Fetch full test data with questions
   try {
-    const response = await axios.get(`/api/tests/${test.id}`)
+    const response = await axios.get(`/api/assessments/${test.id}`)
     if (response.data.success) {
       const testData = response.data.data
       
@@ -473,7 +473,7 @@ const viewResults = async (test: any) => {
   selectedTest.value = test
   
   try {
-    const response = await axios.get(`/api/tests/${test.id}/results`)
+    const response = await axios.get(`/api/assessments/${test.id}/results`)
     if (response.data.success) {
       results.value = response.data.data
     }
@@ -490,7 +490,7 @@ const deleteTest = async (test: any) => {
   }
 
   try {
-    await axios.delete(`/api/tests/${test.id}`)
+    await axios.delete(`/api/assessments/${test.id}`)
     tests.value = tests.value.filter((t) => t.id !== test.id)
   } catch (error) {
     console.error('Error deleting test:', error)
@@ -504,7 +504,7 @@ const saveTest = async () => {
 
     if (showEditModal.value && selectedTest.value) {
       // Update existing test
-      const response = await axios.put(`/api/tests/${selectedTest.value.id}`, formData.value)
+      const response = await axios.put(`/api/assessments/${selectedTest.value.id}`, formData.value)
       if (response.data.success) {
         const index = tests.value.findIndex((t) => t.id === selectedTest.value.id)
         if (index !== -1) {
@@ -513,7 +513,7 @@ const saveTest = async () => {
       }
     } else {
       // Create new test
-      const response = await axios.post('/api/tests', {
+      const response = await axios.post('/api/assessments', {
         ...formData.value,
         questions: [],
       })
@@ -547,7 +547,7 @@ const saveQuestions = async () => {
       })),
     }))
 
-    const response = await axios.put(`/api/tests/${selectedTest.value.id}`, {
+    const response = await axios.put(`/api/assessments/${selectedTest.value.id}`, {
       questions,
     })
 

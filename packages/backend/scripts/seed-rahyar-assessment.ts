@@ -9,7 +9,7 @@ import { logger } from '@yektayar/shared'
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar'
 const db = postgres(DATABASE_URL)
 
-const rahyarTest = {
+const rahyarAssessment = {
   title: 'رهیار - آزمون جامع ارزیابی مولفه‌های رابطه',
   titleEn: 'Rahyar - Comprehensive Relationship Assessment Test',
   description: 'آزمونی که مسیر رابطه را روشن می‌کند و راه‌حل‌ها را نشان می‌دهد، مثل یک دوست کنار فرد می‌ماند تا مشکلات را بشناسد. این پرسشنامه یک ابزار خودارزیابی است که برای ایجاد یک گفتگوی سازنده و مبتنی بر داده طراحی شده است.',
@@ -541,35 +541,35 @@ const rahyarTest = {
   ],
 }
 
-async function seedRahyarTest() {
+async function seedRahyarAssessment() {
   try {
-    logger.info('Starting Rahyar test data seeding...')
+    logger.info('Starting Rahyar assessment data seeding...')
 
     // Check if test already exists
     const existing = await db`
-      SELECT id FROM assessments WHERE title = ${rahyarTest.title}
+      SELECT id FROM assessments WHERE title = ${rahyarAssessment.title}
     `
 
     if (existing.length > 0) {
-      logger.warn('Rahyar test already exists, skipping...')
+      logger.warn('Rahyar assessment already exists, skipping...')
       return
     }
 
-    // Insert the Rahyar test
+    // Insert the Rahyar assessment
     const [test] = await db`
       INSERT INTO assessments (title, description, questions)
-      VALUES (${rahyarTest.title}, ${rahyarTest.description}, ${db.json(rahyarTest.questions)})
+      VALUES (${rahyarAssessment.title}, ${rahyarAssessment.description}, ${db.json(rahyarAssessment.questions)})
       RETURNING *
     `
 
-    logger.success(`Rahyar test created with ID: ${test.id}`)
-    logger.info(`Title: ${rahyarTest.title}`)
-    logger.info(`Questions: ${rahyarTest.questions.length}`)
+    logger.success(`Rahyar assessment created with ID: ${test.id}`)
+    logger.info(`Title: ${rahyarAssessment.title}`)
+    logger.info(`Questions: ${rahyarAssessment.questions.length}`)
     logger.info(`Sections: 9`)
-    logger.info(`Tagline: ${rahyarTest.tagline}`)
+    logger.info(`Tagline: ${rahyarAssessment.tagline}`)
     
   } catch (error) {
-    logger.error('Error seeding Rahyar test data:', error)
+    logger.error('Error seeding Rahyar assessment data:', error)
     throw error
   } finally {
     await db.end()
@@ -577,12 +577,12 @@ async function seedRahyarTest() {
 }
 
 // Run the seed function
-seedRahyarTest()
+seedRahyarAssessment()
   .then(() => {
-    logger.success('Rahyar test data seeding completed!')
+    logger.success('Rahyar assessment data seeding completed!')
     process.exit(0)
   })
   .catch((error) => {
-    logger.error('Rahyar test data seeding failed:', error)
+    logger.error('Rahyar assessment data seeding failed:', error)
     process.exit(1)
   })

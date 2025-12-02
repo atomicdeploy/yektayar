@@ -181,7 +181,7 @@ const loading = ref(true)
 const fetchTests = async () => {
   try {
     loading.value = true
-    const response = await apiClient.get('/api/tests')
+    const response = await apiClient.get('/api/assessments')
     if (response.data.success) {
       tests.value = response.data.data
       logger.success(`Loaded ${tests.value.length} tests`)
@@ -197,7 +197,7 @@ const fetchTestHistory = async () => {
   try {
     // TODO: Get userId from session store once authentication is fully implemented
     const userId = 1 // Placeholder for development
-    const response = await apiClient.get(`/api/tests/user/history?userId=${userId}`)
+    const response = await apiClient.get(`/api/assessments/user/history?userId=${userId}`)
     if (response.data.success) {
       testHistory.value = response.data.data
     }

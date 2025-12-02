@@ -92,7 +92,7 @@
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
 
-          <div class="action-card" @click="navigateToTests">
+          <div class="action-card" @click="navigateToAssessments">
             <div class="action-icon-wrapper info">
               <ion-icon :icon="documentText" class="action-icon"></ion-icon>
             </div>
@@ -229,7 +229,7 @@ const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')
 const navigateToAppointments = () => router.push('/tabs/appointments')
 const navigateToCourses = () => router.push('/tabs/courses')
-const navigateToTests = () => router.push('/tabs/tests')
+const navigateToAssessments = () => router.push('/tabs/assessments')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 

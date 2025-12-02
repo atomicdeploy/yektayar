@@ -91,16 +91,16 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AIChatPage.vue')
       },
       {
-        path: 'tests',
-        component: () => import('@/views/TestsPage.vue')
+        path: 'assessments',
+        component: () => import('@/views/AssessmentsPage.vue')
       },
       {
-        path: 'tests/:id',
-        component: () => import('@/views/TakeTestPage.vue')
+        path: 'assessments/:id',
+        component: () => import('@/views/TakeAssessmentPage.vue')
       },
       {
-        path: 'tests/results/:resultId',
-        component: () => import('@/views/TestResultsPage.vue')
+        path: 'assessments/results/:resultId',
+        component: () => import('@/views/AssessmentResultsPage.vue')
       }
     ]
   }

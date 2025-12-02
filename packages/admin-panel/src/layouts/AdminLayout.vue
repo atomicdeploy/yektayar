@@ -210,7 +210,7 @@ const navItems = [
     permission: 'view_courses' as const,
   },
   {
-    to: '/tests',
+    to: '/assessments',
     label: 'nav.tests',
     icon: ClipboardDocumentCheckIcon,
     permission: 'view_tests' as const,

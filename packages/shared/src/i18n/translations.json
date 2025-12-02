@@ -114,7 +114,7 @@
       "no_enrolled_courses": "دوره‌ی ثبت‌نام شده‌ای وجود ندارد",
       "browse_courses": "مشاهده دوره‌ها"
     },
-    "tests": {
+    "assessments": {
       "title": "آزمون‌ها",
       "available_tests": "آزمون‌های در دسترس",
       "my_tests": "آزمون‌های من",
@@ -293,7 +293,7 @@
       "no_enrolled_courses": "No enrolled courses",
       "browse_courses": "Browse Courses"
     },
-    "tests": {
+    "assessments": {
       "title": "Tests",
       "available_tests": "Available Tests",
       "my_tests": "My Tests",

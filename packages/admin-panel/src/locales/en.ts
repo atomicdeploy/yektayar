@@ -25,7 +25,7 @@ export default {
     appointments: 'Appointments',
     messages: 'Messages',
     courses: 'Courses',
-    tests: 'Tests',
+    assessments: 'Assessments',
     pages: 'Pages',
     reports: 'Reports',
     settings: 'Settings',
