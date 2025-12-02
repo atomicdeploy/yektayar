@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ test?.title || (locale === 'fa' ? 'آزمون' : 'Test') }}</ion-title>
+        <ion-title>{{ assessment?.title || (locale === 'fa' ? 'ارزیابی' : 'Assessment') }}</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="showExitConfirm">
             <ion-icon slot="icon-only" :icon="close"></ion-icon>
@@ -152,7 +152,7 @@
           <div v-else-if="currentStep > 1 && currentStep <= totalSteps - 1" class="step-container">
             <div class="question-section">
               <div class="question-number">
-                {{ locale === 'fa' ? 'سوال' : 'Question' }} {{ currentQuestionIndex + 1 }} {{ locale === 'fa' ? 'از' : 'of' }} {{ test?.questions?.length || 0 }}
+                {{ locale === 'fa' ? 'سوال' : 'Question' }} {{ currentQuestionIndex + 1 }} {{ locale === 'fa' ? 'از' : 'of' }} {{ assessment?.questions?.length || 0 }}
               </div>
               
               <div class="question-card">
@@ -189,7 +189,7 @@
                   :disabled="!answers[currentQuestionIndex]"
                   @click="nextQuestion"
                 >
-                  {{ currentQuestionIndex < (test?.questions?.length || 0) - 1 
+                  {{ currentQuestionIndex < (assessment?.questions?.length || 0) - 1 
                     ? (locale === 'fa' ? 'بعدی' : 'Next')
                     : (locale === 'fa' ? 'اتمام' : 'Finish') }}
                   <ion-icon :icon="chevronForward" slot="end"></ion-icon>
@@ -238,7 +238,7 @@
                   </div>
                   <div class="stat-divider"></div>
                   <div class="stat-item">
-                    <div class="stat-number">{{ test?.questions?.length || 0 }}</div>
+                    <div class="stat-number">{{ assessment?.questions?.length || 0 }}</div>
                     <div class="stat-label">{{ locale === 'fa' ? 'کل سوالات' : 'Total Questions' }}</div>
                   </div>
                 </div>
@@ -379,8 +379,8 @@ const canProceed = computed(() => {
 
 const fetchAssessment = async () => {
   try {
-    const testId = route.params.id
-    const response = await apiClient.get(`/api/assessments/${testId}`)
+    const assessmentId = route.params.id
+    const response = await apiClient.get(`/api/assessments/${assessmentId}`)
     if (response.data.success) {
       assessment.value = response.data.data
       logger.success(`Loaded assessment: ${assessment.value.title}`)
@@ -461,13 +461,13 @@ const showExitConfirm = async () => {
 const submitAssessment = async () => {
   try {
     submitting.value = true
-    const testId = route.params.id
+    const assessmentId = route.params.id
     
     // Convert answers object to array
     const answersArray = assessment.value.questions.map((_: any, index: number) => answers.value[index] || 0)
     
     // TODO: Get userId from session store once authentication is fully implemented
-    const response = await apiClient.post(`/api/assessments/${testId}/submit`, {
+    const response = await apiClient.post(`/api/assessments/${assessmentId}/submit`, {
       answers: answersArray,
       demographicInfo: demographicInfo.value,
       userId: 1, // Placeholder for development,
