@@ -443,20 +443,10 @@ ion-content {
   scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
 }
 
-/* Dark Theme Native Scrollbar Overrides */
+/* Dark Theme Native Scrollbar Overrides
+   Note: Hover states use 'tint' (lighter) in dark mode vs 'shade' (darker) in light mode
+   for better visual contrast and UX */
 .ion-palette-dark ion-content {
-  &::-webkit-scrollbar-track {
-    background: var(--ion-background-color);
-  }
-
-  &::-webkit-scrollbar-track:hover {
-    background: var(--surface-2);
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: var(--ion-color-primary);
-  }
-
   &::-webkit-scrollbar-thumb:hover {
     background: var(--ion-color-primary-tint);
   }
@@ -464,25 +454,10 @@ ion-content {
   &::-webkit-scrollbar-thumb:active {
     background: var(--ion-color-primary-tint);
   }
-
-  scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
 }
 
-/* System Dark Mode Native Scrollbar Overrides */
 @media (prefers-color-scheme: dark) {
   html:not(.theme-forced) ion-content {
-    &::-webkit-scrollbar-track {
-      background: var(--ion-background-color);
-    }
-
-    &::-webkit-scrollbar-track:hover {
-      background: var(--surface-2);
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--ion-color-primary);
-    }
-
     &::-webkit-scrollbar-thumb:hover {
       background: var(--ion-color-primary-tint);
     }
@@ -490,7 +465,5 @@ ion-content {
     &::-webkit-scrollbar-thumb:active {
       background: var(--ion-color-primary-tint);
     }
-
-    scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
   }
 }
