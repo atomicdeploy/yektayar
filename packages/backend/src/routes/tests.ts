@@ -95,8 +95,6 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
     }
   })
 
-  })
-
   /**
    * POST /api/tests
    * Create a new test (admin only)
@@ -153,8 +151,6 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
     }
   })
 
-  })
-
   /**
    * POST /api/tests/:id/submit
    * Submit test answers and get results
@@ -203,14 +199,31 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
       // Calculate score based on test type
       let score = 0
       let personalityType = null
+      let sectionScores: any = {}
 
       // For personality tests, sum up all answers
       if (test.questions && Array.isArray(test.questions)) {
         const questions = test.questions as any[]
+        
+        // Calculate total score
         questions.forEach((question, index) => {
           const answer = answers[index]
           if (typeof answer === 'number') {
             score += answer
+            
+            // Track section scores if sections exist
+            if (question.section) {
+              if (!sectionScores[question.section]) {
+                sectionScores[question.section] = {
+                  title: question.sectionTitle || '',
+                  titleEn: question.sectionTitleEn || '',
+                  score: 0,
+                  maxScore: 0,
+                }
+              }
+              sectionScores[question.section].score += answer
+              sectionScores[question.section].maxScore += 5
+            }
           }
         })
       }
@@ -228,10 +241,11 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
         personalityType = 'high'
       }
 
-      // Store the result with demographic info
+      // Store the result with demographic info and section scores
       const answersWithDemographic = {
         answers,
         demographicInfo,
+        sectionScores: Object.keys(sectionScores).length > 0 ? sectionScores : null,
       }
 
       const [result] = await db`
@@ -259,7 +273,10 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
         data: {
           id: result.id,
           score,
+          maxScore,
+          percentage: Math.round(percentage),
           personalityType,
+          sectionScores: Object.keys(sectionScores).length > 0 ? sectionScores : null,
           completedAt: result.completed_at,
         },
       }
