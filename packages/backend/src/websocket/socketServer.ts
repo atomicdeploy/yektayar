@@ -6,6 +6,9 @@ import { logger } from '@yektayar/shared'
 import { getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../../package.json'
 
+// Type declaration for Bun
+declare const Bun: any
+
 // Get version from package.json
 const APP_VERSION = getVersionFromPackageJson(packageJson)
 

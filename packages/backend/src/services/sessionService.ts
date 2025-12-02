@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { query } from './database-pg'
+import { query } from './database'
 import { logger } from '@yektayar/shared'
 
 export interface Session {

@@ -1,11 +1,13 @@
 import { logger } from '@yektayar/shared'
-import type { ServerWebSocket } from 'bun'
 import { validateSessionToken } from '../services/sessionService'
 import { 
   WebSocketSessionData, 
   routeEvent, 
   createWelcomeMessage 
 } from './eventHandlers'
+
+// Type declaration for Bun
+type ServerWebSocket = any
 
 /**
  * Handle native WebSocket connections for Bun
@@ -64,7 +66,7 @@ export function setupNativeWebSocket() {
      * WebSocket handler configuration
      */
     websocket: {
-      message(ws: ServerWebSocket<WebSocketSessionData>, message: string | Buffer) {
+      message(ws: ServerWebSocket, message: string | Buffer) {
         const data = ws.data
         
         try {
@@ -84,7 +86,7 @@ export function setupNativeWebSocket() {
         }
       },
       
-      open(ws: ServerWebSocket<WebSocketSessionData>) {
+      open(ws: ServerWebSocket) {
         const data = ws.data
         logger.info(`Native WebSocket connected: ${data.socketId}`, {
           sessionToken: data.sessionToken,
@@ -96,12 +98,12 @@ export function setupNativeWebSocket() {
         ws.send(JSON.stringify(createWelcomeMessage(data, 'native-websocket')))
       },
       
-      close(ws: ServerWebSocket<WebSocketSessionData>, code: number, reason: string) {
+      close(ws: ServerWebSocket, code: number, reason: string) {
         const data = ws.data
         logger.info(`Native WebSocket disconnected: ${data.socketId}`, { code, reason })
       },
       
-      drain(ws: ServerWebSocket<WebSocketSessionData>) {
+      drain(ws: ServerWebSocket) {
         // Handle backpressure
         logger.info('WebSocket drain', ws.data.socketId)
       }

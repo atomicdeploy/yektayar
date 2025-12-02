@@ -22,9 +22,12 @@ import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
-import { initializeDatabase } from './services/database-pg'
+import { initializeDatabase } from './services/database'
 import { getWebSocketPathFromEnv, getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../package.json'
+
+// Type declarations for Bun runtime
+declare const Bun: any
 
 // Get version from package.json
 const APP_VERSION = getVersionFromPackageJson(packageJson)
@@ -189,7 +192,7 @@ if (isBun) {
     port,
     hostname,
     idleTimeout: 30, // Increase timeout for slow database queries (default is 10s)
-    fetch: async (req, server) => {
+    fetch: async (req: any, server: any) => {
       const url = new URL(req.url)
       const upgradeHeader = req.headers.get('upgrade')?.toLowerCase()
       const isWebSocketUpgrade = upgradeHeader === 'websocket'

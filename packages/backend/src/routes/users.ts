@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { query } from '../services/database-pg'
+import { query } from '../services/database'
 import bcrypt from 'bcrypt'
 import { 
   getUserPreferences, 

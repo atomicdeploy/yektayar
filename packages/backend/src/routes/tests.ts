@@ -4,7 +4,7 @@
  */
 
 import { Elysia, t } from 'elysia'
-import { query, getDatabase } from '../services/database-pg'
+import { query, getDatabase } from '../services/database'
 import { logger } from '@yektayar/shared'
 
 export const testRoutes = new Elysia({ prefix: '/api/tests' })

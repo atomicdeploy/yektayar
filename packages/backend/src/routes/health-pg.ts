@@ -4,7 +4,7 @@
  * Using pg library for better Bun compatibility
  */
 import { Elysia } from 'elysia'
-import { getPool, query } from '../services/database-pg'
+import { getPool, query } from '../services/database'
 import { logger } from '@yektayar/shared'
 
 /**
