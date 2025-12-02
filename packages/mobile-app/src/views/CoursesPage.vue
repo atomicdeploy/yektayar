@@ -643,7 +643,7 @@ ion-chip {
 // RTL Support
 [dir='rtl'] {
   .courses-horizontal-scroll {
-    direction: ltr;
+    direction: rtl;
   }
 
   .course-card-mini {
