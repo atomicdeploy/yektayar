@@ -185,6 +185,7 @@ if (isBun) {
   httpServer = Bun.serve({
     port,
     hostname,
+    idleTimeout: 30, // Increase timeout for slow database queries (default is 10s)
     fetch: async (req, server) => {
       const url = new URL(req.url)
       const upgradeHeader = req.headers.get('upgrade')?.toLowerCase()

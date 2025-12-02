@@ -8,28 +8,22 @@ import bcrypt from 'bcrypt'
 import { logger } from '@yektayar/shared'
 
 // Initialize PostgreSQL connection
-// Normalize localhost to 127.0.0.1 to avoid IPv6/IPv4 resolution issues
-// This ensures consistent behavior across different system configurations
-const DATABASE_URL = (process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar')
-  .replace(/\/\/localhost:/, '//127.0.0.1:')
-  .replace(/\/\/localhost\//, '//127.0.0.1/')
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar'
 
 let sql: ReturnType<typeof postgres> | null = null
 
 /**
  * Get database connection instance
- * Configured with timeouts and connection pooling for reliability
  */
 export function getDatabase() {
   if (!sql) {
+    logger.info(`Initializing database connection to ${DATABASE_URL.replace(/:([^:@]+)@/, ':*****@')}`)
     sql = postgres(DATABASE_URL, {
-      max: 10, // Maximum connections in pool
-      idle_timeout: 20, // Seconds before idle connection is closed
-      connect_timeout: 10, // Seconds to wait for connection
-      onnotice: () => {}, // Suppress PostgreSQL notices
-      // Prefer IPv4 to avoid resolution delays
-      host_rewrite: (host: string) => host === 'localhost' ? '127.0.0.1' : host,
+      max: 10, // Maximum connections
+      idle_timeout: 20,
+      connect_timeout: 10,
     })
+    logger.info('Database connection pool initialized')
   }
   return sql
 }
