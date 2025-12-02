@@ -380,7 +380,7 @@ const canProceed = computed(() => {
 const fetchTest = async () => {
   try {
     const testId = route.params.id
-    const response = await apiClient.get(`/tests/${testId}`)
+    const response = await apiClient.get(`/api/tests/${testId}`)
     if (response.data.success) {
       test.value = response.data.data
       logger.success(`Loaded test: ${test.value.title}`)
@@ -464,7 +464,7 @@ const submitTest = async () => {
     const answersArray = test.value.questions.map((_: any, index: number) => answers.value[index] || 0)
     
     // TODO: Get userId from session store once authentication is fully implemented
-    const response = await apiClient.post(`/tests/${testId}/submit`, {
+    const response = await apiClient.post(`/api/tests/${testId}/submit`, {
       answers: answersArray,
       demographicInfo: demographicInfo.value,
       userId: 1, // Placeholder for development

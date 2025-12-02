@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { getDatabase } from '../services/database'
+import { query } from '../services/database-pg'
 import { logger } from '@yektayar/shared'
 
 export const pageRoutes = new Elysia({ prefix: '/api/pages' })
