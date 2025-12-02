@@ -232,9 +232,9 @@ pm2 logs
 - `scripts/dev-runner.sh` - Main script with all improvements
 
 ### Added
-- `scripts/test-process-tree-kill.sh` - Process tree killing tests
-- `scripts/test-port-checking.sh` - Port checking tests
-- `scripts/test-vite-simulation.sh` - Vite/ESBuild simulation test
+- `tests/scripts/test-process-tree-kill.sh` - Process tree killing tests
+- `tests/scripts/test-port-checking.sh` - Port checking tests
+- `tests/scripts/test-vite-simulation.sh` - Vite/ESBuild simulation test
 - `docs/PM2-INTEGRATION.md` - Complete PM2 integration guide
 - `docs/DEV-RUNNER-IMPROVEMENTS.md` - This document
 - `ecosystem.config.js` - PM2 ecosystem configuration

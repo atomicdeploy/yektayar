@@ -139,8 +139,8 @@ console.log('Database status:', healthStatus.database.overall)
 
 ### Test Script
 ```bash
-node scripts/test-health-db.js
-node scripts/test-health-db.js http://localhost:3000
+node tests/scripts/test-health-db.cjs
+node tests/scripts/test-health-db.cjs http://localhost:3000
 ```
 
 ## Testing
@@ -152,7 +152,7 @@ The endpoint includes built-in tests:
 npm test
 
 # Run manual test script
-node scripts/test-health-db.js
+node tests/scripts/test-health-db.cjs
 ```
 
 ## Timeouts

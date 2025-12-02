@@ -133,7 +133,7 @@ sudo ./scripts/manage-services.sh status
 ### 4. Automated Testing
 Created test script to verify the fix:
 ```bash
-./scripts/test-backend-fix.sh
+./tests/scripts/test-backend-fix.sh
 ```
 
 ## Testing Performed
@@ -170,7 +170,7 @@ PORT=3001 bun packages/backend/src/index.ts
 4. `scripts/install-services.sh` - Installation script
 5. `scripts/manage-services.sh` - Service management script
 6. `scripts/dev-runner.sh` - Development runner script
-7. `scripts/test-backend-fix.sh` - Automated test script
+7. `tests/scripts/test-backend-fix.sh` - Automated test script
 8. `scripts/README.md` - Comprehensive deployment guide
 9. `QUICK-START.md` - Added deployment section
 
