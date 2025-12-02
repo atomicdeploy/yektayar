@@ -469,7 +469,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         data: modules
       }
     } catch (error) {
-      console.error('Error fetching course modules:', error)
+      logger.error('Error fetching course modules:', error)
       return {
         success: false,
         error: 'Failed to fetch modules',
@@ -508,7 +508,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Module created successfully'
       }
     } catch (error) {
-      console.error('Error creating module:', error)
+      logger.error('Error creating module:', error)
       return {
         success: false,
         error: 'Failed to create module',
@@ -536,7 +536,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         data: lessons
       }
     } catch (error) {
-      console.error('Error fetching lessons:', error)
+      logger.error('Error fetching lessons:', error)
       return {
         success: false,
         error: 'Failed to fetch lessons',
@@ -577,7 +577,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Lesson created successfully'
       }
     } catch (error) {
-      console.error('Error creating lesson:', error)
+      logger.error('Error creating lesson:', error)
       return {
         success: false,
         error: 'Failed to create lesson',
@@ -614,7 +614,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         data: lessons[0]
       }
     } catch (error) {
-      console.error('Error fetching lesson:', error)
+      logger.error('Error fetching lesson:', error)
       return {
         success: false,
         error: 'Failed to fetch lesson',
@@ -676,7 +676,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Lesson updated successfully'
       }
     } catch (error) {
-      console.error('Error updating lesson:', error)
+      logger.error('Error updating lesson:', error)
       return {
         success: false,
         error: 'Failed to update lesson',
@@ -773,7 +773,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Progress updated successfully'
       }
     } catch (error) {
-      console.error('Error updating progress:', error)
+      logger.error('Error updating progress:', error)
       return {
         success: false,
         error: 'Failed to update progress',
@@ -835,7 +835,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         }
       }
     } catch (error) {
-      console.error('Error fetching progress:', error)
+      logger.error('Error fetching progress:', error)
       return {
         success: false,
         error: 'Failed to fetch progress',
@@ -914,7 +914,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         message: 'Review submitted successfully'
       }
     } catch (error) {
-      console.error('Error submitting review:', error)
+      logger.error('Error submitting review:', error)
       return {
         success: false,
         error: 'Failed to submit review',
@@ -973,7 +973,7 @@ export const courseRoutes = new Elysia({ prefix: '/api/courses' })
         }
       }
     } catch (error) {
-      console.error('Error fetching reviews:', error)
+      logger.error('Error fetching reviews:', error)
       return {
         success: false,
         error: 'Failed to fetch reviews',
