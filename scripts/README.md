@@ -4,6 +4,112 @@ This directory contains scripts and service configurations for deploying and man
 
 ## Contents
 
+### Git Workflow Automation
+
+#### `git-sync.sh`
+
+Automated repository synchronization script that handles the entire workflow of fetching, pulling, pushing, updating dependencies, building, and validating the development environment.
+
+**Usage:**
+```bash
+./scripts/git-sync.sh
+# Or after setup:
+git sync
+# Or via npm:
+npm run sync
+```
+
+**What it does:**
+1. Checks git status and validates current branch
+2. Stashes any uncommitted local changes
+3. Fetches latest changes from all remotes
+4. Pulls and rebases current branch with remote
+5. Pushes any unpushed local commits
+6. Installs/updates dependencies if package files changed
+7. Builds shared packages if needed
+8. Restores previously stashed changes
+9. Runs system requirements validation
+
+**Features:**
+- ✅ Smart stashing - only stashes if there are changes
+- ✅ Safe operations - rolls back on errors
+- ✅ Intelligent dependency detection - only installs when needed
+- ✅ Build optimization - only rebuilds what's necessary
+- ✅ Comprehensive error handling
+- ✅ Works with workspace monorepo structure
+- ✅ Handles merge conflicts gracefully
+
+**Examples:**
+```bash
+# After cloning repository
+npm run sync
+
+# Daily workflow - sync before starting work
+git sync
+
+# After committing changes - push and sync
+git add .
+git commit -m "Add: feature"
+git sync
+```
+
+See **[docs/GIT-SYNC.md](../docs/GIT-SYNC.md)** for complete documentation.
+
+#### `setup-git-sync.sh`
+
+Sets up the `git sync` alias for the repository.
+
+**Usage:**
+```bash
+./scripts/setup-git-sync.sh
+```
+
+**What it does:**
+- Configures a local git alias `sync` that calls `git-sync.sh`
+- Enables using `git sync` as a native git command in this repository
+- Only needs to be run once per clone
+
+**Note:** The npm script `npm run sync` works immediately without running this setup.
+
+#### `cleanup.sh`
+
+Cleans up Vite cache and temporary files that may cause build issues after updates or pulls.
+
+**Usage:**
+```bash
+./scripts/cleanup.sh
+# Or via npm:
+npm run cleanup
+```
+
+**What it does:**
+1. Removes Vite cache directories (`node_modules/.vite`) in all packages
+2. Reports on dist folders (info only)
+3. Cleans temporary files (*.log, *.tmp, .DS_Store, etc.)
+4. Provides summary of cleanup actions
+
+**Features:**
+- ✅ Safe operation - only removes cache and temp files
+- ✅ Finds Vite cache in all workspace packages
+- ✅ Clears common temporary files
+- ✅ Informative output with colored status messages
+
+**When to use:**
+```bash
+# After pulling changes and experiencing build issues
+npm run cleanup
+npm run build
+
+# Before starting fresh development
+npm run cleanup
+npm run dev
+
+# When Vite reports cache-related errors
+npm run cleanup
+```
+
+**Note:** For complete cleanup including node_modules and dist, use `npm run clean` instead.
+
 ### Route Management
 
 #### `list-routes.mjs`
