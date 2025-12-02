@@ -398,3 +398,71 @@ Benefits:
 - No need to manually parse JSON
 - Better error handling
 - Type safety
+
+## Common Mistakes to Avoid
+
+### ❌ Incorrect: Accessing nested response.data.data
+
+```typescript
+// WRONG - This is the raw axios response pattern
+const response = await apiClient.get('/api/users')
+if (response.data.success) {
+  users.value = response.data.data  // ❌ INCORRECT
+}
+```
+
+### ✅ Correct: Access response.data directly
+
+```typescript
+// CORRECT - apiClient already unwraps the axios response
+const response = await apiClient.get<User[]>('/api/users')
+if (response.success && response.data) {
+  users.value = response.data  // ✅ CORRECT
+}
+```
+
+### ❌ Incorrect: Using axios directly
+
+```typescript
+// WRONG - Don't import and use axios directly
+import axios from 'axios'
+const response = await axios.get('/api/users')
+```
+
+### ✅ Correct: Use the configured apiClient
+
+```typescript
+// CORRECT - Use the pre-configured apiClient instance
+import apiClient from '@/api'
+const response = await apiClient.get<User[]>('/api/users')
+```
+
+### Key Points
+
+1. **Response structure**: The apiClient methods (get, post, put, etc.) return `ApiResponse<T>` which has the structure:
+   ```typescript
+   {
+     success: boolean
+     data?: T
+     error?: string
+     message?: string
+   }
+   ```
+
+2. **No double wrapping**: The apiClient already extracts `response.data` from axios, so you access the data directly via `response.data`, not `response.data.data`
+
+3. **Type safety**: Always use TypeScript generics for type-safe responses:
+   ```typescript
+   const response = await apiClient.get<User[]>('/api/users')
+   // response.data is typed as User[] | undefined
+   ```
+
+4. **Error handling**: Check both `response.success` and `response.data`:
+   ```typescript
+   if (response.success && response.data) {
+     // Success case
+   } else {
+     // Error case - use response.error
+     console.error(response.error)
+   }
+   ```
