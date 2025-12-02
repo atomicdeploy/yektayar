@@ -42,7 +42,7 @@
               <div class="course-stats">
                 <div class="stat-item">
                   <ion-icon :icon="star" color="warning"></ion-icon>
-                  <span>{{ course.rating }} ({{ course.reviewCount }} {{ t('courses.reviews') }})</span>
+                  <span>{{ course.rating }} ({{ course.reviewCount }} {{ t('courses.review_count') }})</span>
                 </div>
                 <div class="stat-item">
                   <ion-icon :icon="people"></ion-icon>
@@ -142,10 +142,10 @@
             <div v-show="activeTab === 'curriculum'" class="curriculum-content">
               <div class="curriculum-stats">
                 <div class="stat">
-                  <strong>{{ modules.length }}</strong> {{ t('courses.modules') }}
+                  <strong>{{ modules.length }}</strong> {{ t('courses.module_count') }}
                 </div>
                 <div class="stat">
-                  <strong>{{ totalLessons }}</strong> {{ t('courses.lessons') }}
+                  <strong>{{ totalLessons }}</strong> {{ t('courses.lesson_count') }}
                 </div>
                 <div class="stat">
                   <strong>{{ formatDuration(course.duration) }}</strong>
@@ -156,11 +156,11 @@
                 <div v-for="module in modules" :key="module.id" class="module-item">
                   <div class="module-header" @click="toggleModule(module.id)">
                     <div class="module-title">
-                      <ion-icon :icon="expandedModules.has(module.id) ? chevronDown : chevronForward"></ion-icon>
+                      <ion-icon :icon="expandedModules.has(module.id) ? chevronDown : (locale === 'fa' ? chevronBack : chevronForward)"></ion-icon>
                       <h3>{{ module.title }}</h3>
                     </div>
                     <div class="module-meta">
-                      <span>{{ module.lessons.length }} {{ t('courses.lessons') }}</span>
+                      <span>{{ module.lessons.length }} {{ t('courses.lesson_count') }}</span>
                     </div>
                   </div>
                   <div v-show="expandedModules.has(module.id)" class="lessons-list">
@@ -216,7 +216,7 @@
                       color="warning"
                     ></ion-icon>
                   </div>
-                  <p>{{ course.reviewCount }} {{ t('courses.reviews') }}</p>
+                  <p>{{ course.reviewCount }} {{ t('courses.review_count') }}</p>
                 </div>
               </div>
 
@@ -230,7 +230,11 @@
               <div class="reviews-list">
                 <div v-for="review in reviews" :key="review.id" class="review-item">
                   <div class="review-header">
-                    <img :src="review.userAvatar" :alt="review.userName" class="review-avatar" />
+                    <LazyImage
+                      :src="review.userAvatar || '/placeholder-avatar.jpg'"
+                      :alt="review.userName"
+                      image-class="review-avatar"
+                    />
                     <div class="review-info">
                       <h4>{{ review.userName }}</h4>
                       <div class="review-rating">
@@ -808,7 +812,7 @@ onMounted(() => {
           transition: background 0.2s ease;
 
           &:hover {
-            background: var(--ion-background-color);
+            background: var(--ion-color-step-100, var(--ion-color-light-shade));
           }
 
           .lesson-icon {
@@ -896,6 +900,21 @@ onMounted(() => {
           border-radius: 50%;
           object-fit: cover;
           background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+          display: block;
+
+          .image-error {
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-tertiary-tint));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .error-text {
+              display: none;
+            }
+          }
         }
 
         .review-info {
@@ -944,6 +963,12 @@ onMounted(() => {
 
     .lessons-list {
       background: var(--ion-color-step-100);
+
+      .lesson-item {
+        &:hover {
+          background: var(--ion-color-step-50);
+        }
+      }
     }
   }
 
