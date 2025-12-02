@@ -247,7 +247,7 @@
               <ion-button 
                 expand="block" 
                 size="large"
-                @click="submitTest"
+                @click="submitAssessment"
                 :disabled="submitting"
               >
                 <ion-icon v-if="!submitting" :icon="send" slot="start"></ion-icon>
@@ -330,7 +330,7 @@ const { locale } = useI18n()
 const router = useRouter()
 const route = useRoute()
 
-const test = ref<any>(null)
+const assessment = ref<any>(null)
 const currentStep = ref(0) // 0: intro, 1: demographic, 2+: questions, last: review
 const demographicInfo = ref({
   age: '',
@@ -342,8 +342,8 @@ const answers = ref<{ [key: number]: number }>({})
 const submitting = ref(false)
 
 const totalSteps = computed(() => {
-  if (!test.value?.questions) return 2
-  return 2 + test.value.questions.length // intro + demographic + questions + review
+  if (!assessment.value?.questions) return 2
+  return 2 + assessment.value.questions.length // intro + demographic + questions + review
 })
 
 const progress = computed(() => {
@@ -355,8 +355,8 @@ const currentQuestionIndex = computed(() => {
 })
 
 const currentQuestion = computed(() => {
-  if (!test.value?.questions || currentQuestionIndex.value < 0) return null
-  return test.value.questions[currentQuestionIndex.value]
+  if (!assessment.value?.questions || currentQuestionIndex.value < 0) return null
+  return assessment.value.questions[currentQuestionIndex.value]
 })
 
 const answeredCount = computed(() => {
@@ -377,13 +377,13 @@ const canProceed = computed(() => {
   return true
 })
 
-const fetchTest = async () => {
+const fetchAssessment = async () => {
   try {
     const testId = route.params.id
     const response = await apiClient.get(`/api/assessments/${testId}`)
     if (response.data.success) {
-      test.value = response.data.data
-      logger.success(`Loaded assessment: ${test.value.title}`)
+      assessment.value = response.data.data
+      logger.success(`Loaded assessment: ${assessment.value.title}`)
     } else {
       logger.error('Failed to fetch assessment:', response.data.error || 'Unknown error')
       router.back()
@@ -421,7 +421,7 @@ const previousStep = () => {
 }
 
 const nextQuestion = () => {
-  if (currentQuestionIndex.value < (test.value?.questions?.length || 0) - 1) {
+  if (currentQuestionIndex.value < (assessment.value?.questions?.length || 0) - 1) {
     currentStep.value++
   } else {
     // Move to review step
@@ -458,13 +458,13 @@ const showExitConfirm = async () => {
   await alert.present()
 }
 
-const submitTest = async () => {
+const submitAssessment = async () => {
   try {
     submitting.value = true
     const testId = route.params.id
     
     // Convert answers object to array
-    const answersArray = test.value.questions.map((_: any, index: number) => answers.value[index] || 0)
+    const answersArray = assessment.value.questions.map((_: any, index: number) => answers.value[index] || 0)
     
     // TODO: Get userId from session store once authentication is fully implemented
     const response = await apiClient.post(`/api/assessments/${testId}/submit`, {
@@ -504,7 +504,7 @@ const submitTest = async () => {
 }
 
 onMounted(() => {
-  fetchTest()
+  fetchAssessment()
 })
 </script>
 

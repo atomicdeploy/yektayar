@@ -2,14 +2,14 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>{{ locale === 'fa' ? 'آزمون‌ها' : 'Tests' }}</ion-title>
+        <ion-title>{{ locale === 'fa' ? 'ارزیابی‌ها' : 'Assessments' }}</ion-title>
       </ion-toolbar>
     </ion-header>
     
     <ion-content :fullscreen="true" :scroll-y="false">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">{{ locale === 'fa' ? 'آزمون‌ها' : 'Tests' }}</ion-title>
+          <ion-title size="large">{{ locale === 'fa' ? 'ارزیابی‌ها' : 'Assessments' }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
@@ -31,16 +31,16 @@
             <div class="hero-icon-wrapper">
               <ion-icon :icon="documentText"></ion-icon>
             </div>
-            <h2>{{ locale === 'fa' ? 'آزمون‌های روانشناختی' : 'Psychological Tests' }}</h2>
+            <h2>{{ locale === 'fa' ? 'ارزیابی‌های روانشناختی' : 'Psychological Assessments' }}</h2>
             <p>{{ locale === 'fa' 
-              ? 'شناخت بهتر خود با آزمون‌های تخصصی' 
-              : 'Better self-understanding with specialized tests' }}</p>
+              ? 'شناخت بهتر خود با ارزیابی‌های تخصصی' 
+              : 'Better self-understanding with specialized assessments' }}</p>
           </div>
 
-          <!-- My Tests History -->
-          <div class="section" v-if="testHistory.length > 0">
+          <!-- My Assessments History -->
+          <div class="section" v-if="assessmentHistory.length > 0">
             <div class="section-header">
-              <h2 class="section-title">{{ locale === 'fa' ? 'آزمون‌های من' : 'My Tests' }}</h2>
+              <h2 class="section-title">{{ locale === 'fa' ? 'ارزیابی‌های من' : 'My Assessments' }}</h2>
               <ion-button fill="clear" size="small" @click="viewHistory">
                 {{ locale === 'fa' ? 'مشاهده همه' : 'View All' }}
                 <ion-icon :icon="locale === 'fa' ? chevronBack : chevronForward" slot="end"></ion-icon>
@@ -49,7 +49,7 @@
 
             <div class="history-cards">
               <div 
-                v-for="result in testHistory.slice(0, 3)" 
+                v-for="result in assessmentHistory.slice(0, 3)" 
                 :key="result.id"
                 class="history-card"
                 @click="viewResult(result.id)"
@@ -67,9 +67,9 @@
             </div>
           </div>
 
-          <!-- Available Tests -->
+          <!-- Available Assessments -->
           <div class="section">
-            <h2 class="section-title">{{ locale === 'fa' ? 'آزمون‌های در دسترس' : 'Available Tests' }}</h2>
+            <h2 class="section-title">{{ locale === 'fa' ? 'ارزیابی‌های در دسترس' : 'Available Assessments' }}</h2>
             
             <!-- Loading State -->
             <div v-if="loading" class="loading-container">
@@ -78,27 +78,27 @@
             </div>
 
             <!-- Tests List -->
-            <div v-else-if="tests.length > 0" class="tests-list">
+            <div v-else-if="assessments.length > 0" class="tests-list">
               <div 
-                v-for="test in tests" 
-                :key="test.id"
-                class="test-card"
-                @click="startTest(test.id)"
+                v-for="assessment in assessments" 
+                :key="assessment.id"
+                class="assessment-card"
+                @click="startAssessment(assessment.id)"
               >
-                <div class="test-icon-wrapper">
+                <div class="assessment-icon-wrapper">
                   <ion-icon :icon="clipboard"></ion-icon>
                 </div>
-                <div class="test-content">
-                  <h3>{{ test.title }}</h3>
-                  <p>{{ test.description }}</p>
-                  <div class="test-meta">
+                <div class="assessment-content">
+                  <h3>{{ assessment.title }}</h3>
+                  <p>{{ assessment.description }}</p>
+                  <div class="assessment-meta">
                     <div class="meta-item">
                       <ion-icon :icon="time"></ion-icon>
-                      <span>{{ calculateDuration(test.question_count) }} {{ locale === 'fa' ? 'دقیقه' : 'min' }}</span>
+                      <span>{{ calculateDuration(assessment.question_count) }} {{ locale === 'fa' ? 'دقیقه' : 'min' }}</span>
                     </div>
                     <div class="meta-item">
                       <ion-icon :icon="help"></ion-icon>
-                      <span>{{ test.question_count || 0 }} {{ locale === 'fa' ? 'سوال' : 'questions' }}</span>
+                      <span>{{ assessment.question_count || 0 }} {{ locale === 'fa' ? 'سوال' : 'questions' }}</span>
                     </div>
                   </div>
                 </div>
@@ -110,10 +110,10 @@
             </div>
 
             <!-- Empty State -->
-            <div v-if="!loading && tests.length === 0" class="empty-state">
+            <div v-if="!loading && assessments.length === 0" class="empty-state">
               <ion-icon :icon="documentText"></ion-icon>
-              <h3>{{ locale === 'fa' ? 'آزمونی موجود نیست' : 'No tests available' }}</h3>
-              <p>{{ locale === 'fa' ? 'به زودی آزمون‌های جدید اضافه می‌شود' : 'New tests will be added soon' }}</p>
+              <h3>{{ locale === 'fa' ? 'ارزیابی موجود نیست' : 'No assessments available' }}</h3>
+              <p>{{ locale === 'fa' ? 'به زودی آزمون‌های جدید اضافه می‌شود' : 'New assessments will be added soon' }}</p>
             </div>
           </div>
 
@@ -132,8 +132,8 @@
                   ? 'نتایج کاملاً محرمانه خواهند ماند' 
                   : 'Results will remain completely confidential' }}</li>
                 <li>{{ locale === 'fa' 
-                  ? 'می‌توانید آزمون را چندین بار تکرار کنید' 
-                  : 'You can repeat tests multiple times' }}</li>
+                  ? 'می‌توانید ارزیابی را چندین بار تکرار کنید' 
+                  : 'You can repeat assessments multiple times' }}</li>
               </ul>
             </div>
           </div>
@@ -174,45 +174,45 @@ import { logger } from '@yektayar/shared'
 const { locale } = useI18n()
 const router = useRouter()
 
-const tests = ref<any[]>([])
-const testHistory = ref<any[]>([])
+const assessments = ref<any[]>([])
+const assessmentHistory = ref<any[]>([])
 const loading = ref(true)
 
-const fetchTests = async () => {
+const fetchAssessments = async () => {
   try {
     loading.value = true
     const response = await apiClient.get('/api/assessments')
     if (response.data.success) {
-      tests.value = response.data.data
-      logger.success(`Loaded ${tests.value.length} assessments`)
+      assessments.value = response.data.data
+      logger.success(`Loaded ${assessments.value.length} assessments`)
     } else {
       logger.error('Failed to fetch assessments:', response.data.error || 'Unknown error')
       // Show error to user via empty state
-      tests.value = []
+      assessments.value = []
     }
   } catch (error) {
     logger.error('Failed to fetch assessments:', error)
     // Show error to user via empty state
-    tests.value = []
+    assessments.value = []
   } finally {
     loading.value = false
   }
 }
 
-const fetchTestHistory = async () => {
+const fetchAssessmentHistory = async () => {
   try {
     // TODO: Get userId from session store once authentication is fully implemented
     const userId = 1 // Placeholder for development
     const response = await apiClient.get(`/api/assessments/user/history?userId=${userId}`)
     if (response.data.success) {
-      testHistory.value = response.data.data
+      assessmentHistory.value = response.data.data
     } else {
       logger.error('Failed to fetch assessment history:', response.data.error || 'Unknown error')
-      testHistory.value = []
+      assessmentHistory.value = []
     }
   } catch (error) {
     logger.error('Failed to fetch assessment history:', error)
-    testHistory.value = []
+    assessmentHistory.value = []
   }
 }
 
@@ -227,8 +227,8 @@ const formatDate = (dateString: string) => {
   return date.toLocaleDateString(locale.value === 'fa' ? 'fa-IR' : 'en-US')
 }
 
-const startTest = (testId: number) => {
-  router.push(`/tabs/assessments/${testId}`)
+const startAssessment = (assessmentId: number) => {
+  router.push(`/tabs/assessments/${assessmentId}`)
 }
 
 const viewResult = (resultId: number) => {
@@ -240,8 +240,8 @@ const viewHistory = () => {
 }
 
 onMounted(() => {
-  fetchTests()
-  fetchTestHistory()
+  fetchAssessments()
+  fetchAssessmentHistory()
 })
 </script>
 
