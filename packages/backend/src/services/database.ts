@@ -8,7 +8,10 @@ import bcrypt from 'bcrypt'
 import { logger } from '@yektayar/shared'
 
 // Initialize PostgreSQL connection
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar'
+// Normalize localhost to 127.0.0.1 to avoid IPv6/IPv4 resolution issues
+const DATABASE_URL = (process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar')
+  .replace(/\/\/localhost:/, '//127.0.0.1:')
+  .replace(/\/\/localhost\//, '//127.0.0.1/')
 
 let sql: ReturnType<typeof postgres> | null = null
 
@@ -21,6 +24,7 @@ export function getDatabase() {
       max: 10, // Maximum connections
       idle_timeout: 20,
       connect_timeout: 10,
+      onnotice: () => {}, // Suppress notices
     })
   }
   return sql
