@@ -337,7 +337,7 @@ This allows both protocols to coexist on the same port without conflicts.
 - `packages/backend/src/websocketServer.ts` - Dedicated WebSocket server
 - `packages/backend/src/websocket/socketServer.ts` - Socket.IO implementation
 - `packages/backend/src/websocket/nativeWebSocketServer.ts` - Native WebSocket implementation
-- `scripts/test-websocket.js` - Testing utility
+- `tests/scripts/test-websocket.cjs` - Testing utility
 
 ## Future Enhancements
 

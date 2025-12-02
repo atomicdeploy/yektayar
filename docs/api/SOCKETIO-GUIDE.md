@@ -459,10 +459,10 @@ Use the provided test script to verify Socket.IO functionality:
 
 ```bash
 # Run the test script
-./scripts/test-socketio.sh
+./tests/scripts/test-socketio.sh
 
 # Or specify custom backend URL
-./scripts/test-socketio.sh http://localhost:3000
+./tests/scripts/test-socketio.sh http://localhost:3000
 ```
 
 The script will:
@@ -689,7 +689,7 @@ Then restart the backend.
 
 For issues or questions:
 - Check backend logs for errors
-- Run test script: `./scripts/test-socketio.sh`
+- Run test script: `./tests/scripts/test-socketio.sh`
 - Review [troubleshooting](#troubleshooting) section
 - Open an issue on GitHub
 

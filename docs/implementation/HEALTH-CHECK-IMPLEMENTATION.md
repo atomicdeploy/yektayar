@@ -28,7 +28,7 @@ Successfully implemented a comprehensive `/health/db` endpoint for the YektaYar 
 - Validates response format and structure
 
 ### 4. Manual Testing Script
-**File:** `/scripts/test-health-db.js`
+**File:** `/tests/scripts/test-health-db.cjs`
 - Node.js script for manual endpoint testing
 - Provides formatted output with emojis and colors
 - Shows detailed test results and timing information
@@ -127,8 +127,8 @@ curl http://localhost:3000/health/db
 
 ### Test Script
 ```bash
-node scripts/test-health-db.js
-node scripts/test-health-db.js http://localhost:3000
+node tests/scripts/test-health-db.cjs
+node tests/scripts/test-health-db.cjs http://localhost:3000
 ```
 
 ### Integration (Kubernetes)
@@ -165,7 +165,7 @@ livenessProbe:
 1. ✅ `/packages/backend/src/routes/health.ts` (created)
 2. ✅ `/packages/backend/src/index.ts` (modified)
 3. ✅ `/packages/backend/src/__tests__/health.test.ts` (created)
-4. ✅ `/scripts/test-health-db.js` (created)
+4. ✅ `/tests/scripts/test-health-db.cjs` (created)
 5. ✅ `/docs/HEALTH-DB-ENDPOINT.md` (created)
 
 ## Testing Performed

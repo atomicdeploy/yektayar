@@ -253,9 +253,9 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 
 #### Testing
-- **[Socket.IO Test Script](scripts/test-socketio.sh)** - Interactive TUI for testing Socket.IO functionality
+- **[Socket.IO Test Script](tests/scripts/test-socketio.sh)** - Interactive TUI for testing Socket.IO functionality
   ```bash
-  ./scripts/test-socketio.sh
+  ./tests/scripts/test-socketio.sh
   ```
 
 ---

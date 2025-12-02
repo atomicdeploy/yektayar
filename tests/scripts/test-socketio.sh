@@ -6,7 +6,7 @@
 # This script provides an interactive TUI for testing Socket.IO connectivity
 # and commands with the YektaYar backend server.
 #
-# Usage: ./scripts/test-socketio.sh [backend-url]
+# Usage: ./tests/scripts/test-socketio.sh [backend-url]
 # Default: http://localhost:3000
 # =============================================================================
 
