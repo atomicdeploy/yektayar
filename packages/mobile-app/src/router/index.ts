@@ -97,6 +97,10 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'tests/:id',
         component: () => import('@/views/TakeTestPage.vue')
+      },
+      {
+        path: 'tests/results/:resultId',
+        component: () => import('@/views/TestResultsPage.vue')
       }
     ]
   }
