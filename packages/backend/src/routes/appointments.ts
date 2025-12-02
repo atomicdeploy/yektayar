@@ -122,10 +122,15 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
       }
 
       // Verify users exist and have correct types
+      interface UserTypeCheck {
+        id: number
+        type: string
+      }
+      
       const users = await db`
         SELECT id, type FROM users 
         WHERE id IN (${patientId}, ${psychologistId})
-      `
+      ` as UserTypeCheck[]
 
       if (users.length !== 2) {
         return {
@@ -135,8 +140,8 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
         }
       }
 
-      const patient = users.find((u: any) => u.id === parseInt(patientId))
-      const psychologist = users.find((u: any) => u.id === parseInt(psychologistId))
+      const patient = users.find((u: UserTypeCheck) => u.id === parseInt(patientId))
+      const psychologist = users.find((u: UserTypeCheck) => u.id === parseInt(psychologistId))
 
       if (patient?.type !== 'patient') {
         return {

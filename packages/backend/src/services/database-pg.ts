@@ -52,7 +52,7 @@ export async function query<T = any>(text: string, params?: any[]): Promise<T[]>
  * Tagged template SQL function for backward compatibility with postgres library syntax
  * Converts tagged template calls to parameterized queries
  */
-export function sql(strings: TemplateStringsArray, ...values: any[]): Promise<any[]> & { unsafe?: (query: string, params: any[]) => Promise<any[]> } {
+export function sql(strings: TemplateStringsArray, ...values: any[]): Promise<any[]> {
   // For immediate execution, return a thenable with the query
   const queryText = strings.reduce((acc, str, i) => {
     return acc + str + (i < values.length ? `$${i + 1}` : '')
@@ -62,7 +62,7 @@ export function sql(strings: TemplateStringsArray, ...values: any[]): Promise<an
 }
 
 // Make sql callable with unsafe for dynamic queries
-sql.unsafe = (queryText: string, params: any[]) => {
+sql.unsafe = (queryText: string, params: any[]): Promise<any[]> => {
   return query(queryText, params)
 }
 
