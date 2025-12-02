@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { ApiClient } from '../packages/shared/src/api/client'
+import packageJson from '../packages/shared/package.json'
 
 describe('ApiClient URL Normalization', () => {
   it('should normalize URLs correctly with various formats', () => {
@@ -28,7 +29,7 @@ describe('ApiClient URL Normalization', () => {
     
     const axiosInstance = client.getAxiosInstance()
     expect(axiosInstance.defaults.headers['Accept']).toBe('application/json')
-    expect(axiosInstance.defaults.headers['User-Agent']).toBe('@yektayar/shared/0.1.0')
+    expect(axiosInstance.defaults.headers['User-Agent']).toBe(`${packageJson.name}/${packageJson.version}`)
     expect(axiosInstance.defaults.timeout).toBe(30000)
   })
 
@@ -55,6 +56,6 @@ describe('ApiClient URL Normalization', () => {
     const axiosInstance = client.getAxiosInstance()
     expect(axiosInstance.defaults.headers['X-Custom-Header']).toBe('test-value')
     expect(axiosInstance.defaults.headers['Accept']).toBe('application/json')
-    expect(axiosInstance.defaults.headers['User-Agent']).toBe('@yektayar/shared/0.1.0')
+    expect(axiosInstance.defaults.headers['User-Agent']).toBe(`${packageJson.name}/${packageJson.version}`)
   })
 })

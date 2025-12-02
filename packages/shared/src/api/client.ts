@@ -20,6 +20,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { ApiClientConfig, ApiResponse, ApiError, RequestOptions, TokenDeliveryMethod } from './types'
 import { logger } from '../utils/logger'
 import { TokenStorage } from './storage'
+import packageJson from '../../package.json'
 
 export class ApiClient {
   private axiosInstance: AxiosInstance
@@ -40,7 +41,7 @@ export class ApiClient {
       timeout: config.timeout || 30000,
       headers: {
         'Accept': 'application/json',
-        'User-Agent': '@yektayar/shared/0.1.0',
+        'User-Agent': `${packageJson.name}/${packageJson.version}`,
         ...config.headers,
       },
     })
