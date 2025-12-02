@@ -9,6 +9,7 @@ import { logger } from '@yektayar/shared'
 
 // Initialize PostgreSQL connection
 // Normalize localhost to 127.0.0.1 to avoid IPv6/IPv4 resolution issues
+// This ensures consistent behavior across different system configurations
 const DATABASE_URL = (process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar')
   .replace(/\/\/localhost:/, '//127.0.0.1:')
   .replace(/\/\/localhost\//, '//127.0.0.1/')
@@ -17,14 +18,17 @@ let sql: ReturnType<typeof postgres> | null = null
 
 /**
  * Get database connection instance
+ * Configured with timeouts and connection pooling for reliability
  */
 export function getDatabase() {
   if (!sql) {
     sql = postgres(DATABASE_URL, {
-      max: 10, // Maximum connections
-      idle_timeout: 20,
-      connect_timeout: 10,
-      onnotice: () => {}, // Suppress notices
+      max: 10, // Maximum connections in pool
+      idle_timeout: 20, // Seconds before idle connection is closed
+      connect_timeout: 10, // Seconds to wait for connection
+      onnotice: () => {}, // Suppress PostgreSQL notices
+      // Prefer IPv4 to avoid resolution delays
+      host_rewrite: (host: string) => host === 'localhost' ? '127.0.0.1' : host,
     })
   }
   return sql

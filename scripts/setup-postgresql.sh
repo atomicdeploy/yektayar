@@ -144,15 +144,18 @@ print_section "Configuring PostgreSQL Access"
 PG_VERSION_INSTALLED=$(psql --version | awk '{print $3}' | cut -d. -f1)
 PG_CONF_DIR="/etc/postgresql/$PG_VERSION_INSTALLED/main"
 
+# Backup configuration file
+print_info "Backing up postgresql.conf..."
+sudo cp "$PG_CONF_DIR/postgresql.conf" "$PG_CONF_DIR/postgresql.conf.backup.$(date +%Y%m%d_%H%M%S)" 2>/dev/null || true
+
 if [ "$ALLOW_REMOTE_ACCESS" = "true" ]; then
     print_info "Configuring for remote access..."
     
-    # Backup configuration files
-    sudo cp "$PG_CONF_DIR/postgresql.conf" "$PG_CONF_DIR/postgresql.conf.backup.$(date +%Y%m%d_%H%M%S)"
+    # Backup pg_hba.conf
     sudo cp "$PG_CONF_DIR/pg_hba.conf" "$PG_CONF_DIR/pg_hba.conf.backup.$(date +%Y%m%d_%H%M%S)"
     
     # Update postgresql.conf to listen on all interfaces
-    sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" "$PG_CONF_DIR/postgresql.conf"
+    sudo sed -i "s/#*listen_addresses = .*/listen_addresses = '*'/" "$PG_CONF_DIR/postgresql.conf"
     
     # Add remote access to pg_hba.conf
     if ! sudo grep -q "host.*all.*all.*0.0.0.0/0.*md5" "$PG_CONF_DIR/pg_hba.conf"; then
@@ -162,7 +165,10 @@ if [ "$ALLOW_REMOTE_ACCESS" = "true" ]; then
     print_success "Remote access enabled"
     print_info "Note: Make sure your firewall allows PostgreSQL connections (port 5432)"
 else
-    print_success "Configured for local access only"
+    # Configure for local access - explicitly set localhost to ensure both IPv4 and IPv6
+    print_info "Configuring for local access (IPv4 and IPv6)..."
+    sudo sed -i "s/#*listen_addresses = .*/listen_addresses = 'localhost'/" "$PG_CONF_DIR/postgresql.conf"
+    print_success "Configured for local access on both IPv4 (127.0.0.1) and IPv6 (::1)"
 fi
 
 # Restart PostgreSQL to apply changes
