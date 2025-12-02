@@ -94,11 +94,11 @@
                   <div class="test-meta">
                     <div class="meta-item">
                       <ion-icon :icon="time"></ion-icon>
-                      <span>{{ calculateDuration(test.questions) }} {{ locale === 'fa' ? 'دقیقه' : 'min' }}</span>
+                      <span>{{ calculateDuration(test.question_count) }} {{ locale === 'fa' ? 'دقیقه' : 'min' }}</span>
                     </div>
                     <div class="meta-item">
                       <ion-icon :icon="help"></ion-icon>
-                      <span>{{ test.questions?.length || 0 }} {{ locale === 'fa' ? 'سوال' : 'questions' }}</span>
+                      <span>{{ test.question_count || 0 }} {{ locale === 'fa' ? 'سوال' : 'questions' }}</span>
                     </div>
                   </div>
                 </div>
@@ -206,10 +206,10 @@ const fetchTestHistory = async () => {
   }
 }
 
-const calculateDuration = (questions: any[]) => {
-  if (!questions || !Array.isArray(questions)) return 10
+const calculateDuration = (questionCount: number) => {
+  if (!questionCount || typeof questionCount !== 'number') return 10
   // Estimate 30 seconds per question
-  return Math.ceil(questions.length * 0.5)
+  return Math.ceil(questionCount * 0.5)
 }
 
 const formatDate = (dateString: string) => {

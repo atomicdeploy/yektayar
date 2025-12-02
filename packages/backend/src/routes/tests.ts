@@ -10,7 +10,7 @@ import { logger } from '@yektayar/shared'
 export const testRoutes = new Elysia({ prefix: '/api/tests' })
   /**
    * GET /api/tests
-   * Get all available tests/assessments
+   * Get all available tests/assessments (without questions to reduce payload size)
    */
   .get('/', async () => {
     try {
@@ -20,7 +20,7 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
           id,
           title,
           description,
-          questions,
+          jsonb_array_length(questions) as question_count,
           created_at,
           updated_at
         FROM assessments
@@ -42,7 +42,7 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
     detail: {
       tags: ['Tests'],
       summary: 'List all tests',
-      description: 'Get all available tests/assessments'
+      description: 'Get all available tests/assessments without question details'
     }
   })
 
