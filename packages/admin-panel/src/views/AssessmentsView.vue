@@ -345,7 +345,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import axios from 'axios'
+import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 const { t } = useI18n()
 
@@ -411,12 +412,12 @@ const filteredTests = computed(() => {
 const fetchTests = async () => {
   try {
     loading.value = true
-    const response = await axios.get('/api/assessments')
-    if (response.data.success) {
-      tests.value = response.data.data
+    const response = await apiClient.get<any[]>('/api/assessments')
+    if (response.success && response.data) {
+      tests.value = response.data
     }
   } catch (error) {
-    console.error('Error fetching tests:', error)
+    logger.error('Error fetching tests:', error)
   } finally {
     loading.value = false
   }
@@ -444,13 +445,11 @@ const editTest = (test: any) => {
 const manageQuestions = async (test: any) => {
   selectedTest.value = test
   
-  // Fetch full test data with questions
   try {
-    const response = await axios.get(`/api/assessments/${test.id}`)
-    if (response.data.success) {
-      const testData = response.data.data
+    const response = await apiClient.get<any>(`/api/assessments/${test.id}`)
+    if (response.success && response.data) {
+      const testData = response.data
       
-      // Parse questions into sections format
       if (testData.questions && Array.isArray(testData.questions)) {
         questionsData.value.sections = testData.questions.map((section: any) => ({
           title: section.title || '',
@@ -463,7 +462,7 @@ const manageQuestions = async (test: any) => {
       }
     }
   } catch (error) {
-    console.error('Error fetching test questions:', error)
+    logger.error('Error fetching test questions:', error)
   }
   
   showQuestionsModal.value = true
@@ -473,12 +472,12 @@ const viewResults = async (test: any) => {
   selectedTest.value = test
   
   try {
-    const response = await axios.get(`/api/assessments/${test.id}/results`)
-    if (response.data.success) {
-      results.value = response.data.data
+    const response = await apiClient.get<any[]>(`/api/assessments/${test.id}/results`)
+    if (response.success && response.data) {
+      results.value = response.data
     }
   } catch (error) {
-    console.error('Error fetching results:', error)
+    logger.error('Error fetching results:', error)
   }
   
   showResultsModal.value = true
@@ -490,10 +489,10 @@ const deleteTest = async (test: any) => {
   }
 
   try {
-    await axios.delete(`/api/assessments/${test.id}`)
+    await apiClient.delete(`/api/assessments/${test.id}`)
     tests.value = tests.value.filter((t) => t.id !== test.id)
   } catch (error) {
-    console.error('Error deleting test:', error)
+    logger.error('Error deleting test:', error)
     alert('خطا در حذف آزمون')
   }
 }
@@ -503,28 +502,26 @@ const saveTest = async () => {
     saving.value = true
 
     if (showEditModal.value && selectedTest.value) {
-      // Update existing test
-      const response = await axios.put(`/api/assessments/${selectedTest.value.id}`, formData.value)
-      if (response.data.success) {
+      const response = await apiClient.put<any>(`/api/assessments/${selectedTest.value.id}`, formData.value)
+      if (response.success && response.data) {
         const index = tests.value.findIndex((t) => t.id === selectedTest.value.id)
         if (index !== -1) {
           tests.value[index] = { ...tests.value[index], ...formData.value }
         }
       }
     } else {
-      // Create new test
-      const response = await axios.post('/api/assessments', {
+      const response = await apiClient.post<any>('/api/assessments', {
         ...formData.value,
         questions: [],
       })
-      if (response.data.success) {
-        tests.value.push(response.data.data)
+      if (response.success && response.data) {
+        tests.value.push(response.data)
       }
     }
 
     closeModals()
   } catch (error) {
-    console.error('Error saving test:', error)
+    logger.error('Error saving test:', error)
     alert('خطا در ذخیره آزمون')
   } finally {
     saving.value = false
@@ -537,7 +534,6 @@ const saveQuestions = async () => {
   try {
     saving.value = true
 
-    // Convert sections format to API format
     const questions = questionsData.value.sections.map((section) => ({
       title: section.title,
       titleEn: section.title_en,
@@ -547,17 +543,17 @@ const saveQuestions = async () => {
       })),
     }))
 
-    const response = await axios.put(`/api/assessments/${selectedTest.value.id}`, {
+    const response = await apiClient.put(`/api/assessments/${selectedTest.value.id}`, {
       questions,
     })
 
-    if (response.data.success) {
+    if (response.success) {
       alert('سوالات با موفقیت ذخیره شد')
       closeModals()
       fetchTests()
     }
   } catch (error) {
-    console.error('Error saving questions:', error)
+    logger.error('Error saving questions:', error)
     alert('خطا در ذخیره سوالات')
   } finally {
     saving.value = false

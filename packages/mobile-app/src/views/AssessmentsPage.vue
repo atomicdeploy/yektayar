@@ -183,27 +183,15 @@ const fetchAssessments = async () => {
     loading.value = true
     const response = await apiClient.get('/api/assessments')
     
-    // Handle both response formats:
-    // 1. Wrapped: {success: true, data: [...]}
-    // 2. Direct: [...]
-    let data
-    if (Array.isArray(response.data)) {
-      // Direct array response
-      data = response.data
-    } else if (response.data.success && response.data.data) {
-      // Wrapped response
-      data = response.data.data
+    if (response.success && response.data) {
+      assessments.value = response.data
+      logger.success(`Loaded ${assessments.value.length} assessments`)
     } else {
-      logger.error('Failed to fetch assessments:', response.data.error || 'Unknown error')
+      logger.error('Failed to fetch assessments:', response.error || 'Unknown error')
       assessments.value = []
-      return
     }
-    
-    assessments.value = data
-    logger.success(`Loaded ${assessments.value.length} assessments`)
   } catch (error) {
     logger.error('Failed to fetch assessments:', error)
-    // Show error to user via empty state
     assessments.value = []
   } finally {
     loading.value = false
@@ -216,19 +204,21 @@ const fetchAssessmentHistory = async () => {
     const userId = 1 // Placeholder for development
     const response = await apiClient.get(`/api/assessments/user/history?userId=${userId}`)
     
-    // Handle both response formats
-    let data
-    if (Array.isArray(response.data)) {
-      data = response.data
-    } else if (response.data.success && response.data.data) {
-      data = response.data.data
+    if (response.success && response.data) {
+      assessmentHistory.value = response.data
     } else {
-      logger.error('Failed to fetch assessment history:', response.data.error || 'Unknown error')
+      logger.error('Failed to fetch assessment history:', response.error || 'Unknown error')
       assessmentHistory.value = []
       return
     }
     
-    assessmentHistory.value = data
+    if (response.success && response.data) {
+      assessmentHistory.value = response.data
+    } else {
+      logger.error('Failed to fetch assessment history:', response.error || 'Unknown error')
+      assessmentHistory.value = []
+      return
+    }
   } catch (error) {
     logger.error('Failed to fetch assessment history:', error)
     assessmentHistory.value = []

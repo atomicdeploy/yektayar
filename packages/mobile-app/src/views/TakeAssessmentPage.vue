@@ -381,11 +381,11 @@ const fetchAssessment = async () => {
   try {
     const assessmentId = route.params.id
     const response = await apiClient.get(`/api/assessments/${assessmentId}`)
-    if (response.data.success) {
-      assessment.value = response.data.data
+    if (response.success && response.data) {
+      assessment.value = response.data
       logger.success(`Loaded assessment: ${assessment.value.title}`)
     } else {
-      logger.error('Failed to fetch assessment:', response.data.error || 'Unknown error')
+      logger.error('Failed to fetch assessment:', response.error || 'Unknown error')
       router.back()
     }
   } catch (error) {
@@ -473,12 +473,11 @@ const submitAssessment = async () => {
       userId: 1, // Placeholder for development,
     })
     
-    if (response.data.success) {
+    if (response.success && response.data) {
       logger.success('Assessment submitted successfully')
-      // Navigate to results page
-      router.push(`/tabs/assessments/results/${response.data.data.id}`)
+      router.push(`/tabs/assessments/results/${response.data.id}`)
     } else {
-      logger.error('Failed to submit assessment:', response.data.error || 'Unknown error')
+      logger.error('Failed to submit assessment:', response.error || 'Unknown error')
       const alert = await alertController.create({
         header: locale.value === 'fa' ? 'خطا' : 'Error',
         message: locale.value === 'fa' 
