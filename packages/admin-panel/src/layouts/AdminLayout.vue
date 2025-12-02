@@ -155,6 +155,7 @@ import {
   SunIcon,
   MoonIcon,
   DocumentTextIcon,
+  ClipboardDocumentCheckIcon,
   ComputerDesktopIcon,
 } from '@heroicons/vue/24/outline'
 import { useSessionStore } from '@/stores/session'
@@ -207,6 +208,12 @@ const navItems = [
     label: 'nav.courses',
     icon: AcademicCapIcon,
     permission: 'view_courses' as const,
+  },
+  {
+    to: '/tests',
+    label: 'nav.tests',
+    icon: ClipboardDocumentCheckIcon,
+    permission: 'view_tests' as const,
   },
   {
     to: '/pages',
