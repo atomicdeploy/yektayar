@@ -288,6 +288,7 @@ import {
   checkmarkCircle,
   chevronDown,
   chevronForward,
+  chevronBack,
   lockOpen,
   lockClosed,
   videocam,
