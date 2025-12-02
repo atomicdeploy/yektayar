@@ -46,7 +46,7 @@ node scripts/pollination-ai-tui.js http://your-backend-url:3000
 
 ### Prerequisites
 
-1. **Required**: Node.js 18.x or higher
+1. **Required**: Node.js 24.x or higher
 2. **Required**: `socket.io-client` package (installed via `npm install`)
 3. **Optional**: Backend server running (for backend tests)
 
