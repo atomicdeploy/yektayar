@@ -16,6 +16,7 @@ import { logger } from '@yektayar/shared'
 import { settingsRoutes } from './routes/settings'
 import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
+import { testRoutes } from './routes/tests'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
@@ -89,6 +90,7 @@ app
           { name: 'Settings', description: 'Application settings endpoints' },
           { name: 'Support', description: 'Support tickets and messaging endpoints' },
           { name: 'AI', description: 'AI counselor chat endpoints' },
+          { name: 'Tests', description: 'Tests and assessments endpoints' },
           { name: 'WebSocket', description: 'Real-time communication via Socket.IO' }
         ],
         externalDocs: {
@@ -146,6 +148,7 @@ app
   .use(settingsRoutes)
   .use(supportRoutes)
   .use(aiRoutes)
+  .use(testRoutes)
 
 // Server configuration
 const port = Number(process.env.PORT) || 3000

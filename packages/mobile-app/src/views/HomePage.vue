@@ -92,6 +92,17 @@
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
 
+          <div class="action-card" @click="navigateToTests">
+            <div class="action-icon-wrapper info">
+              <ion-icon :icon="documentText" class="action-icon"></ion-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ locale === 'fa' ? 'آزمون‌ها' : 'Tests' }}</h3>
+              <p>{{ locale === 'fa' ? 'ارزیابی و شناخت شخصیت' : 'Assessment and personality insights' }}</p>
+            </div>
+            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+          </div>
+
           <div class="action-card" @click="navigateToProfile">
             <div class="action-icon-wrapper warning">
               <ion-icon :icon="person" class="action-icon"></ion-icon>
@@ -204,6 +215,7 @@ import {
   moon,
   sunny,
   school,
+  documentText,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -217,6 +229,7 @@ const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')
 const navigateToAppointments = () => router.push('/tabs/appointments')
 const navigateToCourses = () => router.push('/tabs/courses')
+const navigateToTests = () => router.push('/tabs/tests')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
@@ -380,6 +393,10 @@ const navigateToProfile = () => router.push('/tabs/profile')
 
 .action-icon-wrapper.warning {
   background: linear-gradient(135deg, #ff9500 0%, #ffb038 100%);
+}
+
+.action-icon-wrapper.info {
+  background: linear-gradient(135deg, #5856d6 0%, #7c7ae0 100%);
 }
 
 .action-icon-wrapper.ai {
