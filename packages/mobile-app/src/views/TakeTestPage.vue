@@ -463,10 +463,11 @@ const submitTest = async () => {
     // Convert answers object to array
     const answersArray = test.value.questions.map((_: any, index: number) => answers.value[index] || 0)
     
+    // TODO: Get userId from session store once authentication is fully implemented
     const response = await apiClient.post(`/tests/${testId}/submit`, {
       answers: answersArray,
       demographicInfo: demographicInfo.value,
-      userId: 1, // TODO: Get from session store
+      userId: 1, // Placeholder for development
     })
     
     if (response.data.success) {
@@ -554,7 +555,7 @@ onMounted(() => {
 }
 
 .intro-content {
-  text-align: right;
+  text-align: start;
   background: var(--surface-1);
   padding: 1.5rem;
   border-radius: 16px;

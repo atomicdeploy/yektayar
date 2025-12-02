@@ -195,8 +195,8 @@ const fetchTests = async () => {
 
 const fetchTestHistory = async () => {
   try {
-    // TODO: Get userId from session store
-    const userId = 1 // Placeholder
+    // TODO: Get userId from session store once authentication is fully implemented
+    const userId = 1 // Placeholder for development
     const response = await apiClient.get(`/tests/user/history?userId=${userId}`)
     if (response.data.success) {
       testHistory.value = response.data.data

@@ -253,7 +253,8 @@ const fetchResult = async () => {
   try {
     loading.value = true
     const resultId = route.params.resultId
-    const userId = 1 // TODO: Get from session store
+    // TODO: Get userId from session store once authentication is fully implemented
+    const userId = 1 // Placeholder for development
     const response = await apiClient.get(`/tests/results/${resultId}?userId=${userId}`)
     if (response.data.success) {
       result.value = response.data.data

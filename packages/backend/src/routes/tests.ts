@@ -46,8 +46,6 @@ export const testRoutes = new Elysia({ prefix: '/api/tests' })
     }
   })
 
-  })
-
   /**
    * GET /api/tests/:id
    * Get a specific test by ID
