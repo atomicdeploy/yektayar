@@ -434,75 +434,94 @@ onMounted(() => {
   gap: 1rem;
 }
 
-.test-card {
-  background: var(--surface-1);
+.assessment-card {
+  background: var(--ion-card-background);
   border-radius: 16px;
-  padding: 1.25rem;
-  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  flex-direction: row;
+  align-items: stretch;
 }
 
-.test-card:active {
+.assessment-card:active {
   transform: translateY(-2px);
-  box-shadow: var(--card-shadow-hover);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.test-icon-wrapper {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  background: var(--secondary-gradient);
+.assessment-icon-wrapper {
+  width: 100px;
+  min-width: 100px;
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--secondary-glow);
+  flex-shrink: 0;
 }
 
-.test-icon-wrapper ion-icon {
-  font-size: 28px;
+.assessment-icon-wrapper ion-icon {
+  font-size: 48px;
   color: white;
 }
 
-.test-content h3 {
-  font-size: 1.25rem;
+.assessment-content {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.assessment-content h3 {
+  font-size: 1.125rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
-  color: var(--secondary-accent);
+  color: var(--ion-text-color);
+  line-height: 1.3;
+  text-align: start;
 }
 
-.test-content p {
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
-  margin: 0 0 1rem 0;
-  line-height: 1.6;
+.assessment-content p {
+  font-size: 0.875rem;
+  color: var(--ion-color-medium);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.5;
+  text-align: start;
+  flex: 1;
 }
 
-.test-meta {
+.assessment-meta {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
+  margin-bottom: 0.75rem;
 }
 
 .meta-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
+  gap: 0.375rem;
+  color: var(--ion-color-medium);
+  font-size: 0.8125rem;
 }
 
 .meta-item ion-icon {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--ion-color-primary);
 }
 
 .start-button {
+  --border-radius: 8px;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  height: 36px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  margin: 0;
   align-self: flex-start;
-  --box-shadow: var(--secondary-glow);
 }
 
 /* Loading State */
