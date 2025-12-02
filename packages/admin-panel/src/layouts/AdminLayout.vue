@@ -211,9 +211,9 @@ const navItems = [
   },
   {
     to: '/assessments',
-    label: 'nav.tests',
+    label: 'nav.assessments',
     icon: ClipboardDocumentCheckIcon,
-    permission: 'view_tests' as const,
+    permission: 'view_assessments' as const,
   },
   {
     to: '/pages',

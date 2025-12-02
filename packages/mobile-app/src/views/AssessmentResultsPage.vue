@@ -432,7 +432,7 @@ const getSectionInterpretation = (score: number, maxScore: number) => {
 
 const retakeTest = () => {
   if (result.value) {
-    router.push(`/tabs/tests/${result.value.assessment_id}`)
+    router.push(`/tabs/assessments/${result.value.assessment_id}`)
   }
 }
 

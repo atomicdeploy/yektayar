@@ -218,15 +218,15 @@ const formatDate = (dateString: string) => {
 }
 
 const startTest = (testId: number) => {
-  router.push(`/tabs/tests/${testId}`)
+  router.push(`/tabs/assessments/${testId}`)
 }
 
 const viewResult = (resultId: number) => {
-  router.push(`/tabs/tests/results/${resultId}`)
+  router.push(`/tabs/assessments/results/${resultId}`)
 }
 
 const viewHistory = () => {
-  router.push('/tabs/tests/history')
+  router.push('/tabs/assessments/history')
 }
 
 onMounted(() => {

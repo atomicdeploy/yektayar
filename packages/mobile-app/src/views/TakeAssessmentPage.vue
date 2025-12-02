@@ -473,7 +473,7 @@ const submitTest = async () => {
     if (response.data.success) {
       logger.success('Test submitted successfully')
       // Navigate to results page
-      router.push(`/tabs/tests/results/${response.data.data.id}`)
+      router.push(`/tabs/assessments/results/${response.data.data.id}`)
     }
   } catch (error) {
     logger.error('Failed to submit test:', error)
