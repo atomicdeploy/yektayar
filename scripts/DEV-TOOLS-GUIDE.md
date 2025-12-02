@@ -163,7 +163,7 @@ After installation, verify all tools:
 npm run check:requirements
 
 # Or check manually
-node --version     # Should be >= 20.19.0
+node --version     # Should be >= 24.0.0
 npm --version      # Should be >= 9.0.0
 bun --version      # Should be >= 1.0.0
 psql --version     # Should be >= 15.0
