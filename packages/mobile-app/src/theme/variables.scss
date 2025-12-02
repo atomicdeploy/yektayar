@@ -155,51 +155,52 @@
 }
 
 /* ========================================
-   DARK THEME - Premium, Professional, Beautiful
+   DARK THEME - Premium, Professional
+   Based on Navy Seal + Gold Branding
    ======================================== */
 /* Apply dark theme when .ion-palette-dark class is present (forced dark mode) */
 .ion-palette-dark {
-  /* Background - Rich dark gradients */
-  --ion-background-color: #0f172a;
-  --ion-background-color-rgb: 15, 23, 42;
+  /* Background - Rich Navy gradients */
+  --ion-background-color: #0a0f1a;
+  --ion-background-color-rgb: 10, 15, 26;
 
-  /* Text Colors - Excellent readability */
-  --ion-text-color: #f1f5f9;
-  --ion-text-color-rgb: 241, 245, 249;
+  /* Text Colors - Warm and readable */
+  --ion-text-color: #e8e9ed;
+  --ion-text-color-rgb: 232, 233, 237;
 
   /* Toolbar & Header - Translucent glass effect */
-  --ion-toolbar-background: rgba(30, 41, 59, 0.72);
-  --ion-toolbar-border-color: rgba(148, 163, 184, 0.12);
-  --ion-toolbar-color: #f1f5f9;
+  --ion-toolbar-background: rgba(16, 24, 38, 0.72);
+  --ion-toolbar-border-color: rgba(26, 36, 54, 0.5);
+  --ion-toolbar-color: #e8e9ed;
 
-  /* Card & Surface - Elevated surfaces */
-  --ion-card-background: #1e293b;
-  --ion-item-background: #1e293b;
+  /* Card & Surface - Layered depth */
+  --ion-card-background: #121a2b;
+  --ion-item-background: #121a2b;
 
-  /* Borders & Dividers */
-  --ion-border-color: #334155;
+  /* Borders & Dividers - Subtle separation */
+  --ion-border-color: #1e2a3f;
 
   /* Tab Bar - Translucent glass effect */
-  --ion-tab-bar-background: rgba(30, 41, 59, 0.72);
-  --ion-tab-bar-border-color: rgba(148, 163, 184, 0.12);
+  --ion-tab-bar-background: rgba(13, 20, 33, 0.72);
+  --ion-tab-bar-border-color: rgba(26, 36, 54, 0.5);
 
   /* Custom Dark Theme Variables */
   --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #f0ca6f 100%);
-  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-  --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
-  --glass-background: rgba(30, 41, 59, 0.72);
-  --glass-border: rgba(148, 163, 184, 0.12);
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --glass-background: rgba(18, 26, 43, 0.72);
+  --glass-border: rgba(26, 36, 54, 0.5);
   --overlay-background: rgba(0, 0, 0, 0.7);
 
   /* Dark theme specific colors */
-  --surface-1: #1e293b;
-  --surface-2: #334155;
-  --surface-3: #475569;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --accent-soft: #1e1810;
-  --accent-light: #27210f;
+  --surface-1: #121a2b;
+  --surface-2: #162033;
+  --surface-3: #1a2436;
+  --text-primary: #e8e9ed;
+  --text-secondary: #b4b8c5;
+  --text-tertiary: #7a7f8f;
+  --accent-soft: #2a2416;
+  --accent-light: #1f1d15;
   
   /* Navy Seal (Secondary) Accent Variables - Dark Mode Overrides */
   --secondary-accent: #8fa3c7;
@@ -209,25 +210,25 @@
   --secondary-glow: 0 2px 8px rgba(143, 163, 199, 0.3);
 
   /* Adjust Ionic component colors for dark mode */
-  --ion-color-step-50: #1a2332;
-  --ion-color-step-100: #1e293b;
-  --ion-color-step-150: #233044;
-  --ion-color-step-200: #27364d;
-  --ion-color-step-250: #2c3d56;
-  --ion-color-step-300: #30435f;
-  --ion-color-step-350: #354a68;
-  --ion-color-step-400: #395071;
-  --ion-color-step-450: #3e567a;
-  --ion-color-step-500: #425d83;
-  --ion-color-step-550: #47638c;
-  --ion-color-step-600: #4b6a95;
-  --ion-color-step-650: #50709e;
-  --ion-color-step-700: #5477a7;
-  --ion-color-step-750: #597db0;
-  --ion-color-step-800: #5d84b9;
-  --ion-color-step-850: #628ac2;
-  --ion-color-step-900: #6691cb;
-  --ion-color-step-950: #6b97d4;
+  --ion-color-step-50: #14202f;
+  --ion-color-step-100: #182638;
+  --ion-color-step-150: #1c2c41;
+  --ion-color-step-200: #20324a;
+  --ion-color-step-250: #243853;
+  --ion-color-step-300: #283e5c;
+  --ion-color-step-350: #2c4465;
+  --ion-color-step-400: #304a6e;
+  --ion-color-step-450: #345077;
+  --ion-color-step-500: #385680;
+  --ion-color-step-550: #3c5c89;
+  --ion-color-step-600: #406292;
+  --ion-color-step-650: #44689b;
+  --ion-color-step-700: #486ea4;
+  --ion-color-step-750: #4c74ad;
+  --ion-color-step-800: #507ab6;
+  --ion-color-step-850: #5480bf;
+  --ion-color-step-900: #5886c8;
+  --ion-color-step-950: #5c8cd1;
   
   /* Semantic colors - Dark mode variants */
   --ion-color-tertiary: #818cf8;
@@ -254,47 +255,47 @@
 /* Apply dark theme when system prefers dark mode AND not in forced mode */
 @media (prefers-color-scheme: dark) {
   html:not(.theme-forced) {
-    /* Background - Rich dark gradients */
-    --ion-background-color: #0f172a;
-    --ion-background-color-rgb: 15, 23, 42;
+    /* Background - Rich Navy gradients */
+    --ion-background-color: #0a0f1a;
+    --ion-background-color-rgb: 10, 15, 26;
 
-    /* Text Colors - Excellent readability */
-    --ion-text-color: #f1f5f9;
-    --ion-text-color-rgb: 241, 245, 249;
+    /* Text Colors - Warm and readable */
+    --ion-text-color: #e8e9ed;
+    --ion-text-color-rgb: 232, 233, 237;
 
     /* Toolbar & Header - Translucent glass effect */
-    --ion-toolbar-background: rgba(30, 41, 59, 0.72);
-    --ion-toolbar-border-color: rgba(148, 163, 184, 0.12);
-    --ion-toolbar-color: #f1f5f9;
+    --ion-toolbar-background: rgba(16, 24, 38, 0.72);
+    --ion-toolbar-border-color: rgba(26, 36, 54, 0.5);
+    --ion-toolbar-color: #e8e9ed;
 
-    /* Card & Surface - Elevated surfaces */
-    --ion-card-background: #1e293b;
-    --ion-item-background: #1e293b;
+    /* Card & Surface - Layered depth */
+    --ion-card-background: #121a2b;
+    --ion-item-background: #121a2b;
 
-    /* Borders & Dividers */
-    --ion-border-color: #334155;
+    /* Borders & Dividers - Subtle separation */
+    --ion-border-color: #1e2a3f;
 
     /* Tab Bar - Translucent glass effect */
-    --ion-tab-bar-background: rgba(30, 41, 59, 0.72);
-    --ion-tab-bar-border-color: rgba(148, 163, 184, 0.12);
+    --ion-tab-bar-background: rgba(13, 20, 33, 0.72);
+    --ion-tab-bar-border-color: rgba(26, 36, 54, 0.5);
 
     /* Custom Dark Theme Variables */
     --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #f0ca6f 100%);
-    --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.6);
-    --glass-background: rgba(30, 41, 59, 0.72);
-    --glass-border: rgba(148, 163, 184, 0.12);
+    --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --glass-background: rgba(18, 26, 43, 0.72);
+    --glass-border: rgba(26, 36, 54, 0.5);
     --overlay-background: rgba(0, 0, 0, 0.7);
 
     /* Dark theme specific colors */
-    --surface-1: #1e293b;
-    --surface-2: #334155;
-    --surface-3: #475569;
-    --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-tertiary: #94a3b8;
-    --accent-soft: #1e1810;
-    --accent-light: #27210f;
+    --surface-1: #121a2b;
+    --surface-2: #162033;
+    --surface-3: #1a2436;
+    --text-primary: #e8e9ed;
+    --text-secondary: #b4b8c5;
+    --text-tertiary: #7a7f8f;
+    --accent-soft: #2a2416;
+    --accent-light: #1f1d15;
     
     /* Navy Seal (Secondary) Accent Variables - Dark Mode Overrides */
     --secondary-accent: #8fa3c7;
@@ -304,25 +305,25 @@
     --secondary-glow: 0 2px 8px rgba(143, 163, 199, 0.3);
 
     /* Adjust Ionic component colors for dark mode */
-    --ion-color-step-50: #1a2332;
-    --ion-color-step-100: #1e293b;
-    --ion-color-step-150: #233044;
-    --ion-color-step-200: #27364d;
-    --ion-color-step-250: #2c3d56;
-    --ion-color-step-300: #30435f;
-    --ion-color-step-350: #354a68;
-    --ion-color-step-400: #395071;
-    --ion-color-step-450: #3e567a;
-    --ion-color-step-500: #425d83;
-    --ion-color-step-550: #47638c;
-    --ion-color-step-600: #4b6a95;
-    --ion-color-step-650: #50709e;
-    --ion-color-step-700: #5477a7;
-    --ion-color-step-750: #597db0;
-    --ion-color-step-800: #5d84b9;
-    --ion-color-step-850: #628ac2;
-    --ion-color-step-900: #6691cb;
-    --ion-color-step-950: #6b97d4;
+    --ion-color-step-50: #14202f;
+    --ion-color-step-100: #182638;
+    --ion-color-step-150: #1c2c41;
+    --ion-color-step-200: #20324a;
+    --ion-color-step-250: #243853;
+    --ion-color-step-300: #283e5c;
+    --ion-color-step-350: #2c4465;
+    --ion-color-step-400: #304a6e;
+    --ion-color-step-450: #345077;
+    --ion-color-step-500: #385680;
+    --ion-color-step-550: #3c5c89;
+    --ion-color-step-600: #406292;
+    --ion-color-step-650: #44689b;
+    --ion-color-step-700: #486ea4;
+    --ion-color-step-750: #4c74ad;
+    --ion-color-step-800: #507ab6;
+    --ion-color-step-850: #5480bf;
+    --ion-color-step-900: #5886c8;
+    --ion-color-step-950: #5c8cd1;
     
     /* Semantic colors - Dark mode variants */
     --ion-color-tertiary: #818cf8;
@@ -536,68 +537,6 @@ ion-tab-bar {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 1px solid var(--glass-border);
   box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.04);
-  padding-top: 4px;
-  padding-bottom: 4px;
-  height: 60px;
-}
-
-ion-tab-button {
-  --color: var(--text-secondary);
-  --color-selected: var(--ion-color-primary);
-  --ripple-color: var(--ion-color-primary-tint);
-  font-weight: 500;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  ion-icon {
-    margin-bottom: 4px;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  ion-label {
-    font-size: 11px;
-    font-weight: 500;
-    margin-top: 2px;
-    letter-spacing: 0.01em;
-  }
-  
-  /* Active state with beautiful indicator */
-  &.tab-selected {
-    position: relative;
-    
-    ion-icon {
-      transform: translateY(-2px);
-      filter: drop-shadow(0 2px 4px rgba(212, 164, 62, 0.3));
-    }
-    
-    ion-label {
-      font-weight: 600;
-    }
-    
-    /* Modern pill indicator */
-    &::before {
-      content: '';
-      position: absolute;
-      top: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 3px;
-      background: var(--accent-gradient);
-      border-radius: 2px;
-      box-shadow: 0 2px 8px rgba(212, 164, 62, 0.4);
-    }
-  }
-  
-  /* Hover effect for desktop/web */
-  @media (hover: hover) {
-    &:hover:not(.tab-selected) {
-      --color: var(--text-primary);
-      
-      ion-icon {
-        transform: translateY(-1px);
-      }
-    }
-  }
 }
 
 /* Content area styling */
