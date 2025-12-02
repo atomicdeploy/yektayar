@@ -3,6 +3,10 @@ import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
 import { getWebSocketPathFromEnv, logger } from '@yektayar/shared'
 import { initializeDatabase } from './services/database'
 
+// Type declarations for Bun runtime
+declare const Bun: any
+declare const Buffer: any
+
 /**
  * Dedicated WebSocket server for ws.yektayar.ir
  * This server handles both Socket.IO and native WebSocket connections

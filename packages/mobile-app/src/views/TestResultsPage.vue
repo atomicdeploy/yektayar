@@ -291,7 +291,7 @@ const fetchResult = async () => {
     const resultId = route.params.resultId
     // TODO: Get userId from session store once authentication is fully implemented
     const userId = 1 // Placeholder for development
-    const response = await apiClient.get(`/tests/results/${resultId}?userId=${userId}`)
+    const response = await apiClient.get(`/api/tests/results/${resultId}?userId=${userId}`)
     if (response.data.success) {
       result.value = response.data.data
       logger.success('Loaded test result')
