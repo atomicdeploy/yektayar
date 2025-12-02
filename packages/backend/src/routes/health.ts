@@ -62,7 +62,7 @@ async function testDatabaseWrite(timeoutMs: number = 5000): Promise<{ success: b
       RETURNING id
     `
     
-    const result = await Promise.race([writePromise, timeoutPromise]) as any[]
+    const result = await Promise.race([writePromise, timeoutPromise]) as Array<{ id: number }>
     const recordId = result[0]?.id
     
     const duration = Date.now() - startTime
@@ -100,7 +100,7 @@ async function testDatabaseRead(recordId?: number, timeoutMs: number = 5000): Pr
       readPromise = db`SELECT COUNT(*) as count FROM settings LIMIT 1`
     }
     
-    const result = await Promise.race([readPromise, timeoutPromise]) as any[]
+    const result = await Promise.race([readPromise, timeoutPromise]) as Array<{ count?: number }>
     const recordsFound = recordId ? result.length : (result[0]?.count || 0)
     
     const duration = Date.now() - startTime
@@ -170,7 +170,7 @@ async function checkDatabaseTables(timeoutMs: number = 5000): Promise<{ success:
       ORDER BY table_name
     `
     
-    const result = await Promise.race([tablesPromise, timeoutPromise]) as any[]
+    const result = await Promise.race([tablesPromise, timeoutPromise]) as Array<{ table_name: string }>
     const tables = result.map(row => row.table_name)
     
     const duration = Date.now() - startTime
@@ -295,6 +295,7 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
       }
     }
     
+    // eslint-disable-next-line prefer-const
     testRecordId = writeTest.recordId
     
     // Test 4: Database Read
