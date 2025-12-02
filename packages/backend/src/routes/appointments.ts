@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { query } from '../services/database-pg'
+import { query, getDatabase } from '../services/database-pg'
 import { logger } from '@yektayar/shared'
 
 export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
@@ -135,8 +135,8 @@ export const appointmentRoutes = new Elysia({ prefix: '/api/appointments' })
         }
       }
 
-      const patient = users.find(u => u.id === parseInt(patientId))
-      const psychologist = users.find(u => u.id === parseInt(psychologistId))
+      const patient = users.find((u: any) => u.id === parseInt(patientId))
+      const psychologist = users.find((u: any) => u.id === parseInt(psychologistId))
 
       if (patient?.type !== 'patient') {
         return {

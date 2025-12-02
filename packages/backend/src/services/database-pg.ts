@@ -49,6 +49,24 @@ export async function query<T = any>(text: string, params?: any[]): Promise<T[]>
 }
 
 /**
+ * Tagged template SQL function for backward compatibility with postgres library syntax
+ * Converts tagged template calls to parameterized queries
+ */
+export function sql(strings: TemplateStringsArray, ...values: any[]): Promise<any[]> & { unsafe?: (query: string, params: any[]) => Promise<any[]> } {
+  // For immediate execution, return a thenable with the query
+  const queryText = strings.reduce((acc, str, i) => {
+    return acc + str + (i < values.length ? `$${i + 1}` : '')
+  }, '')
+  
+  return query(queryText, values)
+}
+
+// Make sql callable with unsafe for dynamic queries
+sql.unsafe = (queryText: string, params: any[]) => {
+  return query(queryText, params)
+}
+
+/**
  * Get a client from the pool for transactions
  */
 export async function getClient(): Promise<PoolClient> {
@@ -162,4 +180,8 @@ export async function closePool() {
 }
 
 // For backward compatibility with existing code using getDatabase()
-export const getDatabase = getPool
+// Returns sql tagged template function
+export function getDatabase() {
+  getPool() // Ensure pool is initialized
+  return sql
+}
