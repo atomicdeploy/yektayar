@@ -24,7 +24,7 @@ sudo ./scripts/enable-system-bashrc-features.sh
 - **build-essential** - C/C++ compilers for native modules
 
 ### Node.js Ecosystem
-- **Node.js 18.x** - JavaScript runtime
+- **Node.js 24.x** - JavaScript runtime
 - **npm** - Package manager (comes with Node.js)
 - **Bun 1.x** - Fast JavaScript runtime (for backend)
 
@@ -124,7 +124,7 @@ If you prefer to install tools manually:
 ### Node.js & npm
 ```bash
 # Using NodeSource repository
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
@@ -163,7 +163,7 @@ After installation, verify all tools:
 npm run check:requirements
 
 # Or check manually
-node --version     # Should be >= 18.0.0
+node --version     # Should be >= 20.19.0
 npm --version      # Should be >= 9.0.0
 bun --version      # Should be >= 1.0.0
 psql --version     # Should be >= 15.0
@@ -218,7 +218,7 @@ sudo usermod -aG docker $USER
 ### npm/Node.js version too old
 ```bash
 # Update Node.js
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # Update npm
