@@ -1,6 +1,6 @@
 /**
- * Seed script for comprehensive relationship assessment test (رهنما)
- * Run with: bun run seed-rahnama-test.ts
+ * Seed script for comprehensive relationship assessment test (رهیار)
+ * Run with: bun run seed-rahyar-test.ts
  */
 
 import postgres from 'postgres'
@@ -9,9 +9,9 @@ import { logger } from '@yektayar/shared'
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar'
 const db = postgres(DATABASE_URL)
 
-const rahnamaTest = {
-  title: 'رهنما - آزمون جامع ارزیابی مولفه‌های رابطه',
-  titleEn: 'Rahnama - Comprehensive Relationship Assessment Test',
+const rahyarTest = {
+  title: 'رهیار - آزمون جامع ارزیابی مولفه‌های رابطه',
+  titleEn: 'Rahyar - Comprehensive Relationship Assessment Test',
   description: 'آزمونی که مسیر رابطه را روشن می‌کند و راه‌حل‌ها را نشان می‌دهد، مثل یک دوست کنار فرد می‌ماند تا مشکلات را بشناسد. این پرسشنامه یک ابزار خودارزیابی است که برای ایجاد یک گفتگوی سازنده و مبتنی بر داده طراحی شده است.',
   descriptionEn: 'A test that illuminates the path of the relationship and shows solutions, standing beside you like a friend to identify problems. This questionnaire is a self-assessment tool designed to create a constructive, data-driven dialogue.',
   tagline: 'رابطه رو بسنج، آسیب‌ها رو بفهم، راه‌حل‌ها بگیر',
@@ -541,35 +541,35 @@ const rahnamaTest = {
   ],
 }
 
-async function seedRahnamaTest() {
+async function seedRahyarTest() {
   try {
-    logger.info('Starting Rahnama test data seeding...')
+    logger.info('Starting Rahyar test data seeding...')
 
     // Check if test already exists
     const existing = await db`
-      SELECT id FROM assessments WHERE title = ${rahnamaTest.title}
+      SELECT id FROM assessments WHERE title = ${rahyarTest.title}
     `
 
     if (existing.length > 0) {
-      logger.warn('Rahnama test already exists, skipping...')
+      logger.warn('Rahyar test already exists, skipping...')
       return
     }
 
-    // Insert the Rahnama test
+    // Insert the Rahyar test
     const [test] = await db`
       INSERT INTO assessments (title, description, questions)
-      VALUES (${rahnamaTest.title}, ${rahnamaTest.description}, ${db.json(rahnamaTest.questions)})
+      VALUES (${rahyarTest.title}, ${rahyarTest.description}, ${db.json(rahyarTest.questions)})
       RETURNING *
     `
 
-    logger.success(`Rahnama test created with ID: ${test.id}`)
-    logger.info(`Title: ${rahnamaTest.title}`)
-    logger.info(`Questions: ${rahnamaTest.questions.length}`)
+    logger.success(`Rahyar test created with ID: ${test.id}`)
+    logger.info(`Title: ${rahyarTest.title}`)
+    logger.info(`Questions: ${rahyarTest.questions.length}`)
     logger.info(`Sections: 9`)
-    logger.info(`Tagline: ${rahnamaTest.tagline}`)
+    logger.info(`Tagline: ${rahyarTest.tagline}`)
     
   } catch (error) {
-    logger.error('Error seeding Rahnama test data:', error)
+    logger.error('Error seeding Rahyar test data:', error)
     throw error
   } finally {
     await db.end()
@@ -577,12 +577,12 @@ async function seedRahnamaTest() {
 }
 
 // Run the seed function
-seedRahnamaTest()
+seedRahyarTest()
   .then(() => {
-    logger.success('Rahnama test data seeding completed!')
+    logger.success('Rahyar test data seeding completed!')
     process.exit(0)
   })
   .catch((error) => {
-    logger.error('Rahnama test data seeding failed:', error)
+    logger.error('Rahyar test data seeding failed:', error)
     process.exit(1)
   })
