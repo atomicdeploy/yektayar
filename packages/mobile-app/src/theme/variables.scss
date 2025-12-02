@@ -405,4 +405,98 @@ ion-tab-button {
 ion-content {
   --background: var(--ion-background-color);
   --color: var(--ion-text-color);
+  --offset-bottom: auto !important;
+  --overflow: auto;
+  overflow: auto;
+
+  /* Native Scrollbar Styling - WebKit (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--ion-background-color);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track:hover {
+    background: var(--surface-2);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--ion-color-primary);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--ion-color-primary-shade);
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: var(--ion-color-primary-shade);
+  }
+
+  /* Native Scrollbar Styling - Firefox */
+  .inner-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
+  }
+}
+
+/* Dark Theme Native Scrollbar Overrides */
+.ion-palette-dark ion-content {
+  &::-webkit-scrollbar-track {
+    background: var(--ion-background-color);
+  }
+
+  &::-webkit-scrollbar-track:hover {
+    background: var(--surface-2);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--ion-color-primary);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--ion-color-primary-tint);
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: var(--ion-color-primary-tint);
+  }
+
+  .inner-scroll {
+    scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
+  }
+}
+
+/* System Dark Mode Native Scrollbar Overrides */
+@media (prefers-color-scheme: dark) {
+  html:not(.theme-forced) ion-content {
+    &::-webkit-scrollbar-track {
+      background: var(--ion-background-color);
+    }
+
+    &::-webkit-scrollbar-track:hover {
+      background: var(--surface-2);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--ion-color-primary);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--ion-color-primary-tint);
+    }
+
+    &::-webkit-scrollbar-thumb:active {
+      background: var(--ion-color-primary-tint);
+    }
+
+    .inner-scroll {
+      scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
+    }
+  }
 }
