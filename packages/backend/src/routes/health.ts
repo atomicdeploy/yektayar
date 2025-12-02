@@ -1,10 +1,11 @@
 /**
  * Health Check Routes
  * Provides comprehensive health check endpoints for monitoring
+ * Using pg library for better Bun compatibility
  */
 
 import { Elysia } from 'elysia'
-import { query, getDatabase } from '../services/database'
+import { getPool, query } from '../services/database'
 import { logger } from '@yektayar/shared'
 
 /**
@@ -14,15 +15,15 @@ async function testDatabaseConnection(timeoutMs: number = 5000): Promise<{ succe
   const startTime = Date.now()
   
   try {
-    const db = getDatabase()
+    const pool = getPool()
     
     // Create a promise that will timeout
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('Database connection timeout')), timeoutMs)
     })
     
-    // Test connection with a simple query
-    const testPromise = db`SELECT 1 as test`
+    // Test connection with a simple query using pg library
+    const testPromise = pool.query('SELECT 1 as test')
     
     await Promise.race([testPromise, timeoutPromise])
     
@@ -46,7 +47,7 @@ async function testDatabaseWrite(timeoutMs: number = 5000): Promise<{ success: b
   const startTime = Date.now()
   
   try {
-    const db = getDatabase()
+    const pool = getPool()
     const testKey = `health_check_${Date.now()}`
     const testValue = `test_${Math.random().toString(36).substring(7)}`
     
@@ -55,15 +56,14 @@ async function testDatabaseWrite(timeoutMs: number = 5000): Promise<{ success: b
       setTimeout(() => reject(new Error('Database write timeout')), timeoutMs)
     })
     
-    // Insert a test record into settings table
-    const writePromise = db`
-      INSERT INTO settings (key, value, type)
-      VALUES (${testKey}, ${testValue}, 'string')
-      RETURNING id
-    `
+    // Insert a test record into settings table using parameterized query
+    const writePromise = pool.query(
+      `INSERT INTO settings (key, value, type) VALUES ($1, $2, $3) RETURNING id`,
+      [testKey, testValue, 'string']
+    )
     
-    const result = await Promise.race([writePromise, timeoutPromise]) as unknown as Array<{ id: number }>
-    const recordId = result[0]?.id
+    const result = await Promise.race([writePromise, timeoutPromise])
+    const recordId = result.rows[0]?.id
     
     const duration = Date.now() - startTime
     logger.success(`Database write test passed (${duration}ms) - Record ID: ${recordId}`)
@@ -85,7 +85,7 @@ async function testDatabaseRead(recordId?: number, timeoutMs: number = 5000): Pr
   const startTime = Date.now()
   
   try {
-    const db = getDatabase()
+    const pool = getPool()
     
     // Create a promise that will timeout
     const timeoutPromise = new Promise<never>((_, reject) => {
@@ -95,13 +95,13 @@ async function testDatabaseRead(recordId?: number, timeoutMs: number = 5000): Pr
     // Read the test record or check for existing records
     let readPromise
     if (recordId) {
-      readPromise = db`SELECT * FROM settings WHERE id = ${recordId}`
+      readPromise = pool.query('SELECT * FROM settings WHERE id = $1', [recordId])
     } else {
-      readPromise = db`SELECT COUNT(*) as count FROM settings LIMIT 1`
+      readPromise = pool.query('SELECT COUNT(*) as count FROM settings LIMIT 1')
     }
     
-    const result = await Promise.race([readPromise, timeoutPromise]) as unknown as Array<{ count?: number }>
-    const recordsFound = recordId ? result.length : (result[0]?.count || 0)
+    const result = await Promise.race([readPromise, timeoutPromise])
+    const recordsFound = recordId ? result.rows.length : (result.rows[0]?.count || 0)
     
     const duration = Date.now() - startTime
     logger.success(`Database read test passed (${duration}ms) - Records found: ${recordsFound}`)
@@ -123,7 +123,7 @@ async function cleanupTestRecord(recordId: number, timeoutMs: number = 5000): Pr
   const startTime = Date.now()
   
   try {
-    const db = getDatabase()
+    const pool = getPool()
     
     // Create a promise that will timeout
     const timeoutPromise = new Promise<never>((_, reject) => {
@@ -131,7 +131,7 @@ async function cleanupTestRecord(recordId: number, timeoutMs: number = 5000): Pr
     })
     
     // Delete the test record
-    const deletePromise = db`DELETE FROM settings WHERE id = ${recordId}`
+    const deletePromise = pool.query('DELETE FROM settings WHERE id = $1', [recordId])
     
     await Promise.race([deletePromise, timeoutPromise])
     
@@ -155,7 +155,7 @@ async function checkDatabaseTables(timeoutMs: number = 5000): Promise<{ success:
   const startTime = Date.now()
   
   try {
-    const db = getDatabase()
+    const pool = getPool()
     
     // Create a promise that will timeout
     const timeoutPromise = new Promise<never>((_, reject) => {
@@ -163,15 +163,15 @@ async function checkDatabaseTables(timeoutMs: number = 5000): Promise<{ success:
     })
     
     // Check for expected tables
-    const tablesPromise = db`
+    const tablesPromise = pool.query(`
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_schema = 'public' 
       ORDER BY table_name
-    `
+    `)
     
-    const result = await Promise.race([tablesPromise, timeoutPromise]) as unknown as Array<{ table_name: string }>
-    const tables = result.map(row => row.table_name)
+    const result = await Promise.race([tablesPromise, timeoutPromise])
+    const tables = result.rows.map(row => row.table_name)
     
     const duration = Date.now() - startTime
     logger.success(`Database tables check passed (${duration}ms) - Found ${tables.length} tables`)
@@ -188,6 +188,16 @@ async function checkDatabaseTables(timeoutMs: number = 5000): Promise<{ success:
 }
 
 export const healthRoutes = new Elysia({ prefix: '/health' })
+  .get('/', () => ({
+    status: 'healthy',
+    timestamp: new Date().toISOString()
+  }), {
+    detail: {
+      tags: ['Health'],
+      summary: 'Basic health check',
+      description: 'Returns basic health status'
+    }
+  })
   .get('/db', async () => {
     logger.info('======================================')
     logger.info('🏥 Database Health Check - Starting')
@@ -203,6 +213,7 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
     logger.info(`  DB_NAME: ${process.env.DB_NAME || 'not set'}`)
     logger.info(`  DB_USER: ${process.env.DB_USER || 'not set'}`)
     logger.info(`  DB_PASSWORD: ${process.env.DB_PASSWORD ? '*****' : 'not set'}`)
+    logger.info(`  Library: pg (PostgreSQL client for Node.js and Bun)`)
     logger.info('======================================')
     
     const healthCheck = {
@@ -220,7 +231,8 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
         host: process.env.DB_HOST || 'not set',
         port: process.env.DB_PORT || 'not set',
         database: process.env.DB_NAME || 'not set',
-        user: process.env.DB_USER || 'not set'
+        user: process.env.DB_USER || 'not set',
+        library: 'pg'
       }
     }
     
@@ -395,6 +407,6 @@ export const healthRoutes = new Elysia({ prefix: '/health' })
     detail: {
       tags: ['Health'],
       summary: 'Comprehensive database health check',
-      description: 'Performs comprehensive health checks including connection test, tables verification, write test, read test, and cleanup. Provides verbose logging to help diagnose database issues.'
+      description: 'Performs comprehensive health checks including connection test, tables verification, write test, read test, and cleanup. Provides verbose logging to help diagnose database issues. Uses pg library for better Bun compatibility.'
     }
   })
