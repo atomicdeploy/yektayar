@@ -558,7 +558,7 @@ async function seedRahnamaTest() {
     // Insert the Rahnama test
     const [test] = await db`
       INSERT INTO assessments (title, description, questions)
-      VALUES (${rahnamaTest.title}, ${rahnamaTest.description}, ${JSON.stringify(rahnamaTest.questions)})
+      VALUES (${rahnamaTest.title}, ${rahnamaTest.description}, ${db.json(rahnamaTest.questions)})
       RETURNING *
     `
 
