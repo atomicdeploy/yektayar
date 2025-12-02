@@ -96,7 +96,7 @@ npm run dev:mobile     # Mobile App (port 8100)
 
 - **Backend API**: http://localhost:3000
 - **API Documentation**: http://localhost:3000/api-docs (protected with Basic Auth - see `.env` for credentials)
-- **Socket.IO WebSocket**: ws://localhost:3000 (same port as HTTP, requires session token - see [Socket.IO Guide](docs/SOCKETIO-GUIDE.md))
+- **Socket.IO WebSocket**: ws://localhost:3000 (same port as HTTP, requires session token - see [Socket.IO Guide](docs/api/SOCKETIO-GUIDE.md))
 - **Admin Panel**: http://localhost:5173
 - **Mobile App**: http://localhost:8100
 
@@ -187,7 +187,7 @@ npm run test:coverage     # Generate coverage report
 - ✅ All tests must pass before committing
 - ✅ ESLint checks must pass
 - 📖 See [.github/copilot-instructions.md](.github/copilot-instructions.md) for coding standards
-- 📖 See [docs/I18N-VALIDATION.md](docs/I18N-VALIDATION.md) for i18n validation guide
+- 📖 See [docs/implementation/I18N-VALIDATION.md](docs/implementation/I18N-VALIDATION.md) for i18n validation guide
 
 ### Start All Services
 
@@ -230,9 +230,9 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 
 #### Getting Started
 - **[Quick Start Guide](QUICK-START.md)** - Fast setup for the monorepo
-- **[Getting Started Guide](docs/GETTING-STARTED.md)** - Comprehensive developer onboarding
+- **[Getting Started Guide](docs/guides/GETTING-STARTED.md)** - Comprehensive developer onboarding
 - **[Development Guide](DEVELOPMENT.md)** - Detailed development practices
-- **[Quick Reference](docs/QUICK-REFERENCE.md)** - Code snippets and daily checklist
+- **[Quick Reference](docs/guides/QUICK-REFERENCE.md)** - Code snippets and daily checklist
 
 #### Architecture & Planning
 - **[Architecture Overview](docs/ARCHITECTURE.md)** - Complete system architecture with prototype/production phases
@@ -240,13 +240,13 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 
 #### Setup & Deployment
 - **[Environment Configuration Guide](ENV-GUIDE.md)** - Complete .env management and configuration guide
-- **[Setup Guide](docs/SETUP.md)** - Complete setup for all phases
-- **[Ubuntu 24.04 Deployment](docs/UBUNTU-24-DEPLOYMENT.md)** - VPS deployment guide
-- **[Network Configuration](docs/NETWORK-CONFIGURATION.md)** - Port and interface configuration
-- **[Bun vs NPM](docs/BUN-VS-NPM.md)** - Runtime comparison guide
+- **[Setup Guide](docs/guides/SETUP.md)** - Complete setup for all phases
+- **[Ubuntu 24.04 Deployment](docs/deployment/UBUNTU-24-DEPLOYMENT.md)** - VPS deployment guide
+- **[Network Configuration](docs/deployment/NETWORK-CONFIGURATION.md)** - Port and interface configuration
+- **[Bun vs NPM](docs/guides/BUN-VS-NPM.md)** - Runtime comparison guide
 
 #### Additional Resources
-- **[Socket.IO Connection Guide](docs/SOCKETIO-GUIDE.md)** - Real-time WebSocket communication setup and usage
+- **[Socket.IO Connection Guide](docs/api/SOCKETIO-GUIDE.md)** - Real-time WebSocket communication setup and usage
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
 - **[CORS Fix Documentation](CORS-FIX.md)** - CORS OPTIONS verb support implementation
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
@@ -307,7 +307,7 @@ For a quick web server setup with reverse proxy configurations:
 
 ### Complete Deployment Guides
 
-- **[Ubuntu 24.04 Deployment Guide](docs/UBUNTU-24-DEPLOYMENT.md)** - Complete VPS deployment instructions
+- **[Ubuntu 24.04 Deployment Guide](docs/deployment/UBUNTU-24-DEPLOYMENT.md)** - Complete VPS deployment instructions
 - **[Mobile App Build Guide](packages/mobile-app/BUILD_APK.md)** - Android APK build instructions
 - **[Web Server Configuration](config/webserver/README.md)** - Detailed web server configuration guide
 
@@ -335,8 +335,8 @@ sudo ./scripts/install-caddy.sh    # For Caddy (automatic HTTPS)
 
 ### Additional Deployment Resources
 
-- [Network Configuration Guide](docs/NETWORK-CONFIGURATION.md) - Configure ports and interfaces
-- [Bun vs NPM Guide](docs/BUN-VS-NPM.md) - Understanding the runtime and package manager
+- [Network Configuration Guide](docs/deployment/NETWORK-CONFIGURATION.md) - Configure ports and interfaces
+- [Bun vs NPM Guide](docs/guides/BUN-VS-NPM.md) - Understanding the runtime and package manager
 
 ---
 
