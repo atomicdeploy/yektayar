@@ -101,50 +101,50 @@
 }
 
 /* ========================================
-   LIGHT THEME - Calm, Modern, Vibrant
+   LIGHT THEME - Calm, Modern, Lively
    ======================================== */
 :root {
-  /* Background Colors - Clean and bright */
-  --ion-background-color: #f8f9fb;
-  --ion-background-color-rgb: 248, 249, 251;
+  /* Background Colors - Soft and airy */
+  --ion-background-color: #fafbfc;
+  --ion-background-color-rgb: 250, 251, 252;
 
   /* Text Colors - High contrast for readability */
-  --ion-text-color: #0f172a;
-  --ion-text-color-rgb: 15, 23, 42;
+  --ion-text-color: #1a1a1a;
+  --ion-text-color-rgb: 26, 26, 26;
 
   /* Toolbar & Header - Translucent glass effect */
-  --ion-toolbar-background: rgba(255, 255, 255, 0.72);
-  --ion-toolbar-border-color: rgba(148, 163, 184, 0.12);
-  --ion-toolbar-color: #0f172a;
+  --ion-toolbar-background: rgba(255, 255, 255, 0.85);
+  --ion-toolbar-border-color: rgba(0, 0, 0, 0.08);
+  --ion-toolbar-color: #1a1a1a;
 
   /* Card & Surface */
   --ion-card-background: #ffffff;
   --ion-item-background: #ffffff;
 
   /* Borders & Dividers */
-  --ion-border-color: #e2e8f0;
+  --ion-border-color: #e8eaed;
 
   /* Tab Bar - Translucent glass effect */
-  --ion-tab-bar-background: rgba(255, 255, 255, 0.72);
-  --ion-tab-bar-border-color: rgba(148, 163, 184, 0.12);
+  --ion-tab-bar-background: rgba(255, 255, 255, 0.85);
+  --ion-tab-bar-border-color: rgba(0, 0, 0, 0.08);
 
   /* Custom Light Theme Variables */
-  --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #f0ca6f 100%);
-  --card-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --card-shadow-hover: 0 4px 12px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
-  --glass-background: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(148, 163, 184, 0.12);
-  --overlay-background: rgba(15, 23, 42, 0.5);
+  --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #e8c170 100%);
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --card-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --glass-background: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --overlay-background: rgba(0, 0, 0, 0.4);
   
   /* Light theme specific colors */
   --surface-1: #ffffff;
-  --surface-2: #f1f5f9;
-  --surface-3: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
-  --accent-soft: #fef3e2;
-  --accent-light: #fffbf5;
+  --surface-2: #f7f8fa;
+  --surface-3: #eef0f3;
+  --text-primary: #1a1a1a;
+  --text-secondary: #5f6368;
+  --text-tertiary: #80868b;
+  --accent-soft: #f8f1e5;
+  --accent-light: #fef9f0;
   
   /* Navy Seal (Secondary) Accent Variables - For Beautiful Accents */
   --secondary-accent: #01183a;
