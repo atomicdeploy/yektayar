@@ -22,12 +22,12 @@ node tests/scripts/test-health-db.cjs
 node tests/scripts/test-health-db.cjs http://localhost:3000
 ```
 
-#### `test-websocket.cjs`
+#### `test-websocket.mjs`
 WebSocket connection test utility.
 
 **Usage:**
 ```bash
-node tests/scripts/test-websocket.cjs
+node tests/scripts/test-websocket.mjs
 # or via npm:
 npm run test:websocket
 ```

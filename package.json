@@ -28,7 +28,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:deps": "node tests/scripts/test-dependencies.cjs",
-    "test:websocket": "node tests/scripts/test-websocket.cjs",
+    "test:websocket": "node tests/scripts/test-websocket.mjs",
     "socketio:test": "node scripts/socketio-tui.js",
     "ai:test": "node scripts/pollination-ai-tui.js",
     "db:cli": "bash scripts/db-cli.sh",
