@@ -209,7 +209,7 @@ export function useAIChat() {
 
     try {
       const response = await apiClient.post<{ response?: string; message?: string }>(
-        '/api/ai/chat',
+        '/ai/chat',
         {
           message: content,
           conversationHistory: messages.value
