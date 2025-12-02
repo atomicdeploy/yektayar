@@ -50,7 +50,9 @@ export class ApiClient {
     this.baseURL = config.baseURL
 
     // Create axios instance with base configuration
-    // Note: We don't set baseURL here because we'll handle URL normalization manually
+    // Note: baseURL is NOT set on the axios instance to allow manual URL normalization.
+    // This gives us better control over slash handling (e.g., 'http://api.com/api/' + '/route')
+    // and supports the absolutePath option. URLs are normalized in each HTTP method.
     this.axiosInstance = axios.create({
       timeout: config.timeout || 30000,
       headers: {
@@ -189,6 +191,8 @@ export class ApiClient {
   async get<T = any>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
     const finalUrl = options?.absolutePath ? url : normalizeUrl(this.baseURL, url)
     
+    // Content-Type is set here (not just in axios instance) to ensure it's always 'application/json'
+    // and cannot be overridden by custom headers passed in options.
     const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
       params: options?.params,
       headers: {
