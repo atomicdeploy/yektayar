@@ -3,12 +3,17 @@
  * 
  * This client handles all HTTP communication with the backend API.
  * It supports browser, Node.js, and React Native environments.
+ * 
  * Features:
  * - Automatic token management
  * - Request/response interceptors
  * - Proxy support (via axios)
  * - Error handling
  * - TypeScript support
+ * - JSON request/response format (enforced)
+ * 
+ * Note: All requests use JSON format (Content-Type: application/json).
+ * All responses are expected to be in JSON format with the ApiResponse wrapper.
  */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
@@ -16,20 +21,37 @@ import { ApiClientConfig, ApiResponse, ApiError, RequestOptions, TokenDeliveryMe
 import { logger } from '../utils/logger'
 import { TokenStorage } from './storage'
 
+/**
+ * Normalize URL path by removing duplicate slashes and handling trailing slashes
+ * @param baseURL - The base URL (may or may not have trailing slash)
+ * @param path - The path to append (may or may not have leading slash)
+ * @returns Normalized full URL
+ */
+function normalizeUrl(baseURL: string, path: string): string {
+  // Remove trailing slash from baseURL if present
+  const normalizedBase = baseURL.replace(/\/+$/, '')
+  // Ensure path starts with a single slash
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  // Join and remove any duplicate slashes except in protocol (http://)
+  return `${normalizedBase}${normalizedPath}`.replace(/([^:]\/)\/+/g, '$1')
+}
+
 export class ApiClient {
   private axiosInstance: AxiosInstance
   private tokenStorage: TokenStorage
   private debug: boolean
   private tokenDeliveryMethod: TokenDeliveryMethod
+  private baseURL: string
 
   constructor(config: ApiClientConfig) {
     this.debug = config.debug || false
     this.tokenStorage = new TokenStorage(config.storageKey)
     this.tokenDeliveryMethod = config.tokenDeliveryMethod || 'header'
+    this.baseURL = config.baseURL
 
     // Create axios instance with base configuration
+    // Note: We don't set baseURL here because we'll handle URL normalization manually
     this.axiosInstance = axios.create({
-      baseURL: config.baseURL,
       timeout: config.timeout || 30000,
       headers: {
         'Content-Type': 'application/json',
@@ -156,81 +178,144 @@ export class ApiClient {
 
   /**
    * GET request
+   * 
+   * Makes a GET request to the specified URL.
+   * The URL should be relative to the baseURL (without /api prefix if baseURL includes it).
+   * 
+   * @param url - Relative URL path (e.g., '/users', '/dashboard/stats') or absolute URL if absolutePath is true
+   * @param options - Optional request configuration
+   * @returns Promise resolving to ApiResponse<T>
    */
   async get<T = any>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+    const finalUrl = options?.absolutePath ? url : normalizeUrl(this.baseURL, url)
+    
     const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
       params: options?.params,
-      headers: options?.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
       tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
-    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.get(url, config)
+    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.get(finalUrl, config)
     return response.data
   }
 
   /**
    * POST request
+   * 
+   * Makes a POST request to the specified URL with JSON data.
+   * The URL should be relative to the baseURL (without /api prefix if baseURL includes it).
+   * 
+   * @param url - Relative URL path (e.g., '/auth/login', '/users') or absolute URL if absolutePath is true
+   * @param data - Request body data (will be sent as JSON)
+   * @param options - Optional request configuration
+   * @returns Promise resolving to ApiResponse<T>
    */
   async post<T = any>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+    const finalUrl = options?.absolutePath ? url : normalizeUrl(this.baseURL, url)
+    
     const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
-      headers: options?.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
       tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
-    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.post(url, data, config)
+    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.post(finalUrl, data, config)
     return response.data
   }
 
   /**
    * PUT request
+   * 
+   * Makes a PUT request to the specified URL with JSON data.
+   * The URL should be relative to the baseURL (without /api prefix if baseURL includes it).
+   * 
+   * @param url - Relative URL path (e.g., '/users/123') or absolute URL if absolutePath is true
+   * @param data - Request body data (will be sent as JSON)
+   * @param options - Optional request configuration
+   * @returns Promise resolving to ApiResponse<T>
    */
   async put<T = any>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+    const finalUrl = options?.absolutePath ? url : normalizeUrl(this.baseURL, url)
+    
     const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
-      headers: options?.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
       tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
-    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.put(url, data, config)
+    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.put(finalUrl, data, config)
     return response.data
   }
 
   /**
    * PATCH request
+   * 
+   * Makes a PATCH request to the specified URL with JSON data.
+   * The URL should be relative to the baseURL (without /api prefix if baseURL includes it).
+   * 
+   * @param url - Relative URL path (e.g., '/users/123') or absolute URL if absolutePath is true
+   * @param data - Request body data (will be sent as JSON)
+   * @param options - Optional request configuration
+   * @returns Promise resolving to ApiResponse<T>
    */
   async patch<T = any>(url: string, data?: any, options?: RequestOptions): Promise<ApiResponse<T>> {
+    const finalUrl = options?.absolutePath ? url : normalizeUrl(this.baseURL, url)
+    
     const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
-      headers: options?.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
       tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
-    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.patch(url, data, config)
+    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.patch(finalUrl, data, config)
     return response.data
   }
 
   /**
    * DELETE request
+   * 
+   * Makes a DELETE request to the specified URL.
+   * The URL should be relative to the baseURL (without /api prefix if baseURL includes it).
+   * 
+   * @param url - Relative URL path (e.g., '/users/123') or absolute URL if absolutePath is true
+   * @param options - Optional request configuration
+   * @returns Promise resolving to ApiResponse<T>
    */
   async delete<T = any>(url: string, options?: RequestOptions): Promise<ApiResponse<T>> {
+    const finalUrl = options?.absolutePath ? url : normalizeUrl(this.baseURL, url)
+    
     const config: AxiosRequestConfig & { skipAuth?: boolean; tokenDeliveryMethod?: TokenDeliveryMethod } = {
-      headers: options?.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
       params: options?.params,
       timeout: options?.timeout,
       skipAuth: options?.skipAuth,
       tokenDeliveryMethod: options?.tokenDeliveryMethod,
     }
 
-    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.delete(url, config)
+    const response: AxiosResponse<ApiResponse<T>> = await this.axiosInstance.delete(finalUrl, config)
     return response.data
   }
 
@@ -260,6 +345,13 @@ export class ApiClient {
    */
   async hasToken(): Promise<boolean> {
     return await this.tokenStorage.hasToken()
+  }
+
+  /**
+   * Get the current base URL
+   */
+  getBaseURL(): string {
+    return this.baseURL
   }
 
   /**
