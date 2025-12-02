@@ -16,20 +16,8 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true" :scroll-y="false">
-      <OverlayScrollbarsComponent
-        class="scrollable-content"
-        :options="{
-          scrollbars: {
-            theme: 'os-theme-yektayar-mobile',
-            visibility: 'auto',
-            autoHide: 'scroll',
-            autoHideDelay: 1300
-          }
-        }"
-        defer
-      >
-        <div class="content-wrapper">
+    <ion-content :fullscreen="true">
+      <div class="content-wrapper">
           <!-- Hero Section -->
           <div class="course-hero">
             <div class="hero-image">
@@ -263,7 +251,6 @@
             </div>
           </div>
         </div>
-      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -284,7 +271,6 @@ import {
   IonBadge,
   IonProgressBar
 } from '@ionic/vue'
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import LazyImage from '@/components/LazyImage.vue'
 import {
   shareSocial,
@@ -721,6 +707,10 @@ onMounted(() => {
           display: flex;
           align-items: center;
           justify-content: center;
+
+          .error-text {
+            display: none;
+          }
         }
       }
 

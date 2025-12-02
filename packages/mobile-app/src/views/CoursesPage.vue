@@ -11,26 +11,14 @@
       </ion-toolbar>
     </ion-header>
     
-    <ion-content :fullscreen="true" :scroll-y="false">
+    <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ t('courses.title') }}</ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <OverlayScrollbarsComponent
-        class="scrollable-content"
-        :options="{
-          scrollbars: {
-            theme: 'os-theme-yektayar-mobile',
-            visibility: 'auto',
-            autoHide: 'scroll',
-            autoHideDelay: 1300
-          }
-        }"
-        defer
-      >
-        <div class="content-wrapper">
+      <div class="content-wrapper">
           <!-- Search Bar -->
           <div class="search-section">
             <ion-searchbar
@@ -178,7 +166,6 @@
             </div>
           </div>
         </div>
-      </OverlayScrollbarsComponent>
     </ion-content>
   </ion-page>
 </template>
@@ -204,7 +191,6 @@ import {
   IonSelectOption,
   IonSkeletonText
 } from '@ionic/vue'
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import LazyImage from '@/components/LazyImage.vue'
 import {
   funnel,
@@ -384,7 +370,7 @@ ion-chip {
 
 .section-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
@@ -392,6 +378,11 @@ ion-chip {
   ion-select {
     max-width: fit-content;
     min-width: 120px;
+    margin-inline-end: auto;
+  }
+
+  ion-button {
+    margin-inline-start: auto;
   }
 }
 
