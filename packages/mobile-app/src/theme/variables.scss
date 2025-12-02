@@ -439,10 +439,8 @@ ion-content {
   }
 
   /* Native Scrollbar Styling - Firefox */
-  .inner-scroll {
-    scrollbar-width: thin;
-    scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
-  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
 }
 
 /* Dark Theme Native Scrollbar Overrides */
@@ -467,9 +465,7 @@ ion-content {
     background: var(--ion-color-primary-tint);
   }
 
-  .inner-scroll {
-    scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
-  }
+  scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
 }
 
 /* System Dark Mode Native Scrollbar Overrides */
@@ -495,8 +491,6 @@ ion-content {
       background: var(--ion-color-primary-tint);
     }
 
-    .inner-scroll {
-      scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
-    }
+    scrollbar-color: var(--ion-color-primary) var(--ion-background-color);
   }
 }
