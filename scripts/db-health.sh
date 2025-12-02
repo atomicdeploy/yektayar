@@ -224,13 +224,34 @@ print_info "Checking if backend is running at ${BACKEND_URL}..."
 if curl -s -f "${BACKEND_URL}/health" > /dev/null 2>&1; then
     print_success "Backend is running"
     
-    print_info "Calling /health/db endpoint..."
+    print_info "Calling /health/db endpoint (timeout: 30s)..."
     echo ""
     
-    # Call the health endpoint and show response
-    RESPONSE=$(curl -s "${BACKEND_URL}/health/db" 2>&1)
+    # Call the health endpoint with timeout and show response
+    RESPONSE=$(timeout 30 curl -s "${BACKEND_URL}/health/db" 2>&1)
+    CURL_EXIT=$?
     
-    if [ $? -eq 0 ]; then
+    if [ $CURL_EXIT -eq 124 ]; then
+        print_error "Health check endpoint timed out after 30 seconds"
+        echo ""
+        print_info "This usually means:"
+        echo "  - Database connection is hanging (check DATABASE_URL)"
+        echo "  - Backend code has an infinite loop or deadlock"
+        echo "  - Database is not responding"
+        echo ""
+        print_info "Troubleshooting steps:"
+        echo "  1. Check if database is accessible:"
+        echo "     psql -h \${DB_HOST:-localhost} -U \${DB_USER} -d \${DB_NAME} -c 'SELECT 1;'"
+        echo ""
+        echo "  2. Check backend logs for errors"
+        echo ""
+        echo "  3. Restart backend:"
+        echo "     cd packages/backend && npm run dev"
+        echo ""
+        echo "  4. Run full diagnostics:"
+        echo "     npm run db:debug"
+        exit 3
+    elif [ $CURL_EXIT -eq 0 ]; then
         echo "$RESPONSE" | head -100
         echo ""
         
