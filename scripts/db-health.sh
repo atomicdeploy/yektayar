@@ -256,14 +256,14 @@ if curl -s -f "${BACKEND_URL}/health" > /dev/null 2>&1; then
         echo ""
         
         # Parse the response to determine overall health
-        if echo "$RESPONSE" | grep -q '"overall":"healthy"'; then
+        if echo "$RESPONSE" | grep -q '"overall"[[:space:]]*:[[:space:]]*"healthy"'; then
             print_success "Database health check: HEALTHY"
             exit 0
-        elif echo "$RESPONSE" | grep -q '"overall":"degraded"'; then
+        elif echo "$RESPONSE" | grep -q '"overall"[[:space:]]*:[[:space:]]*"degraded"'; then
             print_warning "Database health check: DEGRADED"
             print_info "Some database operations may not be working correctly"
             exit 1
-        elif echo "$RESPONSE" | grep -q '"overall":"unhealthy"'; then
+        elif echo "$RESPONSE" | grep -q '"overall"[[:space:]]*:[[:space:]]*"unhealthy"'; then
             print_error "Database health check: UNHEALTHY"
             print_info "Database is not accessible or critically failing"
             exit 2
