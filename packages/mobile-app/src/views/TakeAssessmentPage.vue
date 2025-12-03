@@ -1003,7 +1003,7 @@ onMounted(() => {
 /* Footer Navigation */
 .footer-navigation {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   padding: 1rem;
   background: var(--ion-toolbar-background);
@@ -1014,6 +1014,7 @@ onMounted(() => {
   position: relative;
   z-index: 2;
   flex-shrink: 0;
+  align-self: center;
 }
 
 .step-indicators-wrapper {
@@ -1021,6 +1022,8 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
   margin: 0 0.5rem;
+  display: flex;
+  align-items: center;
   
   /* Gradient masks on sides for fading effect */
   &::before,
@@ -1047,10 +1050,12 @@ onMounted(() => {
 
 .step-indicators {
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0 1rem;
   overflow-x: auto;
   scroll-behavior: smooth;
+  width: 100%;
   
   /* Hide scrollbar but keep functionality */
   scrollbar-width: none; /* Firefox */
