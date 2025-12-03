@@ -381,13 +381,27 @@ const fetchAssessment = async () => {
   try {
     const assessmentId = route.params.id
     const response = await apiClient.get(`/api/assessments/${assessmentId}`)
-    if (response.data.success) {
-      assessment.value = response.data.data
-      logger.success(`Loaded assessment: ${assessment.value.title}`)
+    
+    // Handle both response formats:
+    // 1. Wrapped: {success: true, data: {...}}
+    // 2. Direct: {...}
+    let data
+    if (response.data.success !== undefined) {
+      // Wrapped response
+      if (response.data.success) {
+        data = response.data.data
+      } else {
+        logger.error('Failed to fetch assessment:', response.data.error || 'Unknown error')
+        router.back()
+        return
+      }
     } else {
-      logger.error('Failed to fetch assessment:', response.data.error || 'Unknown error')
-      router.back()
+      // Direct response
+      data = response.data
     }
+    
+    assessment.value = data
+    logger.success(`Loaded assessment: ${assessment.value.title}`)
   } catch (error) {
     logger.error('Failed to fetch assessment:', error)
     router.back()
