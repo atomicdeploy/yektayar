@@ -99,7 +99,7 @@
 
           <!-- Demographic Info Step -->
           <div v-else-if="currentStep === 1" class="step-container">
-            <div class="form-section">
+            <form class="form-section" @submit.prevent="handleDemographicSubmit">
               <div class="form-header">
                 <div class="form-icon">
                   <ion-icon :icon="person"></ion-icon>
@@ -115,6 +115,7 @@
                     type="number"
                     :placeholder="locale === 'fa' ? 'سن خود را وارد کنید' : 'Enter your age'"
                     inputmode="numeric"
+                    @keyup.enter="handleDemographicSubmit"
                   ></ion-input>
                   <span class="field-unit">{{ locale === 'fa' ? 'سال' : 'years' }}</span>
                 </div>
@@ -126,6 +127,7 @@
                     type="number"
                     :placeholder="locale === 'fa' ? 'مدت ازدواج را وارد کنید' : 'Enter marriage duration'"
                     inputmode="numeric"
+                    @keyup.enter="handleDemographicSubmit"
                   ></ion-input>
                   <span class="field-unit">{{ locale === 'fa' ? 'سال' : 'years' }}</span>
                 </div>
@@ -152,11 +154,24 @@
                     type="number"
                     :placeholder="locale === 'fa' ? 'تعداد فرزندان را وارد کنید' : 'Enter number of children'"
                     inputmode="numeric"
+                    @keyup.enter="handleDemographicSubmit"
                   ></ion-input>
                   <span class="field-unit">{{ locale === 'fa' ? 'فرزند' : 'children' }}</span>
                 </div>
               </div>
-            </div>
+              
+              <!-- Next Button for Demographic Form -->
+              <ion-button 
+                expand="block" 
+                size="large"
+                class="form-next-button"
+                type="submit"
+                :disabled="!canProceed"
+              >
+                {{ locale === 'fa' ? 'ادامه' : 'Continue' }}
+                <ion-icon :icon="arrowForward" slot="end" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
+              </ion-button>
+            </form>
           </div>
 
           <!-- Question Steps -->
@@ -447,6 +462,12 @@ const nextStep = () => {
 const previousStep = () => {
   if (currentStep.value > 0) {
     currentStep.value--
+  }
+}
+
+const handleDemographicSubmit = () => {
+  if (canProceed.value) {
+    nextStep()
   }
 }
 
@@ -747,6 +768,14 @@ onMounted(() => {
 [dir="rtl"] .field-unit {
   left: auto;
   right: 1rem;
+}
+
+.form-next-button {
+  margin-top: 2rem;
+  --background: var(--accent-gradient);
+  --box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.3);
+  font-weight: 600;
+  font-size: 1.0625rem;
 }
 
 /* Question Section */
