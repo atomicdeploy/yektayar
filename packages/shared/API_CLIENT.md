@@ -23,7 +23,13 @@ import { createApiClient } from '@yektayar/shared'
 
 ## Important: API Endpoint Paths
 
-**The baseURL is configured with `/api` included, so when making requests, do NOT prepend `/api` to your endpoints.**
+**The baseURL is configured via the `API_BASE_URL` environment variable which includes `/api` prefix. When making requests, do NOT prepend `/api` to your endpoints.**
+
+**Configuration in `.env`:**
+```bash
+# Include the /api prefix in the environment variable
+API_BASE_URL=http://localhost:3000/api
+```
 
 ✅ **Correct:**
 ```typescript
@@ -43,14 +49,20 @@ apiClient.post('/api/auth/login', {}) // Would request: http://localhost:3000/ap
 
 ### Creating an API Client Instance
 
-**Important:** The baseURL should include the `/api` prefix so endpoints don't need to repeat it.
+**Important:** The baseURL comes from the `API_BASE_URL` environment variable which should include the `/api` prefix.
 
+**Set in your `.env` file:**
+```bash
+API_BASE_URL=http://localhost:3000/api
+```
+
+**Then in your code:**
 ```typescript
 import { createApiClient } from '@yektayar/shared'
 import config from '@/config'
 
 const apiClient = createApiClient({
-  baseURL: `${config.apiBaseUrl}/api`, // Include /api in baseURL
+  baseURL: config.apiBaseUrl, // Uses API_BASE_URL from .env (includes /api)
   storageKey: 'my_session_token', // Optional, defaults to 'yektayar_session_token'
   timeout: 30000, // Optional, defaults to 30000ms
   debug: true, // Optional, enables debug logging
@@ -156,25 +168,25 @@ The API client supports multiple methods for sending authentication tokens to th
 ```typescript
 // Use header method (default)
 const apiClient = createApiClient({
-  baseURL: `${config.apiBaseUrl}/api`,
+  baseURL: config.apiBaseUrl, // From .env: API_BASE_URL=http://localhost:3000/api
   tokenDeliveryMethod: 'header' // or omit for default
 })
 
 // Use cookie method
 const apiClient = createApiClient({
-  baseURL: `${config.apiBaseUrl}/api`,
+  baseURL: config.apiBaseUrl,
   tokenDeliveryMethod: 'cookie'
 })
 
 // Use query parameter method
 const apiClient = createApiClient({
-  baseURL: `${config.apiBaseUrl}/api`,
+  baseURL: config.apiBaseUrl,
   tokenDeliveryMethod: 'query'
 })
 
 // Use body parameter method
 const apiClient = createApiClient({
-  baseURL: `${config.apiBaseUrl}/api`,
+  baseURL: config.apiBaseUrl,
   tokenDeliveryMethod: 'body'
 })
 ```
@@ -260,7 +272,7 @@ import { createApiClient } from '@yektayar/shared'
 import config from '@/config'
 
 export const apiClient = createApiClient({
-  baseURL: `${config.apiBaseUrl}/api`, // Include /api prefix
+  baseURL: config.apiBaseUrl, // Uses API_BASE_URL from .env
   storageKey: 'yektayar_admin_session_token',
   timeout: 30000,
   debug: config.environment === 'development',
@@ -277,7 +289,7 @@ import { createApiClient } from '@yektayar/shared'
 import config from '@/config'
 
 export const apiClient = createApiClient({
-  baseURL: `${config.apiBaseUrl}/api`, // Include /api prefix
+  baseURL: config.apiBaseUrl, // Uses API_BASE_URL from .env
   storageKey: 'yektayar_session_token',
   timeout: 30000,
   debug: config.environment === 'development',

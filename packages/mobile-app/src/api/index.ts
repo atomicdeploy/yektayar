@@ -1,8 +1,8 @@
 /**
  * API Client instance for Mobile App
  * 
- * Note: The baseURL already includes '/api', so when making requests,
- * do NOT prepend '/api' to your endpoints.
+ * Note: The baseURL is configured via API_BASE_URL environment variable
+ * which includes the '/api' prefix. Do NOT prepend '/api' to your endpoints.
  * 
  * ✅ Correct: apiClient.get('/assessments')
  * ❌ Wrong:   apiClient.get('/api/assessments')
@@ -15,7 +15,7 @@ import config from '@/config'
  * Singleton API client instance
  */
 export const apiClient = createApiClient({
-  baseURL: `${config.apiBaseUrl}/api`,
+  baseURL: config.apiBaseUrl,
   storageKey: 'yektayar_session_token',
   timeout: 30000,
   debug: config.environment === 'development',
