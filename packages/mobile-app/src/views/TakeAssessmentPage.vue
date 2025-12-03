@@ -83,6 +83,17 @@
                   </div>
                 </div>
               </div>
+              
+              <!-- Start Button for Introduction -->
+              <ion-button 
+                expand="block" 
+                size="large"
+                class="intro-start-button"
+                @click="nextStep"
+              >
+                {{ locale === 'fa' ? 'شروع ارزیابی' : 'Start Assessment' }}
+                <ion-icon :icon="arrowForward" slot="end" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
+              </ion-button>
             </div>
           </div>
 
@@ -318,6 +329,7 @@ import {
   person,
   chevronBack,
   chevronForward,
+  arrowForward,
   checkmarkCircle,
   send,
 } from 'ionicons/icons'
@@ -649,6 +661,14 @@ onMounted(() => {
   flex: 1;
   font-size: 0.9375rem;
   color: var(--text-primary);
+}
+
+.intro-start-button {
+  margin-top: 2rem;
+  --background: var(--accent-gradient);
+  --box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.3);
+  font-weight: 600;
+  font-size: 1.0625rem;
 }
 
 /* Form Section */
