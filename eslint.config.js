@@ -101,7 +101,10 @@ export default [
         }
       ],
       'vue/multi-word-component-names': 'warn',
-      'vue/no-deprecated-slot-attribute': 'warn'
+      'vue/no-deprecated-slot-attribute': 'warn',
+      // Allow attributes on the same line (not forcing multiline)
+      'vue/max-attributes-per-line': 'off',
+      'vue/first-attribute-linebreak': 'off'
     }
   },
   // Shared package files - need both browser and Node.js globals

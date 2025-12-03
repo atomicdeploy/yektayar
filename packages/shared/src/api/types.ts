@@ -90,6 +90,14 @@ export interface RequestOptions {
    * Override token delivery method for this request
    */
   tokenDeliveryMethod?: TokenDeliveryMethod
+
+  /**
+   * Use absolute path instead of joining with baseURL
+   * When true, the URL will be used as-is without baseURL prefix
+   * Useful for calling external APIs or when you need full control over the URL
+   * @default false
+   */
+  absolutePath?: boolean
 }
 
 /**

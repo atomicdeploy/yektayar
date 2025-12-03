@@ -199,7 +199,7 @@ Possible causes:
 
 ## Test Script Output
 
-Running `node scripts/test-health-db.js`:
+Running `node tests/scripts/test-health-db.cjs`:
 
 ```
 🏥 Testing Database Health Check Endpoint

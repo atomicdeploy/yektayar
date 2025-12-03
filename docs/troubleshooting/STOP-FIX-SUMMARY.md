@@ -165,7 +165,7 @@ netstat -tlnp | grep -E ":5173|:8100"  # Should show no listeners
    - Enhanced `kill_process_tree` function
    - Added port verification in `stop_services` function
    
-2. **scripts/test-real-vite-scenario.sh** (new)
+2. **tests/scripts/test-real-vite-scenario.sh** (new)
    - Comprehensive test for the real-world scenario
 
 ## Security Considerations
