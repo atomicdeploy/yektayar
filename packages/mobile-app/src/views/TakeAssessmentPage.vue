@@ -1032,7 +1032,7 @@ onMounted(() => {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 40px;
+    width: 20px;
     z-index: 1;
     pointer-events: none;
   }
@@ -1050,12 +1050,14 @@ onMounted(() => {
 
 .step-indicators {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   padding: 0 1rem;
   overflow-x: auto;
   scroll-behavior: smooth;
   width: 100%;
+  height: 100%;
   
   /* Hide scrollbar but keep functionality */
   scrollbar-width: none; /* Firefox */
