@@ -211,14 +211,6 @@ const fetchAssessmentHistory = async () => {
       assessmentHistory.value = []
       return
     }
-    
-    if (response.success && response.data) {
-      assessmentHistory.value = response.data
-    } else {
-      logger.error('Failed to fetch assessment history:', response.error || 'Unknown error')
-      assessmentHistory.value = []
-      return
-    }
   } catch (error) {
     logger.error('Failed to fetch assessment history:', error)
     assessmentHistory.value = []

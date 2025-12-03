@@ -455,7 +455,7 @@ if (response.data.success) {
 
 ```typescript
 // CORRECT - apiClient already unwraps the axios response
-const response = await apiClient.get<User[]>('/api/users')
+const response = await apiClient.get<User[]>('/users')
 if (response.success && response.data) {
   users.value = response.data  // ✅ CORRECT
 }
@@ -474,7 +474,7 @@ const response = await axios.get('/api/users')
 ```typescript
 // CORRECT - Use the pre-configured apiClient instance
 import apiClient from '@/api'
-const response = await apiClient.get<User[]>('/api/users')
+const response = await apiClient.get<User[]>('/users')
 ```
 
 ### Key Points
@@ -493,7 +493,7 @@ const response = await apiClient.get<User[]>('/api/users')
 
 3. **Type safety**: Always use TypeScript generics for type-safe responses:
    ```typescript
-   const response = await apiClient.get<User[]>('/api/users')
+   const response = await apiClient.get<User[]>('/users')
    // response.data is typed as User[] | undefined
    ```
 
