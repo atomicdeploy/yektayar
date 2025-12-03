@@ -83,6 +83,17 @@
                   </div>
                 </div>
               </div>
+              
+              <!-- Start Button for Introduction -->
+              <ion-button 
+                expand="block" 
+                size="large"
+                class="intro-start-button"
+                @click="nextStep"
+              >
+                {{ locale === 'fa' ? 'شروع ارزیابی' : 'Start Assessment' }}
+                <ion-icon :icon="arrowForward" slot="end" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
+              </ion-button>
             </div>
           </div>
 
@@ -318,6 +329,7 @@ import {
   person,
   chevronBack,
   chevronForward,
+  arrowForward,
   checkmarkCircle,
   send,
 } from 'ionicons/icons'
@@ -381,13 +393,31 @@ const fetchAssessment = async () => {
   try {
     const assessmentId = route.params.id
     const response = await apiClient.get(`/assessments/${assessmentId}`)
-    if (response.success && response.data) {
-      assessment.value = response.data
-      logger.success(`Loaded assessment: ${assessment.value.title}`)
+    
+    // Handle both wrapped and direct response formats
+    let data
+    if (response && typeof response === 'object') {
+      // Check if response has success/data wrapper
+      if ('success' in response && 'data' in response) {
+        if (response.success && response.data) {
+          data = response.data
+        } else {
+          logger.error('Failed to fetch assessment:', response.error || 'Unknown error')
+          router.back()
+          return
+        }
+      } else {
+        // Direct response format
+        data = response
+      }
     } else {
-      logger.error('Failed to fetch assessment:', response.error || 'Unknown error')
+      logger.error('Invalid assessment response format')
       router.back()
+      return
     }
+    
+    assessment.value = data
+    logger.success(`Loaded assessment: ${assessment.value.title}`)
   } catch (error) {
     logger.error('Failed to fetch assessment:', error)
     router.back()
@@ -470,29 +500,33 @@ const submitAssessment = async () => {
     const response = await apiClient.post(`/assessments/${assessmentId}/submit`, {
       answers: answersArray,
       demographicInfo: demographicInfo.value,
-      userId: 1, // Placeholder for development,
+      userId: 1, // Placeholder for development
     })
     
-    if (response.success && response.data) {
-      logger.success('Assessment submitted successfully')
-      router.push(`/tabs/assessments/results/${response.data.id}`)
+    // Handle both wrapped and direct response formats
+    let data
+    if (response && typeof response === 'object') {
+      if ('success' in response && 'data' in response) {
+        if (response.success && response.data) {
+          data = response.data
+        } else {
+          throw new Error(response.error || 'Unknown error')
+        }
+      } else {
+        data = response
+      }
     } else {
-      logger.error('Failed to submit assessment:', response.error || 'Unknown error')
-      const alert = await alertController.create({
-        header: locale.value === 'fa' ? 'خطا' : 'Error',
-        message: locale.value === 'fa' 
-          ? 'خطایی در ارسال آزمون رخ داد. لطفاً دوباره تلاش کنید.'
-          : 'An error occurred while submitting the assessment. Please try again.',
-        buttons: ['OK'],
-      })
-      await alert.present()
+      throw new Error('Invalid response format')
     }
+    
+    logger.success('Assessment submitted successfully')
+    router.push(`/tabs/assessments/results/${data.id}`)
   } catch (error) {
     logger.error('Failed to submit assessment:', error)
     const alert = await alertController.create({
       header: locale.value === 'fa' ? 'خطا' : 'Error',
       message: locale.value === 'fa' 
-        ? 'خطایی در ارسال آزمون رخ داد. لطفاً دوباره تلاش کنید.'
+        ? 'خطایی در ارسال ارزیابی رخ داد. لطفاً دوباره تلاش کنید.'
         : 'An error occurred while submitting the assessment. Please try again.',
       buttons: ['OK'],
     })
@@ -627,6 +661,14 @@ onMounted(() => {
   flex: 1;
   font-size: 0.9375rem;
   color: var(--text-primary);
+}
+
+.intro-start-button {
+  margin-top: 2rem;
+  --background: var(--accent-gradient);
+  --box-shadow: 0 4px 16px rgba(var(--primary-rgb), 0.3);
+  font-weight: 600;
+  font-size: 1.0625rem;
 }
 
 /* Form Section */
