@@ -104,7 +104,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .lazy-image-wrapper {
   display: flex;
   position: relative;
@@ -166,6 +166,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   background: rgba(var(--ion-color-light-rgb), 0.5);
   backdrop-filter: blur(10px);
   padding: 1rem;
@@ -175,7 +176,6 @@ onMounted(() => {
   font-size: 3rem;
   color: var(--ion-color-medium);
   opacity: 0.5;
-  margin-bottom: 0.5rem;
 }
 
 .error-text {

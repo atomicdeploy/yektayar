@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { RouteRecordRaw } from 'vue-router'
 import TabsPage from '../views/TabsPage.vue'
 import SplashScreen from '../views/SplashScreen.vue'
+import SplashTester from '../views/SplashTester.vue'
 import WelcomeScreen from '../views/WelcomeScreen.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -15,9 +16,19 @@ const routes: Array<RouteRecordRaw> = [
     component: SplashScreen
   },
   {
+    path: '/splashTester',
+    name: 'SplashTester',
+    component: SplashTester
+  },
+  {
     path: '/welcome',
     name: 'Welcome',
     component: WelcomeScreen
+  },
+  {
+    path: '/icon-test',
+    name: 'IconTest',
+    component: () => import('@/views/IconTestPage.vue')
   },
   {
     path: '/tabs/',
@@ -30,6 +41,22 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'home',
         component: () => import('@/views/HomePage.vue')
+      },
+      {
+        path: 'courses',
+        component: () => import('@/views/CoursesPage.vue')
+      },
+      {
+        path: 'my-courses',
+        component: () => import('@/views/MyCoursesPage.vue')
+      },
+      {
+        path: 'courses/:id',
+        component: () => import('@/views/CourseDetailPage.vue')
+      },
+      {
+        path: 'courses/:id/lessons/:lessonId',
+        component: () => import('@/views/LessonViewerPage.vue')
       },
       {
         path: 'chat',

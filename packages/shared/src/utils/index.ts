@@ -1,6 +1,10 @@
 export * from './logger'
 export * from './solutions'
 export * from './validation'
+export * from './version'
+
+// i18n utilities
+export * from '../i18n/missingHandler'
 
 /**
  * Format date for Persian (Jalali) calendar

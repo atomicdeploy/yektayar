@@ -1,0 +1,95 @@
+/* Import Sahel Font */
+@import './fonts.scss';
+
+@import "tailwindcss";
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  /* Custom color palette */
+  --color-primary-50: #fef9e7;
+  --color-primary-100: #fdf2c4;
+  --color-primary-200: #fbe88c;
+  --color-primary-300: #f7d94d;
+  --color-primary-400: #f3c617;
+  --color-primary-500: #d4a43e;
+  --color-primary-600: #ba8b2d;
+  --color-primary-700: #9e6f25;
+  --color-primary-800: #805723;
+  --color-primary-900: #6a471f;
+
+  /* Custom font family */
+  --font-family-sans: Vazirmatn, system-ui, -apple-system, sans-serif;
+}
+
+/* Configure dark mode to use class selector instead of media query */
+@variant dark (.dark &);
+
+/* CSS Reset in base layer - Tailwind utilities will override these */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Remove tap highlights on mobile devices */
+    -webkit-tap-highlight-color: transparent;
+    tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Sahel', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #app {
+    min-height: 100vh;
+  }
+
+  /* Prevent text selection and callouts on interactive elements */
+  button,
+  a,
+  [role="button"],
+  [onclick] {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+/* OverlayScrollbars Custom Styling - Light Theme */
+.os-theme-yektayar.os-scrollbar-horizontal,
+.os-theme-yektayar.os-scrollbar-vertical {
+  --os-size: 6px;
+  --os-padding-perpendicular: 0px;
+  --os-padding-axis: 0px;
+  --os-track-border-radius: 9999px;
+  --os-track-bg: rgb(243 244 246);
+  --os-handle-border-radius: 9999px;
+  --os-handle-bg: rgb(209 213 219);
+  --os-handle-bg-hover: rgb(156 163 175);
+  --os-handle-bg-active: rgb(156 163 175);
+}
+
+/* OverlayScrollbars Custom Styling - Dark Theme */
+.dark .os-theme-yektayar.os-scrollbar-horizontal,
+.dark .os-theme-yektayar.os-scrollbar-vertical {
+  --os-track-bg: rgb(31 41 55);
+  --os-handle-bg: rgb(75 85 99);
+  --os-handle-bg-hover: rgb(107 114 128);
+  --os-handle-bg-active: rgb(107 114 128);
+}
+
+/* Apply dark theme scrollbar styles when system prefers dark mode (only in auto mode) */
+@media (prefers-color-scheme: dark) {
+  html:not(.theme-forced) .os-theme-yektayar.os-scrollbar-horizontal,
+  html:not(.theme-forced) .os-theme-yektayar.os-scrollbar-vertical {
+    --os-track-bg: rgb(31 41 55);
+    --os-handle-bg: rgb(75 85 99);
+    --os-handle-bg-hover: rgb(107 114 128);
+    --os-handle-bg-active: rgb(107 114 128);
+  }
+}

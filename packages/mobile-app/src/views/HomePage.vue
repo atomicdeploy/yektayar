@@ -36,7 +36,7 @@
         <div class="hero-content">
           <div class="logo-container">
             <div class="logo-circle">
-              <ion-icon :icon="heart" class="hero-icon"></ion-icon>
+              <ion-icon src="/logo-simple.svg" class="hero-icon"></ion-icon>
             </div>
           </div>
           <h1 class="hero-title">{{ t('welcome') }}</h1>
@@ -53,14 +53,14 @@
               <ion-icon :icon="sparkles" class="action-icon"></ion-icon>
             </div>
             <div class="action-content">
-              <h3>{{ locale === 'fa' ? 'مشاور هوش مصنوعی' : 'AI Counselor' }}</h3>
-              <p>{{ locale === 'fa' ? 'گفتگو با هوش مصنوعی' : 'Chat with AI assistant' }}</p>
+              <h3>{{ locale === 'fa' ? 'مشاور هوشمند' : 'AI Counselor' }}</h3>
+              <p>{{ locale === 'fa' ? 'گفتگو با هوشمند' : 'Chat with AI assistant' }}</p>
             </div>
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
 
           <div class="action-card" @click="navigateToChat">
-            <div class="action-icon-wrapper primary">
+            <div class="action-icon-wrapper secondary">
               <ion-icon :icon="chatbubbles" class="action-icon"></ion-icon>
             </div>
             <div class="action-content">
@@ -77,6 +77,17 @@
             <div class="action-content">
               <h3>{{ locale === 'fa' ? 'رزرو نوبت' : 'Book Appointment' }}</h3>
               <p>{{ locale === 'fa' ? 'برنامه‌ریزی جلسات' : 'Schedule your sessions' }}</p>
+            </div>
+            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+          </div>
+
+          <div class="action-card" @click="navigateToCourses">
+            <div class="action-icon-wrapper tertiary">
+              <ion-icon :icon="school" class="action-icon"></ion-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ locale === 'fa' ? 'دوره‌های آموزشی' : 'Learning Courses' }}</h3>
+              <p>{{ locale === 'fa' ? 'دسترسی به محتوای آموزشی' : 'Access educational content' }}</p>
             </div>
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
@@ -181,7 +192,6 @@ import {
   IonButtons,
 } from '@ionic/vue'
 import { 
-  heart, 
   chatbubbles, 
   calendar, 
   person, 
@@ -193,6 +203,7 @@ import {
   sparkles,
   moon,
   sunny,
+  school,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -205,10 +216,11 @@ const { isDark, toggleTheme } = useTheme()
 const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')
 const navigateToAppointments = () => router.push('/tabs/appointments')
+const navigateToCourses = () => router.push('/tabs/courses')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;
@@ -264,8 +276,10 @@ const navigateToProfile = () => router.push('/tabs/profile')
 }
 
 .hero-icon {
-  font-size: 48px;
-  color: white;
+  font-size: 70px;
+  width: 70px;
+  height: 70px;
+  filter: brightness(0) invert(1);
 }
 
 .hero-title {
@@ -292,7 +306,20 @@ const navigateToProfile = () => router.push('/tabs/profile')
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 1rem 0.5rem;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--secondary-gradient);
+  border-radius: 2px;
 }
 
 /* Quick Actions */
@@ -310,8 +337,14 @@ const navigateToProfile = () => router.push('/tabs/profile')
   align-items: center;
   gap: 1rem;
   box-shadow: var(--card-shadow);
+  border-left: 3px solid var(--secondary-accent-light);
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  border-left-color: var(--secondary-accent);
+  box-shadow: var(--card-shadow-hover), var(--secondary-glow);
 }
 
 .action-card:active {
@@ -332,8 +365,17 @@ const navigateToProfile = () => router.push('/tabs/profile')
   background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-tint) 100%);
 }
 
+.action-icon-wrapper.secondary {
+  background: var(--secondary-gradient);
+  box-shadow: var(--secondary-glow);
+}
+
 .action-icon-wrapper.success {
   background: linear-gradient(135deg, var(--ion-color-success) 0%, var(--ion-color-success-tint) 100%);
+}
+
+.action-icon-wrapper.tertiary {
+  background: linear-gradient(135deg, var(--ion-color-tertiary) 0%, var(--ion-color-tertiary-tint) 100%);
 }
 
 .action-icon-wrapper.warning {
@@ -408,7 +450,7 @@ const navigateToProfile = () => router.push('/tabs/profile')
 ion-card-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--secondary-accent);
 }
 
 ion-card-content {

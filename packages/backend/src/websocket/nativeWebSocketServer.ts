@@ -1,0 +1,110 @@
+import { logger } from '@yektayar/shared'
+import type { ServerWebSocket } from 'bun'
+import { validateSessionToken } from '../services/sessionService'
+import { 
+  WebSocketSessionData, 
+  routeEvent, 
+  createWelcomeMessage 
+} from './eventHandlers'
+
+/**
+ * Handle native WebSocket connections for Bun
+ * This implements the same event handlers as Socket.IO for compatibility
+ */
+export function setupNativeWebSocket() {
+  return {
+    /**
+     * Handle WebSocket upgrade request
+     * Validate authentication before upgrading connection
+     */
+    async upgrade(req: Request, server: any) {
+      const url = new URL(req.url)
+      
+      // Extract token from query params or headers
+      const token = url.searchParams.get('token') || 
+                   req.headers.get('authorization')?.replace('Bearer ', '')
+      
+      if (!token) {
+        return new Response('Authentication token required', { status: 401 })
+      }
+      
+      // Validate the session token
+      try {
+        const session = await validateSessionToken(token)
+        
+        if (!session) {
+          return new Response('Invalid or expired session token', { status: 401 })
+        }
+        
+        // Prepare WebSocket data
+        const wsData: WebSocketSessionData = {
+          sessionToken: session.token,
+          userId: session.userId,
+          isLoggedIn: session.isLoggedIn,
+          socketId: `ws-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+        }
+        
+        // Upgrade the connection
+        const success = server.upgrade(req, {
+          data: wsData
+        })
+        
+        if (success) {
+          return undefined // Connection upgraded
+        }
+        
+        return new Response('WebSocket upgrade failed', { status: 500 })
+      } catch (error) {
+        logger.error('WebSocket authentication error:', error)
+        return new Response('Authentication failed', { status: 401 })
+      }
+    },
+    
+    /**
+     * WebSocket handler configuration
+     */
+    websocket: {
+      message(ws: ServerWebSocket<WebSocketSessionData>, message: string | Buffer) {
+        const data = ws.data
+        
+        try {
+          // Parse message as JSON
+          const messageStr = typeof message === 'string' ? message : message.toString()
+          const parsed = JSON.parse(messageStr)
+          
+          // Route event to shared handler
+          const send = (msg: any) => ws.send(JSON.stringify(msg))
+          routeEvent(parsed.event, parsed.data, send, data, 'native-websocket')
+        } catch (error) {
+          logger.error('WebSocket message handling error:', error)
+          ws.send(JSON.stringify({
+            event: 'error',
+            data: { error: 'Failed to process message' }
+          }))
+        }
+      },
+      
+      open(ws: ServerWebSocket<WebSocketSessionData>) {
+        const data = ws.data
+        logger.info(`Native WebSocket connected: ${data.socketId}`, {
+          sessionToken: data.sessionToken,
+          userId: data.userId,
+          isLoggedIn: data.isLoggedIn
+        })
+        
+        // Send welcome message
+        ws.send(JSON.stringify(createWelcomeMessage(data, 'native-websocket')))
+      },
+      
+      close(ws: ServerWebSocket<WebSocketSessionData>, code: number, reason: string) {
+        const data = ws.data
+        logger.info(`Native WebSocket disconnected: ${data.socketId}`, { code, reason })
+      },
+      
+      drain(ws: ServerWebSocket<WebSocketSessionData>) {
+        // Handle backpressure
+        logger.info('WebSocket drain', ws.data.socketId)
+      }
+    }
+  }
+}

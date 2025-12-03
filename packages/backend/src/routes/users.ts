@@ -12,6 +12,7 @@ import {
   getUserProfile
 } from '../services/userService'
 import { extractToken } from '../middleware/tokenExtractor'
+import { logger } from '@yektayar/shared'
 
 export const userRoutes = new Elysia({ prefix: '/api/users' })
   .get('/', async ({ query }) => {
@@ -31,7 +32,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         pagination: result.pagination
       }
     } catch (error) {
-      console.error('Error fetching users:', error)
+      logger.error('Error fetching users:', error)
       return {
         success: false,
         error: 'Failed to fetch users',
@@ -68,7 +69,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         data: user
       }
     } catch (error) {
-      console.error('Error fetching user:', error)
+      logger.error('Error fetching user:', error)
       return {
         success: false,
         error: 'Failed to fetch user',
@@ -123,7 +124,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         message: 'User updated successfully'
       }
     } catch (error) {
-      console.error('Error updating user:', error)
+      logger.error('Error updating user:', error)
       return {
         success: false,
         error: 'Failed to update user',
@@ -159,7 +160,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         message: 'User deleted successfully'
       }
     } catch (error) {
-      console.error('Error deleting user:', error)
+      logger.error('Error deleting user:', error)
       return {
         success: false,
         error: 'Failed to delete user',
@@ -190,7 +191,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         data: user
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error)
+      logger.error('Error fetching user profile:', error)
       return {
         success: false,
         error: 'Failed to fetch user profile',
@@ -222,7 +223,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         data: preferences
       }
     } catch (error) {
-      console.error('Error fetching user preferences:', error)
+      logger.error('Error fetching user preferences:', error)
       return {
         success: false,
         error: 'Failed to fetch preferences'
@@ -253,7 +254,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         data: preferences
       }
     } catch (error) {
-      console.error('Error updating user preferences:', error)
+      logger.error('Error updating user preferences:', error)
       return {
         success: false,
         error: 'Failed to update preferences'

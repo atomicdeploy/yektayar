@@ -191,6 +191,7 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 const { locale } = useI18n()
 const router = useRouter()
@@ -220,7 +221,7 @@ async function loadContactInfo() {
       }
     }
   } catch (error) {
-    console.error('Error loading contact info:', error)
+    logger.error('Error loading contact info:', error)
   } finally {
     loading.value = false
   }
@@ -258,7 +259,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;

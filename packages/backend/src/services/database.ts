@@ -5,6 +5,7 @@
 
 import postgres from 'postgres'
 import bcrypt from 'bcrypt'
+import { logger } from '@yektayar/shared'
 
 // Initialize PostgreSQL connection
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://localhost:5432/yektayar'
@@ -13,14 +14,17 @@ let sql: ReturnType<typeof postgres> | null = null
 
 /**
  * Get database connection instance
+ * Configured with timeouts and connection pooling for reliability
  */
 export function getDatabase() {
   if (!sql) {
+    logger.info(`Initializing database connection to ${DATABASE_URL.replace(/:([^:@]+)@/, ':*****@')}`)
     sql = postgres(DATABASE_URL, {
-      max: 10, // Maximum connections
-      idle_timeout: 20,
-      connect_timeout: 10,
+      max: 10, // Maximum connections in pool
+      idle_timeout: 20, // Seconds before idle connection is closed
+      connect_timeout: 10, // Seconds to wait for connection
     })
+    logger.info('Database connection pool initialized')
   }
   return sql
 }
@@ -242,7 +246,7 @@ export async function initializeDatabase() {
       ON otp_codes(identifier, expires_at, is_used)
     `
 
-    console.log('✅ Database tables initialized successfully')
+    logger.success('Database tables initialized successfully')
 
     // Insert default data
     await insertDefaultAboutUsPage(db)
@@ -250,7 +254,7 @@ export async function initializeDatabase() {
     await insertDefaultUsers(db)
 
   } catch (error) {
-    console.error('❌ Failed to initialize database:', error)
+    logger.error('Failed to initialize database:', error)
     throw error
   }
 }
@@ -313,10 +317,10 @@ async function insertDefaultAboutUsPage(db: ReturnType<typeof postgres>) {
           })}
         )
       `
-      console.log('✅ Default about-us page created')
+      logger.success('Default about-us page created')
     }
   } catch (error) {
-    console.error('❌ Failed to create default about-us page:', error)
+    logger.error('Failed to create default about-us page:', error)
   }
 }
 
@@ -346,9 +350,9 @@ async function insertDefaultContactSettings(db: ReturnType<typeof postgres>) {
         `
       }
     }
-    console.log('✅ Default contact settings created')
+    logger.success('Default contact settings created')
   } catch (error) {
-    console.error('❌ Failed to create default contact settings:', error)
+    logger.error('Failed to create default contact settings:', error)
   }
 }
 
@@ -372,10 +376,10 @@ async function insertDefaultUsers(db: ReturnType<typeof postgres>) {
           ('psychologist@yektayar.com', 'Dr. Sara Mohammadi', ${await bcrypt.hash('psych123', 10)}, 'psychologist', 'Licensed Clinical Psychologist with 10 years of experience'),
           ('patient@yektayar.com', 'Ali Ahmadi', ${await bcrypt.hash('patient123', 10)}, 'patient', NULL)
       `
-      console.log('✅ Default users created (admin@yektayar.com / admin123, psychologist@yektayar.com / psych123, patient@yektayar.com / patient123)')
+      logger.success('Default users created (admin@yektayar.com / admin123, psychologist@yektayar.com / psych123, patient@yektayar.com / patient123)')
     }
   } catch (error) {
-    console.error('❌ Failed to create default users:', error)
+    logger.error('Failed to create default users:', error)
   }
 }
 

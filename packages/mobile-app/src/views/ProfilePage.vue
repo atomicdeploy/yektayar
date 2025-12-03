@@ -64,7 +64,7 @@
         <h3 class="section-title">{{ locale === 'fa' ? 'دسترسی سریع' : 'Quick Actions' }}</h3>
         <div class="action-grid">
           <div class="grid-action">
-            <div class="grid-action-icon primary">
+            <div class="grid-action-icon secondary">
               <ion-icon :icon="document"></ion-icon>
             </div>
             <span>{{ locale === 'fa' ? 'سوابق' : 'Records' }}</span>
@@ -95,7 +95,7 @@
         <h3 class="section-title">{{ locale === 'fa' ? 'تنظیمات حساب' : 'Account Settings' }}</h3>
         <ion-list class="settings-list" :inset="true">
           <ion-item button detail @click="navigateToPersonalInfo">
-            <ion-icon :icon="personCircle" slot="start" color="primary"></ion-icon>
+            <ion-icon :icon="personCircle" slot="start" color="secondary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'اطلاعات شخصی' : 'Personal Information' }}</h3>
               <p>{{ locale === 'fa' ? 'ویرایش نام، شماره تماس و ...' : 'Edit name, phone, etc.' }}</p>
@@ -103,7 +103,7 @@
           </ion-item>
 
           <ion-item button detail>
-            <ion-icon :icon="shield" slot="start" color="success"></ion-icon>
+            <ion-icon :icon="shield" slot="start" color="secondary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'حریم خصوصی و امنیت' : 'Privacy & Security' }}</h3>
               <p>{{ locale === 'fa' ? 'تنظیمات امنیتی حساب' : 'Account security settings' }}</p>
@@ -153,7 +153,7 @@
           </ion-item>
 
           <ion-item button detail>
-            <ion-icon :icon="language" slot="start" color="primary"></ion-icon>
+            <ion-icon :icon="language" slot="start" color="secondary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'زبان' : 'Language' }}</h3>
               <p>{{ locale === 'fa' ? 'فارسی' : 'English' }}</p>
@@ -192,7 +192,7 @@
             <ion-icon :icon="informationCircle" slot="start" color="tertiary"></ion-icon>
             <ion-label>
               <h3>{{ locale === 'fa' ? 'درباره برنامه' : 'About App' }}</h3>
-              <p>{{ locale === 'fa' ? 'نسخه ۰.۱.۰' : 'Version 0.1.0' }}</p>
+              <p>{{ versionText }}</p>
             </ion-label>
           </ion-item>
 
@@ -250,9 +250,19 @@ import {
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
+import { getPackageVersion } from '@yektayar/shared'
+import { computed } from 'vue'
 
 const { locale } = useI18n()
 const { currentTheme, toggleTheme } = useTheme()
+
+// Get version from environment variable
+const APP_VERSION = getPackageVersion()
+
+// Computed property for version display based on locale
+const versionText = computed(() => {
+  return locale.value === 'fa' ? `نسخه ${APP_VERSION}` : `Version ${APP_VERSION}`
+})
 
 // Import router for navigation
 import { useRouter } from 'vue-router'
@@ -275,7 +285,7 @@ function navigateToAbout() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* OverlayScrollbars container */
 .scrollable-content {
   height: 100%;
@@ -408,7 +418,21 @@ function navigateToAbout() {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 1rem 0.5rem;
-  color: var(--text-tertiary);
+  color: var(--secondary-accent);
+  position: relative;
+  padding-left: 12px;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 16px;
+  background: var(--secondary-gradient);
+  border-radius: 2px;
 }
 
 /* Quick Action Grid */
@@ -444,6 +468,11 @@ function navigateToAbout() {
 
 .grid-action-icon.primary {
   background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-tint) 100%);
+}
+
+.grid-action-icon.secondary {
+  background: var(--secondary-gradient);
+  box-shadow: var(--secondary-glow);
 }
 
 .grid-action-icon.success {
