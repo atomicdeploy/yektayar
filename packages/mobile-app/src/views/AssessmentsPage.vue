@@ -1093,7 +1093,6 @@ onMounted(() => {
 .assessment-row:hover .row-arrow {
   transform: translateX(4px);
 }
-}
 
 /* Animations */
 @keyframes pulse {
