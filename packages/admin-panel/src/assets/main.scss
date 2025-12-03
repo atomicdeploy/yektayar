@@ -5,7 +5,7 @@
 
 /* Tailwind v4 Theme Configuration */
 @theme {
-  /* Custom color palette */
+  /* Custom color palette - Brand Gold */
   --color-primary-50: #fef9e7;
   --color-primary-100: #fdf2c4;
   --color-primary-200: #fbe88c;
@@ -17,12 +17,61 @@
   --color-primary-800: #805723;
   --color-primary-900: #6a471f;
 
+  /* Brand Secondary - Navy Seal */
+  --color-navy-50: #e6e9ed;
+  --color-navy-100: #b3bcc9;
+  --color-navy-200: #8091a5;
+  --color-navy-300: #4d6581;
+  --color-navy-400: #1a395d;
+  --color-navy-500: #01183a;
+  --color-navy-600: #011433;
+  --color-navy-700: #010f2b;
+  --color-navy-800: #010b23;
+  --color-navy-900: #00061b;
+
   /* Custom font family */
   --font-family-sans: Vazirmatn, system-ui, -apple-system, sans-serif;
 }
 
 /* Configure dark mode to use class selector instead of media query */
 @variant dark (.dark &);
+
+/* CSS Variables for Light and Dark Modes */
+:root {
+  /* Light mode colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --card-bg: #ffffff;
+  
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  
+  --border-color: #e5e7eb;
+  
+  --primary-color: #d4a43e;
+  --primary-rgb: 212, 164, 62;
+  --primary-gradient: linear-gradient(135deg, #d4a43e 0%, #ba8b2d 100%);
+}
+
+.dark {
+  /* Dark mode colors */
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --bg-tertiary: #0f1419;
+  --card-bg: #1f2937;
+  
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  
+  --border-color: #374151;
+  
+  --primary-color: #d4a43e;
+  --primary-rgb: 212, 164, 62;
+  --primary-gradient: linear-gradient(135deg, #d4a43e 0%, #ba8b2d 100%);
+}
 
 /* CSS Reset in base layer - Tailwind utilities will override these */
 @layer base {
