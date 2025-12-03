@@ -717,7 +717,7 @@ async function fetchUsers() {
   }
 
   .user-card-actions {
-    @extend .card-footer;
+    /* Uses card-footer base styles */
     display: flex;
     gap: 8px;
 

@@ -993,6 +993,8 @@ onUnmounted(() => {
 
     &:hover {
       background: rgb(37 99 235);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -1000,6 +1002,8 @@ onUnmounted(() => {
 
       &:hover {
         background: rgb(37 99 235);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
       }
     }
   }
