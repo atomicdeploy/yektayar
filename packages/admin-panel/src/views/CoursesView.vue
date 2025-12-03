@@ -7,8 +7,12 @@
       </div>
       <div class="header-actions">
         <ViewModeToggle v-model="viewMode" />
-        <button class="btn btn-primary" @click="showCreateModal = true">
-          <i class="icon-plus"></i>
+        <button
+          v-if="permissionsStore.hasPermission('edit_users')"
+          class="btn btn-primary"
+          @click="showCreateModal = true"
+        >
+          <PlusIcon class="w-5 h-5" />
           افزودن دوره جدید
         </button>
       </div>
@@ -63,16 +67,16 @@
           <img :src="course.thumbnailUrl || '/placeholder-course.jpg'" :alt="course.title" />
           <div class="course-overlay">
             <button class="btn-icon" @click="editCourseInModal(course)">
-              <i class="icon-edit"></i>
+              <PencilIcon class="w-5 h-5" />
             </button>
             <button class="btn-icon" @click="editCourseInPage(course)">
-              <i class="icon-external-link"></i>
+              <ArrowTopRightOnSquareIcon class="w-5 h-5" />
             </button>
             <button class="btn-icon" @click="manageLessons(course)">
-              <i class="icon-list"></i>
+              <ListBulletIcon class="w-5 h-5" />
             </button>
             <button class="btn-icon btn-danger" @click="deleteCourse(course)">
-              <i class="icon-trash"></i>
+              <TrashIcon class="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -156,16 +160,16 @@
             <td>
               <div class="action-buttons">
                 <button class="btn-icon" @click="editCourseInModal(course)" title="ویرایش سریع">
-                  <i class="icon-edit"></i>
+                  <PencilIcon class="w-5 h-5" />
                 </button>
                 <button class="btn-icon" @click="editCourseInPage(course)" title="ویرایش کامل">
-                  <i class="icon-external-link"></i>
+                  <ArrowTopRightOnSquareIcon class="w-5 h-5" />
                 </button>
                 <button class="btn-icon" @click="manageLessons(course)" title="مدیریت درس‌ها">
-                  <i class="icon-list"></i>
+                  <ListBulletIcon class="w-5 h-5" />
                 </button>
                 <button class="btn-icon btn-danger" @click="deleteCourse(course)" title="حذف">
-                  <i class="icon-trash"></i>
+                  <TrashIcon class="w-5 h-5" />
                 </button>
               </div>
             </td>
@@ -180,6 +184,7 @@
       <h3>هیچ دوره‌ای یافت نشد</h3>
       <p>برای شروع، اولین دوره خود را ایجاد کنید</p>
       <button class="btn btn-primary" @click="showCreateModal = true">
+        <PlusIcon class="w-5 h-5" />
         افزودن دوره جدید
       </button>
     </div>
@@ -278,12 +283,21 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  ListBulletIcon,
+  ArrowTopRightOnSquareIcon,
+} from '@heroicons/vue/24/outline'
 import { useViewMode } from '@/composables/useViewMode'
+import { usePermissionsStore } from '@/stores/permissions'
 import ViewModeToggle from '@/components/shared/ViewModeToggle.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const router = useRouter()
+const permissionsStore = usePermissionsStore()
 const { viewMode } = useViewMode('courses-view-mode')
 
 const searchQuery = ref('')
@@ -681,27 +695,44 @@ onMounted(() => {
     border-collapse: collapse;
 
     thead {
-      background: var(--bg-secondary);
-      border-bottom: 2px solid var(--border-color);
+      background: rgb(249 250 251);
+      border-bottom: 1px solid rgb(229 231 235);
+
+      @media (prefers-color-scheme: dark) {
+        background: rgb(55 65 81);
+        border-bottom-color: rgb(75 85 99);
+      }
 
       th {
-        padding: 16px;
+        padding: 12px 24px;
         text-align: right;
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 12px;
+        color: rgb(107 114 128);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.05em;
+
+        @media (prefers-color-scheme: dark) {
+          color: rgb(156 163 175);
+        }
       }
     }
 
     tbody {
       tr {
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s ease;
+        border-bottom: 1px solid rgb(229 231 235);
+        transition: background-color 0.15s ease;
+
+        @media (prefers-color-scheme: dark) {
+          border-bottom-color: rgb(75 85 99);
+        }
 
         &:hover {
-          background: var(--bg-secondary);
+          background: rgb(249 250 251);
+
+          @media (prefers-color-scheme: dark) {
+            background: rgba(55, 65, 81, 0.5);
+          }
         }
 
         &:last-child {
@@ -710,9 +741,10 @@ onMounted(() => {
       }
 
       td {
-        padding: 16px;
+        padding: 16px 24px;
         color: var(--text-primary);
         font-size: 14px;
+        white-space: nowrap;
 
         .course-title-cell {
           display: flex;
@@ -736,23 +768,42 @@ onMounted(() => {
 
         .btn-icon {
           padding: 6px;
-          border: 1px solid var(--border-color);
+          border: none;
           background: transparent;
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.2s ease;
-          color: var(--text-primary);
+          color: rgb(59 130 246);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
 
-          &:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
+          @media (prefers-color-scheme: dark) {
+            color: rgb(96 165 250);
           }
 
-          &.btn-danger:hover {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: #ef4444;
-            color: #ef4444;
+          &:hover {
+            color: rgb(37 99 235);
+
+            @media (prefers-color-scheme: dark) {
+              color: rgb(147 197 253);
+            }
+          }
+
+          &.btn-danger {
+            color: rgb(239 68 68);
+
+            @media (prefers-color-scheme: dark) {
+              color: rgb(248 113 113);
+            }
+
+            &:hover {
+              color: rgb(220 38 38);
+
+              @media (prefers-color-scheme: dark) {
+                color: rgb(252 165 165);
+              }
+            }
           }
         }
       }
@@ -906,24 +957,31 @@ onMounted(() => {
 }
 
 .btn {
-  padding: 12px 24px;
+  padding: 8px 16px;
   border: none;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 8px;
 
   &.btn-primary {
-    background: var(--primary-gradient);
+    background: rgb(59 130 246);
     color: white;
 
     &:hover {
-      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
-      transform: translateY(-2px);
+      background: rgb(37 99 235);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      background: rgb(59 130 246);
+
+      &:hover {
+        background: rgb(37 99 235);
+      }
     }
   }
 

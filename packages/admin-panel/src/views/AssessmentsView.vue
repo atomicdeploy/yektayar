@@ -7,8 +7,12 @@
       </div>
       <div class="header-actions">
         <ViewModeToggle v-model="viewMode" />
-        <button class="btn btn-primary" @click="showCreateModal = true">
-          <i class="icon-plus"></i>
+        <button
+          v-if="permissionsStore.hasPermission('edit_users')"
+          class="btn btn-primary"
+          @click="showCreateModal = true"
+        >
+          <PlusIcon class="w-5 h-5" />
           افزودن آزمون جدید
         </button>
       </div>
@@ -79,22 +83,22 @@
         </div>
         <div class="test-actions">
           <button class="btn-action" @click="viewTest(test)" title="مشاهده جزئیات">
-            <i class="icon-eye"></i>
+            <EyeIcon class="w-5 h-5" />
           </button>
           <button class="btn-action" @click="editTestInModal(test)" title="ویرایش سریع">
-            <i class="icon-edit"></i>
+            <PencilIcon class="w-5 h-5" />
           </button>
           <button class="btn-action" @click="editTestInPage(test)" title="ویرایش کامل">
-            <i class="icon-external-link"></i>
+            <ArrowTopRightOnSquareIcon class="w-5 h-5" />
           </button>
           <button class="btn-action" @click="manageQuestions(test)" title="مدیریت سوالات">
-            <i class="icon-list"></i>
+            <ListBulletIcon class="w-5 h-5" />
           </button>
           <button class="btn-action" @click="viewResults(test)" title="مشاهده نتایج">
-            <i class="icon-chart"></i>
+            <ChartBarIcon class="w-5 h-5" />
           </button>
           <button class="btn-action btn-danger" @click="deleteTest(test)" title="حذف">
-            <i class="icon-trash"></i>
+            <TrashIcon class="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -137,22 +141,22 @@
             <td>
               <div class="action-buttons">
                 <button class="btn-icon" @click="viewTest(test)" title="مشاهده جزئیات">
-                  <i class="icon-eye"></i>
+                  <EyeIcon class="w-5 h-5" />
                 </button>
                 <button class="btn-icon" @click="editTestInModal(test)" title="ویرایش سریع">
-                  <i class="icon-edit"></i>
+                  <PencilIcon class="w-5 h-5" />
                 </button>
                 <button class="btn-icon" @click="editTestInPage(test)" title="ویرایش کامل">
-                  <i class="icon-external-link"></i>
+                  <ArrowTopRightOnSquareIcon class="w-5 h-5" />
                 </button>
                 <button class="btn-icon" @click="manageQuestions(test)" title="مدیریت سوالات">
-                  <i class="icon-list"></i>
+                  <ListBulletIcon class="w-5 h-5" />
                 </button>
                 <button class="btn-icon" @click="viewResults(test)" title="مشاهده نتایج">
-                  <i class="icon-chart"></i>
+                  <ChartBarIcon class="w-5 h-5" />
                 </button>
                 <button class="btn-icon btn-danger" @click="deleteTest(test)" title="حذف">
-                  <i class="icon-trash"></i>
+                  <TrashIcon class="w-5 h-5" />
                 </button>
               </div>
             </td>
@@ -167,6 +171,7 @@
       <h3>آزمونی یافت نشد</h3>
       <p>هنوز آزمونی ایجاد نشده است یا با فیلترهای انتخابی نتیجه‌ای یافت نشد.</p>
       <button class="btn btn-primary" @click="showCreateModal = true">
+        <PlusIcon class="w-5 h-5" />
         افزودن اولین آزمون
       </button>
     </div>
@@ -411,13 +416,24 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import {
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  EyeIcon,
+  ListBulletIcon,
+  ChartBarIcon,
+  ArrowTopRightOnSquareIcon,
+} from '@heroicons/vue/24/outline'
 import { useViewMode } from '@/composables/useViewMode'
+import { usePermissionsStore } from '@/stores/permissions'
 import ViewModeToggle from '@/components/shared/ViewModeToggle.vue'
 import apiClient from '@/api'
 import { logger } from '@yektayar/shared'
 
 const { t } = useI18n()
 const router = useRouter()
+const permissionsStore = usePermissionsStore()
 const { viewMode } = useViewMode('assessments-view-mode')
 
 // State
@@ -790,27 +806,44 @@ onMounted(() => {
     border-collapse: collapse;
 
     thead {
-      background: var(--bg-secondary);
-      border-bottom: 2px solid var(--border-color);
+      background: rgb(249 250 251);
+      border-bottom: 1px solid rgb(229 231 235);
+
+      @media (prefers-color-scheme: dark) {
+        background: rgb(55 65 81);
+        border-bottom-color: rgb(75 85 99);
+      }
 
       th {
-        padding: 16px;
+        padding: 12px 24px;
         text-align: right;
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 12px;
+        color: rgb(107 114 128);
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.05em;
+
+        @media (prefers-color-scheme: dark) {
+          color: rgb(156 163 175);
+        }
       }
     }
 
     tbody {
       tr {
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s ease;
+        border-bottom: 1px solid rgb(229 231 235);
+        transition: background-color 0.15s ease;
+
+        @media (prefers-color-scheme: dark) {
+          border-bottom-color: rgb(75 85 99);
+        }
 
         &:hover {
-          background: var(--bg-secondary);
+          background: rgb(249 250 251);
+
+          @media (prefers-color-scheme: dark) {
+            background: rgba(55, 65, 81, 0.5);
+          }
         }
 
         &:last-child {
@@ -819,9 +852,10 @@ onMounted(() => {
       }
 
       td {
-        padding: 16px;
+        padding: 16px 24px;
         color: var(--text-primary);
         font-size: 14px;
+        white-space: nowrap;
 
         .test-title-cell {
           display: flex;
@@ -845,23 +879,42 @@ onMounted(() => {
 
         .btn-icon {
           padding: 6px;
-          border: 1px solid var(--border-color);
+          border: none;
           background: transparent;
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.2s ease;
-          color: var(--text-primary);
+          color: rgb(59 130 246);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
 
-          &:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
+          @media (prefers-color-scheme: dark) {
+            color: rgb(96 165 250);
           }
 
-          &.btn-danger:hover {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: #ef4444;
-            color: #ef4444;
+          &:hover {
+            color: rgb(37 99 235);
+
+            @media (prefers-color-scheme: dark) {
+              color: rgb(147 197 253);
+            }
+          }
+
+          &.btn-danger {
+            color: rgb(239 68 68);
+
+            @media (prefers-color-scheme: dark) {
+              color: rgb(248 113 113);
+            }
+
+            &:hover {
+              color: rgb(220 38 38);
+
+              @media (prefers-color-scheme: dark) {
+                color: rgb(252 165 165);
+              }
+            }
           }
         }
       }
@@ -981,31 +1034,52 @@ onMounted(() => {
 
 .test-actions {
   display: flex;
-  gap: 0.5rem;
-  padding: 1rem 1.25rem;
+  gap: 8px;
+  padding: 16px 20px;
   border-top: 1px solid var(--border-color);
   background: var(--bg-secondary);
 }
 
 .btn-action {
   flex: 1;
-  padding: 0.5rem;
+  padding: 8px;
   background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s;
-}
+  transition: all 0.2s ease;
+  color: rgb(59 130 246);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-.btn-action:hover {
-  background: var(--bg-secondary);
-  border-color: var(--text-secondary);
-}
+  @media (prefers-color-scheme: dark) {
+    color: rgb(96 165 250);
+  }
 
-.btn-action.btn-danger:hover {
-  background: #fee2e2;
-  border-color: #fca5a5;
-  color: #dc2626;
+  &:hover {
+    color: rgb(37 99 235);
+
+    @media (prefers-color-scheme: dark) {
+      color: rgb(147 197 253);
+    }
+  }
+
+  &.btn-danger {
+    color: rgb(239 68 68);
+
+    @media (prefers-color-scheme: dark) {
+      color: rgb(248 113 113);
+    }
+
+    &:hover {
+      color: rgb(220 38 38);
+
+      @media (prefers-color-scheme: dark) {
+        color: rgb(252 165 165);
+      }
+    }
+  }
 }
 
 .empty-state,
@@ -1143,39 +1217,47 @@ onMounted(() => {
 
 /* Buttons */
 .btn {
-  padding: 0.625rem 1.25rem;
+  padding: 8px 16px;
   border: none;
-  border-radius: 0.5rem;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .btn-primary {
-  background: var(--primary-gradient);
+  background: rgb(59 130 246);
   color: white;
-}
 
-.btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+  &:hover:not(:disabled) {
+    background: rgb(37 99 235);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background: rgb(59 130 246);
+
+    &:hover:not(:disabled) {
+      background: rgb(37 99 235);
+    }
+  }
 }
 
 .btn-secondary {
   background: var(--bg-secondary);
   color: var(--text-primary);
-}
 
-.btn-secondary:hover {
-  background: var(--bg-tertiary);
+  &:hover {
+    background: var(--bg-tertiary);
+  }
 }
 
 .btn-sm {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
+  padding: 6px 12px;
+  font-size: 13px;
 }
 
 .btn:disabled {
@@ -1184,12 +1266,17 @@ onMounted(() => {
 }
 
 .btn-icon {
-  padding: 0.5rem;
+  padding: 8px;
   background: transparent;
   border: 1px solid var(--border-color);
-  border-radius: 0.375rem;
+  border-radius: 6px;
   cursor: pointer;
   color: var(--text-primary);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--bg-secondary);
+  }
 }
 
 /* Questions Management */
