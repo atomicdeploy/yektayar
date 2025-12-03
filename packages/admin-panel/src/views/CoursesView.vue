@@ -482,7 +482,7 @@ onMounted(() => {
         height: 40px;
         border-radius: 50%;
         border: none;
-        background: white;
+        background: rgba(255, 255, 255, 0.95);
         color: var(--primary-color);
         cursor: pointer;
         transition: all 0.3s ease;
@@ -492,7 +492,7 @@ onMounted(() => {
         }
 
         &.btn-danger {
-          background: #ef4444;
+          background: rgba(239, 68, 68, 0.95);
           color: white;
         }
       }

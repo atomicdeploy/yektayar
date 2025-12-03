@@ -653,18 +653,18 @@ onMounted(() => {
   align-items: flex-start;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .header-content h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
@@ -689,9 +689,11 @@ onMounted(() => {
 .filter-select {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   font-size: 0.95rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .tests-grid {
@@ -701,9 +703,9 @@ onMounted(() => {
 }
 
 .test-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 0.75rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   overflow: hidden;
   transition: all 0.2s;
 }
@@ -715,7 +717,7 @@ onMounted(() => {
 
 .test-header {
   padding: 1.25rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   color: white;
   display: flex;
   align-items: center;
@@ -814,23 +816,23 @@ onMounted(() => {
   display: flex;
   gap: 0.5rem;
   padding: 1rem 1.25rem;
-  border-top: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
 }
 
 .btn-action {
   flex: 1;
   padding: 0.5rem;
-  background: white;
-  border: 1px solid #d1d5db;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-action:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
+  background: var(--bg-secondary);
+  border-color: var(--text-secondary);
 }
 
 .btn-action.btn-danger:hover {
@@ -843,21 +845,21 @@ onMounted(() => {
 .loading-state {
   text-align: center;
   padding: 4rem 2rem;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .empty-state i,
 .loading-state .spinner {
   font-size: 4rem;
   margin-bottom: 1.5rem;
-  color: #d1d5db;
+  color: var(--text-tertiary);
 }
 
 .spinner {
   width: 64px;
   height: 64px;
-  border: 4px solid #e5e7eb;
-  border-top-color: #667eea;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1.5rem;
@@ -882,7 +884,7 @@ onMounted(() => {
 }
 
 .modal-content {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 0.75rem;
   max-width: 600px;
   width: 100%;
@@ -901,13 +903,14 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .modal-header h2 {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .btn-close {
@@ -915,12 +918,12 @@ onMounted(() => {
   border: none;
   font-size: 2rem;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-secondary);
   line-height: 1;
 }
 
 .btn-close:hover {
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .modal-body {
@@ -931,7 +934,7 @@ onMounted(() => {
 
 .modal-footer {
   padding: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
@@ -945,21 +948,23 @@ onMounted(() => {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .form-control {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   font-size: 0.95rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
 }
 
 .form-actions {
@@ -983,22 +988,22 @@ onMounted(() => {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
 }
 
 .btn-secondary {
-  background: #e5e7eb;
-  color: #374151;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .btn-secondary:hover {
-  background: #d1d5db;
+  background: var(--bg-tertiary);
 }
 
 .btn-sm {
@@ -1014,9 +1019,10 @@ onMounted(() => {
 .btn-icon {
   padding: 0.5rem;
   background: transparent;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
   cursor: pointer;
+  color: var(--text-primary);
 }
 
 /* Questions Management */
@@ -1028,10 +1034,10 @@ onMounted(() => {
 }
 
 .section-card {
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border-color);
   border-radius: 0.75rem;
   padding: 1.5rem;
-  background: #f9fafb;
+  background: var(--bg-secondary);
 }
 
 .section-header {
@@ -1050,15 +1056,15 @@ onMounted(() => {
   gap: 0.75rem;
   margin-top: 0.75rem;
   padding: 1rem;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
 }
 
 .question-number {
   width: 32px;
   height: 32px;
-  background: #667eea;
+  background: var(--primary-color);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1084,7 +1090,7 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--primary-gradient);
   color: white;
   padding: 1.5rem;
   border-radius: 0.75rem;
@@ -1115,16 +1121,16 @@ onMounted(() => {
 .results-table td {
   padding: 0.75rem 1rem;
   text-align: right;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .results-table th {
-  background: #f9fafb;
+  background: var(--bg-secondary);
   font-weight: 600;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .results-table tr:hover {
-  background: #f9fafb;
+  background: var(--bg-secondary);
 }
 </style>
