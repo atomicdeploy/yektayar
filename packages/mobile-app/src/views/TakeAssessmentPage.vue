@@ -181,7 +181,7 @@
                   fill="outline" 
                   @click="previousQuestion"
                 >
-                  <ion-icon :icon="chevronBack" slot="start"></ion-icon>
+                  <ion-icon :icon="chevronBack" slot="start" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
                   {{ locale === 'fa' ? 'قبلی' : 'Previous' }}
                 </ion-button>
                 <div class="spacer"></div>
@@ -192,7 +192,7 @@
                   {{ currentQuestionIndex < (assessment?.questions?.length || 0) - 1 
                     ? (locale === 'fa' ? 'بعدی' : 'Next')
                     : (locale === 'fa' ? 'اتمام' : 'Finish') }}
-                  <ion-icon :icon="chevronForward" slot="end"></ion-icon>
+                  <ion-icon :icon="chevronForward" slot="end" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
                 </ion-button>
               </div>
             </div>
@@ -270,7 +270,7 @@
           @click="previousStep"
           :disabled="currentStep === 0"
         >
-          <ion-icon :icon="chevronBack" slot="icon-only"></ion-icon>
+          <ion-icon :icon="chevronBack" slot="icon-only" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
         </ion-button>
         <div class="step-indicators">
           <div 
@@ -284,7 +284,7 @@
           @click="nextStep"
           :disabled="!canProceed"
         >
-          <ion-icon :icon="chevronForward" slot="icon-only"></ion-icon>
+          <ion-icon :icon="chevronForward" slot="icon-only" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
         </ion-button>
       </div>
     </ion-footer>

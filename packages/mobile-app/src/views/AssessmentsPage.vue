@@ -43,7 +43,7 @@
               <h2 class="section-title">{{ locale === 'fa' ? 'ارزیابی‌های من' : 'My Assessments' }}</h2>
               <ion-button fill="clear" size="small" @click="viewHistory">
                 {{ locale === 'fa' ? 'مشاهده همه' : 'View All' }}
-                <ion-icon :icon="locale === 'fa' ? chevronBack : chevronForward" slot="end"></ion-icon>
+                <ion-icon :icon="chevronForward" slot="end" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
               </ion-button>
             </div>
 
@@ -62,7 +62,7 @@
                   <p>{{ locale === 'fa' ? 'امتیاز:' : 'Score:' }} {{ result.score }}</p>
                   <span class="history-date">{{ formatDate(result.completed_at) }}</span>
                 </div>
-                <ion-icon :icon="chevronForward" class="history-arrow"></ion-icon>
+                <ion-icon :icon="chevronForward" class="history-arrow" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
               </div>
             </div>
           </div>
@@ -147,9 +147,9 @@
                 </div>
                 <div class="assessment-footer">
                   <ion-button expand="block" fill="solid" color="primary" class="start-button">
-                    <ion-icon :icon="play" slot="start"></ion-icon>
+                    <ion-icon :icon="play" slot="start" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
                     {{ locale === 'fa' ? 'شروع ارزیابی' : 'Start Assessment' }}
-                    <ion-icon :icon="arrowForward" slot="end"></ion-icon>
+                    <ion-icon :icon="arrowForward" slot="end" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
                   </ion-button>
                 </div>
               </div>
@@ -185,7 +185,7 @@
                     </span>
                   </div>
                 </div>
-                <ion-icon :icon="chevronForward" class="row-arrow"></ion-icon>
+                <ion-icon :icon="chevronForward" class="row-arrow" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
               </div>
             </div>
 
