@@ -1,11 +1,12 @@
 <template>
-  <div class="courses-view">
+  <main class="courses-view">
     <div class="view-header">
       <div class="header-content">
         <h1>{{ t('nav.courses') }}</h1>
         <p class="subtitle">مدیریت دوره‌های آموزشی</p>
       </div>
       <div class="header-actions">
+        <ViewModeToggle v-model="viewMode" />
         <button class="btn btn-primary" @click="showCreateModal = true">
           <i class="icon-plus"></i>
           افزودن دوره جدید
@@ -51,13 +52,21 @@
     </div>
 
     <!-- Courses List -->
-    <div class="courses-grid">
+    <div v-if="loading" class="loading-state">
+      <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
+      <p>در حال بارگذاری دوره‌ها...</p>
+    </div>
+
+    <div v-else-if="viewMode === 'card'" class="courses-grid">
       <div v-for="course in filteredCourses" :key="course.id" class="course-card">
         <div class="course-image">
           <img :src="course.thumbnailUrl || '/placeholder-course.jpg'" :alt="course.title" />
           <div class="course-overlay">
-            <button class="btn-icon" @click="editCourse(course)">
+            <button class="btn-icon" @click="editCourseInModal(course)">
               <i class="icon-edit"></i>
+            </button>
+            <button class="btn-icon" @click="editCourseInPage(course)">
+              <i class="icon-external-link"></i>
             </button>
             <button class="btn-icon" @click="manageLessons(course)">
               <i class="icon-list"></i>
@@ -110,8 +119,63 @@
       </div>
     </div>
 
+    <!-- Table View -->
+    <div v-else class="courses-table">
+      <table>
+        <thead>
+          <tr>
+            <th>عنوان</th>
+            <th>دسته‌بندی</th>
+            <th>سطح</th>
+            <th>مدت زمان</th>
+            <th>دانشجویان</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="course in filteredCourses" :key="course.id">
+            <td>
+              <div class="course-title-cell">
+                <strong>{{ course.title }}</strong>
+                <span class="course-desc-preview">{{ truncate(course.description, 50) }}</span>
+              </div>
+            </td>
+            <td>{{ course.category }}</td>
+            <td>{{ getDifficultyLabel(course.difficulty) }}</td>
+            <td>{{ course.duration }} دقیقه</td>
+            <td>{{ course.enrollmentCount || 0 }}</td>
+            <td>
+              <span
+                class="status-badge"
+                :class="{ published: course.isPublished, draft: !course.isPublished }"
+              >
+                {{ course.isPublished ? 'منتشر شده' : 'پیش‌نویس' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon" @click="editCourseInModal(course)" title="ویرایش سریع">
+                  <i class="icon-edit"></i>
+                </button>
+                <button class="btn-icon" @click="editCourseInPage(course)" title="ویرایش کامل">
+                  <i class="icon-external-link"></i>
+                </button>
+                <button class="btn-icon" @click="manageLessons(course)" title="مدیریت درس‌ها">
+                  <i class="icon-list"></i>
+                </button>
+                <button class="btn-icon btn-danger" @click="deleteCourse(course)" title="حذف">
+                  <i class="icon-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Empty State -->
-    <div v-if="filteredCourses.length === 0" class="empty-state">
+    <div v-if="!loading && filteredCourses.length === 0" class="empty-state">
       <i class="icon-courses-empty"></i>
       <h3>هیچ دوره‌ای یافت نشد</h3>
       <p>برای شروع، اولین دوره خود را ایجاد کنید</p>
@@ -207,21 +271,26 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useViewMode } from '@/composables/useViewMode'
+import ViewModeToggle from '@/components/shared/ViewModeToggle.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const router = useRouter()
+const { viewMode } = useViewMode('courses-view-mode')
 
 const searchQuery = ref('')
 const filterCategory = ref('')
 const filterDifficulty = ref('')
 const filterStatus = ref('')
+const loading = ref(false)
 const showCreateModal = ref(false)
 const editingCourse = ref<any>(null)
 
@@ -305,10 +374,14 @@ const truncate = (text: string, length: number) => {
   return text.substring(0, length) + '...'
 }
 
-const editCourse = (course: any) => {
+const editCourseInModal = (course: any) => {
   editingCourse.value = course
   courseForm.value = { ...course }
   showCreateModal.value = true
+}
+
+const editCourseInPage = (course: any) => {
+  router.push(`/courses/${course.id}/edit`)
 }
 
 const manageLessons = (course: any) => {
@@ -363,6 +436,7 @@ const closeModal = () => {
 
 onMounted(() => {
   // TODO: Fetch courses from API
+  loading.value = false
 })
 </script>
 
@@ -393,6 +467,12 @@ onMounted(() => {
       color: var(--text-secondary);
     }
   }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 }
 
 .filters-section {
@@ -421,6 +501,16 @@ onMounted(() => {
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
     }
+  }
+}
+
+.loading-state {
+  text-align: center;
+  padding: 80px 20px;
+  
+  p {
+    margin-top: 16px;
+    color: var(--text-secondary);
   }
 }
 
@@ -580,6 +670,96 @@ onMounted(() => {
   }
 }
 
+.courses-table {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--border-color);
+
+      th {
+        padding: 16px;
+        text-align: right;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background: var(--bg-secondary);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      td {
+        padding: 16px;
+        color: var(--text-primary);
+        font-size: 14px;
+
+        .course-title-cell {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          strong {
+            font-weight: 600;
+          }
+
+          .course-desc-preview {
+            font-size: 12px;
+            color: var(--text-secondary);
+          }
+        }
+
+        .action-buttons {
+          display: flex;
+          gap: 8px;
+        }
+
+        .btn-icon {
+          padding: 6px;
+          border: 1px solid var(--border-color);
+          background: transparent;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          color: var(--text-primary);
+
+          &:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+          }
+
+          &.btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #ef4444;
+          }
+        }
+      }
+    }
+  }
+}
+
 .empty-state {
   text-align: center;
   padding: 80px 20px;
@@ -733,6 +913,9 @@ onMounted(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 
   &.btn-primary {
     background: var(--primary-gradient);

@@ -1,11 +1,12 @@
 <template>
-  <div class="tests-view">
+  <main class="tests-view">
     <div class="view-header">
       <div class="header-content">
-        <h1>{{ t('nav.tests') }}</h1>
+        <h1>{{ t('nav.assessments') }}</h1>
         <p class="subtitle">مدیریت آزمون‌ها و ارزیابی‌های روانشناختی</p>
       </div>
       <div class="header-actions">
+        <ViewModeToggle v-model="viewMode" />
         <button class="btn btn-primary" @click="showCreateModal = true">
           <i class="icon-plus"></i>
           افزودن آزمون جدید
@@ -33,7 +34,7 @@
     </div>
 
     <!-- Tests List -->
-    <div class="tests-grid">
+    <div v-if="viewMode === 'card'" class="tests-grid">
       <div v-for="test in filteredTests" :key="test.id" class="test-card">
         <div class="test-header">
           <div class="test-icon">
@@ -80,8 +81,11 @@
           <button class="btn-action" @click="viewTest(test)" title="مشاهده جزئیات">
             <i class="icon-eye"></i>
           </button>
-          <button class="btn-action" @click="editTest(test)" title="ویرایش">
+          <button class="btn-action" @click="editTestInModal(test)" title="ویرایش سریع">
             <i class="icon-edit"></i>
+          </button>
+          <button class="btn-action" @click="editTestInPage(test)" title="ویرایش کامل">
+            <i class="icon-external-link"></i>
           </button>
           <button class="btn-action" @click="manageQuestions(test)" title="مدیریت سوالات">
             <i class="icon-list"></i>
@@ -94,6 +98,67 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Table View -->
+    <div v-else class="tests-table">
+      <table>
+        <thead>
+          <tr>
+            <th>عنوان</th>
+            <th>تعداد سوالات</th>
+            <th>تعداد بخش‌ها</th>
+            <th>آزمون‌های انجام شده</th>
+            <th>میانگین امتیاز</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="test in filteredTests" :key="test.id">
+            <td>
+              <div class="test-title-cell">
+                <strong>{{ test.title }}</strong>
+                <span class="test-desc-preview">{{ truncate(test.description, 50) }}</span>
+              </div>
+            </td>
+            <td>{{ test.question_count || 0 }}</td>
+            <td>{{ test.section_count || 0 }}</td>
+            <td>{{ test.submission_count || 0 }}</td>
+            <td>{{ test.avg_score || 0 }}%</td>
+            <td>
+              <span
+                class="status-badge"
+                :class="{ published: test.is_published, draft: !test.is_published }"
+              >
+                {{ test.is_published ? 'منتشر شده' : 'پیش‌نویس' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-icon" @click="viewTest(test)" title="مشاهده جزئیات">
+                  <i class="icon-eye"></i>
+                </button>
+                <button class="btn-icon" @click="editTestInModal(test)" title="ویرایش سریع">
+                  <i class="icon-edit"></i>
+                </button>
+                <button class="btn-icon" @click="editTestInPage(test)" title="ویرایش کامل">
+                  <i class="icon-external-link"></i>
+                </button>
+                <button class="btn-icon" @click="manageQuestions(test)" title="مدیریت سوالات">
+                  <i class="icon-list"></i>
+                </button>
+                <button class="btn-icon" @click="viewResults(test)" title="مشاهده نتایج">
+                  <i class="icon-chart"></i>
+                </button>
+                <button class="btn-icon btn-danger" @click="deleteTest(test)" title="حذف">
+                  <i class="icon-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- Empty State -->
@@ -339,16 +404,21 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useViewMode } from '@/composables/useViewMode'
+import ViewModeToggle from '@/components/shared/ViewModeToggle.vue'
 import apiClient from '@/api'
 import { logger } from '@yektayar/shared'
 
 const { t } = useI18n()
+const router = useRouter()
+const { viewMode } = useViewMode('assessments-view-mode')
 
 // State
 const tests = ref<any[]>([])
@@ -429,7 +499,7 @@ const viewTest = (test: any) => {
   alert('View test details - to be implemented')
 }
 
-const editTest = (test: any) => {
+const editTestInModal = (test: any) => {
   selectedTest.value = test
   formData.value = {
     title: test.title || '',
@@ -440,6 +510,10 @@ const editTest = (test: any) => {
     is_published: test.is_published || false,
   }
   showEditModal.value = true
+}
+
+const editTestInPage = (test: any) => {
+  router.push(`/assessments/${test.id}/edit`)
 }
 
 const manageQuestions = async (test: any) => {
@@ -639,6 +713,7 @@ onMounted(() => {
 
 <style scoped>
 .tests-view {
+  padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -647,26 +722,28 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 32px;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .header-content h1 {
-  font-size: 2rem;
+  font-size: 32px;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 8px 0;
 }
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 16px;
+  margin: 0;
 }
 
 .header-actions {
   display: flex;
-  gap: 0.75rem;
+  align-items: center;
+  gap: 12px;
 }
 
 .filters-section {
@@ -695,7 +772,101 @@ onMounted(() => {
 .tests-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tests-table {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--border-color);
+
+      th {
+        padding: 16px;
+        text-align: right;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background: var(--bg-secondary);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      td {
+        padding: 16px;
+        color: var(--text-primary);
+        font-size: 14px;
+
+        .test-title-cell {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          strong {
+            font-weight: 600;
+          }
+
+          .test-desc-preview {
+            font-size: 12px;
+            color: var(--text-secondary);
+          }
+        }
+
+        .action-buttons {
+          display: flex;
+          gap: 8px;
+        }
+
+        .btn-icon {
+          padding: 6px;
+          border: 1px solid var(--border-color);
+          background: transparent;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          color: var(--text-primary);
+
+          &:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+          }
+
+          &.btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            color: #ef4444;
+          }
+        }
+      }
+    }
+  }
 }
 
 .test-card {

@@ -95,6 +95,12 @@ export default {
     system: 'سیستم',
   },
   
+  // View Mode
+  view_mode: {
+    card_view: 'نمایش کارتی',
+    table_view: 'نمایش جدولی',
+  },
+  
   // Messages
   messages: {
     success: 'عملیات با موفقیت انجام شد',

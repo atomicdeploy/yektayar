@@ -1,35 +1,38 @@
 <template>
-  <div>
+  <main class="users-view">
     <!-- Header -->
-    <div class="mb-8 flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ t('users_page.title') }}</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">{{ t('users_page.list_title') }}</p>
+    <div class="view-header">
+      <div class="header-content">
+        <h1>{{ t('users_page.title') }}</h1>
+        <p class="subtitle">{{ t('users_page.list_title') }}</p>
       </div>
-      <button
-        v-if="permissionsStore.hasPermission('edit_users')"
-        class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
-      >
-        <PlusIcon class="w-5 h-5" />
-        {{ t('users_page.add_user') }}
-      </button>
+      <div class="header-actions">
+        <ViewModeToggle v-model="viewMode" />
+        <button
+          v-if="permissionsStore.hasPermission('edit_users')"
+          class="btn btn-primary"
+        >
+          <PlusIcon class="w-5 h-5" />
+          {{ t('users_page.add_user') }}
+        </button>
+      </div>
     </div>
 
     <!-- Search and Filter -->
-    <div class="mb-6 flex flex-col sm:flex-row gap-4">
-      <div class="flex-1 relative">
+    <div class="filters-section">
+      <div class="filter-group flex-1 relative">
         <MagnifyingGlassIcon class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           v-model="searchQuery"
           type="text"
           :placeholder="t('users_page.search_placeholder')"
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          class="search-input"
         />
       </div>
-      <div class="flex gap-2">
+      <div class="filter-group flex gap-2">
         <select
           v-model="filterRole"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          class="filter-select"
         >
           <option value="">همه نقش‌ها</option>
           <option value="admin">{{ t('roles.admin') }}</option>
@@ -39,7 +42,7 @@
         </select>
         <select
           v-model="filterStatus"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          class="filter-select"
         >
           <option value="">همه وضعیت‌ها</option>
           <option value="active">{{ t('status.active') }}</option>
@@ -49,8 +52,8 @@
       </div>
     </div>
 
-    <!-- Users Table -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+    <!-- Users Table (Default view) -->
+    <div v-if="viewMode === 'table'" class="users-table">
       <div v-if="isLoading" class="p-8 text-center">
         <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
         <p class="mt-4 text-gray-600 dark:text-gray-400">{{ t('loading') }}</p>
@@ -157,6 +160,79 @@
       </table>
     </div>
 
+    <!-- Users Card View -->
+    <div v-else class="users-grid">
+      <div v-if="isLoading" class="loading-state">
+        <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
+        <p>{{ t('loading') }}</p>
+      </div>
+
+      <div v-else-if="filteredUsers.length === 0" class="empty-state">
+        {{ t('users_page.no_users') }}
+      </div>
+
+      <div v-else v-for="user in paginatedUsers" :key="user.id" class="user-card">
+        <div class="user-card-header">
+          <div class="user-avatar">
+            <span>{{ getInitials(user.name) }}</span>
+          </div>
+          <div class="user-info">
+            <h3>{{ user.name }}</h3>
+            <span
+              :class="[
+                'status-badge',
+                getStatusBadgeClass(user.status),
+              ]"
+            >
+              {{ t(`status.${user.status}`) }}
+            </span>
+          </div>
+        </div>
+        <div class="user-card-body">
+          <div class="user-detail">
+            <span class="label">{{ t('users_page.email') }}</span>
+            <span class="value">{{ user.email }}</span>
+          </div>
+          <div class="user-detail">
+            <span class="label">{{ t('users_page.phone') }}</span>
+            <span class="value">{{ user.phone }}</span>
+          </div>
+          <div class="user-detail">
+            <span class="label">{{ t('users_page.role') }}</span>
+            <span
+              :class="[
+                'role-badge',
+                getRoleBadgeClass(user.role),
+              ]"
+            >
+              {{ t(`roles.${user.role}`) }}
+            </span>
+          </div>
+          <div class="user-detail">
+            <span class="label">{{ t('users_page.created_at') }}</span>
+            <span class="value">{{ formatDate(user.createdAt) }}</span>
+          </div>
+        </div>
+        <div v-if="permissionsStore.hasPermission('edit_users')" class="user-card-actions">
+          <button
+            @click="editUser(user.id)"
+            class="btn-icon"
+            :title="t('edit')"
+          >
+            <PencilIcon class="w-5 h-5" />
+          </button>
+          <button
+            v-if="permissionsStore.hasPermission('delete_users')"
+            @click="deleteUser(user.id)"
+            class="btn-icon btn-danger"
+            :title="t('delete')"
+          >
+            <TrashIcon class="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Pagination -->
     <div v-if="totalPages > 1" class="mt-6 flex items-center justify-between">
       <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -192,7 +268,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -205,11 +281,14 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline'
 import { usePermissionsStore } from '@/stores/permissions'
+import { useViewMode } from '@/composables/useViewMode'
 import { logger } from '@yektayar/shared'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import ViewModeToggle from '@/components/shared/ViewModeToggle.vue'
 
 const { t } = useI18n()
 const permissionsStore = usePermissionsStore()
+const { viewMode } = useViewMode('users-view-mode', 'table') // Default to table view for users
 
 interface User {
   id: string
@@ -394,3 +473,301 @@ onMounted(() => {
   fetchUsers()
 })
 </script>
+
+<style scoped lang="scss">
+.users-view {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+
+  .header-content {
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 16px;
+      color: var(--text-secondary);
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+.filters-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-group {
+    &.flex-1 {
+      position: relative;
+    }
+
+    &.flex {
+      display: flex;
+      gap: 8px;
+    }
+  }
+
+  .search-input,
+  .filter-select {
+    width: 100%;
+    padding: 12px 16px;
+    padding-left: 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    }
+  }
+
+  .filter-select {
+    padding-left: 16px;
+  }
+}
+
+.users-table {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .loading-state,
+  .empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: var(--bg-secondary);
+      border-bottom: 2px solid var(--border-color);
+
+      th {
+        padding: 16px 24px;
+        text-align: right;
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background: var(--bg-secondary);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      td {
+        padding: 16px 24px;
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  .loading-state,
+  .empty-state {
+    grid-column: 1 / -1;
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+}
+
+.user-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .user-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--primary-gradient);
+    color: white;
+
+    .user-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .user-info {
+      flex: 1;
+
+      h3 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .user-card-body {
+    padding: 20px;
+
+    .user-detail {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        font-size: 13px;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .value {
+        font-size: 14px;
+        color: var(--text-primary);
+      }
+
+      .role-badge,
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .user-card-actions {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+
+    .btn-icon {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: var(--bg-tertiary);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      &.btn-danger:hover {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: #ef4444;
+        color: #ef4444;
+      }
+    }
+  }
+}
+
+.status-badge,
+.role-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  &.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+      transform: translateY(-2px);
+    }
+  }
+}
+</style>
