@@ -95,6 +95,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AssessmentsPage.vue')
       },
       {
+        path: 'assessments/history',
+        component: () => import('@/views/AssessmentHistoryPage.vue')
+      },
+      {
         path: 'assessments/:id',
         component: () => import('@/views/TakeAssessmentPage.vue')
       },
