@@ -291,12 +291,12 @@ const fetchResult = async () => {
     const resultId = route.params.resultId
     // TODO: Get userId from session store once authentication is fully implemented
     const userId = 1 // Placeholder for development
-    const response = await apiClient.get(`/api/assessments/results/${resultId}?userId=${userId}`)
-    if (response.data.success) {
-      result.value = response.data.data
+    const response = await apiClient.get(`/assessments/results/${resultId}?userId=${userId}`)
+    if (response.success && response.data) {
+      result.value = response.data
       logger.success('Loaded assessment result')
     } else {
-      logger.error('Failed to fetch assessment result:', response.data.error || 'Unknown error')
+      logger.error('Failed to fetch assessment result:', response.error || 'Unknown error')
       router.back()
     }
   } catch (error) {

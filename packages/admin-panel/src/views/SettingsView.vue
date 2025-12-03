@@ -234,7 +234,7 @@ const recentPages = ref<any[]>([])
 async function loadSettings() {
   loading.value = true
   try {
-    const response = await apiClient.get('/api/settings', { skipAuth: true })
+    const response = await apiClient.get('/settings', { skipAuth: true })
     if (response.success && response.data) {
       settings.value = {
         contact_phone: response.data.contact_phone || '',
@@ -266,7 +266,7 @@ async function saveSettings() {
     ]
 
     for (const setting of settingsToUpdate) {
-      await apiClient.put(`/api/settings/${setting.key}`, {
+      await apiClient.put(`/settings/${setting.key}`, {
         value: setting.value,
         type: setting.type
       }, { skipAuth: true })
@@ -284,7 +284,7 @@ async function saveSettings() {
 async function loadTickets() {
   loadingTickets.value = true
   try {
-    const response = await apiClient.get('/api/support/tickets?status=open', { skipAuth: true })
+    const response = await apiClient.get('/support/tickets?status=open', { skipAuth: true })
     if (response.success) {
       tickets.value = response.data || []
     }
@@ -298,7 +298,7 @@ async function loadTickets() {
 async function loadPages() {
   loadingPages.value = true
   try {
-    const response = await apiClient.get('/api/pages', { skipAuth: true })
+    const response = await apiClient.get('/pages', { skipAuth: true })
     if (response.success) {
       recentPages.value = response.data || []
     }

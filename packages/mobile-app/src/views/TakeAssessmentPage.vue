@@ -380,28 +380,14 @@ const canProceed = computed(() => {
 const fetchAssessment = async () => {
   try {
     const assessmentId = route.params.id
-    const response = await apiClient.get(`/api/assessments/${assessmentId}`)
-    
-    // Handle both response formats:
-    // 1. Wrapped: {success: true, data: {...}}
-    // 2. Direct: {...}
-    let data
-    if (response.data.success !== undefined) {
-      // Wrapped response
-      if (response.data.success) {
-        data = response.data.data
-      } else {
-        logger.error('Failed to fetch assessment:', response.data.error || 'Unknown error')
-        router.back()
-        return
-      }
+    const response = await apiClient.get(`/assessments/${assessmentId}`)
+    if (response.success && response.data) {
+      assessment.value = response.data
+      logger.success(`Loaded assessment: ${assessment.value.title}`)
     } else {
-      // Direct response
-      data = response.data
+      logger.error('Failed to fetch assessment:', response.error || 'Unknown error')
+      router.back()
     }
-    
-    assessment.value = data
-    logger.success(`Loaded assessment: ${assessment.value.title}`)
   } catch (error) {
     logger.error('Failed to fetch assessment:', error)
     router.back()
@@ -481,18 +467,17 @@ const submitAssessment = async () => {
     const answersArray = assessment.value.questions.map((_: any, index: number) => answers.value[index] || 0)
     
     // TODO: Get userId from session store once authentication is fully implemented
-    const response = await apiClient.post(`/api/assessments/${assessmentId}/submit`, {
+    const response = await apiClient.post(`/assessments/${assessmentId}/submit`, {
       answers: answersArray,
       demographicInfo: demographicInfo.value,
       userId: 1, // Placeholder for development,
     })
     
-    if (response.data.success) {
+    if (response.success && response.data) {
       logger.success('Assessment submitted successfully')
-      // Navigate to results page
-      router.push(`/tabs/assessments/results/${response.data.data.id}`)
+      router.push(`/tabs/assessments/results/${response.data.id}`)
     } else {
-      logger.error('Failed to submit assessment:', response.data.error || 'Unknown error')
+      logger.error('Failed to submit assessment:', response.error || 'Unknown error')
       const alert = await alertController.create({
         header: locale.value === 'fa' ? 'خطا' : 'Error',
         message: locale.value === 'fa' 
