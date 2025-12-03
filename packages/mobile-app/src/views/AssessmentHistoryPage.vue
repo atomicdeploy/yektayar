@@ -221,7 +221,7 @@ onMounted(() => {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: var(--ion-color-light);
+    background: var(--ion-color-light-tint);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -236,7 +236,7 @@ onMounted(() => {
   h3 {
     font-size: 1.25rem;
     font-weight: 600;
-    color: var(--ion-color-dark);
+    color: var(--ion-text-color);
     margin: 0 0 0.5rem 0;
   }
 
@@ -259,7 +259,7 @@ onMounted(() => {
 }
 
 .history-card {
-  background: var(--ion-color-light);
+  background: var(--ion-card-background);
   border-radius: 16px;
   padding: 1.25rem;
   display: flex;
@@ -268,6 +268,7 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--ion-border-color);
 
   &:active {
     transform: scale(0.98);
@@ -296,7 +297,7 @@ onMounted(() => {
     h3 {
       font-size: 1rem;
       font-weight: 600;
-      color: var(--ion-color-dark);
+      color: var(--ion-text-color);
       margin: 0 0 0.5rem 0;
       overflow: hidden;
       text-overflow: ellipsis;
