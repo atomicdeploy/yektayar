@@ -69,7 +69,30 @@
 
           <!-- Available Assessments -->
           <div class="section">
-            <h2 class="section-title">{{ locale === 'fa' ? 'ارزیابی‌های در دسترس' : 'Available Assessments' }}</h2>
+            <div class="section-header">
+              <h2 class="section-title">
+                {{ locale === 'fa' ? 'ارزیابی‌های در دسترس' : 'Available Assessments' }}
+                <span class="count-badge">{{ assessments.length }}</span>
+              </h2>
+              <div class="view-toggle">
+                <ion-button 
+                  fill="clear" 
+                  size="small" 
+                  :class="{ active: viewMode === 'grid' }"
+                  @click="viewMode = 'grid'"
+                >
+                  <ion-icon :icon="grid"></ion-icon>
+                </ion-button>
+                <ion-button 
+                  fill="clear" 
+                  size="small" 
+                  :class="{ active: viewMode === 'list' }"
+                  @click="viewMode = 'list'"
+                >
+                  <ion-icon :icon="list"></ion-icon>
+                </ion-button>
+              </div>
+            </div>
             
             <!-- Loading State -->
             <div v-if="loading" class="loading-container">
@@ -77,8 +100,8 @@
               <p>{{ locale === 'fa' ? 'در حال بارگذاری...' : 'Loading...' }}</p>
             </div>
 
-            <!-- Assessments List -->
-            <div v-else-if="assessments.length > 0" class="assessments-list">
+            <!-- Assessments Grid View -->
+            <div v-else-if="assessments.length > 0 && viewMode === 'grid'" class="assessments-list">
               <div 
                 v-for="(assessment, index) in assessments" 
                 :key="assessment.id"
@@ -132,6 +155,40 @@
               </div>
             </div>
 
+            <!-- Assessments List View -->
+            <div v-else-if="assessments.length > 0 && viewMode === 'list'" class="assessments-rows">
+              <div 
+                v-for="(assessment, index) in assessments" 
+                :key="assessment.id"
+                class="assessment-row"
+                :class="`assessment-row-${index % 3}`"
+                @click="startAssessment(assessment.id)"
+              >
+                <div class="row-icon">
+                  <ion-icon :icon="clipboard"></ion-icon>
+                </div>
+                <div class="row-content">
+                  <h3>{{ assessment.title }}</h3>
+                  <p class="row-description">{{ assessment.description }}</p>
+                  <div class="row-meta">
+                    <span class="meta-badge">
+                      <ion-icon :icon="time"></ion-icon>
+                      {{ calculateDuration(assessment.question_count) }} {{ locale === 'fa' ? 'دقیقه' : 'min' }}
+                    </span>
+                    <span class="meta-badge">
+                      <ion-icon :icon="help"></ion-icon>
+                      {{ assessment.question_count || 0 }} {{ locale === 'fa' ? 'سوال' : 'questions' }}
+                    </span>
+                    <span class="meta-badge">
+                      <ion-icon :icon="layers"></ion-icon>
+                      {{ countSections(assessment) }} {{ locale === 'fa' ? 'بخش' : 'sections' }}
+                    </span>
+                  </div>
+                </div>
+                <ion-icon :icon="chevronForward" class="row-arrow"></ion-icon>
+              </div>
+            </div>
+
             <!-- Empty State -->
             <div v-if="!loading && assessments.length === 0" class="empty-state">
               <ion-icon :icon="documentText"></ion-icon>
@@ -142,22 +199,37 @@
 
           <!-- Info Card -->
           <div class="info-card">
-            <div class="info-icon">
-              <ion-icon :icon="informationCircle"></ion-icon>
+            <div class="info-header">
+              <div class="info-icon">
+                <ion-icon :icon="informationCircle"></ion-icon>
+              </div>
+              <h4>{{ locale === 'fa' ? 'نکات مهم' : 'Important Notes' }}</h4>
             </div>
             <div class="info-content">
-              <h4>{{ locale === 'fa' ? 'نکات مهم' : 'Important Notes' }}</h4>
-              <ul>
-                <li>{{ locale === 'fa' 
+              <div class="info-item">
+                <div class="info-item-icon">
+                  <ion-icon :icon="checkmarkCircle"></ion-icon>
+                </div>
+                <p>{{ locale === 'fa' 
                   ? 'با دقت و صداقت به سوالات پاسخ دهید' 
-                  : 'Answer questions carefully and honestly' }}</li>
-                <li>{{ locale === 'fa' 
+                  : 'Answer questions carefully and honestly' }}</p>
+              </div>
+              <div class="info-item">
+                <div class="info-item-icon">
+                  <ion-icon :icon="lockClosed"></ion-icon>
+                </div>
+                <p>{{ locale === 'fa' 
                   ? 'نتایج کاملاً محرمانه خواهند ماند' 
-                  : 'Results will remain completely confidential' }}</li>
-                <li>{{ locale === 'fa' 
+                  : 'Results will remain completely confidential' }}</p>
+              </div>
+              <div class="info-item">
+                <div class="info-item-icon">
+                  <ion-icon :icon="repeat"></ion-icon>
+                </div>
+                <p>{{ locale === 'fa' 
                   ? 'می‌توانید ارزیابی را چندین بار تکرار کنید' 
-                  : 'You can repeat assessments multiple times' }}</li>
-              </ul>
+                  : 'You can repeat assessments multiple times' }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -191,6 +263,10 @@ import {
   star,
   layers,
   arrowForward,
+  grid,
+  list,
+  lockClosed,
+  repeat,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -203,6 +279,7 @@ const router = useRouter()
 const assessments = ref<any[]>([])
 const assessmentHistory = ref<any[]>([])
 const loading = ref(true)
+const viewMode = ref<'grid' | 'list'>('grid')
 
 const fetchAssessments = async () => {
   try {
@@ -382,8 +459,60 @@ onMounted(() => {
 .section-title {
   font-size: 1.25rem;
   font-weight: 700;
-  margin: 0;
+  margin: 0 0 1em 0;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 28px;
+  padding: 0 10px;
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-primary-shade) 100%);
+  color: white;
+  border-radius: 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(var(--ion-color-primary-rgb), 0.3);
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--surface-1);
+  border-radius: 8px;
+  padding: 2px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.view-toggle ion-button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  min-width: 40px;
+  min-height: 36px;
+  margin: 0;
+  font-size: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.view-toggle ion-button::part(native) {
+  border-radius: 6px;
+}
+
+.view-toggle ion-button.active {
+  --background: var(--ion-color-primary);
+  --color: white;
+}
+
+.view-toggle ion-button.active ion-icon {
+  color: white;
 }
 
 /* History Cards */
@@ -782,53 +911,206 @@ onMounted(() => {
 /* Info Card */
 .info-card {
   margin: 0 1rem 1rem;
-  padding: 1.25rem;
-  background: var(--glass-background);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(var(--ion-color-primary-rgb), 0.05) 0%, rgba(var(--ion-color-primary-rgb), 0.02) 100%);
+  border: 1px solid rgba(var(--ion-color-primary-rgb), 0.1);
   border-radius: 16px;
+}
+
+.info-header {
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 
 .info-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--accent-gradient);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--ion-color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.3);
 }
 
 .info-icon ion-icon {
-  font-size: 24px;
+  font-size: 22px;
   color: white;
 }
 
-.info-content h4 {
-  font-size: 1rem;
-  font-weight: 600;
+.info-header h4 {
+  font-size: 1.125rem;
+  font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 0.75rem 0;
-}
-
-.info-content ul {
   margin: 0;
-  padding: 0 0 0 1.25rem;
-  list-style-type: disc;
 }
 
-.info-content li {
-  font-size: 0.875rem;
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.info-item-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(var(--ion-color-success-rgb), 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-item-icon ion-icon {
+  font-size: 16px;
+  color: var(--ion-color-success);
+}
+
+.info-item p {
+  font-size: 0.9375rem;
   color: var(--text-secondary);
   line-height: 1.6;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  flex: 1;
 }
 
-.info-content li:last-child {
-  margin-bottom: 0;
+/* Assessments Rows View */
+.assessments-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.assessment-row {
+  background: var(--surface-1);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+.assessment-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--ion-color-primary);
+  opacity: 0;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.assessment-row:active {
+  transform: scale(0.98);
+}
+
+.assessment-row:hover::before {
+  opacity: 1;
+}
+
+.assessment-row-0 .row-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.assessment-row-1 .row-icon {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.assessment-row-2 .row-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.row-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.row-icon ion-icon {
+  font-size: 28px;
+  color: white;
+}
+
+.row-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-content h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+}
+
+.row-description {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0 0 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.row-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 4px 8px;
+  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--ion-color-primary);
+  font-weight: 500;
+}
+
+.meta-badge ion-icon {
+  font-size: 14px;
+}
+
+.row-arrow {
+  font-size: 24px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.assessment-row:hover .row-arrow {
+  transform: translateX(4px);
+}
 }
 
 /* Animations */
