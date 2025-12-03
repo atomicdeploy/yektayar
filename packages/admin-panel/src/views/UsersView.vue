@@ -620,198 +620,75 @@ async function fetchUsers() {
   margin: 0 auto;
 }
 
-.view-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-
-  .header-content {
-    h1 {
-      margin: 0 0 8px 0;
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .subtitle {
-      margin: 0;
-      font-size: 16px;
-      color: var(--text-secondary);
-    }
-  }
-
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+/* Override search input padding for icon */
+.filters-section .search-input {
+  padding-left: 40px;
 }
 
-.filters-section {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 16px;
-  margin-bottom: 32px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-
-  .filter-group {
-    &.flex-1 {
-      position: relative;
-    }
-
-    &.flex {
-      display: flex;
-      gap: 8px;
-    }
-  }
-
-  .search-input,
-  .filter-select {
-    width: 100%;
-    padding: 12px 16px;
-    padding-left: 40px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 14px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
-    }
-  }
-
-  .filter-select {
-    padding-left: 16px;
-  }
-}
-
+/* Users-specific table styles extending base data-table */
 .users-table {
-  background: var(--card-bg);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  /* Uses data-table base styles from components.scss */
+  /* Override specific colors for users table */
+  table thead {
+    background: rgb(249 250 251);
+    border-bottom: 1px solid rgb(229 231 235);
 
-  .loading-state,
-  .empty-state {
-    padding: 60px 20px;
-    text-align: center;
-    color: var(--text-secondary);
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-
-    thead {
-      background: var(--bg-secondary);
-      border-bottom: 2px solid var(--border-color);
-
-      th {
-        padding: 16px 24px;
-        text-align: right;
-        font-weight: 600;
-        font-size: 12px;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
+    @media (prefers-color-scheme: dark) {
+      background: rgb(55 65 81);
+      border-bottom-color: rgb(75 85 99);
     }
 
-    tbody {
-      tr {
-        border-bottom: 1px solid var(--border-color);
-        transition: background-color 0.2s ease;
+    th {
+      color: rgb(107 114 128);
 
-        &:hover {
-          background: var(--bg-secondary);
-        }
-
-        &:last-child {
-          border-bottom: none;
-        }
+      @media (prefers-color-scheme: dark) {
+        color: rgb(156 163 175);
       }
+    }
+  }
 
-      td {
-        padding: 16px 24px;
-        color: var(--text-primary);
-        font-size: 14px;
+  table tbody tr {
+    border-bottom: 1px solid rgb(229 231 235);
+
+    @media (prefers-color-scheme: dark) {
+      border-bottom-color: rgb(75 85 99);
+    }
+
+    &:hover {
+      background: rgb(249 250 251);
+
+      @media (prefers-color-scheme: dark) {
+        background: rgba(55, 65, 81, 0.5);
       }
     }
   }
 }
 
 .users-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-
+  /* Uses card-grid base styles from components.scss */
   .loading-state,
   .empty-state {
     grid-column: 1 / -1;
-    padding: 60px 20px;
-    text-align: center;
-    color: var(--text-secondary);
   }
 }
 
 .user-card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  /* Uses card base styles from components.scss */
+  .user-card-header {
+    /* Uses card-header base styles */
   }
 
-  .user-card-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px;
-    background: var(--primary-gradient);
-    color: white;
+  .user-avatar {
+    /* Uses card-icon base styles */
+    font-size: 20px;
+  }
 
-    .user-avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 600;
-    }
-
-    .user-info {
-      flex: 1;
-
-      h3 {
-        margin: 0 0 8px 0;
-        font-size: 18px;
-        font-weight: 600;
-      }
-    }
+  .user-info {
+    /* Uses card-title base styles */
   }
 
   .user-card-body {
-    padding: 20px;
+    /* Uses card-body base styles */
 
     .user-detail {
       display: flex;
@@ -835,210 +712,62 @@ async function fetchUsers() {
         color: var(--text-primary);
       }
 
-      .role-badge,
-      .status-badge {
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
-      }
+      /* role-badge and status-badge already defined in shared styles */
     }
   }
 
   .user-card-actions {
+    @extend .card-footer;
     display: flex;
     gap: 8px;
-    padding: 16px 20px;
-    border-top: 1px solid var(--border-color);
-    background: var(--bg-secondary);
 
     .btn-icon {
       flex: 1;
-      padding: 8px;
-      border: 1px solid var(--border-color);
-      background: var(--bg-primary);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &:hover {
-        background: var(--bg-tertiary);
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-      }
-
-      &.btn-danger:hover {
-        background: rgba(239, 68, 68, 0.1);
-        border-color: #ef4444;
-        color: #ef4444;
-      }
     }
   }
 }
 
-.status-badge,
+/* User-specific badge colors */
 .role-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-}
+  &.admin {
+    background: rgba(147, 51, 234, 0.2);
+    color: #9333ea;
 
-.btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+    @media (prefers-color-scheme: dark) {
+      color: #a855f7;
+    }
+  }
 
-  &.btn-primary {
-    background: var(--primary-gradient);
-    color: white;
+  &.psychologist {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
 
-    &:hover {
-      box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
-      transform: translateY(-2px);
+    @media (prefers-color-scheme: dark) {
+      color: #60a5fa;
+    }
+  }
+
+  &.moderator {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+
+    @media (prefers-color-scheme: dark) {
+      color: #34d399;
+    }
+  }
+
+  &.user {
+    background: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+
+    @media (prefers-color-scheme: dark) {
+      color: #9ca3af;
     }
   }
 }
 
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-}
-
-.modal-content {
-  background: var(--bg-primary);
-  border-radius: 16px;
-  max-width: 600px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  border-bottom: 1px solid var(--border-color);
-
-  h2 {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  .btn-close {
-    width: 32px;
-    height: 32px;
-    border: none;
-    background: transparent;
-    font-size: 32px;
-    line-height: 1;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: var(--text-primary);
-    }
-  }
-}
-
-.modal-body {
-  padding: 24px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-
-  label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  .form-control {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 14px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    transition: all 0.3s ease;
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
-    }
-  }
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.form-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 32px;
-
-  .btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-}
-
-.kbd {
-  display: inline-block;
-  padding: 2px 6px;
-  font-size: 11px;
-  font-family: monospace;
-  font-weight: 600;
-  line-height: 1;
-  color: rgb(107 114 128);
-  background: rgb(243 244 246);
-  border: 1px solid rgb(209 213 219);
-  border-radius: 4px;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-
-  @media (prefers-color-scheme: dark) {
-    color: rgb(209 213 219);
-    background: rgb(55 65 81);
-    border-color: rgb(75 85 99);
-  }
-}
+/* Styles already in shared components.scss - removed duplicates */
+/* - .btn, .btn-primary, .btn-secondary */
+/* - .modal-overlay, .modal-content, .modal-header */
+/* - .form-group, .form-actions, .kbd */
 </style>

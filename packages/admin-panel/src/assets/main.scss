@@ -1,6 +1,9 @@
 /* Import Sahel Font */
 @import './fonts.scss';
 
+/* Import shared component styles */
+@import './components.scss';
+
 @import "tailwindcss";
 
 /* Tailwind v4 Theme Configuration */
