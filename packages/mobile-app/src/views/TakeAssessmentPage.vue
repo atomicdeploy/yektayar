@@ -295,20 +295,25 @@
           fill="clear"
           @click="previousStep"
           :disabled="currentStep === 0"
+          class="nav-button"
         >
           <ion-icon :icon="chevronBack" slot="icon-only" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
         </ion-button>
-        <div class="step-indicators">
-          <div 
-            v-for="step in totalSteps + 1" 
-            :key="step"
-            :class="['step-indicator', { active: step - 1 === currentStep, completed: step - 1 < currentStep }]"
-          ></div>
+        <div class="step-indicators-wrapper">
+          <div class="step-indicators" ref="stepIndicatorsRef">
+            <div 
+              v-for="step in totalSteps + 1" 
+              :key="step"
+              :ref="el => { if (step - 1 === currentStep) activeStepRef = el }"
+              :class="['step-indicator', { active: step - 1 === currentStep, completed: step - 1 < currentStep }]"
+            ></div>
+          </div>
         </div>
         <ion-button 
           fill="clear"
           @click="nextStep"
           :disabled="!canProceed"
+          class="nav-button"
         >
           <ion-icon :icon="chevronForward" slot="icon-only" :style="locale === 'fa' ? 'transform: scaleX(-1)' : ''"></ion-icon>
         </ion-button>
@@ -318,7 +323,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import {
   IonContent,
   IonHeader,
@@ -367,6 +372,8 @@ const demographicInfo = ref({
 })
 const answers = ref<{ [key: number]: number }>({})
 const submitting = ref(false)
+const stepIndicatorsRef = ref<HTMLElement | null>(null)
+const activeStepRef = ref<HTMLElement | null>(null)
 
 const totalSteps = computed(() => {
   if (!assessment.value?.questions) return 2
@@ -464,6 +471,18 @@ const previousStep = () => {
     currentStep.value--
   }
 }
+
+// Watch for step changes and scroll active indicator into view
+watch(currentStep, async () => {
+  await nextTick()
+  if (activeStepRef.value && stepIndicatorsRef.value) {
+    activeStepRef.value.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    })
+  }
+})
 
 const handleDemographicSubmit = () => {
   if (canProceed.value) {
@@ -991,11 +1010,55 @@ onMounted(() => {
   border-top: 1px solid var(--ion-border-color);
 }
 
+.nav-button {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.step-indicators-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  margin: 0 0.5rem;
+  
+  /* Gradient masks on sides for fading effect */
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, var(--ion-toolbar-background) 0%, transparent 100%);
+  }
+  
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, var(--ion-toolbar-background) 0%, transparent 100%);
+  }
+}
+
 .step-indicators {
   display: flex;
   gap: 0.5rem;
-  flex: 1;
-  justify-content: center;
+  padding: 0 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
 }
 
 .step-indicator {
@@ -1004,6 +1067,7 @@ onMounted(() => {
   border-radius: 50%;
   background: var(--ion-border-color);
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .step-indicator.active {
