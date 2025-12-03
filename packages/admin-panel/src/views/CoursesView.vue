@@ -62,10 +62,10 @@
     </div>
 
     <div v-else-if="viewMode === 'card'" class="courses-grid">
-      <div v-for="course in filteredCourses" :key="course.id" class="course-card">
+      <div v-for="course in filteredCourses" :key="course.id" class="course-card" @click="editCourseInModal(course)">
         <div class="course-image">
           <img :src="course.thumbnailUrl || '/placeholder-course.jpg'" :alt="course.title" />
-          <div class="course-overlay">
+          <div class="course-overlay" @click.stop>
             <button class="btn-icon" @click="editCourseInModal(course)">
               <PencilIcon class="w-5 h-5" />
             </button>
@@ -266,10 +266,12 @@
             </div>
             <div class="form-actions">
               <button type="button" class="btn btn-secondary" @click="closeModal">
-                انصراف
+                <span>انصراف</span>
+                <kbd class="kbd">Esc</kbd>
               </button>
               <button type="submit" class="btn btn-primary">
-                {{ editingCourse ? 'ذخیره تغییرات' : 'ایجاد دوره' }}
+                <span>{{ editingCourse ? 'ذخیره تغییرات' : 'ایجاد دوره' }}</span>
+                <kbd class="kbd">Ctrl+Enter</kbd>
               </button>
             </div>
           </form>
@@ -280,7 +282,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -448,9 +450,25 @@ const closeModal = () => {
   }
 }
 
+// Handle keyboard shortcuts
+function handleKeyDown(event: KeyboardEvent) {
+  if (showCreateModal.value && event.key === 'Escape') {
+    closeModal()
+  }
+  if (showCreateModal.value && event.ctrlKey && event.key === 'Enter') {
+    event.preventDefault()
+    saveCourse()
+  }
+}
+
 onMounted(() => {
   // TODO: Fetch courses from API
   loading.value = false
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeyDown)
 })
 </script>
 
@@ -544,6 +562,7 @@ onMounted(() => {
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-4px);
@@ -992,6 +1011,26 @@ onMounted(() => {
     &:hover {
       background: var(--bg-tertiary);
     }
+  }
+}
+
+.kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: monospace;
+  font-weight: 600;
+  line-height: 1;
+  color: rgb(107 114 128);
+  background: rgb(243 244 246);
+  border: 1px solid rgb(209 213 219);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(209 213 219);
+    background: rgb(55 65 81);
+    border-color: rgb(75 85 99);
   }
 }
 </style>

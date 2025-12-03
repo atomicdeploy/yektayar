@@ -39,7 +39,7 @@
 
     <!-- Tests List -->
     <div v-if="viewMode === 'card'" class="tests-grid">
-      <div v-for="test in filteredTests" :key="test.id" class="test-card">
+      <div v-for="test in filteredTests" :key="test.id" class="test-card" @click="editTestInModal(test)">
         <div class="test-header">
           <div class="test-icon">
             <i class="icon-test"></i>
@@ -81,7 +81,7 @@
             </div>
           </div>
         </div>
-        <div class="test-actions">
+        <div class="test-actions" @click.stop>
           <button class="btn-action" @click="viewTest(test)" title="مشاهده جزئیات">
             <EyeIcon class="w-5 h-5" />
           </button>
@@ -252,10 +252,12 @@
 
             <div class="form-actions">
               <button type="button" class="btn btn-secondary" @click="closeModals">
-                انصراف
+                <span>انصراف</span>
+                <kbd class="kbd">Esc</kbd>
               </button>
               <button type="submit" class="btn btn-primary" :disabled="saving">
-                {{ saving ? 'در حال ذخیره...' : 'ذخیره' }}
+                <span>{{ saving ? 'در حال ذخیره...' : 'ذخیره' }}</span>
+                <kbd class="kbd" v-if="!saving">Ctrl+Enter</kbd>
               </button>
             </div>
           </form>
@@ -413,7 +415,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -721,9 +723,25 @@ const viewResultDetail = (_result: any) => {
   alert('View result detail - to be implemented')
 }
 
+// Handle keyboard shortcuts
+function handleKeyDown(event: KeyboardEvent) {
+  if ((showCreateModal.value || showEditModal.value) && event.key === 'Escape') {
+    closeModals()
+  }
+  if ((showCreateModal.value || showEditModal.value) && event.ctrlKey && event.key === 'Enter' && !saving.value) {
+    event.preventDefault()
+    saveTest()
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   fetchTests()
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeyDown)
 })
 </script>
 
@@ -928,6 +946,7 @@ onMounted(() => {
   border: 1px solid var(--border-color);
   overflow: hidden;
   transition: all 0.2s;
+  cursor: pointer;
 }
 
 .test-card:hover {
@@ -1386,5 +1405,25 @@ onMounted(() => {
 
 .results-table tr:hover {
   background: var(--bg-secondary);
+}
+
+.kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: monospace;
+  font-weight: 600;
+  line-height: 1;
+  color: rgb(107 114 128);
+  background: rgb(243 244 246);
+  border: 1px solid rgb(209 213 219);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(209 213 219);
+    background: rgb(55 65 81);
+    border-color: rgb(75 85 99);
+  }
 }
 </style>

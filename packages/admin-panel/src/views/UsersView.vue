@@ -93,7 +93,8 @@
           <tr
             v-for="user in paginatedUsers"
             :key="user.id"
-            class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+            @click="openUserEdit(user)"
           >
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-3">
@@ -137,9 +138,9 @@
               <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDate(user.createdAt) }}</p>
             </td>
             <td v-if="permissionsStore.hasPermission('edit_users')" class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2" @click.stop>
                 <button
-                  @click="editUser(user.id)"
+                  @click="editUser(user)"
                   class="p-1.5 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                   :title="t('edit')"
                 >
@@ -171,7 +172,7 @@
         {{ t('users_page.no_users') }}
       </div>
 
-      <div v-else v-for="user in paginatedUsers" :key="user.id" class="user-card">
+      <div v-else v-for="user in paginatedUsers" :key="user.id" class="user-card" @click="openUserEdit(user)">
         <div class="user-card-header">
           <div class="user-avatar">
             <span>{{ getInitials(user.name) }}</span>
@@ -213,9 +214,9 @@
             <span class="value">{{ formatDate(user.createdAt) }}</span>
           </div>
         </div>
-        <div v-if="permissionsStore.hasPermission('edit_users')" class="user-card-actions">
+        <div v-if="permissionsStore.hasPermission('edit_users')" class="user-card-actions" @click.stop>
           <button
-            @click="editUser(user.id)"
+            @click="editUser(user)"
             class="btn-icon"
             :title="t('edit')"
           >
@@ -268,11 +269,80 @@
         </button>
       </div>
     </div>
+
+    <!-- Edit User Modal -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>{{ t('users_page.edit_user') }}</h2>
+          <button class="btn-close" @click="closeEditModal">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="saveUser">
+            <div class="form-group">
+              <label>{{ t('users_page.name') }} *</label>
+              <input
+                type="text"
+                v-model="userForm.name"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="form-group">
+              <label>{{ t('users_page.email') }} *</label>
+              <input
+                type="email"
+                v-model="userForm.email"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="form-group">
+              <label>{{ t('users_page.phone') }}</label>
+              <input
+                type="tel"
+                v-model="userForm.phone"
+                class="form-control"
+              />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ t('users_page.role') }} *</label>
+                <select v-model="userForm.role" required class="form-control">
+                  <option value="admin">{{ t('roles.admin') }}</option>
+                  <option value="psychologist">{{ t('roles.psychologist') }}</option>
+                  <option value="user">{{ t('roles.user') }}</option>
+                  <option value="moderator">{{ t('roles.moderator') }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>{{ t('users_page.status') }} *</label>
+                <select v-model="userForm.status" required class="form-control">
+                  <option value="active">{{ t('status.active') }}</option>
+                  <option value="inactive">{{ t('status.inactive') }}</option>
+                  <option value="blocked">{{ t('status.blocked') }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" @click="closeEditModal">
+                <span>{{ t('cancel') }}</span>
+                <kbd class="kbd">Esc</kbd>
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <span>{{ t('save') }}</span>
+                <kbd class="kbd">Ctrl+Enter</kbd>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   MagnifyingGlassIcon,
@@ -307,6 +377,16 @@ const filterRole = ref('')
 const filterStatus = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
+
+const showEditModal = ref(false)
+const editingUser = ref<User | null>(null)
+const userForm = ref({
+  name: '',
+  email: '',
+  phone: '',
+  role: 'user' as User['role'],
+  status: 'active' as User['status'],
+})
 
 // Mock data for development
 const mockUsers: User[] = [
@@ -445,15 +525,78 @@ function formatDate(date: Date): string {
   }).format(date)
 }
 
-function editUser(id: string) {
-  logger.info('Edit user:', id)
-  // TODO: Implement edit user modal
+function openUserEdit(user: User) {
+  editingUser.value = user
+  userForm.value = {
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+    status: user.status,
+  }
+  showEditModal.value = true
+}
+
+function editUser(user: User) {
+  openUserEdit(user)
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+  editingUser.value = null
+  userForm.value = {
+    name: '',
+    email: '',
+    phone: '',
+    role: 'user',
+    status: 'active',
+  }
+}
+
+function saveUser() {
+  if (editingUser.value) {
+    // Update existing user
+    const index = users.value.findIndex((u) => u.id === editingUser.value!.id)
+    if (index !== -1) {
+      users.value[index] = {
+        ...users.value[index],
+        ...userForm.value,
+      }
+    }
+    logger.info('User updated:', editingUser.value.id)
+  }
+  closeEditModal()
 }
 
 function deleteUser(id: string) {
-  logger.info('Delete user:', id)
-  // TODO: Implement delete confirmation
+  if (confirm(t('messages.confirm_delete'))) {
+    const index = users.value.findIndex((u) => u.id === id)
+    if (index !== -1) {
+      users.value.splice(index, 1)
+    }
+    logger.info('User deleted:', id)
+  }
 }
+
+// Handle keyboard shortcuts
+function handleKeyDown(event: KeyboardEvent) {
+  if (showEditModal.value && event.key === 'Escape') {
+    closeEditModal()
+  }
+  if (showEditModal.value && event.ctrlKey && event.key === 'Enter') {
+    event.preventDefault()
+    saveUser()
+  }
+}
+
+onMounted(() => {
+  fetchUsers()
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeyDown)
+})
 
 async function fetchUsers() {
   isLoading.value = true
@@ -468,10 +611,6 @@ async function fetchUsers() {
     isLoading.value = false
   }
 }
-
-onMounted(() => {
-  fetchUsers()
-})
 </script>
 
 <style scoped lang="scss">
@@ -633,6 +772,7 @@ onMounted(() => {
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-4px);
@@ -768,6 +908,137 @@ onMounted(() => {
       box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
       transform: translateY(-2px);
     }
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .btn-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    }
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: monospace;
+  font-weight: 600;
+  line-height: 1;
+  color: rgb(107 114 128);
+  background: rgb(243 244 246);
+  border: 1px solid rgb(209 213 219);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+
+  @media (prefers-color-scheme: dark) {
+    color: rgb(209 213 219);
+    background: rgb(55 65 81);
+    border-color: rgb(75 85 99);
   }
 }
 </style>
