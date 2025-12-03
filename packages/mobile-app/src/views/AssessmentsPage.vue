@@ -181,7 +181,7 @@ const loading = ref(true)
 const fetchAssessments = async () => {
   try {
     loading.value = true
-    const response = await apiClient.get('/api/assessments')
+    const response = await apiClient.get('/assessments')
     
     if (response.success && response.data) {
       assessments.value = response.data
@@ -202,7 +202,7 @@ const fetchAssessmentHistory = async () => {
   try {
     // TODO: Get userId from session store once authentication is fully implemented
     const userId = 1 // Placeholder for development
-    const response = await apiClient.get(`/api/assessments/user/history?userId=${userId}`)
+    const response = await apiClient.get(`/assessments/user/history?userId=${userId}`)
     
     if (response.success && response.data) {
       assessmentHistory.value = response.data

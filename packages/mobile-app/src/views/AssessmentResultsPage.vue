@@ -291,7 +291,7 @@ const fetchResult = async () => {
     const resultId = route.params.resultId
     // TODO: Get userId from session store once authentication is fully implemented
     const userId = 1 // Placeholder for development
-    const response = await apiClient.get(`/api/assessments/results/${resultId}?userId=${userId}`)
+    const response = await apiClient.get(`/assessments/results/${resultId}?userId=${userId}`)
     if (response.success && response.data) {
       result.value = response.data
       logger.success('Loaded assessment result')

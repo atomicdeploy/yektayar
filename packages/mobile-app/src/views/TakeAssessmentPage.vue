@@ -380,7 +380,7 @@ const canProceed = computed(() => {
 const fetchAssessment = async () => {
   try {
     const assessmentId = route.params.id
-    const response = await apiClient.get(`/api/assessments/${assessmentId}`)
+    const response = await apiClient.get(`/assessments/${assessmentId}`)
     if (response.success && response.data) {
       assessment.value = response.data
       logger.success(`Loaded assessment: ${assessment.value.title}`)
@@ -467,7 +467,7 @@ const submitAssessment = async () => {
     const answersArray = assessment.value.questions.map((_: any, index: number) => answers.value[index] || 0)
     
     // TODO: Get userId from session store once authentication is fully implemented
-    const response = await apiClient.post(`/api/assessments/${assessmentId}/submit`, {
+    const response = await apiClient.post(`/assessments/${assessmentId}/submit`, {
       answers: answersArray,
       demographicInfo: demographicInfo.value,
       userId: 1, // Placeholder for development,

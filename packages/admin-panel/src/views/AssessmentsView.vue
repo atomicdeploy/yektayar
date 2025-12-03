@@ -412,7 +412,7 @@ const filteredTests = computed(() => {
 const fetchTests = async () => {
   try {
     loading.value = true
-    const response = await apiClient.get<any[]>('/api/assessments')
+    const response = await apiClient.get<any[]>('/assessments')
     if (response.success && response.data) {
       tests.value = response.data
     }
@@ -446,7 +446,7 @@ const manageQuestions = async (test: any) => {
   selectedTest.value = test
   
   try {
-    const response = await apiClient.get<any>(`/api/assessments/${test.id}`)
+    const response = await apiClient.get<any>(`/assessments/${test.id}`)
     if (response.success && response.data) {
       const testData = response.data
       
@@ -472,7 +472,7 @@ const viewResults = async (test: any) => {
   selectedTest.value = test
   
   try {
-    const response = await apiClient.get<any[]>(`/api/assessments/${test.id}/results`)
+    const response = await apiClient.get<any[]>(`/assessments/${test.id}/results`)
     if (response.success && response.data) {
       results.value = response.data
     }
@@ -489,7 +489,7 @@ const deleteTest = async (test: any) => {
   }
 
   try {
-    await apiClient.delete(`/api/assessments/${test.id}`)
+    await apiClient.delete(`/assessments/${test.id}`)
     tests.value = tests.value.filter((t) => t.id !== test.id)
   } catch (error) {
     logger.error('Error deleting test:', error)
@@ -502,7 +502,7 @@ const saveTest = async () => {
     saving.value = true
 
     if (showEditModal.value && selectedTest.value) {
-      const response = await apiClient.put<any>(`/api/assessments/${selectedTest.value.id}`, formData.value)
+      const response = await apiClient.put<any>(`/assessments/${selectedTest.value.id}`, formData.value)
       if (response.success && response.data) {
         const index = tests.value.findIndex((t) => t.id === selectedTest.value.id)
         if (index !== -1) {
@@ -510,7 +510,7 @@ const saveTest = async () => {
         }
       }
     } else {
-      const response = await apiClient.post<any>('/api/assessments', {
+      const response = await apiClient.post<any>('/assessments', {
         ...formData.value,
         questions: [],
       })
@@ -543,7 +543,7 @@ const saveQuestions = async () => {
       })),
     }))
 
-    const response = await apiClient.put(`/api/assessments/${selectedTest.value.id}`, {
+    const response = await apiClient.put(`/assessments/${selectedTest.value.id}`, {
       questions,
     })
 
