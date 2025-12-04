@@ -15,7 +15,7 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
   .get('/', async () => {
     try {
       const db = getDatabase()
-      const tests = await db`
+      const assessments = await db`
         SELECT 
           id,
           title,
@@ -29,7 +29,7 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
 
       return {
         success: true,
-        data: tests,
+        data: assessments,
       }
     } catch (error) {
       logger.error('Error fetching assessments:', error)
@@ -55,7 +55,7 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
       const db = getDatabase()
       const { id } = params
 
-      const [test] = await db`
+      const [assessment] = await db`
         SELECT 
           id,
           title,
@@ -67,7 +67,7 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
         WHERE id = ${id}
       `
 
-      if (!test) {
+      if (!assessment) {
         set.status = 404
         return {
           success: false,
@@ -77,7 +77,7 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
 
       return {
         success: true,
-        data: test,
+        data: assessment,
       }
     } catch (error) {
       logger.error('Error fetching assessment:', error)
@@ -117,18 +117,18 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
         }
       }
 
-      const [test] = await db`
+      const [assessment] = await db`
         INSERT INTO assessments (title, description, questions)
         VALUES (${title}, ${description || ''}, ${JSON.stringify(questions)})
         RETURNING *
       `
 
-      logger.info(`Test created: ${test.id} - ${title}`)
+      logger.info(`Assessment created: ${assessment.id} - ${title}`)
 
       set.status = 201
       return {
         success: true,
-        data: test,
+        data: assessment,
       }
     } catch (error) {
       logger.error('Error creating assessment:', error)
@@ -153,7 +153,7 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
 
   /**
    * POST /api/assessments/:id/submit
-   * Submit test answers and get results
+   * Submit assessment answers and get results
    */
   .post('/:id/submit', async ({ params, body, set, headers }) => {
     try {
@@ -183,12 +183,12 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
         }
       }
 
-      // Get the test
-      const [test] = await db`
+      // Get the assessment
+      const [assessment] = await db`
         SELECT * FROM assessments WHERE id = ${id}
       `
 
-      if (!test) {
+      if (!assessment) {
         set.status = 404
         return {
           success: false,
@@ -196,15 +196,15 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
         }
       }
 
-      // Calculate score based on test type
+      // Calculate score based on assessment type
       let score = 0
       let personalityType = null
       let maxScore = 0
       const sectionScores: Record<string, { title: string; titleEn: string; score: number; maxScore: number }> = {}
 
-      // For personality tests, sum up all answers
-      if (test.questions && Array.isArray(test.questions)) {
-        const questions = test.questions as any[]
+      // For personality assessments, sum up all answers
+      if (assessment.questions && Array.isArray(assessment.questions)) {
+        const questions = assessment.questions as any[]
         
         // Calculate total score
         questions.forEach((question, index) => {
@@ -266,7 +266,7 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
         RETURNING *
       `
 
-      logger.info(`Test submitted: User ${userId}, Test ${id}, Score: ${score}`)
+      logger.info(`Assessment submitted: User ${userId}, Assessment ${id}, Score: ${score}`)
 
       return {
         success: true,
@@ -296,14 +296,14 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
     }),
     detail: {
       tags: ['Assessments'],
-      summary: 'Submit test answers',
+      summary: 'Submit assessment answers',
       description: 'Submit answers to an assessment and receive results with score and personality type'
     }
   })
 
   /**
-   * GET /api/tests/:id/results
-   * Get all results for a specific test (user's own results)
+   * GET /api/assessments/:id/results
+   * Get all results for a specific assessment (user's own results)
    */
   .get('/:id/results', async ({ params, query, set }) => {
     try {
@@ -347,12 +347,12 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
     detail: {
       tags: ['Assessments'],
       summary: 'Get assessment results for user',
-      description: 'Get all results for a specific test for the current user'
+      description: 'Get all results for a specific assessment for the current user'
     }
   })
 
   /**
-   * GET /api/tests/results/:resultId
+   * GET /api/assessments/results/:resultId
    * Get a specific assessment result by ID
    */
   .get('/results/:resultId', async ({ params, query, set }) => {
@@ -392,24 +392,24 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
         data: result,
       }
     } catch (error) {
-      logger.error('Error fetching test result:', error)
+      logger.error('Error fetching assessment result:', error)
       set.status = 500
       return {
         success: false,
-        error: 'Failed to fetch test result',
+        error: 'Failed to fetch assessment result',
       }
     }
   }, {
     detail: {
       tags: ['Assessments'],
-      summary: 'Get specific test result',
-      description: 'Get detailed information about a specific test result by ID'
+      summary: 'Get specific assessment result',
+      description: 'Get detailed information about a specific assessment result by ID'
     }
   })
 
   /**
-   * GET /api/tests/user/history
-   * Get user's test history
+   * GET /api/assessments/user/history
+   * Get user's assessment history
    */
   .get('/user/history', async ({ query, set }) => {
     try {
@@ -444,17 +444,17 @@ export const assessmentRoutes = new Elysia({ prefix: '/api/assessments' })
         data: results,
       }
     } catch (error) {
-      logger.error('Error fetching user test history:', error)
+      logger.error('Error fetching user assessment history:', error)
       set.status = 500
       return {
         success: false,
-        error: 'Failed to fetch test history',
+        error: 'Failed to fetch assessment history',
       }
     }
   }, {
     detail: {
       tags: ['Assessments'],
-      summary: 'Get user test history',
-      description: 'Get all tests taken by the user with results'
+      summary: 'Get user assessment history',
+      description: 'Get all assessments taken by the user with results'
     }
   })

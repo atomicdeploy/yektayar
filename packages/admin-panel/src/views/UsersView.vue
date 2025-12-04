@@ -1,5 +1,5 @@
 <template>
-  <main class="users-view">
+  <main class="main-view">
     <!-- Header -->
     <div class="view-header">
       <div class="header-content">
@@ -21,12 +21,15 @@
     <!-- Search and Filter -->
     <div class="filters-section">
       <div class="filter-group flex-1 relative">
+        <!-- TODO: avoid using "left" and "right" style CSS, use "inline" instead; to support both RTL and LTR correctly -->
+        <!-- TODO: make this into re-usable component with selectable icon to make code DRY -->
         <MagnifyingGlassIcon class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           v-model="searchQuery"
           type="text"
           :placeholder="t('users_page.search_placeholder')"
           class="search-input"
+          style="padding-left: 3em"
         />
       </div>
       <div class="filter-group flex gap-2">
@@ -358,7 +361,7 @@ import ViewModeToggle from '@/components/shared/ViewModeToggle.vue'
 
 const { t } = useI18n()
 const permissionsStore = usePermissionsStore()
-const { viewMode } = useViewMode('users-view-mode', 'table') // Default to table view for users
+const { viewMode } = useViewMode('main-view-mode', 'table') // Default to table view for users
 
 interface User {
   id: string
@@ -614,21 +617,8 @@ async function fetchUsers() {
 </script>
 
 <style scoped lang="scss">
-.users-view {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* Override search input padding for icon */
-.filters-section .search-input {
-  padding-left: 40px;
-}
-
-/* Users-specific table styles extending base data-table */
+/* TODO: use our application's appropriate colors instead of hard coded ones below */
 .users-table {
-  /* Uses data-table base styles from components.scss */
-  /* Override specific colors for users table */
   table thead {
     background: rgb(249 250 251);
     border-bottom: 1px solid rgb(229 231 235);
@@ -665,7 +655,6 @@ async function fetchUsers() {
 }
 
 .users-grid {
-  /* Uses card-grid base styles from components.scss */
   .loading-state,
   .empty-state {
     grid-column: 1 / -1;
@@ -673,23 +662,11 @@ async function fetchUsers() {
 }
 
 .user-card {
-  /* Uses card base styles from components.scss */
-  .user-card-header {
-    /* Uses card-header base styles */
-  }
-
   .user-avatar {
-    /* Uses card-icon base styles */
     font-size: 20px;
   }
 
-  .user-info {
-    /* Uses card-title base styles */
-  }
-
   .user-card-body {
-    /* Uses card-body base styles */
-
     .user-detail {
       display: flex;
       justify-content: space-between;
@@ -711,57 +688,15 @@ async function fetchUsers() {
         font-size: 14px;
         color: var(--text-primary);
       }
-
-      /* role-badge and status-badge already defined in shared styles */
     }
   }
 
   .user-card-actions {
-    /* Uses card-footer base styles */
     display: flex;
     gap: 8px;
 
     .btn-icon {
       flex: 1;
-    }
-  }
-}
-
-/* User-specific badge colors */
-.role-badge {
-  &.admin {
-    background: rgba(147, 51, 234, 0.2);
-    color: #9333ea;
-
-    @media (prefers-color-scheme: dark) {
-      color: #a855f7;
-    }
-  }
-
-  &.psychologist {
-    background: rgba(59, 130, 246, 0.2);
-    color: #3b82f6;
-
-    @media (prefers-color-scheme: dark) {
-      color: #60a5fa;
-    }
-  }
-
-  &.moderator {
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
-
-    @media (prefers-color-scheme: dark) {
-      color: #34d399;
-    }
-  }
-
-  &.user {
-    background: rgba(107, 114, 128, 0.2);
-    color: #6b7280;
-
-    @media (prefers-color-scheme: dark) {
-      color: #9ca3af;
     }
   }
 }

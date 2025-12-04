@@ -1,5 +1,5 @@
 <template>
-  <main class="assessment-form-view">
+  <main class="form-view">
     <div class="form-header">
       <div class="header-content">
         <button class="btn-back" @click="goBack">
@@ -55,7 +55,7 @@
             <textarea
               v-model="formData.description_en"
               rows="6"
-              placeholder="Detailed description about the test..."
+              placeholder="Detailed description about the assessment..."
               class="form-control"
             ></textarea>
           </div>
@@ -174,12 +174,6 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.assessment-form-view {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
 .form-header {
   margin-bottom: 32px;
 

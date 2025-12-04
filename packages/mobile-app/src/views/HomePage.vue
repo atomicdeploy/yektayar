@@ -97,7 +97,7 @@
               <ion-icon :icon="documentText" class="action-icon"></ion-icon>
             </div>
             <div class="action-content">
-              <h3>{{ locale === 'fa' ? 'آزمون‌ها' : 'Tests' }}</h3>
+              <h3>{{ locale === 'fa' ? 'ارزیابی‌ها' : 'Assessment' }}</h3>
               <p>{{ locale === 'fa' ? 'ارزیابی و شناخت شخصیت' : 'Assessment and personality insights' }}</p>
             </div>
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>

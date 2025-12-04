@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <main class="main-view">
     <!-- Header -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">تنظیمات</h1>
@@ -206,7 +206,7 @@
         {{ saving ? 'در حال ذخیره...' : 'ذخیره تغییرات' }}
       </button>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -251,6 +251,8 @@ async function loadSettings() {
     loading.value = false
   }
 }
+
+/* TODO: use a elegant alternative with custom UI instead of `alert()` in the entire project */
 
 async function saveSettings() {
   saving.value = true

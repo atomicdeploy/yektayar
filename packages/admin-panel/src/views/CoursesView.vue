@@ -1,5 +1,5 @@
 <template>
-  <main class="courses-view">
+  <main class="main-view">
     <div class="view-header">
       <div class="header-content">
         <h1>{{ t('nav.courses') }}</h1>
@@ -300,7 +300,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 const { t } = useI18n()
 const router = useRouter()
 const permissionsStore = usePermissionsStore()
-const { viewMode } = useViewMode('courses-view-mode')
+const { viewMode } = useViewMode('main-view-mode')
 
 const searchQuery = ref('')
 const filterCategory = ref('')
@@ -473,12 +473,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-.courses-view {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
 .view-header {
   display: flex;
   justify-content: space-between;
@@ -638,8 +632,6 @@ onUnmounted(() => {
         color: var(--text-primary);
         flex: 1;
       }
-
-      /* status-badge styles are in shared components.scss */
     }
 
     .course-description {
@@ -838,10 +830,4 @@ onUnmounted(() => {
     color: var(--text-secondary);
   }
 }
-
-/* Styles from shared components.scss - removed duplicates */
-/* - .modal-overlay, .modal-content, .modal-header, .modal-body */
-/* - .form-group, .form-row, .form-actions */
-/* - .btn, .btn-primary, .btn-secondary */
-/* - .kbd */
 </style>

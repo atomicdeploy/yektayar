@@ -147,7 +147,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .splash-content {
   /* Default gradient - will be overridden by contentStyle */
   --background: linear-gradient(135deg, #01183a 0%, #012952 50%, #01183a 100%);
@@ -314,7 +314,7 @@ ion-spinner {
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.75rem;
   margin: 0;
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 .color-preview {

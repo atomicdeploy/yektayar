@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-back-button :text="locale === 'fa' ? 'بازگشت' : 'Back'"></ion-back-button>
         </ion-buttons>
-        <ion-title>{{ locale === 'fa' ? 'نتیجه آزمون' : 'Test Results' }}</ion-title>
+        <ion-title>{{ locale === 'fa' ? 'نتیجه ارزیابی' : 'Assessment Results' }}</ion-title>
         <ion-buttons slot="end">
           <ion-button @click="shareResults">
             <ion-icon slot="icon-only" :icon="shareSocial"></ion-icon>
@@ -43,11 +43,11 @@
                   <ion-icon :icon="checkmarkCircle"></ion-icon>
                 </div>
               </div>
-              <h2>{{ locale === 'fa' ? 'آزمون با موفقیت تکمیل شد!' : 'Test Completed Successfully!' }}</h2>
+              <h2>{{ locale === 'fa' ? 'ارزیابی با موفقیت تکمیل شد!' : 'Assessment Completed Successfully!' }}</h2>
               <p>{{ formatDate(result.completed_at) }}</p>
             </div>
 
-            <!-- Test Info Card -->
+            <!-- Assessment Info Card -->
             <div class="info-card">
               <h3>{{ result.title }}</h3>
               <p>{{ result.description }}</p>
@@ -154,7 +154,7 @@
               </div>
             </div>
 
-            <!-- Section Scores (for comprehensive tests) -->
+            <!-- Section Scores (for comprehensive assessments) -->
             <div v-if="result.answers?.sectionScores" class="sections-card">
               <h3>{{ locale === 'fa' ? 'نمرات بخش‌ها' : 'Section Scores' }}</h3>
               <p class="sections-subtitle">{{ locale === 'fa' 
@@ -205,13 +205,13 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-              <ion-button expand="block" @click="retakeTest">
+              <ion-button expand="block" @click="retakeAssessment">
                 <ion-icon :icon="refresh" slot="start"></ion-icon>
-                {{ locale === 'fa' ? 'انجام مجدد آزمون' : 'Retake Test' }}
+                {{ locale === 'fa' ? 'انجام مجدد ارزیابی' : 'Retake Assessment' }}
               </ion-button>
-              <ion-button expand="block" fill="outline" @click="viewAllTests">
+              <ion-button expand="block" fill="outline" @click="viewAllAssessments">
                 <ion-icon :icon="documentText" slot="start"></ion-icon>
-                {{ locale === 'fa' ? 'مشاهده سایر آزمون‌ها' : 'View Other Tests' }}
+                {{ locale === 'fa' ? 'مشاهده سایر ارزیابی‌ها' : 'View Other Assessments' }}
               </ion-button>
             </div>
           </div>
@@ -434,13 +434,13 @@ const getSectionInterpretation = (score: number, maxScore: number) => {
   }
 }
 
-const retakeTest = () => {
+const retakeAssessment = () => {
   if (result.value) {
     router.push(`/tabs/assessments/${result.value.assessment_id}`)
   }
 }
 
-const viewAllTests = () => {
+const viewAllAssessments = () => {
   router.push('/tabs/assessments')
 }
 

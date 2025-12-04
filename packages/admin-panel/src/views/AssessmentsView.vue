@@ -1,9 +1,9 @@
 <template>
-  <main class="tests-view">
+  <main class="main-view">
     <div class="view-header">
       <div class="header-content">
         <h1>{{ t('nav.assessments') }}</h1>
-        <p class="subtitle">مدیریت آزمون‌ها و ارزیابی‌های روانشناختی</p>
+        <p class="subtitle">مدیریت ارزیابی‌های روانشناختی</p>
       </div>
       <div class="header-actions">
         <ViewModeToggle v-model="viewMode" />
@@ -13,7 +13,7 @@
           @click="showCreateModal = true"
         >
           <PlusIcon class="w-5 h-5" />
-          افزودن آزمون جدید
+          افزودن ارزیابی جدید
         </button>
       </div>
     </div>
@@ -24,7 +24,7 @@
         <input
           type="text"
           v-model="searchQuery"
-          placeholder="جستجوی آزمون..."
+          placeholder="جستجوی ارزیابی..."
           class="search-input"
         />
       </div>
@@ -37,67 +37,67 @@
       </div>
     </div>
 
-    <!-- Tests List -->
-    <div v-if="viewMode === 'card'" class="tests-grid">
-      <div v-for="test in filteredTests" :key="test.id" class="test-card" @click="editTestInModal(test)">
-        <div class="test-header">
-          <div class="test-icon">
-            <i class="icon-test"></i>
+    <!-- Assessments List -->
+    <div v-if="viewMode === 'card'" class="assessments-grid">
+      <div v-for="assessment in filteredAssessments" :key="assessment.id" class="assessment-card" @click="editAssessmentInModal(assessment)">
+        <div class="assessment-header">
+          <div class="assessment-icon">
+            <i class="icon-assessment"></i>
           </div>
-          <div class="test-title-section">
-            <h3>{{ test.title }}</h3>
+          <div class="assessment-title-section">
+            <h3>{{ assessment.title }}</h3>
             <span
               class="status-badge"
-              :class="{ published: test.is_published, draft: !test.is_published }"
+              :class="{ published: assessment.is_published, draft: !assessment.is_published }"
             >
-              {{ test.is_published ? 'منتشر شده' : 'پیش‌نویس' }}
+              {{ assessment.is_published ? 'منتشر شده' : 'پیش‌نویس' }}
             </span>
           </div>
         </div>
-        <div class="test-content">
-          <p class="test-description">{{ truncate(test.description, 150) }}</p>
-          <div class="test-meta">
+        <div class="assessment-content">
+          <p class="assessment-description">{{ truncate(assessment.description, 150) }}</p>
+          <div class="assessment-meta">
             <div class="meta-item">
               <i class="icon-questions"></i>
-              <span>{{ test.question_count || 0 }} سوال</span>
+              <span>{{ assessment.question_count || 0 }} سوال</span>
             </div>
             <div class="meta-item">
               <i class="icon-sections"></i>
-              <span>{{ test.section_count || 0 }} بخش</span>
+              <span>{{ assessment.section_count || 0 }} بخش</span>
             </div>
             <div class="meta-item">
               <i class="icon-time"></i>
-              <span>{{ formatDate(test.created_at) }}</span>
+              <span>{{ formatDate(assessment.created_at) }}</span>
             </div>
           </div>
-          <div class="test-stats">
+          <div class="assessment-stats">
             <div class="stat">
-              <strong>{{ test.submission_count || 0 }}</strong>
-              <span>آزمون انجام شده</span>
+              <strong>{{ assessment.submission_count || 0 }}</strong>
+              <span>ارزیابی انجام شده</span>
             </div>
             <div class="stat">
-              <strong>{{ test.avg_score || 0 }}%</strong>
+              <strong>{{ assessment.avg_score || 0 }}%</strong>
               <span>میانگین امتیاز</span>
             </div>
           </div>
         </div>
-        <div class="test-actions" @click.stop>
-          <button class="btn-action" @click="viewTest(test)" title="مشاهده جزئیات">
+        <div class="assessment-actions" @click.stop>
+          <button class="btn-action" @click="viewAssessment(assessment)" title="مشاهده جزئیات">
             <EyeIcon class="w-5 h-5" />
           </button>
-          <button class="btn-action" @click="editTestInModal(test)" title="ویرایش سریع">
+          <button class="btn-action" @click="editAssessmentInModal(assessment)" title="ویرایش سریع">
             <PencilIcon class="w-5 h-5" />
           </button>
-          <button class="btn-action" @click="editTestInPage(test)" title="ویرایش کامل">
+          <button class="btn-action" @click="editAssessmentInPage(assessment)" title="ویرایش کامل">
             <ArrowTopRightOnSquareIcon class="w-5 h-5" />
           </button>
-          <button class="btn-action" @click="manageQuestions(test)" title="مدیریت سوالات">
+          <button class="btn-action" @click="manageQuestions(assessment)" title="مدیریت سوالات">
             <ListBulletIcon class="w-5 h-5" />
           </button>
-          <button class="btn-action" @click="viewResults(test)" title="مشاهده نتایج">
+          <button class="btn-action" @click="viewResults(assessment)" title="مشاهده نتایج">
             <ChartBarIcon class="w-5 h-5" />
           </button>
-          <button class="btn-action btn-danger" @click="deleteTest(test)" title="حذف">
+          <button class="btn-action btn-danger" @click="deleteAssessment(assessment)" title="حذف">
             <TrashIcon class="w-5 h-5" />
           </button>
         </div>
@@ -105,57 +105,57 @@
     </div>
 
     <!-- Table View -->
-    <div v-else class="tests-table">
+    <div v-else class="assessments-table">
       <table>
         <thead>
           <tr>
             <th>عنوان</th>
             <th>تعداد سوالات</th>
             <th>تعداد بخش‌ها</th>
-            <th>آزمون‌های انجام شده</th>
+            <th>ارزیابی‌های انجام شده</th>
             <th>میانگین امتیاز</th>
             <th>وضعیت</th>
             <th>عملیات</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="test in filteredTests" :key="test.id">
+          <tr v-for="assessment in filteredAssessments" :key="assessment.id">
             <td>
-              <div class="test-title-cell">
-                <strong>{{ test.title }}</strong>
-                <span class="test-desc-preview">{{ truncate(test.description, 50) }}</span>
+              <div class="assessment-title-cell">
+                <strong>{{ assessment.title }}</strong>
+                <span class="assessment-desc-preview">{{ truncate(assessment.description, 50) }}</span>
               </div>
             </td>
-            <td>{{ test.question_count || 0 }}</td>
-            <td>{{ test.section_count || 0 }}</td>
-            <td>{{ test.submission_count || 0 }}</td>
-            <td>{{ test.avg_score || 0 }}%</td>
+            <td>{{ assessment.question_count || 0 }}</td>
+            <td>{{ assessment.section_count || 0 }}</td>
+            <td>{{ assessment.submission_count || 0 }}</td>
+            <td>{{ assessment.avg_score || 0 }}%</td>
             <td>
               <span
                 class="status-badge"
-                :class="{ published: test.is_published, draft: !test.is_published }"
+                :class="{ published: assessment.is_published, draft: !assessment.is_published }"
               >
-                {{ test.is_published ? 'منتشر شده' : 'پیش‌نویس' }}
+                {{ assessment.is_published ? 'منتشر شده' : 'پیش‌نویس' }}
               </span>
             </td>
             <td>
               <div class="action-buttons">
-                <button class="btn-icon" @click="viewTest(test)" title="مشاهده جزئیات">
+                <button class="btn-icon" @click="viewAssessment(assessment)" title="مشاهده جزئیات">
                   <EyeIcon class="w-5 h-5" />
                 </button>
-                <button class="btn-icon" @click="editTestInModal(test)" title="ویرایش سریع">
+                <button class="btn-icon" @click="editAssessmentInModal(assessment)" title="ویرایش سریع">
                   <PencilIcon class="w-5 h-5" />
                 </button>
-                <button class="btn-icon" @click="editTestInPage(test)" title="ویرایش کامل">
+                <button class="btn-icon" @click="editAssessmentInPage(assessment)" title="ویرایش کامل">
                   <ArrowTopRightOnSquareIcon class="w-5 h-5" />
                 </button>
-                <button class="btn-icon" @click="manageQuestions(test)" title="مدیریت سوالات">
+                <button class="btn-icon" @click="manageQuestions(assessment)" title="مدیریت سوالات">
                   <ListBulletIcon class="w-5 h-5" />
                 </button>
-                <button class="btn-icon" @click="viewResults(test)" title="مشاهده نتایج">
+                <button class="btn-icon" @click="viewResults(assessment)" title="مشاهده نتایج">
                   <ChartBarIcon class="w-5 h-5" />
                 </button>
-                <button class="btn-icon btn-danger" @click="deleteTest(test)" title="حذف">
+                <button class="btn-icon btn-danger" @click="deleteAssessment(assessment)" title="حذف">
                   <TrashIcon class="w-5 h-5" />
                 </button>
               </div>
@@ -166,44 +166,44 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="filteredTests.length === 0 && !loading" class="empty-state">
+    <div v-if="filteredAssessments.length === 0 && !loading" class="empty-state">
       <i class="icon-empty"></i>
-      <h3>آزمونی یافت نشد</h3>
-      <p>هنوز آزمونی ایجاد نشده است یا با فیلترهای انتخابی نتیجه‌ای یافت نشد.</p>
+      <h3>ارزیابیی یافت نشد</h3>
+      <p>هنوز ارزیابیی ایجاد نشده است یا با فیلترهای انتخابی نتیجه‌ای یافت نشد.</p>
       <button class="btn btn-primary" @click="showCreateModal = true">
         <PlusIcon class="w-5 h-5" />
-        افزودن اولین آزمون
+        افزودن اولین ارزیابی
       </button>
     </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>در حال بارگذاری آزمون‌ها...</p>
+      <p>در حال بارگذاری ارزیابی‌ها...</p>
     </div>
 
     <!-- Create/Edit Modal -->
     <div v-if="showCreateModal || showEditModal" class="modal-overlay" @click.self="closeModals">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>{{ showEditModal ? 'ویرایش آزمون' : 'افزودن آزمون جدید' }}</h2>
+          <h2>{{ showEditModal ? 'ویرایش ارزیابی' : 'افزودن ارزیابی جدید' }}</h2>
           <button class="btn-close" @click="closeModals">×</button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="saveTest">
+          <form @submit.prevent="saveAssessment">
             <div class="form-group">
-              <label>عنوان آزمون (فارسی)</label>
+              <label>عنوان ارزیابی (فارسی)</label>
               <input
                 type="text"
                 v-model="formData.title"
                 required
-                placeholder="مثال: رهیار - آزمون جامع ارزیابی مولفههای رابطه"
+                placeholder="مثال: رهیار - ارزیابی جامع ارزیابی مولفههای رابطه"
                 class="form-control"
               />
             </div>
 
             <div class="form-group">
-              <label>عنوان آزمون (انگلیسی)</label>
+              <label>عنوان ارزیابی (انگلیسی)</label>
               <input
                 type="text"
                 v-model="formData.title_en"
@@ -218,7 +218,7 @@
                 v-model="formData.description"
                 required
                 rows="4"
-                placeholder="توضیحات کامل درباره آزمون..."
+                placeholder="توضیحات کامل درباره ارزیابی..."
                 class="form-control"
               ></textarea>
             </div>
@@ -228,7 +228,7 @@
               <textarea
                 v-model="formData.description_en"
                 rows="4"
-                placeholder="Detailed description about the test..."
+                placeholder="Detailed description about the assessment..."
                 class="form-control"
               ></textarea>
             </div>
@@ -269,7 +269,7 @@
     <div v-if="showQuestionsModal" class="modal-overlay" @click.self="closeModals">
       <div class="modal-content modal-large">
         <div class="modal-header">
-          <h2>مدیریت سوالات: {{ selectedTest?.title }}</h2>
+          <h2>مدیریت سوالات: {{ selectedAssessment?.title }}</h2>
           <button class="btn-close" @click="closeModals">×</button>
         </div>
         <div class="modal-body">
@@ -363,14 +363,14 @@
     <div v-if="showResultsModal" class="modal-overlay" @click.self="closeModals">
       <div class="modal-content modal-large">
         <div class="modal-header">
-          <h2>نتایج آزمون: {{ selectedTest?.title }}</h2>
+          <h2>نتایج ارزیابی: {{ selectedAssessment?.title }}</h2>
           <button class="btn-close" @click="closeModals">×</button>
         </div>
         <div class="modal-body">
           <div class="results-stats">
             <div class="stat-card">
               <div class="stat-value">{{ results.length }}</div>
-              <div class="stat-label">کل آزمون‌های انجام شده</div>
+              <div class="stat-label">کل ارزیابی‌های انجام شده</div>
             </div>
             <div class="stat-card">
               <div class="stat-value">{{ calculateAverageScore() }}%</div>
@@ -439,7 +439,7 @@ const permissionsStore = usePermissionsStore()
 const { viewMode } = useViewMode('assessments-view-mode')
 
 // State
-const tests = ref<any[]>([])
+const assessments = ref<any[]>([])
 const loading = ref(true)
 const saving = ref(false)
 const searchQuery = ref('')
@@ -450,7 +450,7 @@ const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const showQuestionsModal = ref(false)
 const showResultsModal = ref(false)
-const selectedTest = ref<any>(null)
+const selectedAssessment = ref<any>(null)
 const results = ref<any[]>([])
 
 // Form data
@@ -475,75 +475,75 @@ const questionsData = ref({
 })
 
 // Computed
-const filteredTests = computed(() => {
-  let filtered = tests.value
+const filteredAssessments = computed(() => {
+  let filtered = assessments.value
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(
-      (test) =>
-        test.title?.toLowerCase().includes(query) ||
-        test.description?.toLowerCase().includes(query)
+      (assessment) =>
+        assessment.title?.toLowerCase().includes(query) ||
+        assessment.description?.toLowerCase().includes(query)
     )
   }
 
   if (filterStatus.value === 'published') {
-    filtered = filtered.filter((test) => test.is_published)
+    filtered = filtered.filter((assessment) => assessment.is_published)
   } else if (filterStatus.value === 'draft') {
-    filtered = filtered.filter((test) => !test.is_published)
+    filtered = filtered.filter((assessment) => !assessment.is_published)
   }
 
   return filtered
 })
 
 // Methods
-const fetchTests = async () => {
+const fetchAssessments = async () => {
   try {
     loading.value = true
     const response = await apiClient.get<any[]>('/assessments')
     if (response.success && response.data) {
-      tests.value = response.data
+      assessments.value = response.data
     }
   } catch (error) {
-    logger.error('Error fetching tests:', error)
+    logger.error('Error fetching assessments:', error)
   } finally {
     loading.value = false
   }
 }
 
-const viewTest = (test: any) => {
-  selectedTest.value = test
+const viewAssessment = (assessment: any) => {
+  selectedAssessment.value = assessment
   // Open a view modal or navigate to details page
-  alert('View test details - to be implemented')
+  alert('View assessment details - to be implemented')
 }
 
-const editTestInModal = (test: any) => {
-  selectedTest.value = test
+const editAssessmentInModal = (assessment: any) => {
+  selectedAssessment.value = assessment
   formData.value = {
-    title: test.title || '',
-    title_en: test.title_en || '',
-    description: test.description || '',
-    description_en: test.description_en || '',
-    tagline: test.tagline || '',
-    is_published: test.is_published || false,
+    title: assessment.title || '',
+    title_en: assessment.title_en || '',
+    description: assessment.description || '',
+    description_en: assessment.description_en || '',
+    tagline: assessment.tagline || '',
+    is_published: assessment.is_published || false,
   }
   showEditModal.value = true
 }
 
-const editTestInPage = (test: any) => {
-  router.push(`/assessments/${test.id}/edit`)
+const editAssessmentInPage = (assessment: any) => {
+  router.push(`/assessments/${assessment.id}/edit`)
 }
 
-const manageQuestions = async (test: any) => {
-  selectedTest.value = test
+const manageQuestions = async (assessment: any) => {
+  selectedAssessment.value = assessment
   
   try {
-    const response = await apiClient.get<any>(`/assessments/${test.id}`)
+    const response = await apiClient.get<any>(`/assessments/${assessment.id}`)
     if (response.success && response.data) {
-      const testData = response.data
+      const assessmentData = response.data
       
-      if (testData.questions && Array.isArray(testData.questions)) {
-        questionsData.value.sections = testData.questions.map((section: any) => ({
+      if (assessmentData.questions && Array.isArray(assessmentData.questions)) {
+        questionsData.value.sections = assessmentData.questions.map((section: any) => ({
           title: section.title || '',
           title_en: section.titleEn || '',
           questions: section.questions?.map((q: any) => ({
@@ -554,17 +554,17 @@ const manageQuestions = async (test: any) => {
       }
     }
   } catch (error) {
-    logger.error('Error fetching test questions:', error)
+    logger.error('Error fetching assessment questions:', error)
   }
   
   showQuestionsModal.value = true
 }
 
-const viewResults = async (test: any) => {
-  selectedTest.value = test
+const viewResults = async (assessment: any) => {
+  selectedAssessment.value = assessment
   
   try {
-    const response = await apiClient.get<any[]>(`/assessments/${test.id}/results`)
+    const response = await apiClient.get<any[]>(`/assessments/${assessment.id}/results`)
     if (response.success && response.data) {
       results.value = response.data
     }
@@ -575,30 +575,30 @@ const viewResults = async (test: any) => {
   showResultsModal.value = true
 }
 
-const deleteTest = async (test: any) => {
-  if (!confirm(`آیا از حذف آزمون "${test.title}" اطمینان دارید؟`)) {
+const deleteAssessment = async (assessment: any) => {
+  if (!confirm(`آیا از حذف ارزیابی "${assessment.title}" اطمینان دارید؟`)) {
     return
   }
 
   try {
-    await apiClient.delete(`/assessments/${test.id}`)
-    tests.value = tests.value.filter((t) => t.id !== test.id)
+    await apiClient.delete(`/assessments/${assessment.id}`)
+    assessments.value = assessments.value.filter((t) => t.id !== assessment.id)
   } catch (error) {
-    logger.error('Error deleting test:', error)
-    alert('خطا در حذف آزمون')
+    logger.error('Error deleting assessment:', error)
+    alert('خطا در حذف ارزیابی')
   }
 }
 
-const saveTest = async () => {
+const saveAssessment = async () => {
   try {
     saving.value = true
 
-    if (showEditModal.value && selectedTest.value) {
-      const response = await apiClient.put<any>(`/assessments/${selectedTest.value.id}`, formData.value)
+    if (showEditModal.value && selectedAssessment.value) {
+      const response = await apiClient.put<any>(`/assessments/${selectedAssessment.value.id}`, formData.value)
       if (response.success && response.data) {
-        const index = tests.value.findIndex((t) => t.id === selectedTest.value.id)
+        const index = assessments.value.findIndex((t) => t.id === selectedAssessment.value.id)
         if (index !== -1) {
-          tests.value[index] = { ...tests.value[index], ...formData.value }
+          assessments.value[index] = { ...assessments.value[index], ...formData.value }
         }
       }
     } else {
@@ -607,21 +607,21 @@ const saveTest = async () => {
         questions: [],
       })
       if (response.success && response.data) {
-        tests.value.push(response.data)
+        assessments.value.push(response.data)
       }
     }
 
     closeModals()
   } catch (error) {
-    logger.error('Error saving test:', error)
-    alert('خطا در ذخیره آزمون')
+    logger.error('Error saving assessment:', error)
+    alert('خطا در ذخیره ارزیابی')
   } finally {
     saving.value = false
   }
 }
 
 const saveQuestions = async () => {
-  if (!selectedTest.value) return
+  if (!selectedAssessment.value) return
 
   try {
     saving.value = true
@@ -635,14 +635,14 @@ const saveQuestions = async () => {
       })),
     }))
 
-    const response = await apiClient.put(`/assessments/${selectedTest.value.id}`, {
+    const response = await apiClient.put(`/assessments/${selectedAssessment.value.id}`, {
       questions,
     })
 
     if (response.success) {
       alert('سوالات با موفقیت ذخیره شد')
       closeModals()
-      fetchTests()
+      fetchAssessments()
     }
   } catch (error) {
     logger.error('Error saving questions:', error)
@@ -682,7 +682,7 @@ const closeModals = () => {
   showEditModal.value = false
   showQuestionsModal.value = false
   showResultsModal.value = false
-  selectedTest.value = null
+  selectedAssessment.value = null
   formData.value = {
     title: '',
     title_en: '',
@@ -699,14 +699,14 @@ const truncate = (text: string, length: number) => {
   return text.length > length ? text.substring(0, length) + '...' : text
 }
 
-const formatDate = (dateString: string) => {
-  if (!dateString) return ''
-  return new Date(dateString).toLocaleDateString('fa-IR')
+const formatDate = (daassessmentring: string) => {
+  if (!daassessmentring) return ''
+  return new Date(daassessmentring).toLocaleDaassessmentring('fa-IR')
 }
 
-const formatDateTime = (dateString: string) => {
-  if (!dateString) return ''
-  return new Date(dateString).toLocaleString('fa-IR')
+const formatDateTime = (daassessmentring: string) => {
+  if (!daassessmentring) return ''
+  return new Date(daassessmentring).toLocaleString('fa-IR')
 }
 
 const calculateAverageScore = () => {
@@ -730,13 +730,13 @@ function handleKeyDown(event: KeyboardEvent) {
   }
   if ((showCreateModal.value || showEditModal.value) && event.ctrlKey && event.key === 'Enter' && !saving.value) {
     event.preventDefault()
-    saveTest()
+    saveAssessment()
   }
 }
 
 // Lifecycle
 onMounted(() => {
-  fetchTests()
+  fetchAssessments()
   document.addEventListener('keydown', handleKeyDown)
 })
 
@@ -745,13 +745,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
-.tests-view {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
+<style scoped lang="scss">
 .view-header {
   display: flex;
   justify-content: space-between;
@@ -803,7 +797,7 @@ onUnmounted(() => {
   color: var(--text-primary);
 }
 
-.tests-grid {
+.assessments-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 24px;
@@ -813,7 +807,7 @@ onUnmounted(() => {
   }
 }
 
-.tests-table {
+.assessments-table {
   background: var(--card-bg);
   border-radius: 16px;
   overflow: hidden;
@@ -875,7 +869,7 @@ onUnmounted(() => {
         font-size: 14px;
         white-space: nowrap;
 
-        .test-title-cell {
+        .assessment-title-cell {
           display: flex;
           flex-direction: column;
           gap: 4px;
@@ -884,7 +878,7 @@ onUnmounted(() => {
             font-weight: 600;
           }
 
-          .test-desc-preview {
+          .assessment-desc-preview {
             font-size: 12px;
             color: var(--text-secondary);
           }
@@ -940,7 +934,7 @@ onUnmounted(() => {
   }
 }
 
-.test-card {
+.assessment-card {
   background: var(--card-bg);
   border-radius: 0.75rem;
   border: 1px solid var(--border-color);
@@ -949,12 +943,12 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.test-card:hover {
+.assessment-card:hover {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
-.test-header {
+.assessment-header {
   padding: 1.25rem;
   background: var(--primary-gradient);
   color: white;
@@ -963,7 +957,7 @@ onUnmounted(() => {
   gap: 1rem;
 }
 
-.test-icon {
+.assessment-icon {
   width: 48px;
   height: 48px;
   background: rgba(255, 255, 255, 0.2);
@@ -974,30 +968,28 @@ onUnmounted(() => {
   font-size: 1.5rem;
 }
 
-.test-title-section {
+.assessment-title-section {
   flex: 1;
 }
 
-.test-title-section h3 {
+.assessment-title-section h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1.1rem;
   font-weight: 600;
 }
 
-/* status-badge styles are in shared components.scss */
-
-.test-content {
+.assessment-content {
   padding: 1.25rem;
 }
 
-.test-description {
+.assessment-description {
   color: #6b7280;
   margin-bottom: 1rem;
   line-height: 1.6;
   min-height: 60px;
 }
 
-.test-meta {
+.assessment-meta {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
@@ -1012,7 +1004,7 @@ onUnmounted(() => {
   font-size: 0.85rem;
 }
 
-.test-stats {
+.assessment-stats {
   display: flex;
   gap: 1.5rem;
   padding-top: 1rem;
@@ -1035,7 +1027,7 @@ onUnmounted(() => {
   color: #6b7280;
 }
 
-.test-actions {
+.assessment-actions {
   display: flex;
   gap: 8px;
   padding: 16px 20px;
@@ -1115,13 +1107,7 @@ onUnmounted(() => {
   }
 }
 
-/* Styles from shared components.scss - removed duplicates */
-/* - .modal-overlay, .modal-content, .modal-header, .modal-body, .modal-footer */
-/* - .btn-close */
-/* - .form-group, .form-control, .form-actions */
-/* - .btn, .btn-primary, .btn-secondary, .btn-sm, .btn:disabled, .btn-icon */
-
-/* Questions Management - Assessment-specific styles */
+/* Questions Management */
 .sections-list {
   display: flex;
   flex-direction: column;
@@ -1228,25 +1214,5 @@ onUnmounted(() => {
 
 .results-table tr:hover {
   background: var(--bg-secondary);
-}
-
-.kbd {
-  display: inline-block;
-  padding: 2px 6px;
-  font-size: 11px;
-  font-family: monospace;
-  font-weight: 600;
-  line-height: 1;
-  color: rgb(107 114 128);
-  background: rgb(243 244 246);
-  border: 1px solid rgb(209 213 219);
-  border-radius: 4px;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-
-  @media (prefers-color-scheme: dark) {
-    color: rgb(209 213 219);
-    background: rgb(55 65 81);
-    border-color: rgb(75 85 99);
-  }
 }
 </style>

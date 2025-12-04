@@ -192,12 +192,13 @@
     cursor: not-allowed;
   }
 
+  /* TODO: rename the following to btn-info, create btn-primary that uses var(--primary-gradient) and other related colors */
   &.btn-primary {
     background: rgb(59 130 246);
     color: white;
 
     &:hover:not(:disabled) {
-      background: rgb(37 99 235);
+      background: rgb(37 99 235); 
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
     }
@@ -301,7 +302,8 @@
   display: inline-block;
   padding: 2px 6px;
   font-size: 11px;
-  font-family: monospace;
+  /* TODO: use a global CSS variable instead; include more beautiful monospace fonts */
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   font-weight: 600;
   line-height: 1;
   color: rgb(107 114 128);
@@ -320,6 +322,18 @@
 /* ============================================
    View Components
    ============================================ */
+
+.main-view {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.form-view {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
 
 .view-header {
   display: flex;
@@ -600,6 +614,46 @@
     @media (prefers-color-scheme: dark) {
       background: rgba(239, 68, 68, 0.2);
       color: #f87171;
+    }
+  }
+}
+
+/* TODO: instead of role-based style names below , use generalized names that can be reused everywhere */
+
+.role-badge {
+  &.admin {
+    background: rgba(147, 51, 234, 0.2);
+    color: #9333ea;
+
+    @media (prefers-color-scheme: dark) {
+      color: #a855f7;
+    }
+  }
+
+  &.psychologist {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+
+    @media (prefers-color-scheme: dark) {
+      color: #60a5fa;
+    }
+  }
+
+  &.moderator {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+
+    @media (prefers-color-scheme: dark) {
+      color: #34d399;
+    }
+  }
+
+  &.user {
+    background: rgba(107, 114, 128, 0.2);
+    color: #6b7280;
+
+    @media (prefers-color-scheme: dark) {
+      color: #9ca3af;
     }
   }
 }
