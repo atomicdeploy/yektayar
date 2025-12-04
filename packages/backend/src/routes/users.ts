@@ -5,80 +5,60 @@ import {
   getUserPreferences, 
   updateUserPreferences 
 } from '../services/preferencesService'
+import {
+  getAllUsers,
+  getUserById as getUserByIdService,
+  updateUser as updateUserService,
+  getUserProfile
+} from '../services/userService'
 import { extractToken } from '../middleware/tokenExtractor'
 import { logger } from '@yektayar/shared'
 
 export const userRoutes = new Elysia({ prefix: '/api/users' })
   .get('/', async ({ query: queryParams }) => {
     try {
-      const page = parseInt(queryParams.page as string) || 1
-      const limit = parseInt(queryParams.limit as string) || 10
-      const offset = (page - 1) * limit
-      const type = queryParams.type as string || undefined
-
-      let countResult
-      let users
-
-      if (type) {
-        countResult = await query<{ count: string }>('SELECT COUNT(*) FROM users WHERE type = $1', [type])
-        users = await query(`
-          SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
-          FROM users
-          WHERE type = $1
-          ORDER BY created_at DESC
-          LIMIT $2 OFFSET $3
-        `, [type, limit, offset])
-      } else {
-        countResult = await query<{ count: string }>('SELECT COUNT(*) FROM users')
-        users = await query(`
-          SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
-          FROM users
-          ORDER BY created_at DESC
-          LIMIT $1 OFFSET $2
-        `, [limit, offset])
+      const filters = {
+        type: query.type as string | undefined,
+        search: query.search as string | undefined,
+        page: parseInt(query.page as string) || 1,
+        limit: parseInt(query.limit as string) || 10
       }
-
-      const total = parseInt(countResult[0].count)
-
+      
+      const offset = (filters.page - 1) * filters.limit
+      
+      const result = await getAllUsers(filters)
+      
       return {
         success: true,
-        data: users,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.ceil(total / limit)
-        }
+        data: result.users,
+        pagination: result.pagination
       }
     } catch (error) {
       logger.error('Error fetching users:', error)
       return {
         success: false,
         error: 'Failed to fetch users',
-        message: 'Could not retrieve user list'
+        message: error instanceof Error ? error.message : 'Could not retrieve user list'
       }
     }
   }, {
     detail: {
       tags: ['Users'],
       summary: 'List all users',
-      description: 'Get paginated list of users with optional type filter',
+      description: 'Get paginated list of users with optional filters',
       parameters: [
         { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
         { name: 'limit', in: 'query', schema: { type: 'integer', default: 10 } },
-        { name: 'type', in: 'query', schema: { type: 'string', enum: ['patient', 'psychologist', 'admin'] } }
+        { name: 'type', in: 'query', schema: { type: 'string', enum: ['patient', 'psychologist', 'admin'] } },
+        { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Search by name, email, or phone' }
       ]
     }
   })
   .get('/:id', async ({ params: { id } }) => {
     try {
-      const users = await query(`
-        SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
-        FROM users
-        WHERE id = $1
-      `, [id])
+      const user = await getUserByIdService(id)
 
-      if (users.length === 0) {
+      if (!user) {
         return {
           success: false,
           error: 'User not found',
@@ -88,14 +68,14 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
 
       return {
         success: true,
-        data: users[0]
+        data: user
       }
     } catch (error) {
       logger.error('Error fetching user:', error)
       return {
         success: false,
         error: 'Failed to fetch user',
-        message: 'Could not retrieve user details'
+        message: error instanceof Error ? error.message : 'Could not retrieve user details'
       }
     }
   }, {
@@ -109,44 +89,30 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
     try {
       const updateData = body as any
 
-      // Build dynamic update query
-      const allowedFields = ['name', 'email', 'phone', 'avatar', 'bio', 'specialization', 'is_active']
-      const updates: string[] = []
-      const values: any[] = []
-
-      for (const field of allowedFields) {
-        if (updateData[field] !== undefined) {
-          updates.push(`${field} = $${values.length + 1}`)
-          values.push(updateData[field])
-        }
-      }
-
       // Handle password update separately
       if (updateData.password) {
+        const db = getDatabase()
         const passwordHash = await bcrypt.hash(updateData.password, 10)
-        updates.push(`password_hash = $${values.length + 1}`)
-        values.push(passwordHash)
+        await db`
+          UPDATE users
+          SET password_hash = ${passwordHash}, updated_at = CURRENT_TIMESTAMP
+          WHERE id = ${id}
+        `
+        delete updateData.password
       }
 
-      if (updates.length === 0) {
-        return {
-          success: false,
-          error: 'No valid fields to update',
-          message: 'Please provide at least one field to update'
-        }
-      }
+      // Use service for other updates
+      const user = await updateUserService(id, {
+        name: updateData.name,
+        email: updateData.email,
+        phone: updateData.phone,
+        avatar: updateData.avatar,
+        bio: updateData.bio,
+        specialization: updateData.specialization,
+        isActive: updateData.is_active
+      })
 
-      updates.push('updated_at = CURRENT_TIMESTAMP')
-      values.push(id)
-
-      const result = await query(`
-        UPDATE users
-        SET ${updates.join(', ')}
-        WHERE id = $${values.length}
-        RETURNING id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
-      `, values)
-
-      if (result.length === 0) {
+      if (!user) {
         return {
           success: false,
           error: 'User not found',
@@ -156,7 +122,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
 
       return {
         success: true,
-        data: result[0],
+        data: user,
         message: 'User updated successfully'
       }
     } catch (error) {
@@ -164,7 +130,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
       return {
         success: false,
         error: 'Failed to update user',
-        message: 'Could not update user details'
+        message: error instanceof Error ? error.message : 'Could not update user details'
       }
     }
   }, {
@@ -211,13 +177,9 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
   })
   .get('/:id/profile', async ({ params: { id } }) => {
     try {
-      const users = await query(`
-        SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
-        FROM users
-        WHERE id = $1
-      `, [id])
+      const user = await getUserProfile(id)
 
-      if (users.length === 0) {
+      if (!user) {
         return {
           success: false,
           error: 'User not found',
@@ -225,40 +187,16 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         }
       }
 
-      // If psychologist, get their appointments count
-      if (users[0].type === 'psychologist') {
-        const appointmentStats = await query(`
-          SELECT 
-            COUNT(*) as total_appointments,
-            COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_appointments
-          FROM appointments
-          WHERE psychologist_id = $1
-        `, [id])
-        users[0].stats = appointmentStats[0]
-      }
-
-      // If patient, get their course enrollments
-      if (users[0].type === 'patient') {
-        const enrollmentStats = await query(`
-          SELECT 
-            COUNT(*) as total_enrollments,
-            COUNT(CASE WHEN completed = true THEN 1 END) as completed_courses
-          FROM course_enrollments
-          WHERE user_id = $1
-        `, [id])
-        users[0].stats = enrollmentStats[0]
-      }
-
       return {
         success: true,
-        data: users[0]
+        data: user
       }
     } catch (error) {
       logger.error('Error fetching user profile:', error)
       return {
         success: false,
         error: 'Failed to fetch user profile',
-        message: 'Could not retrieve user profile'
+        message: error instanceof Error ? error.message : 'Could not retrieve user profile'
       }
     }
   }, {

@@ -358,6 +358,7 @@ import { useViewMode } from '@/composables/useViewMode'
 import { logger } from '@yektayar/shared'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ViewModeToggle from '@/components/shared/ViewModeToggle.vue'
+import apiClient from '@/api'
 
 const { t } = useI18n()
 const permissionsStore = usePermissionsStore()
@@ -390,55 +391,6 @@ const userForm = ref({
   role: 'user' as User['role'],
   status: 'active' as User['status'],
 })
-
-// Mock data for development
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'علی محمدی',
-    email: 'ali@example.com',
-    phone: '09121234567',
-    role: 'admin',
-    status: 'active',
-    createdAt: new Date('2024-01-15'),
-  },
-  {
-    id: '2',
-    name: 'سارا احمدی',
-    email: 'sara@example.com',
-    phone: '09129876543',
-    role: 'psychologist',
-    status: 'active',
-    createdAt: new Date('2024-02-20'),
-  },
-  {
-    id: '3',
-    name: 'محمد رضایی',
-    email: 'mohammad@example.com',
-    phone: '09135551234',
-    role: 'user',
-    status: 'active',
-    createdAt: new Date('2024-03-10'),
-  },
-  {
-    id: '4',
-    name: 'فاطمه کریمی',
-    email: 'fatemeh@example.com',
-    phone: '09141112233',
-    role: 'moderator',
-    status: 'active',
-    createdAt: new Date('2024-03-25'),
-  },
-  {
-    id: '5',
-    name: 'رضا حسینی',
-    email: 'reza@example.com',
-    phone: '09151234567',
-    role: 'user',
-    status: 'inactive',
-    createdAt: new Date('2024-04-05'),
-  },
-]
 
 const filteredUsers = computed(() => {
   let result = users.value
@@ -604,16 +556,44 @@ onUnmounted(() => {
 async function fetchUsers() {
   isLoading.value = true
   try {
-    // TODO: Fetch from API
-    // For now, use mock data
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    users.value = mockUsers
+    const response = await apiClient.get<any[]>('/api/users')
+    
+    if (response.success && response.data) {
+      // Map backend data to frontend User interface
+      users.value = response.data.map((user: any) => ({
+        id: user.id.toString(),
+        name: user.name,
+        email: user.email || '',
+        phone: user.phone || '',
+        role: mapTypeToRole(user.type),
+        status: user.is_active ? 'active' : 'inactive',
+        createdAt: new Date(user.created_at),
+      }))
+    } else {
+      throw new Error('Failed to fetch users')
+    }
   } catch (error) {
     logger.error('Error fetching users:', error)
+    users.value = []
   } finally {
     isLoading.value = false
   }
 }
+
+// Map backend user type to frontend role
+function mapTypeToRole(type: string): 'admin' | 'psychologist' | 'user' | 'moderator' {
+  const mapping: Record<string, 'admin' | 'psychologist' | 'user' | 'moderator'> = {
+    'admin': 'admin',
+    'psychologist': 'psychologist',
+    'patient': 'user',
+    'moderator': 'moderator',
+  }
+  return mapping[type] || 'user'
+}
+
+onMounted(() => {
+  fetchUsers()
+})
 </script>
 
 <style scoped lang="scss">
