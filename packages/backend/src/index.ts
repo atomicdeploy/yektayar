@@ -16,14 +16,18 @@ import { logger } from '@yektayar/shared'
 import { settingsRoutes } from './routes/settings'
 import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
-import { healthRoutes } from './routes/health-pg'
+import { assessmentRoutes } from './routes/assessments'
+import { healthRoutes } from './routes/health'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
 import { swaggerAuth } from './middleware/swaggerAuth'
-import { initializeDatabase } from './services/database-pg'
+import { initializeDatabase } from './services/database'
 import { getWebSocketPathFromEnv, getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../package.json'
+
+// Type declarations for Bun runtime
+declare const Bun: any
 
 // Get version from package.json
 const APP_VERSION = getVersionFromPackageJson(packageJson)
@@ -91,6 +95,7 @@ app
           { name: 'Settings', description: 'Application settings endpoints' },
           { name: 'Support', description: 'Support tickets and messaging endpoints' },
           { name: 'AI', description: 'AI counselor chat endpoints' },
+          { name: 'Assessments', description: 'Psychological assessments and surveys endpoints' },
           { name: 'WebSocket', description: 'Real-time communication via Socket.IO' }
         ],
         externalDocs: {
@@ -149,6 +154,7 @@ app
   .use(settingsRoutes)
   .use(supportRoutes)
   .use(aiRoutes)
+  .use(assessmentRoutes)
 
 // Server configuration
 const port = Number(process.env.PORT) || 3000
@@ -186,7 +192,7 @@ if (isBun) {
     port,
     hostname,
     idleTimeout: 30, // Increase timeout for slow database queries (default is 10s)
-    fetch: async (req, server) => {
+    fetch: async (req: any, server: any) => {
       const url = new URL(req.url)
       const upgradeHeader = req.headers.get('upgrade')?.toLowerCase()
       const isWebSocketUpgrade = upgradeHeader === 'websocket'

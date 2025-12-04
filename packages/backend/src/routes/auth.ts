@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { getDatabase } from '../services/database'
+import { query, getDatabase } from '../services/database'
 import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'

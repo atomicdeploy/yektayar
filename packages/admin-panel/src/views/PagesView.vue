@@ -201,7 +201,7 @@ const editingPage = ref<Partial<Page>>({
 async function loadPages() {
   loading.value = true
   try {
-    const response = await apiClient.get('/api/pages', { skipAuth: true })
+    const response = await apiClient.get('/pages', { skipAuth: true })
     if (response.success) {
       pages.value = response.data || []
     }
@@ -236,13 +236,13 @@ async function savePage() {
   try {
     if (editingPage.value.id) {
       // Update existing page
-      await apiClient.put(`/api/pages/${editingPage.value.slug}`, {
+      await apiClient.put(`/pages/${editingPage.value.slug}`, {
         title: editingPage.value.title,
         content: editingPage.value.content
       }, { skipAuth: true })
     } else {
       // Create new page
-      await apiClient.post('/api/pages', editingPage.value, { skipAuth: true })
+      await apiClient.post('/pages', editingPage.value, { skipAuth: true })
     }
     
     showModal.value = false

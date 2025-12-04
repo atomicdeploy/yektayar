@@ -172,7 +172,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   IonPage,
@@ -203,7 +202,6 @@ import {
 } from 'ionicons/icons'
 
 const { t, locale } = useI18n()
-const router = useRouter()
 
 const searchQuery = ref('')
 const selectedCategory = ref('all')
@@ -287,14 +285,6 @@ const handleSearch = () => {
 
 const handleSort = () => {
   // TODO: Implement sorting
-}
-
-const viewCourse = (courseId: string) => {
-  router.push(`/tabs/courses/${courseId}`)
-}
-
-const goToMyCourses = () => {
-  router.push('/tabs/my-courses')
 }
 
 const getDifficultyColor = (difficulty: string) => {

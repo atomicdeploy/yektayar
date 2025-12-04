@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { getDatabase } from '../services/database'
+import { query } from '../services/database'
 import bcrypt from 'bcrypt'
 import { 
   getUserPreferences, 
@@ -15,7 +15,7 @@ import { extractToken } from '../middleware/tokenExtractor'
 import { logger } from '@yektayar/shared'
 
 export const userRoutes = new Elysia({ prefix: '/api/users' })
-  .get('/', async ({ query }) => {
+  .get('/', async ({ query: queryParams }) => {
     try {
       const filters = {
         type: query.type as string | undefined,
@@ -23,6 +23,8 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         page: parseInt(query.page as string) || 1,
         limit: parseInt(query.limit as string) || 10
       }
+      
+      const offset = (filters.page - 1) * filters.limit
       
       const result = await getAllUsers(filters)
       
@@ -140,12 +142,11 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
   })
   .delete('/:id', async ({ params: { id } }) => {
     try {
-      const db = getDatabase()
-      const result = await db`
+      const result = await query(`
         DELETE FROM users
-        WHERE id = ${id}
+        WHERE id = $1
         RETURNING id
-      `
+      `, [id])
 
       if (result.length === 0) {
         return {

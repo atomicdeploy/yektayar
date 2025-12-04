@@ -209,7 +209,7 @@ const contactInfo = ref({
 async function loadContactInfo() {
   loading.value = true
   try {
-    const response = await apiClient.get('/api/settings', { skipAuth: true })
+    const response = await apiClient.get('/settings', { skipAuth: true })
     if (response.success && response.data) {
       contactInfo.value = {
         phone: response.data.contact_phone || '',

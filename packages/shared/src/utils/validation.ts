@@ -47,7 +47,9 @@ export async function validateApiReachability(apiBaseUrl: string): Promise<Valid
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-    const response = await fetch(`${apiBaseUrl}/health`, {
+    const healthEndpoint = new URL('/health', apiBaseUrl).toString();
+
+    const response = await fetch(healthEndpoint, {
       method: 'GET',
       signal: controller.signal,
       headers: {

@@ -293,7 +293,7 @@ async function loadTickets() {
   loading.value = true
   try {
     // For now, load all tickets. In production, filter by user_id
-    const response = await apiClient.get('/api/support/tickets', { skipAuth: true })
+    const response = await apiClient.get('/support/tickets', { skipAuth: true })
     if (response.success) {
       tickets.value = response.data || []
     }
@@ -309,7 +309,7 @@ async function submitTicket() {
   
   submitting.value = true
   try {
-    const response = await apiClient.post('/api/support/tickets', newTicket.value, { skipAuth: true })
+    const response = await apiClient.post('/support/tickets', newTicket.value, { skipAuth: true })
     if (response.success) {
       showNewTicketModal.value = false
       newTicket.value = { subject: '', message: '', priority: 'normal' }

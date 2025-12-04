@@ -11,6 +11,7 @@ The YektaYar API Client is a unified HTTP client for communicating with the back
 - **Proxy Support**: Built on axios with full proxy configuration support
 - **Type Safety**: Full TypeScript support with typed responses
 - **Error Handling**: Consistent error handling across all API calls
+- **Automatic API Prefix**: BaseURL includes `/api` prefix - endpoints should NOT include it
 
 ## Installation
 
@@ -20,15 +21,48 @@ The API client is part of the `@yektayar/shared` package. To use it:
 import { createApiClient } from '@yektayar/shared'
 ```
 
+## Important: API Endpoint Paths
+
+**The baseURL is configured via the `API_BASE_URL` environment variable which includes `/api` prefix. When making requests, do NOT prepend `/api` to your endpoints.**
+
+**Configuration in `.env`:**
+```bash
+# Include the /api prefix in the environment variable
+API_BASE_URL=http://localhost:3000/api
+```
+
+✅ **Correct:**
+```typescript
+apiClient.get('/users')           // Requests: http://localhost:3000/api/users
+apiClient.get('/assessments')     // Requests: http://localhost:3000/api/assessments
+apiClient.post('/auth/login', {}) // Requests: http://localhost:3000/api/auth/login
+```
+
+❌ **Wrong:**
+```typescript
+apiClient.get('/api/users')           // Would request: http://localhost:3000/api/api/users
+apiClient.get('/api/assessments')     // Would request: http://localhost:3000/api/api/assessments
+apiClient.post('/api/auth/login', {}) // Would request: http://localhost:3000/api/api/auth/login
+```
+
 ## Usage
 
 ### Creating an API Client Instance
 
+**Important:** The baseURL comes from the `API_BASE_URL` environment variable which should include the `/api` prefix.
+
+**Set in your `.env` file:**
+```bash
+API_BASE_URL=http://localhost:3000/api
+```
+
+**Then in your code:**
 ```typescript
 import { createApiClient } from '@yektayar/shared'
+import config from '@/config'
 
 const apiClient = createApiClient({
-  baseURL: 'http://localhost:3000',
+  baseURL: config.apiBaseUrl, // Uses API_BASE_URL from .env (includes /api)
   storageKey: 'my_session_token', // Optional, defaults to 'yektayar_session_token'
   timeout: 30000, // Optional, defaults to 30000ms
   debug: true, // Optional, enables debug logging
@@ -43,12 +77,14 @@ const apiClient = createApiClient({
 
 #### GET Request
 
-```typescript
-// Simple GET
-const response = await apiClient.get('/api/users')
+**Note:** Do NOT include `/api` prefix in endpoints - it's already in the baseURL.
 
-// GET with query parameters
-const response = await apiClient.get('/api/users', {
+```typescript
+// Simple GET (requests /api/users)
+const response = await apiClient.get('/users')
+
+// GET with query parameters (requests /api/users?page=1&limit=10)
+const response = await apiClient.get('/users', {
   params: {
     page: 1,
     limit: 10
@@ -62,10 +98,10 @@ interface User {
   email: string
 }
 
-const response = await apiClient.get<User[]>('/api/users')
+const response = await apiClient.get<User[]>('/users')
 if (response.success && response.data) {
   response.data.forEach(user => {
-    console.log(user.name) // TypeScript knows this is a string
+    logger.info(user.name) // TypeScript knows this is a string
   })
 }
 ```
@@ -74,13 +110,13 @@ if (response.success && response.data) {
 
 ```typescript
 // Simple POST
-const response = await apiClient.post('/api/users', {
+const response = await apiClient.post('/users', {
   name: 'John Doe',
   email: 'john@example.com'
 })
 
 // POST without authentication (e.g., login endpoint)
-const response = await apiClient.post('/api/auth/login', credentials, {
+const response = await apiClient.post('/auth/login', credentials, {
   skipAuth: true
 })
 ```
@@ -89,13 +125,13 @@ const response = await apiClient.post('/api/auth/login', credentials, {
 
 ```typescript
 // PUT
-await apiClient.put('/api/users/123', { name: 'Jane Doe' })
+await apiClient.put('/users/123', { name: 'Jane Doe' })
 
 // PATCH
-await apiClient.patch('/api/users/123', { email: 'jane@example.com' })
+await apiClient.patch('/users/123', { email: 'jane@example.com' })
 
 // DELETE
-await apiClient.delete('/api/users/123')
+await apiClient.delete('/users/123')
 ```
 
 ### Token Management
@@ -132,25 +168,25 @@ The API client supports multiple methods for sending authentication tokens to th
 ```typescript
 // Use header method (default)
 const apiClient = createApiClient({
-  baseURL: 'http://localhost:3000',
+  baseURL: config.apiBaseUrl, // From .env: API_BASE_URL=http://localhost:3000/api
   tokenDeliveryMethod: 'header' // or omit for default
 })
 
 // Use cookie method
 const apiClient = createApiClient({
-  baseURL: 'http://localhost:3000',
+  baseURL: config.apiBaseUrl,
   tokenDeliveryMethod: 'cookie'
 })
 
 // Use query parameter method
 const apiClient = createApiClient({
-  baseURL: 'http://localhost:3000',
+  baseURL: config.apiBaseUrl,
   tokenDeliveryMethod: 'query'
 })
 
 // Use body parameter method
 const apiClient = createApiClient({
-  baseURL: 'http://localhost:3000',
+  baseURL: config.apiBaseUrl,
   tokenDeliveryMethod: 'body'
 })
 ```
@@ -161,12 +197,12 @@ You can override the token delivery method for individual requests:
 
 ```typescript
 // Default uses 'header', but this request uses 'query'
-const response = await apiClient.get('/api/auth/session', {
+const response = await apiClient.get('/auth/session', {
   tokenDeliveryMethod: 'query'
 })
 
 // POST with token in body instead of header
-const response = await apiClient.post('/api/data', { some: 'data' }, {
+const response = await apiClient.post('/data', { some: 'data' }, {
   tokenDeliveryMethod: 'body'
 })
 ```
@@ -186,7 +222,7 @@ const response = await apiClient.post('/api/data', { some: 'data' }, {
 import { ApiError } from '@yektayar/shared'
 
 try {
-  const response = await apiClient.get('/api/protected-resource')
+  const response = await apiClient.get('/protected-resource')
 } catch (error) {
   if (error instanceof ApiError) {
     console.error('API Error:', error.message)
@@ -203,7 +239,7 @@ try {
 #### Custom Request Options
 
 ```typescript
-const response = await apiClient.get('/api/users', {
+const response = await apiClient.get('/users', {
   timeout: 5000, // Override default timeout
   headers: {
     'X-Custom-Header': 'value'
@@ -236,7 +272,7 @@ import { createApiClient } from '@yektayar/shared'
 import config from '@/config'
 
 export const apiClient = createApiClient({
-  baseURL: config.apiBaseUrl,
+  baseURL: config.apiBaseUrl, // Uses API_BASE_URL from .env
   storageKey: 'yektayar_admin_session_token',
   timeout: 30000,
   debug: config.environment === 'development',
@@ -253,7 +289,7 @@ import { createApiClient } from '@yektayar/shared'
 import config from '@/config'
 
 export const apiClient = createApiClient({
-  baseURL: config.apiBaseUrl,
+  baseURL: config.apiBaseUrl, // Uses API_BASE_URL from .env
   storageKey: 'yektayar_session_token',
   timeout: 30000,
   debug: config.environment === 'development',
@@ -273,12 +309,12 @@ export const useUserStore = defineStore('user', () => {
 
   async function fetchUsers() {
     try {
-      const response = await apiClient.get<User[]>('/api/users')
+      const response = await apiClient.get<User[]>('/users')
       if (response.success && response.data) {
         users.value = response.data
       }
     } catch (error) {
-      console.error('Failed to fetch users:', error)
+      logger.error('Failed to fetch users:', error)
     }
   }
 
@@ -398,3 +434,87 @@ Benefits:
 - No need to manually parse JSON
 - Better error handling
 - Type safety
+
+## Common Mistakes to Avoid
+
+### ❌ Incorrect: Including /api prefix in endpoints
+
+```typescript
+// WRONG - Don't include /api in the endpoint
+const response = await apiClient.get('/api/users')
+// This would request: http://localhost:3000/api/api/users (doubled!)
+```
+
+### ✅ Correct: Omit /api prefix from endpoints
+
+```typescript
+// CORRECT - /api is already in baseURL
+const response = await apiClient.get('/users')
+// This requests: http://localhost:3000/api/users (correct!)
+```
+
+### ❌ Incorrect: Accessing nested response.data.data
+
+```typescript
+// WRONG - This is the raw axios response pattern
+const response = await apiClient.get('/api/users')
+if (response.data.success) {
+  users.value = response.data.data  // ❌ INCORRECT
+}
+```
+
+### ✅ Correct: Access response.data directly
+
+```typescript
+// CORRECT - apiClient already unwraps the axios response
+const response = await apiClient.get<User[]>('/users')
+if (response.success && response.data) {
+  users.value = response.data  // ✅ CORRECT
+}
+```
+
+### ❌ Incorrect: Using axios directly
+
+```typescript
+// WRONG - Don't import and use axios directly
+import axios from 'axios'
+const response = await axios.get('/api/users')
+```
+
+### ✅ Correct: Use the configured apiClient
+
+```typescript
+// CORRECT - Use the pre-configured apiClient instance
+import apiClient from '@/api'
+const response = await apiClient.get<User[]>('/users')
+```
+
+### Key Points
+
+1. **Response structure**: The apiClient methods (get, post, put, etc.) return `ApiResponse<T>` which has the structure:
+   ```typescript
+   {
+     success: boolean
+     data?: T
+     error?: string
+     message?: string
+   }
+   ```
+
+2. **No double wrapping**: The apiClient already extracts `response.data` from axios, so you access the data directly via `response.data`, not `response.data.data`
+
+3. **Type safety**: Always use TypeScript generics for type-safe responses:
+   ```typescript
+   const response = await apiClient.get<User[]>('/users')
+   // response.data is typed as User[] | undefined
+   ```
+
+4. **Error handling**: Check both `response.success` and `response.data`:
+   ```typescript
+   if (response.success && response.data) {
+     // Success case
+   } else {
+     // Error case - use response.error
+     console.error(response.error)
+   }
+   ```
