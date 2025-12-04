@@ -78,9 +78,24 @@ else
 fi
 
 echo ""
-echo "🎨 Enabling colorful PS1 prompt..."
+echo "📖 Enabling bash completion..."
+if ! pattern_exists "if \[ -f /etc/bash_completion \]"; then
+    # Add bash completion block after stty werase or after checkwinsize
+    if pattern_exists "stty werase"; then
+        insert_after "stty werase" '\n\n# enable bash completion in interactive shells\nif [ -f /etc/bash_completion ] && ! shopt -oq posix; then\n    . /etc/bash_completion\nfi'
+        echo "  ✅ Bash completion enabled"
+    elif pattern_exists "shopt -s checkwinsize"; then
+        insert_after "shopt -s checkwinsize" '\n\n# enable bash completion in interactive shells\nif [ -f /etc/bash_completion ] && ! shopt -oq posix; then\n    . /etc/bash_completion\nfi'
+        echo "  ✅ Bash completion enabled"
+    fi
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "🎨 Enabling colorful PS1 prompt with git integration..."
 # Check if custom PS1 is already set
-if ! grep -q '\[\\e\[01;31m\]\\u\[\\e\[01;32m\]@' ~/.bashrc; then
+if ! grep -q 'parse_git_branch' ~/.bashrc; then
     # Set force_color_prompt if not already set
     if ! pattern_exists "^force_color_prompt=yes"; then
         # Find and uncomment or add force_color_prompt=yes
@@ -94,11 +109,29 @@ if ! grep -q '\[\\e\[01;31m\]\\u\[\\e\[01;32m\]@' ~/.bashrc; then
         fi
     fi
     
-    # Replace the colored PS1 line (line with \\033[01;32m])
+    # Replace the colored PS1 line with enhanced version including git
     if grep -q "PS1='\${debian_chroot:+(\$debian_chroot)}.*033\[01;32m" ~/.bashrc; then
-        # Use line-based replacement for the specific colored PS1
-        sed -i "/PS1='\${debian_chroot:+(\$debian_chroot)}.*033\[01;32m.*033\[01;34m/c\    export PS1=\"\\\[\\\e]0;\\\u@\\\h: \\\w\\\a\\\]\\\\n\\\[\\\e[01;31m\\\]\\\u\\\[\\\e[01;32m\\\]@\\\[\\\e[01;34m\\\]\\\h \\\[\\\e[01;33m\\\]\\\w\\\\n\\\[\\\e[01;35m\\\]\\\\\\\\\$\\\[\\\e[0m\\\] \"" ~/.bashrc
-        echo "  ✅ Colorful PS1 prompt enabled"
+        # Add git parsing function and enhanced PS1
+        sed -i "/PS1='\${debian_chroot:+(\$debian_chroot)}.*033\[01;32m.*033\[01;34m/i\\
+# Git branch in prompt\\
+parse_git_branch() {\\
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \\(.*\\)/ (\\1)/'\\
+}\\
+\\
+git_status_color() {\\
+    local git_status=\$(git status 2>&1)\\
+    if [[ ! \$git_status =~ \"working tree clean\" ]]; then\\
+        echo -e \"\\\\033[01;33m\"  # yellow for dirty\\
+    elif [[ \$git_status =~ \"Your branch is ahead\" ]]; then\\
+        echo -e \"\\\\033[01;36m\"  # cyan for unpushed\\
+    else\\
+        echo -e \"\\\\033[01;32m\"  # green for clean\\
+    fi\\
+}" ~/.bashrc
+        
+        # Replace the PS1 line
+        sed -i "/PS1='\${debian_chroot:+(\$debian_chroot)}.*033\[01;32m.*033\[01;34m/c\    export PS1=\"\\\[\\\e]0;\\\u@\\\h: \\\w\\\a\\\]\\\\n\\\[\\\e[01;31m\\\]\\\u\\\[\\\e[01;32m\\\]@\\\[\\\e[01;34m\\\]\\\h \\\[\\\e[01;33m\\\]\\\w\\\[\\\$(git_status_color)\\\]\\\$(parse_git_branch)\\\\n\\\[\\\e[01;35m\\\]\\\\\\\\\$\\\[\\\e[0m\\\] \"" ~/.bashrc
+        echo "  ✅ Enhanced PS1 prompt with git support enabled"
     else
         echo "  ⚠️  Could not find standard colored PS1 to replace"
     fi
@@ -180,6 +213,47 @@ if ! pattern_exists "export LESSCHARSET="; then
     echo "  ✅ UTF-8 less charset enabled"
 else
     echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "📦 Enabling npm completion..."
+if ! pattern_exists "npm completion"; then
+    # Setup npm completion
+    if command -v npm >/dev/null 2>&1; then
+        insert_after "export LESSCHARSET=" '\n# npm completion\nif command -v npm >/dev/null 2>&1; then\n    source <(npm completion)\nfi'
+        echo "  ✅ npm completion enabled"
+    else
+        echo "  ⚠️  npm not found, skipping completion setup"
+    fi
+else
+    echo "  ⏭️  Already configured"
+fi
+
+echo ""
+echo "⌨️  Configuring inputrc for enhanced keyboard shortcuts..."
+# Check if ~/.inputrc exists and configure it
+if [ ! -f ~/.inputrc ]; then
+    echo "# Custom readline configuration" > ~/.inputrc
+    echo "  ✅ Created ~/.inputrc"
+fi
+
+# Add Ctrl-Delete and Ctrl-Backspace if not already present
+if ! grep -q "shell-kill-word" ~/.inputrc 2>/dev/null; then
+    echo "" >> ~/.inputrc
+    echo "# Ctrl-Delete: delete next word" >> ~/.inputrc
+    echo '"\e[3;5~": shell-kill-word' >> ~/.inputrc
+    echo "  ✅ Added Ctrl-Delete binding"
+else
+    echo "  ⏭️  Ctrl-Delete already configured"
+fi
+
+if ! grep -q "shell-backward-kill-word" ~/.inputrc 2>/dev/null; then
+    echo "" >> ~/.inputrc
+    echo "# Ctrl-Backspace: delete previous word" >> ~/.inputrc
+    echo '"\C-H": shell-backward-kill-word' >> ~/.inputrc
+    echo "  ✅ Added Ctrl-Backspace binding"
+else
+    echo "  ⏭️  Ctrl-Backspace already configured"
 fi
 
 echo ""
