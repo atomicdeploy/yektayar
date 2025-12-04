@@ -6,6 +6,11 @@ import { logger } from '@yektayar/shared'
 import { getVersionFromPackageJson } from '@yektayar/shared'
 import packageJson from '../../package.json'
 
+// Type declarations for Bun and Node.js globals
+declare const Bun: any
+declare const process: any
+declare const setInterval: any
+
 // Get version from package.json
 const APP_VERSION = getVersionFromPackageJson(packageJson)
 

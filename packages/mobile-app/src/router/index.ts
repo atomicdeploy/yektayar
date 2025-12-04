@@ -89,6 +89,22 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'chat/ai',
         component: () => import('@/views/AIChatPage.vue')
+      },
+      {
+        path: 'assessments',
+        component: () => import('@/views/AssessmentsPage.vue')
+      },
+      {
+        path: 'assessments/history',
+        component: () => import('@/views/AssessmentHistoryPage.vue')
+      },
+      {
+        path: 'assessments/:id',
+        component: () => import('@/views/TakeAssessmentPage.vue')
+      },
+      {
+        path: 'assessments/results/:resultId',
+        component: () => import('@/views/AssessmentResultsPage.vue')
       }
     ]
   }

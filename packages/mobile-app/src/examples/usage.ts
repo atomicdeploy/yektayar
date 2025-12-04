@@ -35,6 +35,11 @@ export function isProduction(): boolean {
  * IMPORTANT: Always use the unified API client from @/api instead of
  * direct fetch() calls. The API client handles authentication,
  * error handling, and provides a consistent interface.
+ * 
+ * NOTE: Do NOT prepend '/api' to endpoints - the baseURL already includes it.
+ * 
+ * ✅ Correct: apiClient.get('/assessments')
+ * ❌ Wrong:   apiClient.get('/api/assessments')
  */
 export async function apiRequest<T>(endpoint: string): Promise<T> {
   const response = await apiClient.get<T>(endpoint);

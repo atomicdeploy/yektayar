@@ -151,7 +151,7 @@ async function loadPage() {
   error.value = ''
   
   try {
-    const response = await apiClient.get('/api/pages/about-us', { skipAuth: true })
+    const response = await apiClient.get('/pages/about-us', { skipAuth: true })
     
     if (response.success && response.data) {
       pageData.value = response.data

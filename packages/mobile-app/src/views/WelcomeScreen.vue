@@ -445,7 +445,7 @@ watch(allTypewritersComplete, (isComplete: boolean) => {
 // Fetch user preferences to check if terms were already accepted
 const fetchUserPreferences = async () => {
   try {
-    const response = await apiClient.get('/api/users/preferences')
+    const response = await apiClient.get('/users/preferences')
     if (response.data?.termsAccepted) {
       termsAccepted.value = true
       logger.info('[WelcomeScreen] User has previously accepted terms')
@@ -840,7 +840,7 @@ const startApp = async () => {
     localStorage.setItem(WELCOME_SHOWN_KEY, 'true')
     
     // Make API request while showing loading state
-    await apiClient.post('/api/users/preferences', {
+    await apiClient.post('/users/preferences', {
       welcomeScreenShown: true,
       termsAccepted: true
     })
