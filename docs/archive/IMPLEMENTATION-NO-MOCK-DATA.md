@@ -185,7 +185,7 @@ These TODOs are intentional integration points or UI enhancements:
 - ✅ CodeQL scan completed - 0 alerts found
 
 ### Manual Testing
-- ✅ Created test script: `scripts/test-implementations.mjs`
+- ✅ Created test script: `tests/test-implementations.mjs`
 - Tests all implemented features
 - Verifies no mock data is used
 - Confirms database queries work
@@ -196,7 +196,7 @@ To run tests:
 npm run dev:backend
 
 # In another terminal
-node scripts/test-implementations.mjs
+node tests/test-implementations.mjs
 ```
 
 ---
