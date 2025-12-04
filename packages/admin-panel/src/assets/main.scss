@@ -1,9 +1,6 @@
 /* Import Sahel Font */
 @import './fonts.scss';
 
-/* Import shared component styles */
-@import './components.scss';
-
 @import "tailwindcss";
 
 /* Tailwind v4 Theme Configuration */
@@ -118,6 +115,9 @@
     -webkit-touch-callout: none;
   }
 }
+
+/* Import shared component styles */
+@import './components.scss';
 
 /* OverlayScrollbars Custom Styling - Light Theme */
 .os-theme-yektayar.os-scrollbar-horizontal,
