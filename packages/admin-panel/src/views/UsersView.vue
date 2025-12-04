@@ -766,8 +766,4 @@ async function fetchUsers() {
   }
 }
 
-/* Styles already in shared components.scss - removed duplicates */
-/* - .btn, .btn-primary, .btn-secondary */
-/* - .modal-overlay, .modal-content, .modal-header */
-/* - .form-group, .form-actions, .kbd */
 </style>
