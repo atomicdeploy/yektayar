@@ -121,3 +121,4 @@ tmp/
 **/ios/App/build
 **/ios/App/*.xcworkspace
 !**/ios/App/*.xcworkspace/contents.xcworkspacedata
+actionlint
