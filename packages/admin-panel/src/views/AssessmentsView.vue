@@ -699,14 +699,14 @@ const truncate = (text: string, length: number) => {
   return text.length > length ? text.substring(0, length) + '...' : text
 }
 
-const formatDate = (daassessmentring: string) => {
-  if (!daassessmentring) return ''
-  return new Date(daassessmentring).toLocaleDaassessmentring('fa-IR')
+const formatDate = (dateString: string) => {
+  if (!dateString) return ''
+  return new Date(dateString).toLocaleDateString('fa-IR')
 }
 
-const formatDateTime = (daassessmentring: string) => {
-  if (!daassessmentring) return ''
-  return new Date(daassessmentring).toLocaleString('fa-IR')
+const formatDateTime = (dateString: string) => {
+  if (!dateString) return ''
+  return new Date(dateString).toLocaleString('fa-IR')
 }
 
 const calculateAverageScore = () => {
