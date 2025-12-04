@@ -271,7 +271,7 @@
               </button>
               <button type="submit" class="btn btn-primary">
                 <span>{{ editingCourse ? 'ذخیره تغییرات' : 'ایجاد دوره' }}</span>
-                <kbd class="kbd">Ctrl+Enter</kbd>
+                <kbd class="kbd">Ctrl+⏎</kbd>
               </button>
             </div>
           </form>

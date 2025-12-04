@@ -257,7 +257,7 @@
               </button>
               <button type="submit" class="btn btn-primary" :disabled="saving">
                 <span>{{ saving ? 'در حال ذخیره...' : 'ذخیره' }}</span>
-                <kbd class="kbd" v-if="!saving">Ctrl+Enter</kbd>
+                <kbd class="kbd" v-if="!saving">Ctrl+⏎</kbd>
               </button>
             </div>
           </form>

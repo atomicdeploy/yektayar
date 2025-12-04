@@ -334,7 +334,7 @@
               </button>
               <button type="submit" class="btn btn-primary">
                 <span>{{ t('save') }}</span>
-                <kbd class="kbd">Ctrl+Enter</kbd>
+                <kbd class="kbd">Ctrl+⏎</kbd>
               </button>
             </div>
           </form>
