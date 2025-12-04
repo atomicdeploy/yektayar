@@ -69,6 +69,27 @@ export async function getAllUsers(filters?: UserFilters): Promise<{
     `, params)
     
     const total = parseInt(countResult[0].count)
+
+    /*
+      if (filters?type) {
+        countResult = await query<{ count: string }>('SELECT COUNT(*) FROM users WHERE type = $1', [type])
+        users = await query(`
+          SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
+          FROM users
+          WHERE type = $1
+          ORDER BY created_at DESC
+          LIMIT $2 OFFSET $3
+        `, [type, limit, offset])
+      } else {
+        countResult = await query<{ count: string }>('SELECT COUNT(*) FROM users')
+        users = await query(`
+          SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
+          FROM users
+          ORDER BY created_at DESC
+          LIMIT $1 OFFSET $2
+        `, [limit, offset])
+      }
+    */
     
     // Get users with pagination
     const users = await db.unsafe(`
@@ -105,6 +126,15 @@ export async function getUserById(id: string | number): Promise<User | null> {
   const db = getDatabase()
   
   try {
+    /*
+    const users = await query(`
+      SELECT id, email, phone, name, type, avatar, bio, specialization,
+      is_active, created_at, updated_at
+      FROM users
+      WHERE id = $1
+    `, [id])
+    */
+    
     const users = await db`
       SELECT 
         id, email, phone, name, type, avatar, bio, specialization, 
@@ -282,8 +312,17 @@ export async function updateUser(
     
     // Always update updated_at
     setClauses.push(`updated_at = CURRENT_TIMESTAMP`)
-    
+
     params.push(id)
+
+    /*
+      const result = await query(`
+        UPDATE users
+        SET ${updates.join(', ')}
+        WHERE id = $${values.length}
+        RETURNING id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
+      `, values)
+    */
     
     const users = await db.unsafe(`
       UPDATE users
@@ -331,6 +370,15 @@ export async function getUserProfile(id: string | number): Promise<(User & { sta
   const db = getDatabase()
   
   try {
+    /*
+    const users = await query(`
+      SELECT id, email, phone, name, type, avatar, bio, specialization,
+      is_active, created_at, updated_at
+      FROM users
+      WHERE id = $1
+    `, [id])
+    */
+    
     const users = await db`
       SELECT 
         id, email, phone, name, type, avatar, bio, specialization, 
@@ -346,7 +394,20 @@ export async function getUserProfile(id: string | number): Promise<(User & { sta
     const user = mapDatabaseUserToUser(users[0])
     
     // Add type-specific statistics
+
+    // If psychologist, get their appointments count
     if (user.type === 'psychologist') {
+
+      /*
+      const stats = await query(`
+        SELECT 
+          COUNT(*) as total_appointments,
+          COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_appointments
+        FROM appointments
+        WHERE psychologist_id = $1
+      `, [id])
+      */
+      
       const stats = await db`
         SELECT 
           COUNT(*) as total_appointments,
@@ -356,8 +417,20 @@ export async function getUserProfile(id: string | number): Promise<(User & { sta
       `
       return { ...user, stats: stats[0] }
     }
-    
+
+    // If patient, get their course enrollments
     if (user.type === 'patient') {
+
+      /*
+      const enrollmentStats = await query(`
+        SELECT 
+          COUNT(*) as total_enrollments,
+          COUNT(CASE WHEN completed = true THEN 1 END) as completed_courses
+        FROM course_enrollments
+        WHERE user_id = $1
+      `, [id])
+      */
+      
       const stats = await db`
         SELECT 
           COUNT(*) as total_enrollments,
