@@ -406,3 +406,32 @@ ion-content {
   --background: var(--ion-background-color);
   --color: var(--ion-text-color);
 }
+
+/* ========================================
+   CAPACITOR/ANDROID SPECIFIC STYLES
+   ======================================== */
+
+/* Disable text selection on Android/iOS for native feel */
+.plt-capacitor,
+.plt-android,
+.plt-ios {
+  * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Allow text selection in specific input/textarea elements */
+  input,
+  textarea,
+  [contenteditable="true"],
+  .text-selectable {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+  }
+}

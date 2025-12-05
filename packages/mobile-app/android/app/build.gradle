@@ -1,14 +1,32 @@
 apply plugin: 'com.android.application'
 
+// Read version from package.json
+def getVersionFromPackageJson() {
+    def packageJson = new groovy.json.JsonSlurper().parseText(file('../../package.json').text)
+    return packageJson.version
+}
+
+// Calculate version code from version name (e.g., "0.1.0" -> 100)
+def getVersionCodeFromName(versionName) {
+    def parts = versionName.split('\\.')
+    def major = parts.length > 0 ? parts[0].toInteger() : 0
+    def minor = parts.length > 1 ? parts[1].toInteger() : 0
+    def patch = parts.length > 2 ? parts[2].toInteger() : 0
+    return major * 10000 + minor * 100 + patch
+}
+
+def appVersion = getVersionFromPackageJson()
+def appVersionCode = getVersionCodeFromName(appVersion)
+
 android {
-    namespace "com.yektayar.app"
+    namespace "ir.yektayar.app"
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.yektayar.app"
+        applicationId "ir.yektayar.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode appVersionCode
+        versionName appVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

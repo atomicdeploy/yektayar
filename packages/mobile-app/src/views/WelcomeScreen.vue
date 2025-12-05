@@ -193,11 +193,18 @@ import { useTypewriter } from '@/composables/useTypewriter'
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useDebugConfigStore } from '@/stores/debugConfig'
 import { createKeyboardHandler } from './WelcomeScreen.utils'
+import { useBackButton } from '@/composables/useBackButton'
 
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
 const configStore = useDebugConfigStore()
+
+// Handle back button to exit app when on welcome screen
+useBackButton(() => {
+  // Always allow exit from welcome screen
+  return true
+})
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 
@@ -1471,7 +1478,7 @@ const onImageError = () => {
 .error-text {
   text-align: right;
   font-size: 0.95rem;
-  color: #991b1b;
+  color: #7f1d1d; /* Darker color for better readability in light mode */
   line-height: 1.6;
   margin: 0;
   font-weight: 600;
@@ -1712,10 +1719,10 @@ const onImageError = () => {
 @media (prefers-color-scheme: dark) {
   .welcome-content {
     --background: linear-gradient(135deg, 
-      #0f1419 0%, 
+      #0a0f1a 0%, 
       #1a1f2e 20%,
       #16213e 80%, 
-      #0f1419 100%
+      #0a0f1a 100%
     );
   }
 
@@ -1823,11 +1830,11 @@ const onImageError = () => {
   .scroll-reminder-mask {
     background: linear-gradient(
       to bottom,
-      rgba(15, 20, 25, 0) 0%,
-      rgba(15, 20, 25, 0.4) 20%,
-      rgba(15, 20, 25, 0.7) 40%,
-      rgba(15, 20, 25, 0.9) 70%,
-      rgba(15, 20, 25, 1) 100%
+      rgba(10, 15, 26, 0) 0%,
+      rgba(10, 15, 26, 0.4) 20%,
+      rgba(10, 15, 26, 0.7) 40%,
+      rgba(10, 15, 26, 0.9) 70%,
+      rgba(10, 15, 26, 1) 100%
     );
   }
 }

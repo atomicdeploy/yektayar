@@ -138,6 +138,15 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+/* Disable text selection for native app feel */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 /* Web (non-mobile) styles */
 .error-screen {
   position: fixed;
