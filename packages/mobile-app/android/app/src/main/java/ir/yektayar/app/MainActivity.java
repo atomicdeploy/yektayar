@@ -17,5 +17,6 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(JSBridgePlugin.class);
         registerPlugin(ToastPlugin.class);
         registerPlugin(DialogPlugin.class);
+        registerPlugin(SecureModePlugin.class);
     }
 }
