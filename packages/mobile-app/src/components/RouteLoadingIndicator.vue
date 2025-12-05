@@ -15,28 +15,25 @@ import { IonSpinner } from '@ionic/vue'
 
 const router = useRouter()
 const isLoading = ref(false)
-let loadingTimer: number | null = null
+const navigationId = ref(0)
 
 // Show loading indicator during route transitions
 router.beforeEach((_to, _from, next) => {
   // Only show loading for tab navigation routes
   if (_to.path.startsWith('/tabs/') && _from.path.startsWith('/tabs/')) {
+    navigationId.value++
     isLoading.value = true
-    // Set a minimum display time to avoid flash
-    loadingTimer = window.setTimeout(() => {
-      // Will be hidden by afterEach
-    }, 100)
   }
   next()
 })
 
 router.afterEach(() => {
+  const currentNavId = navigationId.value
   // Add a small delay to ensure smooth transition
   setTimeout(() => {
-    isLoading.value = false
-    if (loadingTimer) {
-      clearTimeout(loadingTimer)
-      loadingTimer = null
+    // Only hide if no new navigation has started
+    if (currentNavId === navigationId.value) {
+      isLoading.value = false
     }
   }, 150)
 })
