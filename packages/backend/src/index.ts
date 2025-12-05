@@ -18,6 +18,7 @@ import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
 import { assessmentRoutes } from './routes/assessments'
 import { healthRoutes } from './routes/health'
+import { updateRoutes } from './routes/updates'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
@@ -96,6 +97,7 @@ app
           { name: 'Support', description: 'Support tickets and messaging endpoints' },
           { name: 'AI', description: 'AI counselor chat endpoints' },
           { name: 'Assessments', description: 'Psychological assessments and surveys endpoints' },
+          { name: 'Updates', description: 'App update check and management endpoints' },
           { name: 'WebSocket', description: 'Real-time communication via Socket.IO' }
         ],
         externalDocs: {
@@ -155,6 +157,7 @@ app
   .use(supportRoutes)
   .use(aiRoutes)
   .use(assessmentRoutes)
+  .use(updateRoutes)
 
 // Server configuration
 const port = Number(process.env.PORT) || 3000
