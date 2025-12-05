@@ -104,12 +104,17 @@ export function getWebDeviceInfo(): Partial<DeviceInfo> {
   }
   
   // Connection information
+  // Note: Network Information API is experimental and may not be available in all browsers
+  // See: https://developer.mozilla.org/en-US/docs/Web/API/Network_Information_API
   if ('connection' in navigator || 'mozConnection' in navigator || 'webkitConnection' in navigator) {
     const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
     info.connectionType = connection?.effectiveType || connection?.type || 'unknown'
   }
   
-  // Memory information (if available)
+  // Memory information
+  // Note: Device Memory API is experimental and not widely supported (Chrome, Edge only)
+  // Returns approximate amount of device memory in gigabytes
+  // See: https://developer.mozilla.org/en-US/docs/Web/API/Device_Memory_API
   if ('deviceMemory' in navigator) {
     info.memorySize = (navigator as any).deviceMemory * 1024 // Convert GB to MB
   }

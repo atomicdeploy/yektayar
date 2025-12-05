@@ -5,6 +5,11 @@ import { createAnonymousSession, validateSessionToken, invalidateSession, linkUs
 import { extractToken } from '../middleware/tokenExtractor'
 import { logger } from '@yektayar/shared'
 
+// Define request body types
+interface AcquireSessionBody {
+  deviceInfo?: Record<string, any>
+}
+
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request: _request, body }) => {
     try {
@@ -13,7 +18,8 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
       
       // Get device info from body if provided
-      const deviceInfo = (body as any)?.deviceInfo || {}
+      const requestBody = body as AcquireSessionBody
+      const deviceInfo = requestBody?.deviceInfo || {}
       
       // Extract device info from custom headers
       const deviceHeaders = {

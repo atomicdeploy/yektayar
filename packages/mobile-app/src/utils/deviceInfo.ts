@@ -7,7 +7,7 @@
 
 import { Device } from '@capacitor/device'
 import { App } from '@capacitor/app'
-import { Capacitor } from '@capacitor/core'
+import { Capacitor, registerPlugin } from '@capacitor/core'
 import type { DeviceInfo } from '@yektayar/shared'
 import { getWebDeviceInfo } from '@yektayar/shared'
 import { logger } from '@yektayar/shared'
@@ -30,6 +30,13 @@ interface DeviceInfoPluginResponse {
   brand: string
   product: string
 }
+
+interface DeviceInfoPluginInterface {
+  getDeviceInfo(): Promise<DeviceInfoPluginResponse>
+}
+
+// Register the native plugin
+const NativeDeviceInfoPlugin = registerPlugin<DeviceInfoPluginInterface>('DeviceInfoPlugin')
 
 /**
  * Get comprehensive device information using Capacitor APIs
@@ -88,32 +95,28 @@ export async function getCapacitorDeviceInfo(): Promise<DeviceInfo> {
     // Try to get additional Android-specific info from our custom plugin
     if (deviceInfo.platform === 'android') {
       try {
-        // Access the plugin via registerPlugin for better type safety
-        const DeviceInfoPlugin = (Capacitor as any).Plugins?.DeviceInfoPlugin
-        if (DeviceInfoPlugin) {
-          const nativeInfo: DeviceInfoPluginResponse = await DeviceInfoPlugin.getDeviceInfo()
-          logger.debug('Native Android device info:', nativeInfo)
-          
-          // Merge native info (prefer native values when available)
-          if (nativeInfo.deviceModel) info.deviceModel = nativeInfo.deviceModel
-          if (nativeInfo.deviceManufacturer) info.deviceManufacturer = nativeInfo.deviceManufacturer
-          if (nativeInfo.androidVersion) info.osVersion = nativeInfo.androidVersion
-          if (nativeInfo.screenWidth) info.screenWidth = nativeInfo.screenWidth
-          if (nativeInfo.screenHeight) info.screenHeight = nativeInfo.screenHeight
-          if (nativeInfo.screenDensity) info.screenDensity = nativeInfo.screenDensity
-          if (nativeInfo.deviceId) info.deviceId = nativeInfo.deviceId
-        }
+        const nativeInfo: DeviceInfoPluginResponse = await NativeDeviceInfoPlugin.getDeviceInfo()
+        logger.debug('Native Android device info:', nativeInfo)
+        
+        // Merge native info (prefer native values when available)
+        if (nativeInfo.deviceModel) info.deviceModel = nativeInfo.deviceModel
+        if (nativeInfo.deviceManufacturer) info.deviceManufacturer = nativeInfo.deviceManufacturer
+        if (nativeInfo.androidVersion) info.osVersion = nativeInfo.androidVersion
+        if (nativeInfo.screenWidth) info.screenWidth = nativeInfo.screenWidth
+        if (nativeInfo.screenHeight) info.screenHeight = nativeInfo.screenHeight
+        if (nativeInfo.screenDensity) info.screenDensity = nativeInfo.screenDensity
+        if (nativeInfo.deviceId) info.deviceId = nativeInfo.deviceId
       } catch (error) {
         logger.warn('Could not get native Android device info:', error)
       }
     }
     
-    // Add memory info if available
+    // Add memory info if available (experimental API, may not be supported in all browsers)
     if ('deviceMemory' in navigator) {
       info.memorySize = (navigator as any).deviceMemory * 1024 // GB to MB
     }
     
-    // Add connection type if available
+    // Add connection type if available (experimental API, may not be supported in all browsers)
     if ('connection' in navigator) {
       const connection = (navigator as any).connection
       info.connectionType = connection?.effectiveType || 'unknown'
