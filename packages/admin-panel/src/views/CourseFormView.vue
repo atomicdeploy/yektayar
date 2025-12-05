@@ -3,7 +3,7 @@
     <div class="form-header">
       <div class="header-content">
         <button class="btn-back" @click="goBack">
-          <i class="icon-arrow-left"></i>
+          <ArrowLeftIcon class="w-5 h-5" />
           بازگشت
         </button>
         <h1>{{ isEditMode ? 'ویرایش دوره' : 'افزودن دوره جدید' }}</h1>
@@ -113,6 +113,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { logger } from '@yektayar/shared'
+import { ArrowLeftIcon } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const route = useRoute()

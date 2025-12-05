@@ -93,15 +93,15 @@
           <p class="course-description">{{ truncate(course.description, 100) }}</p>
           <div class="course-meta">
             <div class="meta-item">
-              <i class="icon-category"></i>
+              <FolderIcon class="w-4 h-4" />
               <span>{{ course.category }}</span>
             </div>
             <div class="meta-item">
-              <i class="icon-level"></i>
+              <AcademicCapIcon class="w-4 h-4" />
               <span>{{ getDifficultyLabel(course.difficulty) }}</span>
             </div>
             <div class="meta-item">
-              <i class="icon-time"></i>
+              <ClockIcon class="w-4 h-4" />
               <span>{{ course.duration }} دقیقه</span>
             </div>
           </div>
@@ -180,7 +180,7 @@
 
     <!-- Empty State -->
     <div v-if="!loading && filteredCourses.length === 0" class="empty-state">
-      <i class="icon-courses-empty"></i>
+      <BookOpenIcon class="w-16 h-16 text-gray-400" />
       <h3>هیچ دوره‌ای یافت نشد</h3>
       <p>برای شروع، اولین دوره خود را ایجاد کنید</p>
       <button class="btn btn-primary" @click="showCreateModal = true">
@@ -291,6 +291,10 @@ import {
   TrashIcon,
   ListBulletIcon,
   ArrowTopRightOnSquareIcon,
+  FolderIcon,
+  AcademicCapIcon,
+  ClockIcon,
+  BookOpenIcon,
 } from '@heroicons/vue/24/outline'
 import { useViewMode } from '@/composables/useViewMode'
 import { usePermissionsStore } from '@/stores/permissions'

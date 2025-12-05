@@ -42,7 +42,7 @@
       <div v-for="assessment in filteredAssessments" :key="assessment.id" class="assessment-card" @click="editAssessmentInModal(assessment)">
         <div class="assessment-header">
           <div class="assessment-icon">
-            <i class="icon-assessment"></i>
+            <ClipboardDocumentListIcon class="w-6 h-6" />
           </div>
           <div class="assessment-title-section">
             <h3>{{ assessment.title }}</h3>
@@ -58,15 +58,15 @@
           <p class="assessment-description">{{ truncate(assessment.description, 150) }}</p>
           <div class="assessment-meta">
             <div class="meta-item">
-              <i class="icon-questions"></i>
+              <QuestionMarkCircleIcon class="w-4 h-4" />
               <span>{{ assessment.question_count || 0 }} سوال</span>
             </div>
             <div class="meta-item">
-              <i class="icon-sections"></i>
+              <RectangleStackIcon class="w-4 h-4" />
               <span>{{ assessment.section_count || 0 }} بخش</span>
             </div>
             <div class="meta-item">
-              <i class="icon-time"></i>
+              <ClockIcon class="w-4 h-4" />
               <span>{{ formatDate(assessment.created_at) }}</span>
             </div>
           </div>
@@ -167,7 +167,7 @@
 
     <!-- Empty State -->
     <div v-if="filteredAssessments.length === 0 && !loading" class="empty-state">
-      <i class="icon-empty"></i>
+      <ClipboardDocumentListIcon class="w-16 h-16 text-gray-400" />
       <h3>ارزیابیی یافت نشد</h3>
       <p>هنوز ارزیابیی ایجاد نشده است یا با فیلترهای انتخابی نتیجه‌ای یافت نشد.</p>
       <button class="btn btn-primary" @click="showCreateModal = true">
@@ -302,7 +302,7 @@
                   @click="removeSection(sectionIndex)"
                   title="حذف بخش"
                 >
-                  <i class="icon-trash"></i>
+                  <TrashIcon class="w-5 h-5" />
                 </button>
               </div>
 
@@ -335,7 +335,7 @@
                     @click="removeQuestion(sectionIndex, questionIndex)"
                     title="حذف سوال"
                   >
-                    <i class="icon-trash"></i>
+                    <TrashIcon class="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -426,6 +426,10 @@ import {
   ListBulletIcon,
   ChartBarIcon,
   ArrowTopRightOnSquareIcon,
+  ClipboardDocumentListIcon,
+  QuestionMarkCircleIcon,
+  RectangleStackIcon,
+  ClockIcon,
 } from '@heroicons/vue/24/outline'
 import { useViewMode } from '@/composables/useViewMode'
 import { usePermissionsStore } from '@/stores/permissions'
