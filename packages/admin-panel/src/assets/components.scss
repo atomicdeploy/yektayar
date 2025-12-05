@@ -179,6 +179,8 @@
     ============================================ */
 
   .btn {
+    /* @apply inline-flex items-center px-4 py-2 font-medium rounded-lg transition-colors; */
+
     padding: 8px 16px;
     border: none;
     border-radius: 8px;
@@ -196,19 +198,21 @@
     }
 
     &.btn-primary {
+      /* @apply bg-primary-600 hover:bg-primary-700 text-white */
+
       /* background: var(--primary-gradient); */
-      background: var(--primary-color);
+      background: var(--primary-color-600);
       color: black;
 
       &:hover:not(:disabled) {
         /* background-size: 150%; */
-        background: var(--color-primary-400);
-        transform: translateY(-1px);
+        background: var(--color-primary-500);
+        /* transform: translateY(-1px); */
         /* box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4); */
       }
 
       &:active:not(:disabled) {
-        background: var(--color-primary-400);
+        background: var(--color-primary-700);
       }
 
       @media (prefers-color-scheme: dark) {
