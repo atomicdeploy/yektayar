@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand colors -->
+    <color name="colorPrimary">#d4a43e</color>
+    <color name="colorPrimaryDark">#ba8b2d</color>
+    <color name="colorAccent">#01183a</color>
+    
+    <!-- Splash screen colors -->
+    <color name="splash_background_light">#fafbfc</color>
+    <color name="splash_background_dark">#0f1419</color>
+</resources>
