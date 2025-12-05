@@ -6,16 +6,43 @@ import { extractToken } from '../middleware/tokenExtractor'
 import { logger } from '@yektayar/shared'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
-  .post('/acquire-session', async ({ headers, request: _request }) => {
+  .post('/acquire-session', async ({ headers, request: _request, body }) => {
     try {
       // Extract metadata from request
       const userAgent = headers['user-agent'] || 'unknown'
       const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
       
+      // Get device info from body if provided
+      const deviceInfo = (body as any)?.deviceInfo || {}
+      
+      // Extract device info from custom headers
+      const deviceHeaders = {
+        platform: headers['x-device-platform'],
+        deviceModel: headers['x-device-model'],
+        deviceManufacturer: headers['x-device-manufacturer'],
+        osName: headers['x-os-name'],
+        osVersion: headers['x-os-version'],
+        appVersion: headers['x-app-version'],
+        screenSize: headers['x-screen-size'],
+        screenDensity: headers['x-screen-density'],
+        language: headers['x-device-language'],
+        deviceId: headers['x-device-id'],
+        connectionType: headers['x-connection-type'],
+      }
+      
+      // Merge device info from body and headers
+      const mergedDeviceInfo = {
+        ...deviceInfo,
+        ...Object.fromEntries(
+          Object.entries(deviceHeaders).filter(([_, v]) => v !== undefined)
+        ),
+      }
+      
       const metadata = {
         userAgent,
         ip,
-        deviceInfo: {
+        deviceInfo: mergedDeviceInfo,
+        requestHeaders: {
           platform: headers['sec-ch-ua-platform'] || 'unknown',
           mobile: headers['sec-ch-ua-mobile'] === '?1'
         }
