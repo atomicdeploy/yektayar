@@ -179,34 +179,64 @@ jobs:
         id: upload-debug
         run: |
           # Upload to tmpfiles.org
-          RESPONSE=$(curl -F "file=@yektayar-app-debug-secure.zip" https://tmpfiles.org/api/v1/upload)
+          RESPONSE=$(curl -f -F "file=@yektayar-app-debug-secure.zip" https://tmpfiles.org/api/v1/upload 2>&1 || echo '{"status":"error"}')
           echo "Response: $RESPONSE"
           
-          # Extract URL from JSON response
-          URL=$(echo $RESPONSE | grep -oP '(?<="url":")[^"]*')
-          
-          # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
-          DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
-          
-          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-          echo "Upload successful! Download URL: $DOWNLOAD_URL"
+          # Check if upload was successful
+          if echo "$RESPONSE" | grep -q '"status":"success"'; then
+            # Extract URL from JSON response using jq if available, otherwise grep
+            if command -v jq &> /dev/null; then
+              URL=$(echo $RESPONSE | jq -r '.data.url')
+            else
+              URL=$(echo $RESPONSE | grep -oP '(?<="url":")[^"]*' || echo "")
+            fi
+            
+            if [ -n "$URL" ]; then
+              # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
+              DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
+              echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+              echo "upload_status=success" >> $GITHUB_OUTPUT
+              echo "Upload successful! Download URL: $DOWNLOAD_URL"
+            else
+              echo "upload_status=failed" >> $GITHUB_OUTPUT
+              echo "Failed to extract URL from response"
+            fi
+          else
+            echo "upload_status=failed" >> $GITHUB_OUTPUT
+            echo "Upload failed"
+          fi
 
       - name: Upload to tmpfiles.org (Release)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
         id: upload-release
         run: |
           # Upload to tmpfiles.org
-          RESPONSE=$(curl -F "file=@yektayar-app-release-secure.zip" https://tmpfiles.org/api/v1/upload)
+          RESPONSE=$(curl -f -F "file=@yektayar-app-release-secure.zip" https://tmpfiles.org/api/v1/upload 2>&1 || echo '{"status":"error"}')
           echo "Response: $RESPONSE"
           
-          # Extract URL from JSON response
-          URL=$(echo $RESPONSE | grep -oP '(?<="url":")[^"]*')
-          
-          # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
-          DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
-          
-          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-          echo "Upload successful! Download URL: $DOWNLOAD_URL"
+          # Check if upload was successful
+          if echo "$RESPONSE" | grep -q '"status":"success"'; then
+            # Extract URL from JSON response using jq if available, otherwise grep
+            if command -v jq &> /dev/null; then
+              URL=$(echo $RESPONSE | jq -r '.data.url')
+            else
+              URL=$(echo $RESPONSE | grep -oP '(?<="url":")[^"]*' || echo "")
+            fi
+            
+            if [ -n "$URL" ]; then
+              # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
+              DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
+              echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+              echo "upload_status=success" >> $GITHUB_OUTPUT
+              echo "Upload successful! Download URL: $DOWNLOAD_URL"
+            else
+              echo "upload_status=failed" >> $GITHUB_OUTPUT
+              echo "Failed to extract URL from response"
+            fi
+          else
+            echo "upload_status=failed" >> $GITHUB_OUTPUT
+            echo "Upload failed"
+          fi
 
       - name: Comment PR with APK
         if: github.event_name == 'pull_request'
@@ -223,19 +253,37 @@ jobs:
             
             const password = isDebug ? '${{ steps.create-zip-debug.outputs.password }}' : '${{ steps.create-zip-release.outputs.password }}';
             const downloadUrl = isDebug ? '${{ steps.upload-debug.outputs.download_url }}' : '${{ steps.upload-release.outputs.download_url }}';
+            const uploadStatus = isDebug ? '${{ steps.upload-debug.outputs.upload_status }}' : '${{ steps.upload-release.outputs.upload_status }}';
             const zipSize = isDebug ? '${{ steps.create-zip-debug.outputs.zip_size }}' : '${{ steps.create-zip-release.outputs.zip_size }}';
             const apkMd5 = isDebug ? '${{ steps.create-zip-debug.outputs.apk_md5 }}' : '${{ steps.create-zip-release.outputs.apk_md5 }}';
+            
+            // Determine correct APK filename
+            const apkFileName = isDebug ? 'app-debug.apk' : 'app-release-unsigned.apk';
+            const zipFileName = isDebug ? 'yektayar-app-debug-secure.zip' : 'yektayar-app-release-secure.zip';
 
-            const body = `## ✅ Android APK Built Successfully!
-
-            ### 📥 Quick Download (Temporary Link)
+            let downloadSection = '';
+            if (uploadStatus === 'success' && downloadUrl) {
+              downloadSection = `### 📥 Quick Download (Temporary Link)
 
             **Download URL**: ${downloadUrl}  
             **Password**: \`${password}\`  
             **ZIP Size**: ${zipSize}  
             **APK MD5**: \`${apkMd5}\`
 
-            > **Note**: The ZIP file contains the APK directly (no folder structure). Password is current build datetime in ISO format. Link expires after a period of time.
+            > **Note**: The ZIP file contains only \`${apkFileName}\` (no folder structure). Password is current build datetime in ISO format. Link expires after a period of time.
+
+            `;
+            } else {
+              downloadSection = `### 📥 Download Note
+
+            Temporary upload to tmpfiles.org was not available. Please use the GitHub Artifacts download below.
+
+            `;
+            }
+
+            const body = `## ✅ Android APK Built Successfully!
+
+            ${downloadSection}
 
             ### 📦 Artifact Download
 
@@ -249,8 +297,8 @@ jobs:
 
             ### 📖 Installation
 
-            1. Download and extract: \`unzip -P "${password}" yektayar-app-${buildType}-secure.zip\`
-            2. Install: \`adb install app-${buildType}.apk\`
+            1. Download and extract: \`unzip -P "${password}" ${zipFileName}\`
+            2. Install: \`adb install ${apkFileName}\`
             `;
 
             github.rest.issues.createComment({
