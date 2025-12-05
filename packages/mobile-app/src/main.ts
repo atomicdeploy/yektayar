@@ -203,6 +203,34 @@ async function initializeApp() {
       
       errorApp.use(IonicVue)
       errorApp.use(i18n)
+      
+      // Add back button handler for error screen
+      errorApp.mixin({
+        async mounted() {
+          // Only add listener once at root level
+          if (this.$el?.id === 'app') {
+            try {
+              const { App } = await import('@capacitor/app')
+              const { Capacitor } = await import('@capacitor/core')
+              
+              if (Capacitor.isNativePlatform()) {
+                await App.addListener('backButton', async () => {
+                  logger.info('Back button pressed on error screen - exiting app')
+                  try {
+                    const BackButton = (await import('./plugins/backButton')).default
+                    await BackButton.exitApp()
+                  } catch (error) {
+                    logger.error('Failed to exit app:', error)
+                  }
+                })
+              }
+            } catch (error) {
+              // Capacitor not available
+            }
+          }
+        }
+      })
+      
       errorApp.mount('#app')
       return
     }

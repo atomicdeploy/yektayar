@@ -12,5 +12,8 @@ public class MainActivity extends BridgeActivity {
         // Register custom plugins
         registerPlugin(DeviceInfoPlugin.class);
         registerPlugin(WebViewConsoleLoggerPlugin.class);
+        registerPlugin(BackButtonPlugin.class);
+        registerPlugin(StatusBarPlugin.class);
+        registerPlugin(JSBridgePlugin.class);
     }
 }

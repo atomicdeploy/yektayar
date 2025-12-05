@@ -193,11 +193,18 @@ import { useTypewriter } from '@/composables/useTypewriter'
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useDebugConfigStore } from '@/stores/debugConfig'
 import { createKeyboardHandler } from './WelcomeScreen.utils'
+import { useBackButton } from '@/composables/useBackButton'
 
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
 const configStore = useDebugConfigStore()
+
+// Handle back button to exit app when on welcome screen
+useBackButton(() => {
+  // Always allow exit from welcome screen
+  return true
+})
 
 const WELCOME_SHOWN_KEY = 'yektayar_welcome_shown'
 

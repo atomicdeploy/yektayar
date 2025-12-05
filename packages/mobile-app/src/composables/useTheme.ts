@@ -1,4 +1,6 @@
 import { ref, onMounted, watch } from 'vue'
+import { Capacitor } from '@capacitor/core'
+import StatusBar from '../plugins/statusBar'
 
 export type Theme = 'light' | 'dark' | 'auto'
 
@@ -40,14 +42,35 @@ export function useTheme() {
 
   // Update meta theme color for mobile browsers
   const updateMetaThemeColor = (dark: boolean) => {
+    const backgroundColor = dark ? '#0a0f1a' : '#fafbfc'
+    
+    // Update meta tag for web browsers
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', dark ? '#0a0f1a' : '#fafbfc')
+      metaThemeColor.setAttribute('content', backgroundColor)
     } else {
       const meta = document.createElement('meta')
       meta.name = 'theme-color'
-      meta.content = dark ? '#0a0f1a' : '#fafbfc'
+      meta.content = backgroundColor
       document.head.appendChild(meta)
+    }
+    
+    // Update native status bar on Capacitor platforms
+    if (Capacitor.isNativePlatform()) {
+      try {
+        // Set status bar background color
+        StatusBar.setBackgroundColor({ color: backgroundColor }).catch(() => {
+          // Silently fail if plugin not available
+        })
+        
+        // Set status bar icon style
+        // Dark background = light icons, Light background = dark icons
+        StatusBar.setStyle({ style: dark ? 'dark' : 'light' }).catch(() => {
+          // Silently fail if plugin not available
+        })
+      } catch (error) {
+        // Plugin not available on this platform
+      }
     }
   }
 
