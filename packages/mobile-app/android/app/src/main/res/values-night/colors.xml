@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand colors -->
+    <!-- Brand colors (same in dark mode) -->
     <color name="colorPrimary">#d4a43e</color>
     <color name="colorPrimaryDark">#ba8b2d</color>
     <color name="colorAccent">#01183a</color>
@@ -11,16 +11,16 @@
     <color name="splash_background_light">#fafbfc</color>
     <color name="splash_background_dark">#0f1419</color>
     
-    <!-- Additional theme colors -->
-    <color name="colorSurface">#FFFFFF</color>
+    <!-- Dark mode theme colors -->
+    <color name="colorSurface">#1E1E1E</color>
     <color name="colorSurfaceDark">#1E1E1E</color>
     <color name="colorOnPrimary">#FFFFFF</color>
     <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorOnSurface">#000000</color>
+    <color name="colorOnSurface">#FFFFFF</color>
     <color name="colorOnSurfaceDark">#FFFFFF</color>
-    <color name="colorError">#B00020</color>
+    <color name="colorError">#CF6679</color>
     
-    <!-- Dialog colors -->
-    <color name="dialogBackground">#FFFFFF</color>
+    <!-- Dialog colors for dark mode -->
+    <color name="dialogBackground">#2C2C2C</color>
     <color name="dialogBackgroundDark">#2C2C2C</color>
 </resources>
