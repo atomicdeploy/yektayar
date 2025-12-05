@@ -167,6 +167,15 @@
               <p>{{ locale === 'fa' ? 'تنظیمات صدا' : 'Sound settings' }}</p>
             </ion-label>
           </ion-item>
+
+          <ion-item button @click="handleCheckForUpdates" :disabled="isCheckingUpdate">
+            <ion-icon :icon="cloudDownload" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <h3>{{ locale === 'fa' ? 'بررسی به‌روزرسانی' : 'Check for Updates' }}</h3>
+              <p v-if="isCheckingUpdate">{{ locale === 'fa' ? 'در حال بررسی...' : 'Checking...' }}</p>
+              <p v-else>{{ locale === 'fa' ? 'نسخه ' + versionNumber : 'Version ' + versionNumber }}</p>
+            </ion-label>
+          </ion-item>
         </ion-list>
       </div>
 
@@ -226,6 +235,7 @@ import {
   IonList,
   IonItem,
   IonLabel,
+  toastController,
 } from '@ionic/vue'
 import { 
   person,
@@ -247,17 +257,22 @@ import {
   informationCircle,
   logOut,
   call,
+  cloudDownload,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from '../composables/useTheme'
 import { getPackageVersion } from '@yektayar/shared'
 import { computed } from 'vue'
+import { useAppUpdate } from '../composables/useAppUpdate'
+import { logger } from '@yektayar/shared'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 
 const { locale } = useI18n()
 const { currentTheme, toggleTheme } = useTheme()
 
 // Get version from environment variable
 const APP_VERSION = getPackageVersion()
+const versionNumber = APP_VERSION
 
 // Computed property for version display based on locale
 const versionText = computed(() => {
@@ -267,6 +282,63 @@ const versionText = computed(() => {
 // Import router for navigation
 import { useRouter } from 'vue-router'
 const router = useRouter()
+
+// Update functionality
+const {
+  isCheckingUpdate,
+  checkForUpdate
+} = useAppUpdate()
+
+// Handler for manual update check
+async function handleCheckForUpdates() {
+  try {
+    logger.info('Manual update check triggered from profile')
+    const hasUpdate = await checkForUpdate()
+    
+    if (hasUpdate) {
+      const toast = await toastController.create({
+        message: locale.value === 'fa' 
+          ? '✨ به‌روزرسانی جدید موجود است!' 
+          : '✨ New update available!',
+        duration: 3000,
+        position: 'top',
+        color: 'success',
+        buttons: [
+          {
+            text: locale.value === 'fa' ? 'مشاهده' : 'View',
+            role: 'info',
+            handler: () => {
+              // The update modal will be shown by App.vue
+              logger.info('User wants to view update from toast')
+            }
+          }
+        ]
+      })
+      await toast.present()
+    } else {
+      const toast = await toastController.create({
+        message: locale.value === 'fa' 
+          ? '✅ برنامه شما به‌روز است' 
+          : '✅ Your app is up to date',
+        duration: 2000,
+        position: 'top',
+        color: 'success'
+      })
+      await toast.present()
+    }
+  } catch (error) {
+    logger.error('Error checking for updates:', error)
+    const toast = await toastController.create({
+      message: locale.value === 'fa' 
+        ? '❌ خطا در بررسی به‌روزرسانی' 
+        : '❌ Error checking for updates',
+      duration: 2000,
+      position: 'top',
+      color: 'danger'
+    })
+    await toast.present()
+  }
+}
 
 function navigateToPersonalInfo() {
   router.push('/tabs/profile/personal-info')

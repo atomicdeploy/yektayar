@@ -182,3 +182,61 @@ export interface AssessmentResult {
   personalityType?: string
   completedAt: Date
 }
+
+// Update types
+export interface UpdateInfo {
+  id: string
+  version: string
+  platform: UpdatePlatform
+  buildNumber?: number
+  releaseDate: Date
+  mandatory: boolean
+  changelog: string
+  downloadUrl: string
+  fileSize: number
+  checksum?: string
+  minAppVersion?: string
+  metadata?: Record<string, any>
+  createdAt: Date
+  updatedAt: Date
+}
+
+export enum UpdatePlatform {
+  ANDROID = 'android',
+  IOS = 'ios',
+  PWA = 'pwa',
+  WEB = 'web'
+}
+
+export enum UpdateStatus {
+  IDLE = 'idle',
+  CHECKING = 'checking',
+  AVAILABLE = 'available',
+  DOWNLOADING = 'downloading',
+  PAUSED = 'paused',
+  DOWNLOADED = 'downloaded',
+  INSTALLING = 'installing',
+  INSTALLED = 'installed',
+  FAILED = 'failed',
+  UP_TO_DATE = 'up_to_date'
+}
+
+export interface UpdateDownloadProgress {
+  bytesDownloaded: number
+  totalBytes: number
+  percentage: number
+  speed: number // bytes per second
+  estimatedTimeRemaining: number // seconds
+  status: UpdateStatus
+  error?: string
+}
+
+export interface UpdateInstallReport {
+  updateId: string
+  version: string
+  platform: UpdatePlatform
+  installedAt: Date
+  previousVersion?: string
+  userId?: string
+  deviceInfo?: Record<string, any>
+}

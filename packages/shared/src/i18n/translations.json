@@ -176,6 +176,28 @@
       "retry": "تلاش مجدد",
       "completed_at": "تکمیل شده در",
       "review_info": "لطفاً اطلاعات خود را بررسی کنید. در صورت صحت، آزمون را ارسال کنید."
+    },
+    "update": {
+      "availableTitle": "به‌روزرسانی جدید موجود است",
+      "mandatoryTitle": "به‌روزرسانی ضروری",
+      "subtitle": "نسخه {version} اکنون موجود است",
+      "whatsNew": "ویژگی‌های جدید",
+      "build": "ساخت",
+      "downloaded": "دانلود شده",
+      "paused": "متوقف شده",
+      "downloading": "در حال دانلود",
+      "speed": "سرعت",
+      "remaining": "باقی‌مانده",
+      "download": "دانلود به‌روزرسانی",
+      "later": "بعداً",
+      "pause": "توقف",
+      "resume": "ادامه",
+      "cancel": "لغو",
+      "install": "نصب",
+      "retry": "تلاش مجدد",
+      "checkingUpdate": "بررسی به‌روزرسانی...",
+      "upToDate": "برنامه به‌روز است",
+      "updateAvailable": "به‌روزرسانی موجود است"
     }
   },
   "en": {
@@ -355,6 +377,28 @@
       "retry": "Retry",
       "completed_at": "Completed at",
       "review_info": "Please review your information. If correct, submit the test."
+    },
+    "update": {
+      "availableTitle": "New Update Available",
+      "mandatoryTitle": "Critical Update Required",
+      "subtitle": "Version {version} is now available",
+      "whatsNew": "What's New",
+      "build": "Build",
+      "downloaded": "Downloaded",
+      "paused": "Paused",
+      "downloading": "Downloading",
+      "speed": "Speed",
+      "remaining": "Remaining",
+      "download": "Download Update",
+      "later": "Later",
+      "pause": "Pause",
+      "resume": "Resume",
+      "cancel": "Cancel",
+      "install": "Install",
+      "retry": "Retry",
+      "checkingUpdate": "Checking for updates...",
+      "upToDate": "App is up to date",
+      "updateAvailable": "Update available"
     }
   }
 }
