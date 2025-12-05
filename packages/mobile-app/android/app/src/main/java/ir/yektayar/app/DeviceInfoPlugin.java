@@ -1,4 +1,4 @@
-package com.yektayar.app;
+package ir.yektayar.app;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;

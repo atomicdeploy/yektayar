@@ -1,4 +1,4 @@
-package com.yektayar.app;
+package ir.yektayar.app;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

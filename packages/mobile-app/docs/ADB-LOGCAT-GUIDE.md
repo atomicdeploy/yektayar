@@ -157,7 +157,7 @@ adb logcat -s YektaYar:* | grep -i "initialization\|api\|connection"
 
 3. **Verify App is Running**:
    ```bash
-   adb shell am start -n com.yektayar.app/.MainActivity
+   adb shell am start -n ir.yektayar.app/.MainActivity
    ```
 
 4. **Check for Crashes**:

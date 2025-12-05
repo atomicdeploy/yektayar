@@ -217,7 +217,7 @@ The Capacitor configuration is in `capacitor.config.ts`:
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.yektayar.app',
+  appId: 'ir.yektayar.app',
   appName: 'YektaYar',
   webDir: 'dist',
   server: {

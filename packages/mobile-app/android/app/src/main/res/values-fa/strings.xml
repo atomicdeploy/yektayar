@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">یکتایار</string>
     <string name="title_activity_main">یکتایار</string>
-    <string name="package_name">com.yektayar.app</string>
-    <string name="custom_url_scheme">com.yektayar.app</string>
+    <string name="package_name">ir.yektayar.app</string>
+    <string name="custom_url_scheme">ir.yektayar.app</string>
 </resources>

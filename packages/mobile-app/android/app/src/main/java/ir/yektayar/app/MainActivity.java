@@ -1,4 +1,4 @@
-package com.yektayar.app;
+package ir.yektayar.app;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
