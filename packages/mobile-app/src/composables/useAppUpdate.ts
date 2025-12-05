@@ -218,7 +218,19 @@ export function useAppUpdate() {
       
       // Save to filesystem using Capacitor Filesystem API
       // Note: In a real implementation, you would use Capacitor's Filesystem plugin
-      // For now, we'll create a download link (works in browser/PWA)
+      // and then trigger Android's package installer intent
+      // Example:
+      // import { Filesystem, Directory } from '@capacitor/filesystem'
+      // const fileName = `yektayar-${updateInfo.value.version}.apk`
+      // await Filesystem.writeFile({
+      //   path: fileName,
+      //   data: await blob.arrayBuffer(),
+      //   directory: Directory.Cache
+      // })
+      // Then use Capacitor's App plugin or native Android intent to install
+      
+      // For now, we'll create a download link (works in browser/PWA for testing)
+      // This is only for development/testing and won't actually install the APK
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -233,9 +245,10 @@ export function useAppUpdate() {
       downloadProgress.value.percentage = 100
       
       logger.success('APK download completed')
+      logger.warn('For actual Android installation, implement Capacitor Filesystem and Android intent handling')
       
-      // Report successful download (not installation yet)
-      await reportUpdateInstall(updateInfo.value, 'downloaded')
+      // Don't report installation yet - only report when actually installed
+      // The installation report will be sent from installUpdate() method
       
     } catch (err) {
       if (err instanceof Error && err.message.includes('cancelled')) {
@@ -367,13 +380,26 @@ export function useAppUpdate() {
       logger.info('Installing Android update...')
       
       // Note: In a real Android app, you would use Capacitor plugins or native code
-      // to install the APK. This requires specific Android permissions and intents.
-      // For now, we'll just update the status
+      // to install the APK. This requires:
+      // 1. Capacitor Filesystem plugin to save the APK
+      // 2. Android intent to trigger package installer
+      // 3. REQUEST_INSTALL_PACKAGES permission in AndroidManifest.xml
+      // 4. FileProvider configuration for sharing the APK file
+      //
+      // Example implementation:
+      // import { Filesystem, Directory } from '@capacitor/filesystem'
+      // import { App as CapApp } from '@capacitor/app'
+      // 
+      // const fileUri = await Filesystem.getUri({
+      //   path: `yektayar-${updateInfo.value.version}.apk`,
+      //   directory: Directory.Cache
+      // })
+      // 
+      // // Trigger Android package installer
+      // await CapApp.openUrl({ url: fileUri.uri })
       
-      // The actual installation would typically trigger the Android package installer
-      // which requires user interaction to complete
-      
-      logger.warn('APK installation requires manual user action')
+      logger.warn('APK installation requires Capacitor Filesystem and Android intent handling')
+      logger.info('The downloaded APK needs to be installed using Android package installer')
       
       // Report installation attempt
       if (updateInfo.value) {
@@ -406,7 +432,8 @@ export function useAppUpdate() {
         updateId: update.id,
         version: update.version,
         platform: platform.value,
-        deviceInfo,
+        deviceInfo
+      }, {
         skipAuth: true
       })
       
