@@ -88,11 +88,7 @@
                 style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 8px; background: var(--bg-secondary);"
               >
                 <div
-                  :class="[
-                    'w-2 h-2 rounded-full mt-2',
-                    getActivityColor(activity.type),
-                  ]"
-                  style="width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; flex-shrink: 0;"
+                  :class="['activity-indicator', getActivityColor(activity.type)]"
                 ></div>
                 <div style="flex: 1; min-width: 0;">
                   <p style="font-size: 14px; color: var(--text-primary);">{{ activity.description }}</p>

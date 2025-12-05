@@ -19,7 +19,7 @@
       <!-- Contact Information -->
       <div class="card">
         <div class="card-body">
-          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary);">اطلاعات تماس</h2>
+          <h2 class="card-title">اطلاعات تماس</h2>
           
           <div class="form-group">
             <label>شماره تلفن</label>
@@ -62,7 +62,7 @@
       <!-- Map Coordinates -->
       <div class="card">
         <div class="card-body">
-          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary);">موقعیت جغرافیایی</h2>
+          <h2 class="card-title">موقعیت جغرافیایی</h2>
           
           <div class="form-group">
             <label>عرض جغرافیایی (Latitude)</label>
@@ -84,7 +84,7 @@
             />
           </div>
 
-          <div style="background: var(--bg-secondary); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <div class="info-box">
             <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">
               برای دریافت مختصات:
             </p>
@@ -95,7 +95,7 @@
             </ol>
           </div>
 
-          <div style="background: rgba(59, 130, 246, 0.1); border-radius: 8px; padding: 16px;">
+          <div class="info-box-blue">
             <p style="font-size: 14px; color: rgb(59, 130, 246);">
               <strong>موقعیت فعلی:</strong><br />
               {{ settings.contact_map_lat }}, {{ settings.contact_map_lng }}
@@ -103,7 +103,7 @@
             <a 
               :href="`https://www.google.com/maps/search/?api=1&query=${settings.contact_map_lat},${settings.contact_map_lng}`"
               target="_blank"
-              style="display: inline-flex; align-items: center; margin-top: 8px; font-size: 14px; color: rgb(59, 130, 246); text-decoration: none;"
+              class="info-link"
             >
               <ArrowTopRightOnSquareIcon class="w-4 h-4" style="margin-left: 4px;" />
               مشاهده در نقشه
@@ -115,7 +115,7 @@
       <!-- Support Tickets -->
       <div class="card">
         <div class="card-body">
-          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary);">تیکت‌های پشتیبانی</h2>
+          <h2 class="card-title">تیکت‌های پشتیبانی</h2>
           
           <div v-if="loadingTickets" class="loading-state">
             <LoadingSpinner size="32px" class="text-primary-500 mx-auto" />
@@ -130,10 +130,7 @@
             <div 
               v-for="ticket in tickets.slice(0, 5)" 
               :key="ticket.id"
-              style="border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; transition: background-color 0.2s ease;"
-              :style="{ cursor: 'pointer' }"
-              @mouseover="(e: MouseEvent) => (e.currentTarget as HTMLElement).style.background = 'var(--bg-secondary)'"
-              @mouseout="(e: MouseEvent) => (e.currentTarget as HTMLElement).style.background = 'transparent'"
+              class="list-item"
             >
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                 <h4 style="font-weight: 600; font-size: 14px; color: var(--text-primary);">{{ ticket.subject }}</h4>
@@ -157,7 +154,7 @@
       <div class="card">
         <div class="card-body">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">صفحات اخیر</h2>
+            <h2 class="card-title" style="margin-bottom: 0;">صفحات اخیر</h2>
             <router-link
               to="/pages"
               style="font-size: 14px; color: var(--primary-color); text-decoration: none;"
@@ -180,9 +177,8 @@
               v-for="page in recentPages.slice(0, 5)" 
               :key="page.id"
               to="/pages"
-              style="display: block; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-decoration: none; transition: background-color 0.2s ease;"
-              @mouseover="(e: MouseEvent) => (e.currentTarget as HTMLElement).style.background = 'var(--bg-secondary)'"
-              @mouseout="(e: MouseEvent) => (e.currentTarget as HTMLElement).style.background = 'transparent'"
+              class="list-item"
+              style="text-decoration: none;"
             >
               <h4 style="font-weight: 600; font-size: 14px; color: var(--text-primary);">{{ page.title }}</h4>
               <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-family: var(--font-mono);">{{ page.slug }}</p>
