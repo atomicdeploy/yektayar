@@ -2,6 +2,7 @@ export * from './logger'
 export * from './solutions'
 export * from './validation'
 export * from './version'
+export * from './git'
 
 // i18n utilities
 export * from '../i18n/missingHandler'
