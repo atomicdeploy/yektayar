@@ -338,5 +338,3 @@ fi
 echo "  • Review the documentation: $PROJECT_ROOT/README.md"
 echo "  • Check the logs for any errors"
 echo ""
-
-print_info "Installation log saved to: /tmp/yektayar-install-$(date +%Y%m%d-%H%M%S).log"

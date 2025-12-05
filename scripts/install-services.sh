@@ -57,8 +57,14 @@ install_service() {
     
     echo -e "${YELLOW}Installing $service_name...${NC}"
     
-    # Determine bun path
-    BUN_PATH=$(which bun 2>/dev/null || echo "$HOME/.bun/bin")
+    # Determine bun path - check as deploy user
+    if command -v bun >/dev/null 2>&1; then
+        BUN_PATH=$(dirname $(which bun))
+    elif [ -d "/home/$DEPLOY_USER/.bun/bin" ]; then
+        BUN_PATH="/home/$DEPLOY_USER/.bun/bin"
+    else
+        BUN_PATH="$HOME/.bun/bin"
+    fi
     
     # Update paths in service file
     sed -e "s|__BUN_PATH__|$BUN_PATH|g" \
