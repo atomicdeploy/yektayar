@@ -72,9 +72,9 @@
             <div class="section-header">
               <h2 class="section-title">
                 {{ locale === 'fa' ? 'ارزیابی‌های در دسترس' : 'Available Assessments' }}
-                <span class="count-badge">{{ assessments.length }}</span>
+                <span v-if="!loading && assessments.length > 0" class="count-badge">{{ assessments.length }}</span>
               </h2>
-              <div class="view-toggle">
+              <div v-if="!loading && assessments.length > 0" class="view-toggle">
                 <ion-button 
                   fill="clear" 
                   size="small" 
