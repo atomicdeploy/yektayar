@@ -31,9 +31,9 @@ import {
   listBranches,
   getModifiedFiles,
   getStagedFiles,
-  isGitRepository,
-  logger
-} from '@yektayar/shared'
+  isGitRepository
+} from '../packages/shared/dist/utils/git.js'
+import { logger } from '../packages/shared/dist/utils/logger.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
