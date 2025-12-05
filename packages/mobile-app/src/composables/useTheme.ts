@@ -1,6 +1,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { Capacitor } from '@capacitor/core'
 import StatusBar from '../plugins/statusBar'
+import { logger } from '@yektayar/shared'
 
 export type Theme = 'light' | 'dark' | 'auto'
 
@@ -18,7 +19,7 @@ export function useTheme() {
   }
 
   // Apply theme to document
-  const applyTheme = (theme: Theme) => {
+  const applyTheme = async (theme: Theme) => {
     if (theme === 'auto') {
       isDark.value = checkSystemTheme()
       // Remove forced mode marker when in auto mode
@@ -37,12 +38,15 @@ export function useTheme() {
     }
 
     // Update meta theme-color for status bar
-    updateMetaThemeColor(isDark.value)
+    await updateMetaThemeColor(isDark.value)
   }
 
   // Update meta theme color for mobile browsers
-  const updateMetaThemeColor = (dark: boolean) => {
+  const updateMetaThemeColor = async (dark: boolean) => {
     const backgroundColor = dark ? '#0a0f1a' : '#fafbfc'
+    const iconStyle = dark ? 'light' : 'dark' // light=white icons, dark=black icons
+    
+    logger.info(`🎨 Updating theme: dark=${dark}, bg=${backgroundColor}, icons=${iconStyle}`)
     
     // Update meta tag for web browsers
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
@@ -58,18 +62,23 @@ export function useTheme() {
     // Update native status bar on Capacitor platforms
     if (Capacitor.isNativePlatform()) {
       try {
+        logger.info(`📱 Setting status bar: background=${backgroundColor}, iconStyle=${iconStyle}`)
+        
         // Set status bar background color
-        StatusBar.setBackgroundColor({ color: backgroundColor }).catch(() => {
-          // Silently fail if plugin not available
+        await StatusBar.setBackgroundColor({ color: backgroundColor }).catch((error) => {
+          logger.error('Failed to set status bar background:', error)
         })
         
         // Set status bar icon style
-        // Dark background = light icons, Light background = dark icons
-        StatusBar.setStyle({ style: dark ? 'dark' : 'light' }).catch(() => {
-          // Silently fail if plugin not available
+        // CRITICAL: When dark=true (dark bg), we need 'light' (white icons)
+        // CRITICAL: When dark=false (light bg), we need 'dark' (black icons)
+        await StatusBar.setStyle({ style: iconStyle }).catch((error) => {
+          logger.error('Failed to set status bar style:', error)
         })
+        
+        logger.info('✅ Status bar updated successfully')
       } catch (error) {
-        // Plugin not available on this platform
+        logger.error('❌ Status bar plugin error:', error)
       }
     }
   }

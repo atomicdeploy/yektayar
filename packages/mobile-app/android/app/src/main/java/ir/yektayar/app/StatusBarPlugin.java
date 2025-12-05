@@ -1,6 +1,7 @@
 package ir.yektayar.app;
 
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -17,46 +18,63 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 @CapacitorPlugin(name = "StatusBar")
 public class StatusBarPlugin extends Plugin {
     
+    private static final String TAG = "StatusBarPlugin";
+    
     /**
-     * Set status bar style (light or dark icons)
-     * @param call - PluginCall with "style" parameter ("light" or "dark")
+     * Set status bar icon style (light or dark icons)
+     * @param call - PluginCall with "style" parameter
+     *              "light" = light/white icons (for dark backgrounds)
+     *              "dark" = dark/black icons (for light backgrounds)
      */
     @PluginMethod
     public void setStyle(PluginCall call) {
-        String style = call.getString("style", "light");
+        String style = call.getString("style", "dark");
+        Log.i(TAG, "📱 setStyle called with: " + style + " (Android API: " + Build.VERSION.SDK_INT + ")");
         
         getActivity().runOnUiThread(() -> {
-            Window window = getActivity().getWindow();
-            View decorView = window.getDecorView();
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                // Android 11+ (API 30+)
-                WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, decorView);
+            try {
+                Window window = getActivity().getWindow();
+                View decorView = window.getDecorView();
                 
-                if ("dark".equals(style)) {
-                    // Dark style = light icons (for dark backgrounds)
-                    controller.setAppearanceLightStatusBars(false);
-                } else {
-                    // Light style = dark icons (for light backgrounds)
-                    controller.setAppearanceLightStatusBars(true);
-                }
-            } else {
-                // Android 6.0 - 10 (API 23-29)
-                int flags = decorView.getSystemUiVisibility();
-                
-                if ("dark".equals(style)) {
-                    // Dark style = light icons (for dark backgrounds)
-                    // Remove light status bar flag
-                    flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                } else {
-                    // Light style = dark icons (for light backgrounds)
-                    // Add light status bar flag
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    // Android 11+ (API 30+)
+                    WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, decorView);
+                    
+                    if ("light".equals(style)) {
+                        // Light icons = white icons for dark backgrounds
+                        Log.i(TAG, "✅ Setting LIGHT icons (white) via WindowInsetsControllerCompat");
+                        controller.setAppearanceLightStatusBars(false);
+                    } else {
+                        // Dark icons = black icons for light backgrounds
+                        Log.i(TAG, "✅ Setting DARK icons (black) via WindowInsetsControllerCompat");
+                        controller.setAppearanceLightStatusBars(true);
                     }
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    // Android 6.0 - 10 (API 23-29)
+                    int flags = decorView.getSystemUiVisibility();
+                    Log.i(TAG, "📊 Current flags: " + flags);
+                    
+                    if ("light".equals(style)) {
+                        // Light icons = white icons for dark backgrounds
+                        // Remove light status bar flag (shows white icons)
+                        flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                        Log.i(TAG, "✅ Setting LIGHT icons (white) via system UI flags");
+                    } else {
+                        // Dark icons = black icons for light backgrounds
+                        // Add light status bar flag (shows black icons)
+                        flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                        Log.i(TAG, "✅ Setting DARK icons (black) via system UI flags");
+                    }
+                    
+                    Log.i(TAG, "📊 New flags: " + flags);
+                    decorView.setSystemUiVisibility(flags);
+                } else {
+                    Log.w(TAG, "⚠️ Status bar icon style not supported on API < 23");
                 }
                 
-                decorView.setSystemUiVisibility(flags);
+                Log.i(TAG, "✅ Status bar style updated successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "❌ Error setting status bar style: " + e.getMessage(), e);
             }
         });
         
