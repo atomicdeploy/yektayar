@@ -307,32 +307,68 @@ ion-chip,
 /* OverlayScrollbars Custom Styling - Light Theme */
 .os-theme-yektayar-mobile.os-scrollbar-horizontal,
 .os-theme-yektayar-mobile.os-scrollbar-vertical {
-  --os-size: 8px;
-  --os-padding-perpendicular: 0px;
-  --os-padding-axis: 0px;
-  --os-track-border-radius: 4px;
+  --os-size: 6px;
+  --os-padding-perpendicular: 2px;
+  --os-padding-axis: 2px;
+  --os-track-border-radius: 9999px;
   --os-track-bg: transparent;
-  --os-handle-border-radius: 4px;
-  --os-handle-bg: var(--ion-color-primary);
-  --os-handle-bg-hover: var(--ion-color-primary-shade);
-  --os-handle-bg-active: var(--ion-color-primary-shade);
+  --os-handle-border-radius: 9999px;
+  --os-handle-bg: rgba(0, 0, 0, 0.15);
+  --os-handle-bg-hover: rgba(0, 0, 0, 0.25);
+  --os-handle-bg-active: rgba(0, 0, 0, 0.3);
+  --os-handle-min-size: 30px;
+  --os-handle-max-size: none;
+  --os-handle-interactive-area-offset: 0px;
+}
+
+/* Mobile-specific scrollbar styling for better touch experience */
+@media (max-width: 768px) {
+  .os-theme-yektayar-mobile.os-scrollbar-horizontal,
+  .os-theme-yektayar-mobile.os-scrollbar-vertical {
+    --os-size: 4px;
+    --os-padding-perpendicular: 4px;
+    --os-padding-axis: 4px;
+    --os-handle-bg: rgba(0, 0, 0, 0.12);
+    --os-handle-bg-hover: rgba(0, 0, 0, 0.2);
+    --os-handle-bg-active: rgba(0, 0, 0, 0.25);
+  }
 }
 
 /* OverlayScrollbars Custom Styling - Dark Theme */
 .ion-palette-dark .os-theme-yektayar-mobile.os-scrollbar-horizontal,
 .ion-palette-dark .os-theme-yektayar-mobile.os-scrollbar-vertical {
-  --os-handle-bg: var(--ion-color-primary);
-  --os-handle-bg-hover: var(--ion-color-primary-tint);
-  --os-handle-bg-active: var(--ion-color-primary-tint);
+  --os-handle-bg: rgba(255, 255, 255, 0.2);
+  --os-handle-bg-hover: rgba(255, 255, 255, 0.3);
+  --os-handle-bg-active: rgba(255, 255, 255, 0.35);
+}
+
+/* Mobile-specific scrollbar styling for dark theme */
+@media (max-width: 768px) {
+  .ion-palette-dark .os-theme-yektayar-mobile.os-scrollbar-horizontal,
+  .ion-palette-dark .os-theme-yektayar-mobile.os-scrollbar-vertical {
+    --os-handle-bg: rgba(255, 255, 255, 0.15);
+    --os-handle-bg-hover: rgba(255, 255, 255, 0.25);
+    --os-handle-bg-active: rgba(255, 255, 255, 0.3);
+  }
 }
 
 /* Apply dark theme scrollbar styles when system prefers dark mode AND not in forced mode */
 @media (prefers-color-scheme: dark) {
   html:not(.theme-forced) .os-theme-yektayar-mobile.os-scrollbar-horizontal,
   html:not(.theme-forced) .os-theme-yektayar-mobile.os-scrollbar-vertical {
-    --os-handle-bg: var(--ion-color-primary);
-    --os-handle-bg-hover: var(--ion-color-primary-tint);
-    --os-handle-bg-active: var(--ion-color-primary-tint);
+    --os-handle-bg: rgba(255, 255, 255, 0.2);
+    --os-handle-bg-hover: rgba(255, 255, 255, 0.3);
+    --os-handle-bg-active: rgba(255, 255, 255, 0.35);
+  }
+  
+  /* Mobile-specific scrollbar styling for dark theme (system preference) */
+  @media (max-width: 768px) {
+    html:not(.theme-forced) .os-theme-yektayar-mobile.os-scrollbar-horizontal,
+    html:not(.theme-forced) .os-theme-yektayar-mobile.os-scrollbar-vertical {
+      --os-handle-bg: rgba(255, 255, 255, 0.15);
+      --os-handle-bg-hover: rgba(255, 255, 255, 0.25);
+      --os-handle-bg-active: rgba(255, 255, 255, 0.3);
+    }
   }
 }
 
