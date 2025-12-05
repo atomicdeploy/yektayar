@@ -258,7 +258,6 @@ import {
   play,
   checkmarkCircle,
   chevronForward,
-  chevronBack,
   informationCircle,
   star,
   layers,
