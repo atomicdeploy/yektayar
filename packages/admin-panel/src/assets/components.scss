@@ -738,4 +738,122 @@
       }
     }
   }
+
+  /* ============================================
+    Utility Classes
+    ============================================ */
+
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+
+  .info-box {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .info-box-blue {
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .info-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 14px;
+    color: rgb(59, 130, 246);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .list-item {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--bg-secondary);
+    }
+  }
+
+  .activity-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+
+  .text-primary-500 {
+    color: var(--primary-color);
+  }
+
+  .mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .w-5 {
+    width: 1.25rem;
+  }
+
+  .h-5 {
+    height: 1.25rem;
+  }
+
+  .w-4 {
+    width: 1rem;
+  }
+
+  .h-4 {
+    height: 1rem;
+  }
+
+  .w-12 {
+    width: 3rem;
+  }
+
+  .h-12 {
+    height: 3rem;
+  }
+
+  .w-16 {
+    width: 4rem;
+  }
+
+  .h-16 {
+    height: 4rem;
+  }
+
+  .w-2 {
+    width: 0.5rem;
+  }
+
+  .h-2 {
+    height: 0.5rem;
+  }
+
+  .rounded-full {
+    border-radius: 9999px;
+  }
+
+  .text-white {
+    color: white;
+  }
+
+  .text-gray-400 {
+    color: var(--text-tertiary);
+  }
 }
