@@ -1,13 +1,15 @@
 <template>
   <main class="main-view">
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ t('dashboard_page.title') }}</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">{{ t('dashboard_page.welcome_message') }}</p>
+    <div class="view-header">
+      <div class="header-content">
+        <h1>{{ t('dashboard_page.title') }}</h1>
+        <p class="subtitle">{{ t('dashboard_page.welcome_message') }}</p>
+      </div>
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 32px;">
       <StatCard
         :label="t('dashboard_page.total_users')"
         :value="dashboardStore.stats.totalUsers"
@@ -45,10 +47,10 @@
     </div>
 
     <!-- Draggable Widgets Grid -->
-    <div class="mb-8">
+    <div>
       <draggable
         v-model="widgets"
-        class="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px;"
         :item-key="(item: Widget) => item.id"
         handle=".cursor-move"
         @start="isDragging = true"
@@ -79,54 +81,55 @@
             />
 
             <!-- Recent Activities -->
-            <div v-if="element.id === 'recent-activities'" class="space-y-3">
+            <div v-if="element.id === 'recent-activities'" style="display: flex; flex-direction: column; gap: 12px;">
               <div
                 v-for="activity in dashboardStore.recentActivities"
                 :key="activity.id"
-                class="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50"
+                style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 8px; background: var(--bg-secondary);"
               >
                 <div
                   :class="[
                     'w-2 h-2 rounded-full mt-2',
                     getActivityColor(activity.type),
                   ]"
+                  style="width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; flex-shrink: 0;"
                 ></div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-900 dark:text-white">{{ activity.description }}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <div style="flex: 1; min-width: 0;">
+                  <p style="font-size: 14px; color: var(--text-primary);">{{ activity.description }}</p>
+                  <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
                     {{ formatTimestamp(activity.timestamp) }}
                   </p>
                 </div>
               </div>
-              <div v-if="dashboardStore.recentActivities.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+              <div v-if="dashboardStore.recentActivities.length === 0" class="empty-state" style="padding: 40px 20px;">
                 {{ t('dashboard_page.no_activities') }}
               </div>
             </div>
 
             <!-- System Status -->
-            <div v-if="element.id === 'system-status'" class="space-y-4">
-              <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-                <div class="flex items-center gap-3">
-                  <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">API Server</span>
+            <div v-if="element.id === 'system-status'" style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: var(--bg-secondary);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
+                  <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">API Server</span>
                 </div>
-                <span class="text-xs text-gray-500 dark:text-gray-400">آنلاین</span>
+                <span style="font-size: 12px; color: var(--text-secondary);">آنلاین</span>
               </div>
-              <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-                <div class="flex items-center gap-3">
-                  <div :class="['w-3 h-3 rounded-full', sessionStore.isSocketConnected ? 'bg-green-500' : 'bg-red-500']"></div>
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">WebSocket</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: var(--bg-secondary);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div :style="{ width: '12px', height: '12px', borderRadius: '50%', background: sessionStore.isSocketConnected ? '#10b981' : '#ef4444' }"></div>
+                  <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">WebSocket</span>
                 </div>
-                <span class="text-xs text-gray-500 dark:text-gray-400">
+                <span style="font-size: 12px; color: var(--text-secondary);">
                   {{ sessionStore.isSocketConnected ? 'متصل' : 'قطع شده' }}
                 </span>
               </div>
-              <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-                <div class="flex items-center gap-3">
-                  <div class="w-3 h-3 rounded-full bg-green-500"></div>
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">Database</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: var(--bg-secondary);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
+                  <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Database</span>
                 </div>
-                <span class="text-xs text-gray-500 dark:text-gray-400">آنلاین</span>
+                <span style="font-size: 12px; color: var(--text-secondary);">آنلاین</span>
               </div>
             </div>
           </WidgetCard>

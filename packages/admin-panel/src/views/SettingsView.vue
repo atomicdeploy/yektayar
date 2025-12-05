@@ -1,59 +1,58 @@
 <template>
   <main class="main-view">
     <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">تنظیمات</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">مدیریت تنظیمات برنامه و اطلاعات تماس</p>
+    <div class="view-header">
+      <div class="header-content">
+        <h1>تنظیمات</h1>
+        <p class="subtitle">مدیریت تنظیمات برنامه و اطلاعات تماس</p>
+      </div>
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center items-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+    <div v-if="loading" class="loading-state">
+      <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
+      <p>در حال بارگذاری تنظیمات...</p>
     </div>
 
     <!-- Settings Form -->
-    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div v-else class="card-grid">
       <!-- Contact Information -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">اطلاعات تماس</h2>
-        
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">شماره تلفن</label>
+      <div class="card">
+        <div class="card-body">
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary);">اطلاعات تماس</h2>
+          
+          <div class="form-group">
+            <label>شماره تلفن</label>
             <input
               v-model="settings.contact_phone"
               type="text"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="+98 21 1234 5678"
             />
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ایمیل</label>
+          <div class="form-group">
+            <label>ایمیل</label>
             <input
               v-model="settings.contact_email"
               type="email"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="info@yektayar.com"
             />
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">آدرس (فارسی)</label>
+          <div class="form-group">
+            <label>آدرس (فارسی)</label>
             <textarea
               v-model="settings.contact_address"
               rows="2"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="تهران، خیابان ولیعصر"
             ></textarea>
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">آدرس (انگلیسی)</label>
+          <div class="form-group">
+            <label>آدرس (انگلیسی)</label>
             <textarea
               v-model="settings.contact_address_en"
               rows="2"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Tehran, Vali Asr Street"
             ></textarea>
           </div>
@@ -61,56 +60,52 @@
       </div>
 
       <!-- Map Coordinates -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">موقعیت جغرافیایی</h2>
-        
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">عرض جغرافیایی (Latitude)</label>
+      <div class="card">
+        <div class="card-body">
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary);">موقعیت جغرافیایی</h2>
+          
+          <div class="form-group">
+            <label>عرض جغرافیایی (Latitude)</label>
             <input
               v-model.number="settings.contact_map_lat"
               type="number"
               step="0.0001"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="35.6892"
             />
           </div>
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">طول جغرافیایی (Longitude)</label>
+          <div class="form-group">
+            <label>طول جغرافیایی (Longitude)</label>
             <input
               v-model.number="settings.contact_map_lng"
               type="number"
               step="0.0001"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="51.3890"
             />
           </div>
 
-          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <div style="background: var(--bg-secondary); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">
               برای دریافت مختصات:
             </p>
-            <ol class="text-sm text-gray-600 dark:text-gray-400 list-decimal list-inside space-y-1">
+            <ol style="font-size: 14px; color: var(--text-secondary); list-style: decimal; padding-right: 20px;">
               <li>به Google Maps بروید</li>
               <li>روی موقعیت مورد نظر کلیک راست کنید</li>
               <li>مختصات را کپی کنید</li>
             </ol>
           </div>
 
-          <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-            <p class="text-sm text-blue-800 dark:text-blue-300">
+          <div style="background: rgba(59, 130, 246, 0.1); border-radius: 8px; padding: 16px;">
+            <p style="font-size: 14px; color: rgb(59, 130, 246);">
               <strong>موقعیت فعلی:</strong><br />
               {{ settings.contact_map_lat }}, {{ settings.contact_map_lng }}
             </p>
             <a 
               :href="`https://www.google.com/maps/search/?api=1&query=${settings.contact_map_lat},${settings.contact_map_lng}`"
               target="_blank"
-              class="inline-flex items-center mt-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+              style="display: inline-flex; align-items: center; margin-top: 8px; font-size: 14px; color: rgb(59, 130, 246); text-decoration: none;"
             >
-              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
+              <ArrowTopRightOnSquareIcon class="w-4 h-4" style="margin-left: 4px;" />
               مشاهده در نقشه
             </a>
           </div>
@@ -118,91 +113,94 @@
       </div>
 
       <!-- Support Tickets -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">تیکت‌های پشتیبانی</h2>
-        
-        <div v-if="loadingTickets" class="flex justify-center py-8">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-        </div>
+      <div class="card">
+        <div class="card-body">
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 24px; color: var(--text-primary);">تیکت‌های پشتیبانی</h2>
+          
+          <div v-if="loadingTickets" class="loading-state">
+            <LoadingSpinner size="32px" class="text-primary-500 mx-auto" />
+          </div>
 
-        <div v-else-if="tickets.length === 0" class="text-center py-8">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-          </svg>
-          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">تیکتی وجود ندارد</p>
-        </div>
+          <div v-else-if="tickets.length === 0" class="empty-state" style="padding: 40px 20px;">
+            <ChatBubbleLeftRightIcon class="w-12 h-12 text-gray-400" />
+            <p style="margin-top: 8px;">تیکتی وجود ندارد</p>
+          </div>
 
-        <div v-else class="space-y-3">
-          <div 
-            v-for="ticket in tickets.slice(0, 5)" 
-            :key="ticket.id"
-            class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <div class="flex justify-between items-start mb-2">
-              <h4 class="font-medium text-gray-900 dark:text-white text-sm">{{ ticket.subject }}</h4>
-              <span :class="['text-xs px-2 py-1 rounded', getStatusClass(ticket.status)]">
-                {{ ticket.status === 'open' ? 'باز' : 'بسته' }}
-              </span>
-            </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{{ ticket.message }}</p>
-            <div class="flex justify-between items-center mt-2">
-              <span class="text-xs text-gray-500">{{ formatDate(ticket.created_at) }}</span>
-              <span :class="['text-xs px-2 py-1 rounded', getPriorityClass(ticket.priority)]">
-                {{ getPriorityLabel(ticket.priority) }}
-              </span>
+          <div v-else style="display: flex; flex-direction: column; gap: 12px;">
+            <div 
+              v-for="ticket in tickets.slice(0, 5)" 
+              :key="ticket.id"
+              style="border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; transition: background-color 0.2s ease;"
+              :style="{ cursor: 'pointer' }"
+              @mouseover="(e: MouseEvent) => (e.currentTarget as HTMLElement).style.background = 'var(--bg-secondary)'"
+              @mouseout="(e: MouseEvent) => (e.currentTarget as HTMLElement).style.background = 'transparent'"
+            >
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <h4 style="font-weight: 600; font-size: 14px; color: var(--text-primary);">{{ ticket.subject }}</h4>
+                <span :class="['status-badge', ticket.status === 'open' ? 'draft' : 'published']">
+                  {{ ticket.status === 'open' ? 'باز' : 'بسته' }}
+                </span>
+              </div>
+              <p style="font-size: 14px; color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ ticket.message }}</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                <span style="font-size: 12px; color: var(--text-secondary);">{{ formatDate(ticket.created_at) }}</span>
+                <span :class="['status-badge', getPriorityClass(ticket.priority)]">
+                  {{ getPriorityLabel(ticket.priority) }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Recent Pages -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">صفحات اخیر</h2>
-          <router-link
-            to="/pages"
-            class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-          >
-            مشاهده همه
-          </router-link>
-        </div>
-        
-        <div v-if="loadingPages" class="flex justify-center py-8">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-        </div>
+      <div class="card">
+        <div class="card-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--text-primary);">صفحات اخیر</h2>
+            <router-link
+              to="/pages"
+              style="font-size: 14px; color: var(--primary-color); text-decoration: none;"
+            >
+              مشاهده همه
+            </router-link>
+          </div>
+          
+          <div v-if="loadingPages" class="loading-state">
+            <LoadingSpinner size="32px" class="text-primary-500 mx-auto" />
+          </div>
 
-        <div v-else-if="recentPages.length === 0" class="text-center py-8">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">صفحه‌ای وجود ندارد</p>
-        </div>
+          <div v-else-if="recentPages.length === 0" class="empty-state" style="padding: 40px 20px;">
+            <DocumentTextIcon class="w-12 h-12 text-gray-400" />
+            <p style="margin-top: 8px;">صفحه‌ای وجود ندارد</p>
+          </div>
 
-        <div v-else class="space-y-3">
-          <router-link 
-            v-for="page in recentPages.slice(0, 5)" 
-            :key="page.id"
-            to="/pages"
-            class="block border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <h4 class="font-medium text-gray-900 dark:text-white text-sm">{{ page.title }}</h4>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-mono">{{ page.slug }}</p>
-          </router-link>
+          <div v-else style="display: flex; flex-direction: column; gap: 12px;">
+            <router-link 
+              v-for="page in recentPages.slice(0, 5)" 
+              :key="page.id"
+              to="/pages"
+              style="display: block; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-decoration: none; transition: background-color 0.2s ease;"
+              @mouseover="(e: MouseEvent) => (e.currentTarget as HTMLElement).style.background = 'var(--bg-secondary)'"
+              @mouseout="(e: MouseEvent) => (e.currentTarget as HTMLElement).style.background = 'transparent'"
+            >
+              <h4 style="font-weight: 600; font-size: 14px; color: var(--text-primary);">{{ page.title }}</h4>
+              <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-family: var(--font-mono);">{{ page.slug }}</p>
+            </router-link>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Save Button -->
-    <div class="mt-6">
+    <div style="margin-top: 24px;">
       <button
         @click="saveSettings"
         :disabled="saving"
-        class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
+        class="btn btn-primary btn-lg"
       >
-        <svg v-if="!saving" class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <div v-else class="w-5 h-5 ml-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        <CheckIcon v-if="!saving" class="w-5 h-5" />
+        <LoadingSpinner v-else size="20px" class="text-white" />
         {{ saving ? 'در حال ذخیره...' : 'ذخیره تغییرات' }}
       </button>
     </div>
@@ -211,6 +209,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { 
+  CheckIcon, 
+  ChatBubbleLeftRightIcon, 
+  DocumentTextIcon,
+  ArrowTopRightOnSquareIcon
+} from '@heroicons/vue/24/outline'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import apiClient from '@/api'
 import { logger } from '@yektayar/shared'
 
@@ -311,18 +316,12 @@ async function loadPages() {
   }
 }
 
-function getStatusClass(status: string) {
-  return status === 'open' 
-    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-    : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-}
-
 function getPriorityClass(priority: string) {
   const classes: Record<string, string> = {
-    low: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
-    normal: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-    high: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-    urgent: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    low: 'draft',
+    normal: 'published',
+    high: 'draft',
+    urgent: 'blocked',
   }
   return classes[priority] || classes.normal
 }
