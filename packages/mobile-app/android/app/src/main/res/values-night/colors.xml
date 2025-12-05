@@ -2,25 +2,39 @@
 <resources>
     <!-- Brand colors (same in dark mode) -->
     <color name="colorPrimary">#d4a43e</color>
-    <color name="colorPrimaryDark">#ba8b2d</color>
-    <color name="colorAccent">#01183a</color>
-    <color name="colorSecondary">#d4a43e</color>
-    <color name="colorSecondaryDark">#ba8b2d</color>
+    <color name="colorPrimaryDark">#01183a</color>
+    <color name="colorAccent">#d4a43e</color>
     
-    <!-- Splash screen colors -->
+    <!-- Main app colors (matches index.html dark mode) -->
+    <color name="colorBackground">#0a0f1a</color>
+    <color name="colorForeground">#e8e9ed</color>
+    <color name="colorSecondary">#1a2332</color>
+    <color name="colorGrayText">#a0a4a8</color>
+    
+    <!-- Splash screen colors (matches index.html) -->
     <color name="splash_background_light">#fafbfc</color>
-    <color name="splash_background_dark">#0f1419</color>
+    <color name="splash_background_dark">#0a0f1a</color>
     
-    <!-- Dark mode theme colors -->
-    <color name="colorSurface">#1E1E1E</color>
-    <color name="colorSurfaceDark">#1E1E1E</color>
+    <!-- Shadow and overlay -->
+    <color name="shadowColor">#27000000</color>
+    
+    <!-- Button colors -->
+    <color name="colorButtonBackground">#1a2332</color>
+    <color name="colorButtonForeground">#d4a43e</color>
+    
+    <!-- Progress Bar Background -->
+    <color name="colorProgressBarBackground">#33d4a43e</color>
+    
+    <!-- State colors -->
+    <color name="colorError">#ff4757</color>
+    <color name="colorSuccess">#2ecc71</color>
+    
+    <!-- Surface colors -->
+    <color name="colorSurface">#1a2332</color>
     <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorOnSurface">#FFFFFF</color>
-    <color name="colorOnSurfaceDark">#FFFFFF</color>
-    <color name="colorError">#CF6679</color>
+    <color name="colorOnSecondary">#e8e9ed</color>
+    <color name="colorOnSurface">#e8e9ed</color>
     
     <!-- Dialog colors for dark mode -->
-    <color name="dialogBackground">#2C2C2C</color>
-    <color name="dialogBackgroundDark">#2C2C2C</color>
+    <color name="dialogBackground">#1a2332</color>
 </resources>
