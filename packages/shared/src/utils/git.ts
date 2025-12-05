@@ -18,6 +18,9 @@ import { logger } from './logger.js'
 
 const execAsync = promisify(exec)
 
+// Git constants
+const GIT_HASH_LENGTH = 40
+
 /**
  * Git repository information
  */
@@ -87,7 +90,8 @@ export async function readBranchFromFile(cwd?: string): Promise<string | null> {
     }
     
     // If HEAD contains a commit hash directly (detached HEAD state)
-    if (/^[0-9a-f]{40}$/.test(headContent.trim())) {
+    const hashPattern = new RegExp(`^[0-9a-f]{${GIT_HASH_LENGTH}}$`)
+    if (hashPattern.test(headContent.trim())) {
       return 'HEAD (detached)'
     }
     
@@ -123,7 +127,8 @@ export async function readCommitFromFile(cwd?: string, branch?: string): Promise
       }
       
       // If HEAD contains a commit hash directly
-      if (/^[0-9a-f]{40}$/.test(headContent.trim())) {
+      const hashPattern = new RegExp(`^[0-9a-f]{${GIT_HASH_LENGTH}}$`)
+      if (hashPattern.test(headContent.trim())) {
         return headContent.trim()
       }
     } else {
@@ -353,7 +358,7 @@ export async function getGitInfoWithFallback(cwd?: string, preferFiles: boolean 
       return {
         branch: fileInfo.branch,
         commit: fileInfo.commit,
-        shortCommit: fileInfo.shortCommit || fileInfo.commit.substring(0, 7),
+        shortCommit: fileInfo.shortCommit || (fileInfo.commit.length >= 7 ? fileInfo.commit.substring(0, 7) : fileInfo.commit),
         remote: fileInfo.remote || 'unknown',
         fromFiles: true
       }
