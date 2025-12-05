@@ -28,12 +28,14 @@ export class ApiClient {
   private debug: boolean
   private tokenDeliveryMethod: TokenDeliveryMethod
   private baseURL: string
+  private deviceInfoProvider?: () => Record<string, string> | Promise<Record<string, string>>
 
   constructor(config: ApiClientConfig) {
     this.debug = config.debug || false
     this.tokenStorage = new TokenStorage(config.storageKey)
     this.tokenDeliveryMethod = config.tokenDeliveryMethod || 'header'
     this.baseURL = config.baseURL
+    this.deviceInfoProvider = config.deviceInfoProvider
 
     // Create axios instance with base configuration
     this.axiosInstance = axios.create({
@@ -56,6 +58,20 @@ export class ApiClient {
     // Request interceptor - add authorization based on delivery method
     this.axiosInstance.interceptors.request.use(
       async (config) => {
+        // Add device info headers if provider is configured
+        if (this.deviceInfoProvider) {
+          try {
+            const deviceHeaders = await this.deviceInfoProvider()
+            if (deviceHeaders && typeof deviceHeaders === 'object') {
+              Object.assign(config.headers, deviceHeaders)
+            }
+          } catch (error) {
+            if (this.debug) {
+              logger.warn('[ApiClient] Failed to get device info:', error)
+            }
+          }
+        }
+
         // Skip auth for certain endpoints or if explicitly requested
         const skipAuth = (config as any).skipAuth
         if (skipAuth) {
