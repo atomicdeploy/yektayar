@@ -15,5 +15,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(BackButtonPlugin.class);
         registerPlugin(StatusBarPlugin.class);
         registerPlugin(JSBridgePlugin.class);
+        registerPlugin(ToastPlugin.class);
+        registerPlugin(DialogPlugin.class);
     }
 }
