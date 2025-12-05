@@ -114,6 +114,9 @@ tmp/
 **/android/captures
 **/android/*.apk
 **/android/*.aab
+# APK/AAB build outputs (not test fixtures)
+**/build/outputs/**/*.apk
+**/build/outputs/**/*.aab
 *.apk
 *.aab
 

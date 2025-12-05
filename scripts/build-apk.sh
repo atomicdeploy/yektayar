@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # YektaYar Android APK Build Script
 # This script builds a debug APK of the YektaYar mobile app
@@ -45,6 +45,7 @@ echo ""
 # Step 2: Install dependencies
 echo -e "${YELLOW}Step 2/5: Installing dependencies...${NC}"
 cd "$ROOT_DIR"
+# Using --legacy-peer-deps due to peer dependency conflicts in Capacitor/Ionic ecosystem
 npm install --legacy-peer-deps
 echo -e "${GREEN}✓ Dependencies installed${NC}"
 echo ""
@@ -71,7 +72,15 @@ echo ""
 # Check if APK was created
 if [ -f "$APK_OUTPUT" ]; then
     APK_SIZE=$(ls -lh "$APK_OUTPUT" | awk '{print $5}')
-    APK_MD5=$(md5sum "$APK_OUTPUT" | awk '{print $1}')
+    
+    # Use md5sum on Linux or md5 on macOS
+    if command -v md5sum &> /dev/null; then
+        APK_MD5=$(md5sum "$APK_OUTPUT" | awk '{print $1}')
+    elif command -v md5 &> /dev/null; then
+        APK_MD5=$(md5 -q "$APK_OUTPUT")
+    else
+        APK_MD5="(md5 tool not available)"
+    fi
     
     echo -e "${BLUE}================================${NC}"
     echo -e "${GREEN}Build completed successfully!${NC}"
