@@ -348,7 +348,7 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .test-container {
   padding: 1rem;
   max-width: 1200px;
@@ -477,7 +477,7 @@ h1 {
   color: var(--ion-color-light);
   padding: 1rem;
   border-radius: 8px;
-  font-family: 'Courier New', monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.85rem;
   margin: 0.75rem 0;
   overflow-x: auto;

@@ -1,7 +1,7 @@
 /**
- * Seed script for sample test data
- * Run with: node --loader ts-node/esm seed-tests.ts
- * Or with Bun: bun run seed-tests.ts
+ * Seed script for sample assessment data
+ * Run with: node --loader ts-node/esm seed-assessments.ts
+ * Or with Bun: bun run seed-assessments.ts
  */
 
 import postgres from 'postgres'
@@ -10,9 +10,9 @@ import { logger } from '@yektayar/shared'
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://yektayar_user:yektayar_dev_password@localhost:5432/yektayar'
 const db = postgres(DATABASE_URL)
 
-const sampleTest = {
+const sampleAssessment = {
   title: 'آزمون ارزیابی رابطه زناشویی',
-  titleEn: 'Marital Relationship Assessment Test',
+  titleEn: 'Marital Relationship Assessment',
   description: 'این پرسشنامه با هدف کمک به شما و همسرتان برای درک بهتر نقاط قوت و حوزه‌های قابل بهبود در رابطه طراحی شده است.',
   descriptionEn: 'This questionnaire is designed to help you and your spouse better understand strengths and areas for improvement in your relationship.',
   questions: [
@@ -119,33 +119,33 @@ const sampleTest = {
   ],
 }
 
-async function seedTests() {
+async function seedAssessments() {
   try {
-    logger.info('Starting test data seeding...')
+    logger.info('Starting assessment data seeding...')
 
-    // Check if test already exists
+    // Check if assessment already exists
     const existing = await db`
-      SELECT id FROM assessments WHERE title = ${sampleTest.title}
+      SELECT id FROM assessments WHERE title = ${sampleAssessment.title}
     `
 
     if (existing.length > 0) {
-      logger.warn('Sample test already exists, skipping...')
+      logger.warn('Sample assessment already exists, skipping...')
       return
     }
 
-    // Insert the sample test
-    const [test] = await db`
+    // Insert the sample assessment
+    const [assessment] = await db`
       INSERT INTO assessments (title, description, questions)
-      VALUES (${sampleTest.title}, ${sampleTest.description}, ${JSON.stringify(sampleTest.questions)})
+      VALUES (${sampleAssessment.title}, ${sampleAssessment.description}, ${JSON.stringify(sampleAssessment.questions)})
       RETURNING *
     `
 
-    logger.success(`Sample test created with ID: ${test.id}`)
-    logger.info(`Title: ${sampleTest.title}`)
-    logger.info(`Questions: ${sampleTest.questions.length}`)
+    logger.success(`Sample assessment created with ID: ${assessment.id}`)
+    logger.info(`Title: ${sampleAssessment.title}`)
+    logger.info(`Questions: ${sampleAssessment.questions.length}`)
     
   } catch (error) {
-    logger.error('Error seeding test data:', error)
+    logger.error('Error seeding assessment data:', error)
     throw error
   } finally {
     await db.end()
@@ -153,12 +153,12 @@ async function seedTests() {
 }
 
 // Run the seed function
-seedTests()
+seedAssessments()
   .then(() => {
-    logger.success('Test data seeding completed!')
+    logger.success('Assessment data seeding completed!')
     process.exit(0)
   })
   .catch((error) => {
-    logger.error('Test data seeding failed:', error)
+    logger.error('Assessment data seeding failed:', error)
     process.exit(1)
   })

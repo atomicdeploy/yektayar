@@ -254,7 +254,7 @@ ion-content .error-section {
   font-size: 0.875rem;
   color: #6c757d;
   margin: 0;
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   word-break: break-word;
 }
 

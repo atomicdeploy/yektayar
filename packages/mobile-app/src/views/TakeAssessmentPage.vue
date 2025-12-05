@@ -232,8 +232,8 @@
               </div>
               <h2>{{ locale === 'fa' ? 'بررسی نهایی' : 'Final Review' }}</h2>
               <p>{{ locale === 'fa'
-                ? 'لطفاً اطلاعات خود را بررسی کنید. در صورت صحت، آزمون را ارسال کنید.'
-                : 'Please review your information. If correct, submit the test.' }}</p>
+                ? 'لطفاً اطلاعات خود را بررسی کنید. در صورت صحت، ارزیابی را ارسال کنید.'
+                : 'Please review your information. If correct, submit the assessment.' }}</p>
               
               <div class="review-card">
                 <h3>{{ locale === 'fa' ? 'اطلاعات جمعیت‌شناختی' : 'Demographic Information' }}</h3>
@@ -280,7 +280,7 @@
                 <ion-spinner v-else name="circular" slot="start"></ion-spinner>
                 {{ submitting 
                   ? (locale === 'fa' ? 'در حال ارسال...' : 'Submitting...') 
-                  : (locale === 'fa' ? 'ارسال آزمون' : 'Submit Test') }}
+                  : (locale === 'fa' ? 'ارسال ارزیابی' : 'Submit Assessment') }}
               </ion-button>
             </div>
           </div>
@@ -507,7 +507,7 @@ const previousQuestion = () => {
 
 const showExitConfirm = async () => {
   const alert = await alertController.create({
-    header: locale.value === 'fa' ? 'خروج از آزمون' : 'Exit Test',
+    header: locale.value === 'fa' ? 'خروج از ارزیابی' : 'Exit Assessment',
     message: locale.value === 'fa' 
       ? 'آیا مطمئن هستید که می‌خواهید خارج شوید؟ پیشرفت شما ذخیره نخواهد شد.'
       : 'Are you sure you want to exit? Your progress will not be saved.',

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <main class="main-view">
     <!-- Header -->
     <div class="mb-8 flex justify-between items-center">
       <div>
@@ -170,7 +170,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">

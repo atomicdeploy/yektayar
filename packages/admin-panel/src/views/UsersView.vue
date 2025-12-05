@@ -1,35 +1,41 @@
 <template>
-  <div>
+  <main class="main-view">
     <!-- Header -->
-    <div class="mb-8 flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ t('users_page.title') }}</h1>
-        <p class="mt-2 text-gray-600 dark:text-gray-400">{{ t('users_page.list_title') }}</p>
+    <div class="view-header">
+      <div class="header-content">
+        <h1>{{ t('users_page.title') }}</h1>
+        <p class="subtitle">{{ t('users_page.list_title') }}</p>
       </div>
-      <button
-        v-if="permissionsStore.hasPermission('edit_users')"
-        class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
-      >
-        <PlusIcon class="w-5 h-5" />
-        {{ t('users_page.add_user') }}
-      </button>
+      <div class="header-actions">
+        <ViewModeToggle v-model="viewMode" />
+        <button
+          v-if="permissionsStore.hasPermission('edit_users')"
+          class="btn btn-primary"
+        >
+          <PlusIcon class="w-5 h-5" />
+          {{ t('users_page.add_user') }}
+        </button>
+      </div>
     </div>
 
     <!-- Search and Filter -->
-    <div class="mb-6 flex flex-col sm:flex-row gap-4">
-      <div class="flex-1 relative">
+    <div class="filters-section">
+      <div class="filter-group flex-1 relative">
+        <!-- TODO: avoid using "left" and "right" style CSS, use "inline" instead; to support both RTL and LTR correctly -->
+        <!-- TODO: make this into re-usable component with selectable icon to make code DRY -->
         <MagnifyingGlassIcon class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         <input
           v-model="searchQuery"
           type="text"
           :placeholder="t('users_page.search_placeholder')"
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          class="search-input"
+          style="padding-left: 3em"
         />
       </div>
-      <div class="flex gap-2">
+      <div class="filter-group flex gap-2">
         <select
           v-model="filterRole"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          class="filter-select"
         >
           <option value="">همه نقش‌ها</option>
           <option value="admin">{{ t('roles.admin') }}</option>
@@ -39,7 +45,7 @@
         </select>
         <select
           v-model="filterStatus"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          class="filter-select"
         >
           <option value="">همه وضعیت‌ها</option>
           <option value="active">{{ t('status.active') }}</option>
@@ -49,8 +55,8 @@
       </div>
     </div>
 
-    <!-- Users Table -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+    <!-- Users Table (Default view) -->
+    <div v-if="viewMode === 'table'" class="users-table">
       <div v-if="isLoading" class="p-8 text-center">
         <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
         <p class="mt-4 text-gray-600 dark:text-gray-400">{{ t('loading') }}</p>
@@ -90,7 +96,8 @@
           <tr
             v-for="user in paginatedUsers"
             :key="user.id"
-            class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+            @click="openUserEdit(user)"
           >
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-3">
@@ -134,9 +141,9 @@
               <p class="text-sm text-gray-600 dark:text-gray-400">{{ formatDate(user.createdAt) }}</p>
             </td>
             <td v-if="permissionsStore.hasPermission('edit_users')" class="px-6 py-4 whitespace-nowrap">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2" @click.stop>
                 <button
-                  @click="editUser(user.id)"
+                  @click="editUser(user)"
                   class="p-1.5 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                   :title="t('edit')"
                 >
@@ -155,6 +162,79 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Users Card View -->
+    <div v-else class="users-grid">
+      <div v-if="isLoading" class="loading-state">
+        <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
+        <p>{{ t('loading') }}</p>
+      </div>
+
+      <div v-else-if="filteredUsers.length === 0" class="empty-state">
+        {{ t('users_page.no_users') }}
+      </div>
+
+      <div v-else v-for="user in paginatedUsers" :key="user.id" class="user-card" @click="openUserEdit(user)">
+        <div class="user-card-header">
+          <div class="user-avatar">
+            <span>{{ getInitials(user.name) }}</span>
+          </div>
+          <div class="user-info">
+            <h3>{{ user.name }}</h3>
+            <span
+              :class="[
+                'status-badge',
+                getStatusBadgeClass(user.status),
+              ]"
+            >
+              {{ t(`status.${user.status}`) }}
+            </span>
+          </div>
+        </div>
+        <div class="user-card-body">
+          <div class="user-detail">
+            <span class="label">{{ t('users_page.email') }}</span>
+            <span class="value">{{ user.email }}</span>
+          </div>
+          <div class="user-detail">
+            <span class="label">{{ t('users_page.phone') }}</span>
+            <span class="value">{{ user.phone }}</span>
+          </div>
+          <div class="user-detail">
+            <span class="label">{{ t('users_page.role') }}</span>
+            <span
+              :class="[
+                'role-badge',
+                getRoleBadgeClass(user.role),
+              ]"
+            >
+              {{ t(`roles.${user.role}`) }}
+            </span>
+          </div>
+          <div class="user-detail">
+            <span class="label">{{ t('users_page.created_at') }}</span>
+            <span class="value">{{ formatDate(user.createdAt) }}</span>
+          </div>
+        </div>
+        <div v-if="permissionsStore.hasPermission('edit_users')" class="user-card-actions" @click.stop>
+          <button
+            @click="editUser(user)"
+            class="btn-icon"
+            :title="t('edit')"
+          >
+            <PencilIcon class="w-5 h-5" />
+          </button>
+          <button
+            v-if="permissionsStore.hasPermission('delete_users')"
+            @click="deleteUser(user.id)"
+            class="btn-icon btn-danger"
+            :title="t('delete')"
+          >
+            <TrashIcon class="w-5 h-5" />
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Pagination -->
@@ -192,11 +272,80 @@
         </button>
       </div>
     </div>
-  </div>
+
+    <!-- Edit User Modal -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>{{ t('users_page.edit_user') }}</h2>
+          <button class="btn-close" @click="closeEditModal">×</button>
+        </div>
+        <div class="modal-body">
+          <form @submit.prevent="saveUser">
+            <div class="form-group">
+              <label>{{ t('users_page.name') }} *</label>
+              <input
+                type="text"
+                v-model="userForm.name"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="form-group">
+              <label>{{ t('users_page.email') }} *</label>
+              <input
+                type="email"
+                v-model="userForm.email"
+                required
+                class="form-control"
+              />
+            </div>
+            <div class="form-group">
+              <label>{{ t('users_page.phone') }}</label>
+              <input
+                type="tel"
+                v-model="userForm.phone"
+                class="form-control"
+              />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ t('users_page.role') }} *</label>
+                <select v-model="userForm.role" required class="form-control">
+                  <option value="admin">{{ t('roles.admin') }}</option>
+                  <option value="psychologist">{{ t('roles.psychologist') }}</option>
+                  <option value="user">{{ t('roles.user') }}</option>
+                  <option value="moderator">{{ t('roles.moderator') }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>{{ t('users_page.status') }} *</label>
+                <select v-model="userForm.status" required class="form-control">
+                  <option value="active">{{ t('status.active') }}</option>
+                  <option value="inactive">{{ t('status.inactive') }}</option>
+                  <option value="blocked">{{ t('status.blocked') }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" @click="closeEditModal">
+                <span>{{ t('cancel') }}</span>
+                <!-- <kbd class="kbd">Esc</kbd> -->
+              </button>
+              <button type="submit" class="btn btn-info">
+                <span>{{ t('save') }}</span>
+                <!-- <kbd class="kbd">Ctrl+⏎</kbd> -->
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   MagnifyingGlassIcon,
@@ -205,11 +354,15 @@ import {
   TrashIcon,
 } from '@heroicons/vue/24/outline'
 import { usePermissionsStore } from '@/stores/permissions'
+import { useViewMode } from '@/composables/useViewMode'
 import { logger } from '@yektayar/shared'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import ViewModeToggle from '@/components/shared/ViewModeToggle.vue'
+import apiClient from '@/api'
 
 const { t } = useI18n()
 const permissionsStore = usePermissionsStore()
+const { viewMode } = useViewMode('main-view-mode', 'table') // Default to table view for users
 
 interface User {
   id: string
@@ -229,54 +382,15 @@ const filterStatus = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-// Mock data for development
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'علی محمدی',
-    email: 'ali@example.com',
-    phone: '09121234567',
-    role: 'admin',
-    status: 'active',
-    createdAt: new Date('2024-01-15'),
-  },
-  {
-    id: '2',
-    name: 'سارا احمدی',
-    email: 'sara@example.com',
-    phone: '09129876543',
-    role: 'psychologist',
-    status: 'active',
-    createdAt: new Date('2024-02-20'),
-  },
-  {
-    id: '3',
-    name: 'محمد رضایی',
-    email: 'mohammad@example.com',
-    phone: '09135551234',
-    role: 'user',
-    status: 'active',
-    createdAt: new Date('2024-03-10'),
-  },
-  {
-    id: '4',
-    name: 'فاطمه کریمی',
-    email: 'fatemeh@example.com',
-    phone: '09141112233',
-    role: 'moderator',
-    status: 'active',
-    createdAt: new Date('2024-03-25'),
-  },
-  {
-    id: '5',
-    name: 'رضا حسینی',
-    email: 'reza@example.com',
-    phone: '09151234567',
-    role: 'user',
-    status: 'inactive',
-    createdAt: new Date('2024-04-05'),
-  },
-]
+const showEditModal = ref(false)
+const editingUser = ref<User | null>(null)
+const userForm = ref({
+  name: '',
+  email: '',
+  phone: '',
+  role: 'user' as User['role'],
+  status: 'active' as User['status'],
+})
 
 const filteredUsers = computed(() => {
   let result = users.value
@@ -366,31 +480,205 @@ function formatDate(date: Date): string {
   }).format(date)
 }
 
-function editUser(id: string) {
-  logger.info('Edit user:', id)
-  // TODO: Implement edit user modal
+function openUserEdit(user: User) {
+  editingUser.value = user
+  userForm.value = {
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+    status: user.status,
+  }
+  showEditModal.value = true
+}
+
+function editUser(user: User) {
+  openUserEdit(user)
+}
+
+function closeEditModal() {
+  showEditModal.value = false
+  editingUser.value = null
+  userForm.value = {
+    name: '',
+    email: '',
+    phone: '',
+    role: 'user',
+    status: 'active',
+  }
+}
+
+function saveUser() {
+  if (editingUser.value) {
+    // Update existing user
+    const index = users.value.findIndex((u) => u.id === editingUser.value!.id)
+    if (index !== -1) {
+      users.value[index] = {
+        ...users.value[index],
+        ...userForm.value,
+      }
+    }
+    logger.info('User updated:', editingUser.value.id)
+  }
+  closeEditModal()
 }
 
 function deleteUser(id: string) {
-  logger.info('Delete user:', id)
-  // TODO: Implement delete confirmation
+  if (confirm(t('messages.confirm_delete'))) {
+    const index = users.value.findIndex((u) => u.id === id)
+    if (index !== -1) {
+      users.value.splice(index, 1)
+    }
+    logger.info('User deleted:', id)
+  }
 }
+
+// Handle keyboard shortcuts
+function handleKeyDown(event: KeyboardEvent) {
+  if (showEditModal.value && event.key === 'Escape') {
+    closeEditModal()
+  }
+  if (showEditModal.value && event.ctrlKey && event.key === 'Enter') {
+    event.preventDefault()
+    saveUser()
+  }
+}
+
+onMounted(() => {
+  fetchUsers()
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeyDown)
+})
 
 async function fetchUsers() {
   isLoading.value = true
   try {
-    // TODO: Fetch from API
-    // For now, use mock data
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    users.value = mockUsers
+    const response = await apiClient.get<any[]>('/api/users')
+    
+    if (response.success && response.data) {
+      // Map backend data to frontend User interface
+      users.value = response.data.map((user: any) => ({
+        id: user.id.toString(),
+        name: user.name,
+        email: user.email || '',
+        phone: user.phone || '',
+        role: mapTypeToRole(user.type),
+        status: user.is_active ? 'active' : 'inactive',
+        createdAt: new Date(user.created_at),
+      }))
+    } else {
+      throw new Error('Failed to fetch users')
+    }
   } catch (error) {
     logger.error('Error fetching users:', error)
+    users.value = []
   } finally {
     isLoading.value = false
   }
+}
+
+// Map backend user type to frontend role
+function mapTypeToRole(type: string): 'admin' | 'psychologist' | 'user' | 'moderator' {
+  const mapping: Record<string, 'admin' | 'psychologist' | 'user' | 'moderator'> = {
+    'admin': 'admin',
+    'psychologist': 'psychologist',
+    'patient': 'user',
+    'moderator': 'moderator',
+  }
+  return mapping[type] || 'user'
 }
 
 onMounted(() => {
   fetchUsers()
 })
 </script>
+
+<style scoped lang="scss">
+/* TODO: use our application's appropriate colors instead of hard coded ones below */
+.users-table {
+  table thead {
+    background: rgb(249 250 251);
+    border-bottom: 1px solid rgb(229 231 235);
+
+    @media (prefers-color-scheme: dark) {
+      background: rgb(55 65 81);
+      border-bottom-color: rgb(75 85 99);
+    }
+
+    th {
+      color: rgb(107 114 128);
+
+      @media (prefers-color-scheme: dark) {
+        color: rgb(156 163 175);
+      }
+    }
+  }
+
+  table tbody tr {
+    border-bottom: 1px solid rgb(229 231 235);
+
+    @media (prefers-color-scheme: dark) {
+      border-bottom-color: rgb(75 85 99);
+    }
+
+    &:hover {
+      background: rgb(249 250 251);
+
+      @media (prefers-color-scheme: dark) {
+        background: rgba(55, 65, 81, 0.5);
+      }
+    }
+  }
+}
+
+.users-grid {
+  .loading-state,
+  .empty-state {
+    grid-column: 1 / -1;
+  }
+}
+
+.user-card {
+  .user-avatar {
+    font-size: 20px;
+  }
+
+  .user-card-body {
+    .user-detail {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        font-size: 13px;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .value {
+        font-size: 14px;
+        color: var(--text-primary);
+      }
+    }
+  }
+
+  .user-card-actions {
+    display: flex;
+    gap: 8px;
+
+    .btn-icon {
+      flex: 1;
+    }
+  }
+}
+
+</style>

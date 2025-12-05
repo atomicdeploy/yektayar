@@ -95,6 +95,12 @@ export default {
     system: 'System',
   },
   
+  // View Mode
+  view_mode: {
+    card_view: 'Card View',
+    table_view: 'Table View',
+  },
+  
   // Messages
   messages: {
     success: 'Operation completed successfully',

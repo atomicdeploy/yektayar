@@ -43,10 +43,34 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'دوره‌ها' },
       },
       {
+        path: 'courses/create',
+        name: 'courses-create',
+        component: () => import('../views/CourseFormView.vue'),
+        meta: { title: 'افزودن دوره جدید' },
+      },
+      {
+        path: 'courses/:id/edit',
+        name: 'courses-edit',
+        component: () => import('../views/CourseFormView.vue'),
+        meta: { title: 'ویرایش دوره' },
+      },
+      {
         path: 'assessments',
         name: 'assessments',
         component: () => import('../views/AssessmentsView.vue'),
         meta: { title: 'آزمون‌ها' },
+      },
+      {
+        path: 'assessments/create',
+        name: 'assessments-create',
+        component: () => import('../views/AssessmentFormView.vue'),
+        meta: { title: 'افزودن آزمون جدید' },
+      },
+      {
+        path: 'assessments/:id/edit',
+        name: 'assessments-edit',
+        component: () => import('../views/AssessmentFormView.vue'),
+        meta: { title: 'ویرایش آزمون' },
       },
       {
         path: 'reports',
