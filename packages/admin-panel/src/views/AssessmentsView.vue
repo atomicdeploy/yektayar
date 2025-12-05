@@ -253,11 +253,11 @@
             <div class="form-actions">
               <button type="button" class="btn btn-secondary" @click="closeModals">
                 <span>انصراف</span>
-                <kbd class="kbd">Esc</kbd>
+                <!-- <kbd class="kbd">Esc</kbd> -->
               </button>
               <button type="submit" class="btn btn-primary" :disabled="saving">
                 <span>{{ saving ? 'در حال ذخیره...' : 'ذخیره' }}</span>
-                <kbd class="kbd" v-if="!saving">Ctrl+⏎</kbd>
+                <!-- <kbd class="kbd" v-if="!saving">Ctrl+⏎</kbd> -->
               </button>
             </div>
           </form>

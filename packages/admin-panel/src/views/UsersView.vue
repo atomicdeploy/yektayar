@@ -330,11 +330,11 @@
             <div class="form-actions">
               <button type="button" class="btn btn-secondary" @click="closeEditModal">
                 <span>{{ t('cancel') }}</span>
-                <kbd class="kbd">Esc</kbd>
+                <!-- <kbd class="kbd">Esc</kbd> -->
               </button>
               <button type="submit" class="btn btn-primary">
                 <span>{{ t('save') }}</span>
-                <kbd class="kbd">Ctrl+⏎</kbd>
+                <!-- <kbd class="kbd">Ctrl+⏎</kbd> -->
               </button>
             </div>
           </form>
