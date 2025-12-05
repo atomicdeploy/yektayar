@@ -111,7 +111,7 @@ export async function isDirty(cwd?: string): Promise<boolean> {
  * Get number of commits ahead of remote
  */
 export async function getCommitsAhead(cwd?: string): Promise<number> {
-  const result = await executeGitCommand('git rev-list --count @{u}..HEAD 2>/dev/null || echo "0"', cwd)
+  const result = await executeGitCommand('git rev-list --count @{u}..HEAD', cwd)
   return result.success ? parseInt(result.output) || 0 : 0
 }
 
@@ -119,7 +119,7 @@ export async function getCommitsAhead(cwd?: string): Promise<number> {
  * Get number of commits behind remote
  */
 export async function getCommitsBehind(cwd?: string): Promise<number> {
-  const result = await executeGitCommand('git rev-list --count HEAD..@{u} 2>/dev/null || echo "0"', cwd)
+  const result = await executeGitCommand('git rev-list --count HEAD..@{u}', cwd)
   return result.success ? parseInt(result.output) || 0 : 0
 }
 
@@ -311,7 +311,7 @@ export async function listBranches(cwd?: string): Promise<string[]> {
   if (result.success) {
     return result.output
       .split('\n')
-      .map(line => line.trim().replace(/^\*\s+/, ''))
+      .map(line => line.trim())
       .filter(Boolean)
   }
   

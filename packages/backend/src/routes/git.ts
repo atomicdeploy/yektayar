@@ -102,7 +102,7 @@ export const gitRoutes = new Elysia({ prefix: '/api/git' })
    */
   .post('/branch/switch', async ({ body }) => {
     try {
-      const { branchName } = body as { branchName: string }
+      const { branchName } = body
       
       if (!branchName) {
         return {
@@ -141,7 +141,7 @@ export const gitRoutes = new Elysia({ prefix: '/api/git' })
    */
   .post('/branch/create', async ({ body }) => {
     try {
-      const { branchName } = body as { branchName: string }
+      const { branchName } = body
       
       if (!branchName) {
         return {
