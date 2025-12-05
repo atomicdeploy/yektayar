@@ -35,6 +35,8 @@ export interface DeviceInfo {
   userAgent?: string
   language?: string
   languages?: string[]
+  timezone?: string
+  timezoneOffset?: number // Minutes from UTC
   
   // Hardware capabilities
   capabilities?: {
@@ -45,6 +47,15 @@ export interface DeviceInfo {
     nfc?: boolean
     accelerometer?: boolean
     gyroscope?: boolean
+    // Browser/PWA specific capabilities
+    serviceWorker?: boolean
+    notifications?: boolean
+    localStorage?: boolean
+    sessionStorage?: boolean
+    indexedDB?: boolean
+    webGL?: boolean
+    webRTC?: boolean
+    mediaDevices?: boolean
   }
   
   // Connection information
@@ -80,6 +91,15 @@ export function getWebDeviceInfo(): Partial<DeviceInfo> {
     collectedAt: new Date().toISOString(),
   }
   
+  // Timezone information
+  try {
+    info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    info.timezoneOffset = new Date().getTimezoneOffset()
+  } catch (error) {
+    // Fallback if Intl API not available
+    info.timezoneOffset = new Date().getTimezoneOffset()
+  }
+  
   // Detect OS from user agent
   const ua = navigator.userAgent
   if (ua.includes('Windows')) {
@@ -96,11 +116,43 @@ export function getWebDeviceInfo(): Partial<DeviceInfo> {
     info.platform = 'ios'
   }
   
-  // Detect capabilities
+  // Detect capabilities - both native and PWA features
   info.capabilities = {
     touchScreen: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
     geolocation: 'geolocation' in navigator,
     camera: 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices,
+    mediaDevices: 'mediaDevices' in navigator,
+    
+    // PWA/Browser capabilities
+    serviceWorker: 'serviceWorker' in navigator,
+    notifications: 'Notification' in window,
+    localStorage: ((): boolean => {
+      try {
+        return typeof localStorage !== 'undefined'
+      } catch {
+        return false
+      }
+    })(),
+    sessionStorage: ((): boolean => {
+      try {
+        return typeof sessionStorage !== 'undefined'
+      } catch {
+        return false
+      }
+    })(),
+    indexedDB: 'indexedDB' in window,
+    webGL: ((): boolean => {
+      try {
+        const canvas = document.createElement('canvas')
+        return !!(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+      } catch {
+        return false
+      }
+    })(),
+    webRTC: 'RTCPeerConnection' in window,
+    
+    // Check for Bluetooth API
+    bluetooth: 'bluetooth' in navigator,
   }
   
   // Connection information
@@ -161,8 +213,25 @@ export function formatDeviceInfoForHeaders(deviceInfo: DeviceInfo): Record<strin
     headers['X-Screen-Density'] = deviceInfo.screenDensity.toString()
   }
   
+  if (deviceInfo.viewportWidth && deviceInfo.viewportHeight) {
+    headers['X-Viewport-Size'] = `${deviceInfo.viewportWidth}x${deviceInfo.viewportHeight}`
+  }
+  
   if (deviceInfo.language) {
     headers['X-Device-Language'] = deviceInfo.language
+  }
+  
+  // Send all supported languages as a comma-separated list
+  if (deviceInfo.languages && deviceInfo.languages.length > 0) {
+    headers['X-Device-Languages'] = deviceInfo.languages.join(',')
+  }
+  
+  if (deviceInfo.timezone) {
+    headers['X-Device-Timezone'] = deviceInfo.timezone
+  }
+  
+  if (deviceInfo.timezoneOffset !== undefined) {
+    headers['X-Device-Timezone-Offset'] = deviceInfo.timezoneOffset.toString()
   }
   
   if (deviceInfo.deviceId) {
@@ -171,6 +240,11 @@ export function formatDeviceInfoForHeaders(deviceInfo: DeviceInfo): Record<strin
   
   if (deviceInfo.connectionType) {
     headers['X-Connection-Type'] = deviceInfo.connectionType
+  }
+  
+  // Send capabilities as JSON string if available
+  if (deviceInfo.capabilities) {
+    headers['X-Device-Capabilities'] = JSON.stringify(deviceInfo.capabilities)
   }
   
   return headers

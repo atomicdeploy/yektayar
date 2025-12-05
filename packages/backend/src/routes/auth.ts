@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
 import { logger } from '@yektayar/shared'
+import { getClientIpAddress } from '../utils/ipAddress'
 
 // Define request body types
 interface AcquireSessionBody {
@@ -15,7 +16,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
     try {
       // Extract metadata from request
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
       
       // Get device info from body if provided
       const requestBody = body as AcquireSessionBody
@@ -31,9 +32,14 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         appVersion: headers['x-app-version'],
         screenSize: headers['x-screen-size'],
         screenDensity: headers['x-screen-density'],
+        viewportSize: headers['x-viewport-size'],
         language: headers['x-device-language'],
+        languages: headers['x-device-languages'],
+        timezone: headers['x-device-timezone'],
+        timezoneOffset: headers['x-device-timezone-offset'],
         deviceId: headers['x-device-id'],
         connectionType: headers['x-connection-type'],
+        capabilities: headers['x-device-capabilities'],
       }
       
       // Merge device info from body and headers
@@ -42,6 +48,20 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         ...Object.fromEntries(
           Object.entries(deviceHeaders).filter(([_, v]) => v !== undefined)
         ),
+      }
+      
+      // Parse capabilities if it's a JSON string
+      if (typeof mergedDeviceInfo.capabilities === 'string') {
+        try {
+          mergedDeviceInfo.capabilities = JSON.parse(mergedDeviceInfo.capabilities)
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+      }
+      
+      // Parse languages array if it's a comma-separated string
+      if (typeof mergedDeviceInfo.languages === 'string') {
+        mergedDeviceInfo.languages = mergedDeviceInfo.languages.split(',').map((l: string) => l.trim())
       }
       
       const metadata = {
@@ -247,7 +267,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
 
       // Create session for logged-in user
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
       
       const metadata = {
         userAgent,
@@ -395,7 +415,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
 
       // Create session for logged-in user
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
       
       const metadata = {
         userAgent,
