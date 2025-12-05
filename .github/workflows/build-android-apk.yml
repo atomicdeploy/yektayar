@@ -179,17 +179,17 @@ jobs:
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
         id: upload-debug
         run: |
-          # Upload to tmpfiles.org
-          RESPONSE=$(curl -f -F "file=@yektayar-app-debug-secure.zip" https://tmpfiles.org/api/v1/upload 2>&1 || echo '{"status":"error"}')
+          # Upload to tmpfiles.org (using -s for silent mode to avoid progress output)
+          RESPONSE=$(curl -sS -f -F "file=@yektayar-app-debug-secure.zip" https://tmpfiles.org/api/v1/upload 2>&1 || echo '{"status":"error"}')
           echo "Response: $RESPONSE"
           
           # Check if upload was successful
           if echo "$RESPONSE" | grep -q '"status":"success"'; then
             # Extract URL from JSON response using jq if available, otherwise grep
             if command -v jq &> /dev/null; then
-              URL=$(echo $RESPONSE | jq -r '.data.url')
+              URL=$(echo "$RESPONSE" | jq -r '.data.url')
             else
-              URL=$(echo $RESPONSE | grep -oP '(?<="url":")[^"]*' || echo "")
+              URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
             fi
             
             if [ -n "$URL" ]; then
@@ -211,17 +211,17 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
         id: upload-release
         run: |
-          # Upload to tmpfiles.org
-          RESPONSE=$(curl -f -F "file=@yektayar-app-release-secure.zip" https://tmpfiles.org/api/v1/upload 2>&1 || echo '{"status":"error"}')
+          # Upload to tmpfiles.org (using -s for silent mode to avoid progress output)
+          RESPONSE=$(curl -sS -f -F "file=@yektayar-app-release-secure.zip" https://tmpfiles.org/api/v1/upload 2>&1 || echo '{"status":"error"}')
           echo "Response: $RESPONSE"
           
           # Check if upload was successful
           if echo "$RESPONSE" | grep -q '"status":"success"'; then
             # Extract URL from JSON response using jq if available, otherwise grep
             if command -v jq &> /dev/null; then
-              URL=$(echo $RESPONSE | jq -r '.data.url')
+              URL=$(echo "$RESPONSE" | jq -r '.data.url')
             else
-              URL=$(echo $RESPONSE | grep -oP '(?<="url":")[^"]*' || echo "")
+              URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
             fi
             
             if [ -n "$URL" ]; then
