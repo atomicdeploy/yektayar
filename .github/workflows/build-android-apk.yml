@@ -134,6 +134,80 @@ jobs:
           path: apk-analysis.txt
           retention-days: 30
 
+      - name: Create Password-Protected ZIP (Debug)
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
+        id: create-zip-debug
+        run: |
+          # Get current datetime in ISO format for password
+          DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "password=$DATETIME" >> $GITHUB_OUTPUT
+          
+          # Copy APK to temp location without directory structure
+          cp packages/mobile-app/android/app/build/outputs/apk/debug/app-debug.apk ./app-debug.apk
+          
+          # Create password-protected ZIP
+          zip -e -P "$DATETIME" yektayar-app-debug-secure.zip app-debug.apk
+          
+          # Output file size and checksum
+          ls -lh yektayar-app-debug-secure.zip
+          md5sum app-debug.apk | tee apk-checksum.txt
+          echo "zip_size=$(du -h yektayar-app-debug-secure.zip | cut -f1)" >> $GITHUB_OUTPUT
+          echo "apk_md5=$(md5sum app-debug.apk | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Create Password-Protected ZIP (Release)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        id: create-zip-release
+        run: |
+          # Get current datetime in ISO format for password
+          DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "password=$DATETIME" >> $GITHUB_OUTPUT
+          
+          # Copy APK to temp location without directory structure
+          cp packages/mobile-app/android/app/build/outputs/apk/release/app-release-unsigned.apk ./app-release-unsigned.apk
+          
+          # Create password-protected ZIP
+          zip -e -P "$DATETIME" yektayar-app-release-secure.zip app-release-unsigned.apk
+          
+          # Output file size and checksum
+          ls -lh yektayar-app-release-secure.zip
+          md5sum app-release-unsigned.apk | tee apk-checksum.txt
+          echo "zip_size=$(du -h yektayar-app-release-secure.zip | cut -f1)" >> $GITHUB_OUTPUT
+          echo "apk_md5=$(md5sum app-release-unsigned.apk | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Upload to tmpfiles.org (Debug)
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
+        id: upload-debug
+        run: |
+          # Upload to tmpfiles.org
+          RESPONSE=$(curl -F "file=@yektayar-app-debug-secure.zip" https://tmpfiles.org/api/v1/upload)
+          echo "Response: $RESPONSE"
+          
+          # Extract URL from JSON response
+          URL=$(echo $RESPONSE | grep -oP '(?<="url":")[^"]*')
+          
+          # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
+          DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
+          
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "Upload successful! Download URL: $DOWNLOAD_URL"
+
+      - name: Upload to tmpfiles.org (Release)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        id: upload-release
+        run: |
+          # Upload to tmpfiles.org
+          RESPONSE=$(curl -F "file=@yektayar-app-release-secure.zip" https://tmpfiles.org/api/v1/upload)
+          echo "Response: $RESPONSE"
+          
+          # Extract URL from JSON response
+          URL=$(echo $RESPONSE | grep -oP '(?<="url":")[^"]*')
+          
+          # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
+          DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
+          
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "Upload successful! Download URL: $DOWNLOAD_URL"
+
       - name: Comment PR with APK
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -142,16 +216,41 @@ jobs:
           script: |
             const fs = require('fs');
             const analysis = fs.readFileSync('apk-analysis.txt', 'utf8');
+            
+            // Determine build type and get appropriate outputs
+            const buildType = '${{ github.event.inputs.build_type || 'debug' }}';
+            const isDebug = buildType === 'debug';
+            
+            const password = isDebug ? '${{ steps.create-zip-debug.outputs.password }}' : '${{ steps.create-zip-release.outputs.password }}';
+            const downloadUrl = isDebug ? '${{ steps.upload-debug.outputs.download_url }}' : '${{ steps.upload-release.outputs.download_url }}';
+            const zipSize = isDebug ? '${{ steps.create-zip-debug.outputs.zip_size }}' : '${{ steps.create-zip-release.outputs.zip_size }}';
+            const apkMd5 = isDebug ? '${{ steps.create-zip-debug.outputs.apk_md5 }}' : '${{ steps.create-zip-release.outputs.apk_md5 }}';
 
             const body = `## ✅ Android APK Built Successfully!
 
+            ### 📥 Quick Download (Temporary Link)
+
+            **Download URL**: ${downloadUrl}  
+            **Password**: \`${password}\`  
+            **ZIP Size**: ${zipSize}  
+            **APK MD5**: \`${apkMd5}\`
+
+            > **Note**: The ZIP file contains the APK directly (no folder structure). Password is current build datetime in ISO format. Link expires after a period of time.
+
+            ### 📦 Artifact Download
+
             Download the artifact from the [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
 
-            ### APK Analysis
+            ### 📊 APK Analysis
 
             \`\`\`
             ${analysis}
             \`\`\`
+
+            ### 📖 Installation
+
+            1. Download and extract: \`unzip -P "${password}" yektayar-app-${buildType}-secure.zip\`
+            2. Install: \`adb install app-${buildType}.apk\`
             `;
 
             github.rest.issues.createComment({

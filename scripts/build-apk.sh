@@ -93,6 +93,30 @@ if [ -f "$APK_OUTPUT" ]; then
     echo -e "${BLUE}To install on a device:${NC}"
     echo -e "  adb install $APK_OUTPUT"
     echo ""
+    
+    # Optional: Create password-protected ZIP
+    if [ "${CREATE_SECURE_ZIP:-}" = "true" ]; then
+        echo -e "${YELLOW}Creating password-protected ZIP...${NC}"
+        
+        # Get current datetime in ISO format for password
+        DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        
+        # Copy APK to root without directory structure
+        cd "$ROOT_DIR"
+        cp "$APK_OUTPUT" ./app-debug.apk
+        
+        # Create password-protected ZIP
+        zip -e -P "$DATETIME" yektayar-app-debug-secure.zip app-debug.apk
+        
+        echo -e "${GREEN}✓ Secure ZIP created${NC}"
+        echo -e "${GREEN}ZIP Location:${NC} $ROOT_DIR/yektayar-app-debug-secure.zip"
+        echo -e "${GREEN}Password:${NC} $DATETIME"
+        echo ""
+        
+        # Clean up temporary APK copy
+        rm ./app-debug.apk
+    fi
+    echo ""
 else
     echo -e "${RED}Error: APK was not created${NC}"
     exit 1
