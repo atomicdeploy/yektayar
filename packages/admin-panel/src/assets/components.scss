@@ -195,8 +195,34 @@
       cursor: not-allowed;
     }
 
-    /* TODO: rename the following to btn-info, create btn-primary that uses var(--primary-gradient) and other related colors */
     &.btn-primary {
+      background: var(--primary-gradient);
+      /* background: var(--primary-color); */
+      color: black;
+
+      &:hover:not(:disabled) {
+        background-size: 150%;
+        /* background: var(--color-primary-400); */
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        color: white;
+      }
+    }
+
+    &.btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+
+      &:hover:not(:disabled) {
+        background: var(--bg-tertiary);
+      }
+    }
+
+    &.btn-info {
       background: rgb(59 130 246);
       color: white;
 
@@ -217,15 +243,7 @@
       }
     }
 
-    &.btn-secondary {
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-
-      &:hover:not(:disabled) {
-        background: var(--bg-tertiary);
-      }
-    }
+    /* TODO: add btn-success */
 
     &.btn-danger {
       background: rgb(239 68 68);

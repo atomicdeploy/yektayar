@@ -269,7 +269,7 @@
                 <span>انصراف</span>
                 <!-- <kbd class="kbd">Esc</kbd> -->
               </button>
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-info">
                 <span>{{ editingCourse ? 'ذخیره تغییرات' : 'ایجاد دوره' }}</span>
                 <!-- <kbd class="kbd">Ctrl+⏎</kbd> -->
               </button>

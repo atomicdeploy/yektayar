@@ -332,7 +332,7 @@
                 <span>{{ t('cancel') }}</span>
                 <!-- <kbd class="kbd">Esc</kbd> -->
               </button>
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-info">
                 <span>{{ t('save') }}</span>
                 <!-- <kbd class="kbd">Ctrl+⏎</kbd> -->
               </button>

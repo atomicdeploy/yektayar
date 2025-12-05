@@ -275,7 +275,7 @@
         <div class="modal-body">
           <div class="questions-header">
             <button class="btn btn-primary btn-sm" @click="addSection">
-              <i class="icon-plus"></i>
+              <PlusIcon class="w-5 h-5" />
               افزودن بخش جدید
             </button>
           </div>
@@ -308,7 +308,7 @@
 
               <div class="section-questions">
                 <button class="btn btn-secondary btn-sm" @click="addQuestion(sectionIndex)">
-                  <i class="icon-plus"></i>
+                  <PlusIcon class="w-5 h-5" />
                   افزودن سوال
                 </button>
 
