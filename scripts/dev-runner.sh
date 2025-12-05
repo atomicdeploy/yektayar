@@ -4,8 +4,7 @@
 # Modern CLI interface for managing YektaYar development services
 # Supports service-specific actions with clear action-service separation
 
-set -euo pipefail
-IFS=$'\n\t'
+set -eo pipefail
 
 # ============================================================================
 # CONFIGURATION AND CONSTANTS
@@ -48,32 +47,7 @@ readonly BACKEND_PORT=${PORT:-3000}
 readonly ADMIN_PORT=${VITE_ADMIN_PORT:-5173}
 readonly MOBILE_PORT=${VITE_MOBILE_PORT:-8100}
 
-# Service definitions
-declare -A SERVICE_NAMES=(
-    ["backend"]="Backend API"
-    ["admin"]="Admin Panel"
-    ["mobile"]="Mobile App"
-)
-
-declare -A SERVICE_PORTS=(
-    ["backend"]="$BACKEND_PORT"
-    ["admin"]="$ADMIN_PORT"
-    ["mobile"]="$MOBILE_PORT"
-)
-
-declare -A SERVICE_PATHS=(
-    ["backend"]="$PROJECT_ROOT/packages/backend"
-    ["admin"]="$PROJECT_ROOT/packages/admin-panel"
-    ["mobile"]="$PROJECT_ROOT/packages/mobile-app"
-)
-
-declare -A SERVICE_COMMANDS=(
-    ["backend"]="bun run --watch src/index.ts"
-    ["admin"]="npm run dev"
-    ["mobile"]="npm run dev"
-)
-
-# Valid services and actions
+# Service definitions (for reference - actual values retrieved via functions above)
 readonly VALID_SERVICES="backend admin mobile all"
 readonly VALID_ACTIONS="start stop restart status logs interact help"
 
@@ -138,7 +112,45 @@ get_services() {
 # Get service display name
 get_service_name() {
     local service=$1
-    echo "${SERVICE_NAMES[$service]}"
+    case "$service" in
+        backend) echo "Backend API" ;;
+        admin) echo "Admin Panel" ;;
+        mobile) echo "Mobile App" ;;
+        *) echo "$service" ;;
+    esac
+}
+
+# Get service port
+get_service_port() {
+    local service=$1
+    case "$service" in
+        backend) echo "$BACKEND_PORT" ;;
+        admin) echo "$ADMIN_PORT" ;;
+        mobile) echo "$MOBILE_PORT" ;;
+        *) echo "" ;;
+    esac
+}
+
+# Get service path
+get_service_path() {
+    local service=$1
+    case "$service" in
+        backend) echo "$PROJECT_ROOT/packages/backend" ;;
+        admin) echo "$PROJECT_ROOT/packages/admin-panel" ;;
+        mobile) echo "$PROJECT_ROOT/packages/mobile-app" ;;
+        *) echo "" ;;
+    esac
+}
+
+# Get service command
+get_service_command() {
+    local service=$1
+    case "$service" in
+        backend) echo "bun run --watch src/index.ts" ;;
+        admin) echo "npm run dev" ;;
+        mobile) echo "npm run dev" ;;
+        *) echo "" ;;
+    esac
 }
 
 # Get PID file path
@@ -252,9 +264,9 @@ start_service() {
     local force=${4:-false}
     
     local service_name=$(get_service_name "$service")
-    local service_path="${SERVICE_PATHS[$service]}"
-    local service_cmd="${SERVICE_COMMANDS[$service]}"
-    local service_port="${SERVICE_PORTS[$service]}"
+    local service_path=$(get_service_path "$service")
+    local service_cmd=$(get_service_command "$service")
+    local service_port=$(get_service_port "$service")
     local pid_file=$(get_pid_file "$service")
     local log_file=$(get_log_file "$service")
     
@@ -316,7 +328,7 @@ stop_service() {
     local force=${2:-false}
     
     local service_name=$(get_service_name "$service")
-    local service_port="${SERVICE_PORTS[$service]}"
+    local service_port=$(get_service_port "$service")
     local pid_file=$(get_pid_file "$service")
     local log_file=$(get_log_file "$service")
     
@@ -416,7 +428,7 @@ show_service_status() {
     local service=$1
     
     local service_name=$(get_service_name "$service")
-    local service_port="${SERVICE_PORTS[$service]}"
+    local service_port=$(get_service_port "$service")
     local pid_file=$(get_pid_file "$service")
     
     echo -e "${CYAN}${service_name} (Port ${service_port}):${NC}"
@@ -611,7 +623,8 @@ action_start() {
         return 1
     fi
     
-    local services=$(get_services "$service")
+    local services
+    services=$(get_services "$service")
     
     if [[ "$service" == "all" ]]; then
         print_header "${EMOJI_ROCKET} Starting All Services"
@@ -655,7 +668,8 @@ action_stop() {
         shift
     done
     
-    local services=$(get_services "$service")
+    local services
+    services=$(get_services "$service")
     
     if [[ "$service" == "all" ]]; then
         print_header "${EMOJI_STOP} Stopping All Services"
@@ -696,7 +710,8 @@ action_restart() {
         shift
     done
     
-    local services=$(get_services "$service")
+    local services
+    services=$(get_services "$service")
     
     if [[ "$service" == "all" ]]; then
         print_header "${EMOJI_RESTART} Restarting All Services"
@@ -719,7 +734,8 @@ action_restart() {
 action_status() {
     local service=$1
     
-    local services=$(get_services "$service")
+    local services
+    services=$(get_services "$service")
     
     print_header "${EMOJI_STATUS} Service Status"
     
