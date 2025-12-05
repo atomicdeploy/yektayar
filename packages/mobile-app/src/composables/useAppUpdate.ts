@@ -214,7 +214,7 @@ export function useAppUpdate() {
       }
       
       // Combine chunks into single blob
-      const blob = new Blob(chunks, { type: 'application/vnd.android.package-archive' })
+      const blob = new Blob(chunks as BlobPart[], { type: 'application/vnd.android.package-archive' })
       
       // Save to filesystem using Capacitor Filesystem API
       // Note: In a real implementation, you would use Capacitor's Filesystem plugin
