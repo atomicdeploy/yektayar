@@ -179,64 +179,140 @@ jobs:
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
         id: upload-debug
         run: |
-          # Upload to tmpfiles.org (using -s for silent mode to avoid progress output)
-          RESPONSE=$(curl -sS -f -F "file=@yektayar-app-debug-secure.zip" https://tmpfiles.org/api/v1/upload 2>&1 || echo '{"status":"error"}')
-          echo "Response: $RESPONSE"
+          echo "📤 Uploading yektayar-app-debug-secure.zip to tmpfiles.org..."
           
-          # Check if upload was successful
-          if echo "$RESPONSE" | grep -q '"status":"success"'; then
-            # Extract URL from JSON response using jq if available, otherwise grep
-            if command -v jq &> /dev/null; then
-              URL=$(echo "$RESPONSE" | jq -r '.data.url')
-            else
-              URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
-            fi
+          # Upload with progress to stderr (visible in logs) and capture response
+          # -S shows errors, -w writes output to file for clean JSON capture
+          HTTP_CODE=$(curl -w "%{http_code}" -o /tmp/upload_response.json \
+            -F "file=@yektayar-app-debug-secure.zip" \
+            https://tmpfiles.org/api/v1/upload 2>&1 | tee /tmp/curl_stderr.log | tail -n1)
+          
+          echo "📊 HTTP Status Code: $HTTP_CODE"
+          
+          # Read the JSON response
+          if [ -f /tmp/upload_response.json ]; then
+            RESPONSE=$(cat /tmp/upload_response.json)
+            echo "📝 API Response:"
+            echo "$RESPONSE"
             
-            if [ -n "$URL" ]; then
-              # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
-              DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
-              echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-              echo "upload_status=success" >> $GITHUB_OUTPUT
-              echo "Upload successful! Download URL: $DOWNLOAD_URL"
+            # Validate JSON format
+            if echo "$RESPONSE" | grep -q '^{.*}$'; then
+              # Check if upload was successful
+              if echo "$RESPONSE" | grep -q '"status":"success"'; then
+                # Extract URL from JSON response using jq if available, otherwise grep
+                if command -v jq &> /dev/null; then
+                  URL=$(echo "$RESPONSE" | jq -r '.data.url' 2>/dev/null || echo "")
+                  if [ "$URL" = "null" ] || [ -z "$URL" ]; then
+                    echo "⚠️  jq parsing failed, trying grep fallback"
+                    URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
+                  fi
+                else
+                  URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
+                fi
+                
+                if [ -n "$URL" ] && [ "$URL" != "null" ]; then
+                  # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
+                  DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
+                  echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+                  echo "upload_status=success" >> $GITHUB_OUTPUT
+                  echo "✅ Upload successful! Download URL: $DOWNLOAD_URL"
+                else
+                  echo "upload_status=failed" >> $GITHUB_OUTPUT
+                  echo "❌ Failed to extract URL from response"
+                  echo "🔍 Full response for debugging: $RESPONSE"
+                fi
+              else
+                echo "upload_status=failed" >> $GITHUB_OUTPUT
+                echo "❌ Upload failed - API returned non-success status"
+                echo "🔍 Full response for debugging: $RESPONSE"
+              fi
             else
               echo "upload_status=failed" >> $GITHUB_OUTPUT
-              echo "Failed to extract URL from response"
+              echo "❌ Invalid JSON response received"
+              echo "🔍 Raw response for debugging:"
+              echo "$RESPONSE"
+              if [ -f /tmp/curl_stderr.log ]; then
+                echo "🔍 Curl stderr output:"
+                cat /tmp/curl_stderr.log
+              fi
             fi
           else
             echo "upload_status=failed" >> $GITHUB_OUTPUT
-            echo "Upload failed"
+            echo "❌ No response file created - upload may have failed"
+            if [ -f /tmp/curl_stderr.log ]; then
+              echo "🔍 Curl stderr output:"
+              cat /tmp/curl_stderr.log
+            fi
           fi
 
       - name: Upload to tmpfiles.org (Release)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
         id: upload-release
         run: |
-          # Upload to tmpfiles.org (using -s for silent mode to avoid progress output)
-          RESPONSE=$(curl -sS -f -F "file=@yektayar-app-release-secure.zip" https://tmpfiles.org/api/v1/upload 2>&1 || echo '{"status":"error"}')
-          echo "Response: $RESPONSE"
+          echo "📤 Uploading yektayar-app-release-secure.zip to tmpfiles.org..."
           
-          # Check if upload was successful
-          if echo "$RESPONSE" | grep -q '"status":"success"'; then
-            # Extract URL from JSON response using jq if available, otherwise grep
-            if command -v jq &> /dev/null; then
-              URL=$(echo "$RESPONSE" | jq -r '.data.url')
-            else
-              URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
-            fi
+          # Upload with progress to stderr (visible in logs) and capture response
+          # -S shows errors, -w writes output to file for clean JSON capture
+          HTTP_CODE=$(curl -w "%{http_code}" -o /tmp/upload_response.json \
+            -F "file=@yektayar-app-release-secure.zip" \
+            https://tmpfiles.org/api/v1/upload 2>&1 | tee /tmp/curl_stderr.log | tail -n1)
+          
+          echo "📊 HTTP Status Code: $HTTP_CODE"
+          
+          # Read the JSON response
+          if [ -f /tmp/upload_response.json ]; then
+            RESPONSE=$(cat /tmp/upload_response.json)
+            echo "📝 API Response:"
+            echo "$RESPONSE"
             
-            if [ -n "$URL" ]; then
-              # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
-              DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
-              echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-              echo "upload_status=success" >> $GITHUB_OUTPUT
-              echo "Upload successful! Download URL: $DOWNLOAD_URL"
+            # Validate JSON format
+            if echo "$RESPONSE" | grep -q '^{.*}$'; then
+              # Check if upload was successful
+              if echo "$RESPONSE" | grep -q '"status":"success"'; then
+                # Extract URL from JSON response using jq if available, otherwise grep
+                if command -v jq &> /dev/null; then
+                  URL=$(echo "$RESPONSE" | jq -r '.data.url' 2>/dev/null || echo "")
+                  if [ "$URL" = "null" ] || [ -z "$URL" ]; then
+                    echo "⚠️  jq parsing failed, trying grep fallback"
+                    URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
+                  fi
+                else
+                  URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
+                fi
+                
+                if [ -n "$URL" ] && [ "$URL" != "null" ]; then
+                  # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
+                  DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
+                  echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+                  echo "upload_status=success" >> $GITHUB_OUTPUT
+                  echo "✅ Upload successful! Download URL: $DOWNLOAD_URL"
+                else
+                  echo "upload_status=failed" >> $GITHUB_OUTPUT
+                  echo "❌ Failed to extract URL from response"
+                  echo "🔍 Full response for debugging: $RESPONSE"
+                fi
+              else
+                echo "upload_status=failed" >> $GITHUB_OUTPUT
+                echo "❌ Upload failed - API returned non-success status"
+                echo "🔍 Full response for debugging: $RESPONSE"
+              fi
             else
               echo "upload_status=failed" >> $GITHUB_OUTPUT
-              echo "Failed to extract URL from response"
+              echo "❌ Invalid JSON response received"
+              echo "🔍 Raw response for debugging:"
+              echo "$RESPONSE"
+              if [ -f /tmp/curl_stderr.log ]; then
+                echo "🔍 Curl stderr output:"
+                cat /tmp/curl_stderr.log
+              fi
             fi
           else
             echo "upload_status=failed" >> $GITHUB_OUTPUT
-            echo "Upload failed"
+            echo "❌ No response file created - upload may have failed"
+            if [ -f /tmp/curl_stderr.log ]; then
+              echo "🔍 Curl stderr output:"
+              cat /tmp/curl_stderr.log
+            fi
           fi
 
       - name: Comment PR with APK
