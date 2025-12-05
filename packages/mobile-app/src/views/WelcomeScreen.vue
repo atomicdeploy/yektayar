@@ -1471,7 +1471,7 @@ const onImageError = () => {
 .error-text {
   text-align: right;
   font-size: 0.95rem;
-  color: #991b1b;
+  color: #7f1d1d; /* Darker color for better readability in light mode */
   line-height: 1.6;
   margin: 0;
   font-weight: 600;
