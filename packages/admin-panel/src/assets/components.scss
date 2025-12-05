@@ -281,22 +281,21 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: dark; /*rgb(59 130 246)*/
+    color: rgb(59 130 246);
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
     @media (prefers-color-scheme: dark) {
-      /* color: rgb(96 165 250); */
-      color: white;
+      color: rgb(96 165 250);
     }
 
     &:hover {
       background: var(--color-primary-400);
-      /* color: rgb(37 99 235); */
+      color: rgb(37 99 235);
 
       @media (prefers-color-scheme: dark) {
-        /* color: rgb(147 197 253); */
+        color: rgb(147 197 253);
       }
     }
 
