@@ -13,11 +13,11 @@
         <item name="android:textColorHint">@color/colorGrayText</item>
         <item name="android:textAlignment">gravity</item>
         <item name="android:textDirection">locale</item>
+        <item name="android:progressBarStyleHorizontal">@style/ProgressBarHorizontalStyle</item>
         <item name="android:alertDialogStyle">@style/AlertDialogStyle</item>
         <item name="alertDialogStyle">@style/AlertDialogStyle</item>
         <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
         <item name="alertDialogTheme">@style/AlertDialogStyle</item>
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="buttonStyle">@style/ButtonStyle</item>
         <item name="android:textViewStyle">@style/TextViewStyle</item>
@@ -47,6 +47,9 @@
         <item name="android:textColor">@color/colorForeground</item>
         <item name="android:textColorPrimary">@color/colorForeground</item>
         <item name="android:layoutDirection">locale</item>
+        <item name="android:textAppearanceSmall">@style/TextAppearanceSmall</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearanceMedium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearanceLarge</item>
         <item name="buttonBarPositiveButtonStyle">@style/AlertDialogButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/AlertDialogButton</item>
         <item name="buttonBarNeutralButtonStyle">@style/AlertDialogButton</item>
@@ -60,11 +63,7 @@
     </style>
 
     <!-- Bottom Sheet Dialog Theme -->
-    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
-    </style>
-
-    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+    <style name="BottomSheetDialogTheme" parent="Widget.AppCompat.Light.ActionBar.TabView">
         <item name="android:background">@drawable/rounded_dialog_bottom</item>
     </style>
 
@@ -85,6 +84,55 @@
     <style name="TextViewStyle" parent="android:Widget.TextView">
         <item name="android:textColor">@color/colorForeground</item>
         <item name="android:lineSpacingExtra">4dp</item>
+    </style>
+    
+    <!-- Progress Dialog Style -->
+    <style name="ProgressDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@drawable/rounded_dialog</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@color/colorForeground</item>
+        <item name="android:textColorPrimary">@color/colorForeground</item>
+        <item name="android:indeterminateTint">@color/colorAccent</item>
+        <item name="android:layoutDirection">locale</item>
+        <item name="android:textAppearanceSmall">@style/TextAppearanceSmall</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearanceMedium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearanceLarge</item>
+    </style>
+    
+    <!-- Number Picker Style -->
+    <style name="NumberPickerStyle">
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="android:textColorPrimary">@color/colorForeground</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
+        <item name="android:textAppearanceSmall">@style/TextAppearanceSmall</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearanceMedium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearanceLarge</item>
+    </style>
+    
+    <!-- Progress Bar Horizontal Style -->
+    <style name="ProgressBarHorizontalStyle" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal</item>
+        <item name="android:minHeight">8dp</item>
+        <item name="android:maxHeight">20dp</item>
+        <item name="android:scaleY">1</item>
+        <item name="android:layout_height">20dp</item>
+    </style>
+    
+    <!-- Text Appearance Styles -->
+    <style name="TextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/colorForeground</item>
+    </style>
+
+    <style name="TextAppearanceSmall" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/colorForeground</item>
+    </style>
+
+    <style name="TextAppearanceMedium" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/colorForeground</item>
+    </style>
+
+    <style name="TextAppearanceLarge" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textColor">@color/colorForeground</item>
     </style>
 
 </resources>
