@@ -92,12 +92,11 @@ export function getWebDeviceInfo(): Partial<DeviceInfo> {
   }
   
   // Timezone information
+  info.timezoneOffset = new Date().getTimezoneOffset()
   try {
     info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    info.timezoneOffset = new Date().getTimezoneOffset()
   } catch (error) {
-    // Fallback if Intl API not available
-    info.timezoneOffset = new Date().getTimezoneOffset()
+    // Fallback if Intl API not available - timezone offset already set
   }
   
   // Detect OS from user agent

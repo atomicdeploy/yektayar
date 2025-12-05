@@ -81,10 +81,17 @@ function cleanIpAddress(ip: string): string {
   // Remove whitespace
   ip = ip.trim()
   
-  // Remove IPv6 brackets
+  // Handle IPv6 with port: [2001:db8::1]:8080 -> 2001:db8::1
+  if (ip.startsWith('[') && ip.includes(']:')) {
+    const portIndex = ip.lastIndexOf(']:')
+    ip = ip.substring(1, portIndex)
+    return ip
+  }
+  
+  // Remove IPv6 brackets without port: [2001:db8::1] -> 2001:db8::1
   ip = ip.replace(/^\[|\]$/g, '')
   
-  // Remove port number if present (e.g., "192.168.1.1:8080" -> "192.168.1.1")
+  // Remove port number from IPv4 (e.g., "192.168.1.1:8080" -> "192.168.1.1")
   const portIndex = ip.lastIndexOf(':')
   if (portIndex > 0) {
     // Check if it's IPv4 with port (not IPv6)
