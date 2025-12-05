@@ -474,11 +474,6 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .view-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-
   .header-content {
     h1 {
       margin: 0 0 8px 0;

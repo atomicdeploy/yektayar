@@ -750,7 +750,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 32px;
+  margin-bottom: 2rem;
   padding-bottom: 0;
   border-bottom: none;
 }
@@ -1033,48 +1033,6 @@ onUnmounted(() => {
   padding: 16px 20px;
   border-top: 1px solid var(--border-color);
   background: var(--bg-secondary);
-}
-
-.btn-action {
-  flex: 1;
-  padding: 8px;
-  background: var(--bg-primary);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: rgb(59 130 246);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  @media (prefers-color-scheme: dark) {
-    color: rgb(96 165 250);
-  }
-
-  &:hover {
-    color: rgb(37 99 235);
-
-    @media (prefers-color-scheme: dark) {
-      color: rgb(147 197 253);
-    }
-  }
-
-  &.btn-danger {
-    color: rgb(239 68 68);
-
-    @media (prefers-color-scheme: dark) {
-      color: rgb(248 113 113);
-    }
-
-    &:hover {
-      color: rgb(220 38 38);
-
-      @media (prefers-color-scheme: dark) {
-        color: rgb(252 165 165);
-      }
-    }
-  }
 }
 
 .empty-state,
