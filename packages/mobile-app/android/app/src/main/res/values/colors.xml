@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand colors -->
+    <color name="colorPrimary">#d4a43e</color>
+    <color name="colorPrimaryDark">#01183a</color>
+    <color name="colorAccent">#d4a43e</color>
+    
+    <!-- Main app colors (matches index.html) -->
+    <color name="colorBackground">#fafbfc</color>
+    <color name="colorForeground">#1a1a1a</color>
+    <color name="colorSecondary">#e8e9ed</color>
+    <color name="colorGrayText">#525960</color>
+    
+    <!-- Splash screen colors (matches index.html) -->
+    <color name="splash_background_light">#fafbfc</color>
+    <color name="splash_background_dark">#0a0f1a</color>
+    
+    <!-- Shadow and overlay -->
+    <color name="shadowColor">#27272727</color>
+    
+    <!-- Button colors -->
+    <color name="colorButtonBackground">#d4a43e</color>
+    <color name="colorButtonForeground">#FFFFFF</color>
+    
+    <!-- Progress Bar Background -->
+    <color name="colorProgressBarBackground">#251a1a1a</color>
+    
+    <!-- State colors -->
+    <color name="colorError">#c0392b</color>
+    <color name="colorSuccess">#27ae60</color>
+    
+    <!-- Surface colors -->
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorOnSecondary">#1a1a1a</color>
+    <color name="colorOnSurface">#1a1a1a</color>
+    
+    <!-- Dialog colors -->
+    <color name="dialogBackground">#fafbfc</color>
+</resources>

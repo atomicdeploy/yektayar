@@ -203,6 +203,52 @@ async function initializeApp() {
       
       errorApp.use(IonicVue)
       errorApp.use(i18n)
+      
+      // Add back button handler for error screen
+      errorApp.mixin({
+        async mounted() {
+          // Only add listener once at root level
+          if (this.$el?.id === 'app') {
+            try {
+              const { App } = await import('@capacitor/app')
+              const { Capacitor } = await import('@capacitor/core')
+              const { Toast } = await import('@capacitor/toast')
+              
+              if (Capacitor.isNativePlatform()) {
+                logger.info('✅ Registering back button listener for ErrorScreen')
+                await App.addListener('backButton', async (event) => {
+                  logger.info('🔙 Back button pressed on error screen - exiting app', event)
+                  
+                  // Show toast for debugging
+                  try {
+                    await Toast.show({
+                      text: 'Back pressed on error screen - exiting...',
+                      duration: 'short',
+                      position: 'bottom'
+                    })
+                  } catch (toastError) {
+                    logger.warn('Toast not available:', toastError)
+                  }
+                  
+                  // Small delay to show toast
+                  setTimeout(async () => {
+                    try {
+                      const BackButton = (await import('./plugins/backButton')).default
+                      await BackButton.exitApp()
+                    } catch (error) {
+                      logger.error('Failed to exit app:', error)
+                    }
+                  }, 300)
+                })
+                logger.info('✅ Back button listener registered for ErrorScreen')
+              }
+            } catch (error) {
+              logger.error('❌ Failed to register back button for ErrorScreen:', error)
+            }
+          }
+        }
+      })
+      
       errorApp.mount('#app')
       return
     }

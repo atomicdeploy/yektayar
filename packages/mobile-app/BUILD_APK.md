@@ -2,6 +2,24 @@
 
 This guide explains how to build an Android APK from the YektaYar mobile app using Ionic and Capacitor.
 
+## Quick Start - Automated Build Script
+
+For a quick and easy build, use the automated build script from the repository root:
+
+```bash
+./scripts/build-apk.sh
+```
+
+This script automates all the steps below and provides a summary with APK location, size, and checksum.
+
+You can also use the root-level npm script:
+
+```bash
+npm run android:build
+```
+
+For manual step-by-step instructions, continue reading below.
+
 ## Prerequisites
 
 - Node.js >= 18.0.0
@@ -199,7 +217,7 @@ The Capacitor configuration is in `capacitor.config.ts`:
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.yektayar.app',
+  appId: 'ir.yektayar.app',
   appName: 'YektaYar',
   webDir: 'dist',
   server: {

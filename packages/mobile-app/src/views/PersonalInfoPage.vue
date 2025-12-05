@@ -292,7 +292,7 @@ function loadUserData() {
   // For now, use mock data
   const userData: FormData = {
     name: locale.value === 'fa' ? 'کاربر یکتایار' : 'YektaYar User',
-    email: 'user@yektayar.com',
+    email: 'user@yektayar.ir',
     phone: locale.value === 'fa' ? '۰۹۱۲۳۴۵۶۷۸۹' : '+98 912 345 6789',
     type: UserType.PATIENT,
     avatar: undefined,

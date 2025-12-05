@@ -40,7 +40,7 @@
           </div>
         </div>
         <h2 class="profile-name">{{ locale === 'fa' ? 'کاربر یکتایار' : 'YektaYar User' }}</h2>
-        <p class="profile-email">user@yektayar.com</p>
+        <p class="profile-email">user@yektayar.ir</p>
         <div class="profile-stats">
           <div class="stat-item">
             <div class="stat-value">12</div>

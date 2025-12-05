@@ -13,7 +13,7 @@ on:
         options:
           - debug
           - release
-  # Auto-run only on pushes to main/develop that modify mobile-app
+  # Auto-run on pushes to main/develop that modify mobile-app or Android-specific files
   push:
     branches:
       - main
@@ -21,8 +21,17 @@ on:
     paths:
       - 'packages/mobile-app/**'
       - '.github/workflows/build-android-apk.yml'
+  # Also trigger on pull requests that modify Android-related files or have "android" in commit messages
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'packages/mobile-app/android/**'
+      - 'packages/mobile-app/capacitor.config.ts'
+      - '.github/workflows/build-android-apk.yml'
   # For PRs, only run when explicitly requested via workflow_dispatch
-  # to avoid running expensive builds on every PR update
+  # or when Android-specific changes are detected
 
 permissions:
   contents: read
@@ -32,6 +41,7 @@ permissions:
 jobs:
   build-android:
     runs-on: ubuntu-latest
+    environment: android
     permissions:
       contents: read
       actions: read
@@ -40,14 +50,50 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for commit message checking
+
+      - name: Check if build should run based on commit message
+        id: check_commit
+        run: |
+          # Check if any recent commit message contains "android" (case-insensitive)
+          if git log --format=%B -n 10 | grep -iq "android"; then
+            echo "android_mentioned=true" >> $GITHUB_OUTPUT
+            echo "✅ Found 'android' in recent commit messages - build will proceed"
+          else
+            echo "android_mentioned=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ No 'android' mentioned in recent commits"
+          fi
+          
+          # Always run if triggered by workflow_dispatch or if Android files changed
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+            echo "✅ Manual trigger - build will proceed"
+          elif [ "${{ github.event_name }}" = "push" ] || [ "${{ github.event_name }}" = "pull_request" ]; then
+            # Check if Android-related paths were modified
+            if git diff --name-only HEAD~1 HEAD | grep -q "packages/mobile-app/android/\|capacitor.config.ts"; then
+              echo "should_run=true" >> $GITHUB_OUTPUT
+              echo "✅ Android files modified - build will proceed"
+            elif [ "${{ steps.check_commit.outputs.android_mentioned }}" = "true" ]; then
+              echo "should_run=true" >> $GITHUB_OUTPUT
+              echo "✅ 'android' mentioned in commits - build will proceed"
+            else
+              echo "should_run=false" >> $GITHUB_OUTPUT
+              echo "⏭️ No Android-specific changes or mentions - skipping build"
+            fi
+          else
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Setup Node.js
+        if: steps.check_commit.outputs.should_run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '24.x'
           cache: 'npm'
 
       - name: Setup Java
+        if: steps.check_commit.outputs.should_run == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -55,9 +101,11 @@ jobs:
           cache: 'gradle'
 
       - name: Install dependencies
+        if: steps.check_commit.outputs.should_run == 'true'
         run: npm ci --legacy-peer-deps
 
       - name: Build mobile app web assets
+        if: steps.check_commit.outputs.should_run == 'true'
         run: |
           cd packages/mobile-app
           npm run build:production
@@ -66,27 +114,29 @@ jobs:
           VITE_ENVIRONMENT: production
 
       - name: Sync Capacitor
+        if: steps.check_commit.outputs.should_run == 'true'
         run: |
           cd packages/mobile-app
           npm run cap:sync
 
       - name: Make gradlew executable
+        if: steps.check_commit.outputs.should_run == 'true'
         run: chmod +x packages/mobile-app/android/gradlew
 
       - name: Build Debug APK
-        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
+        if: steps.check_commit.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug')
         run: |
           cd packages/mobile-app
           npm run android:build:debug
 
       - name: Build Release APK
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        if: steps.check_commit.outputs.should_run == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
         run: |
           cd packages/mobile-app
           npm run android:build:release
 
       - name: Analyze Debug APK
-        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
+        if: steps.check_commit.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug')
         id: analyze-debug
         run: |
           chmod +x scripts/analyze-apk.sh
@@ -99,7 +149,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Analyze Release APK
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        if: steps.check_commit.outputs.should_run == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
         id: analyze-release
         run: |
           chmod +x scripts/analyze-apk.sh
@@ -112,7 +162,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Upload Debug APK
-        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug'
+        if: steps.check_commit.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug')
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
@@ -120,7 +170,7 @@ jobs:
           retention-days: 30
 
       - name: Upload Release APK
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        if: steps.check_commit.outputs.should_run == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
         uses: actions/upload-artifact@v4
         with:
           name: app-release
@@ -128,30 +178,254 @@ jobs:
           retention-days: 30
 
       - name: Upload APK Analysis
+        if: steps.check_commit.outputs.should_run == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: apk-analysis
           path: apk-analysis.txt
           retention-days: 30
 
+      - name: Create Password-Protected ZIP (Debug)
+        if: steps.check_commit.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug')
+        id: create-zip-debug
+        run: |
+          # Get current datetime in ISO format for password
+          DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "password=$DATETIME" >> $GITHUB_OUTPUT
+          
+          # Copy APK to temp location without directory structure
+          cp packages/mobile-app/android/app/build/outputs/apk/debug/app-debug.apk ./app-debug.apk
+          
+          # Create password-protected ZIP
+          zip -e -P "$DATETIME" yektayar-app-debug-secure.zip app-debug.apk
+          
+          # Output file size and checksum
+          ls -lh yektayar-app-debug-secure.zip
+          md5sum app-debug.apk | tee apk-checksum.txt
+          echo "zip_size=$(du -h yektayar-app-debug-secure.zip | cut -f1)" >> $GITHUB_OUTPUT
+          echo "apk_md5=$(md5sum app-debug.apk | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Create Password-Protected ZIP (Release)
+        if: steps.check_commit.outputs.should_run == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        id: create-zip-release
+        run: |
+          # Get current datetime in ISO format for password
+          DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "password=$DATETIME" >> $GITHUB_OUTPUT
+          
+          # Copy APK to temp location without directory structure
+          cp packages/mobile-app/android/app/build/outputs/apk/release/app-release-unsigned.apk ./app-release-unsigned.apk
+          
+          # Create password-protected ZIP
+          zip -e -P "$DATETIME" yektayar-app-release-secure.zip app-release-unsigned.apk
+          
+          # Output file size and checksum
+          ls -lh yektayar-app-release-secure.zip
+          md5sum app-release-unsigned.apk | tee apk-checksum.txt
+          echo "zip_size=$(du -h yektayar-app-release-secure.zip | cut -f1)" >> $GITHUB_OUTPUT
+          echo "apk_md5=$(md5sum app-release-unsigned.apk | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Upload to tmpfiles.org (Debug)
+        if: steps.check_commit.outputs.should_run == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'debug')
+        id: upload-debug
+        run: |
+          echo "📤 Uploading yektayar-app-debug-secure.zip to tmpfiles.org..."
+          
+          # Upload with progress to stderr (visible in logs) and capture response
+          # -S shows errors, -w writes output to file for clean JSON capture
+          HTTP_CODE=$(curl -w "%{http_code}" -o /tmp/upload_response.json \
+            -F "file=@yektayar-app-debug-secure.zip" \
+            https://tmpfiles.org/api/v1/upload 2>&1 | tee /tmp/curl_stderr.log | tail -n1)
+          
+          echo "📊 HTTP Status Code: $HTTP_CODE"
+          
+          # Read the JSON response
+          if [ -f /tmp/upload_response.json ]; then
+            RESPONSE=$(cat /tmp/upload_response.json)
+            echo "📝 API Response:"
+            echo "$RESPONSE"
+            
+            # Validate JSON format
+            if echo "$RESPONSE" | grep -q '^{.*}$'; then
+              # Check if upload was successful
+              if echo "$RESPONSE" | grep -q '"status":"success"'; then
+                # Extract URL from JSON response using jq if available, otherwise grep
+                if command -v jq &> /dev/null; then
+                  URL=$(echo "$RESPONSE" | jq -r '.data.url' 2>/dev/null || echo "")
+                  if [ "$URL" = "null" ] || [ -z "$URL" ]; then
+                    echo "⚠️  jq parsing failed, trying grep fallback"
+                    URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
+                  fi
+                else
+                  URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
+                fi
+                
+                if [ -n "$URL" ] && [ "$URL" != "null" ]; then
+                  # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
+                  DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
+                  echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+                  echo "upload_status=success" >> $GITHUB_OUTPUT
+                  echo "✅ Upload successful! Download URL: $DOWNLOAD_URL"
+                else
+                  echo "upload_status=failed" >> $GITHUB_OUTPUT
+                  echo "❌ Failed to extract URL from response"
+                  echo "🔍 Full response for debugging: $RESPONSE"
+                fi
+              else
+                echo "upload_status=failed" >> $GITHUB_OUTPUT
+                echo "❌ Upload failed - API returned non-success status"
+                echo "🔍 Full response for debugging: $RESPONSE"
+              fi
+            else
+              echo "upload_status=failed" >> $GITHUB_OUTPUT
+              echo "❌ Invalid JSON response received"
+              echo "🔍 Raw response for debugging:"
+              echo "$RESPONSE"
+              if [ -f /tmp/curl_stderr.log ]; then
+                echo "🔍 Curl stderr output:"
+                cat /tmp/curl_stderr.log
+              fi
+            fi
+          else
+            echo "upload_status=failed" >> $GITHUB_OUTPUT
+            echo "❌ No response file created - upload may have failed"
+            if [ -f /tmp/curl_stderr.log ]; then
+              echo "🔍 Curl stderr output:"
+              cat /tmp/curl_stderr.log
+            fi
+          fi
+
+      - name: Upload to tmpfiles.org (Release)
+        if: steps.check_commit.outputs.should_run == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release'
+        id: upload-release
+        run: |
+          echo "📤 Uploading yektayar-app-release-secure.zip to tmpfiles.org..."
+          
+          # Upload with progress to stderr (visible in logs) and capture response
+          # -S shows errors, -w writes output to file for clean JSON capture
+          HTTP_CODE=$(curl -w "%{http_code}" -o /tmp/upload_response.json \
+            -F "file=@yektayar-app-release-secure.zip" \
+            https://tmpfiles.org/api/v1/upload 2>&1 | tee /tmp/curl_stderr.log | tail -n1)
+          
+          echo "📊 HTTP Status Code: $HTTP_CODE"
+          
+          # Read the JSON response
+          if [ -f /tmp/upload_response.json ]; then
+            RESPONSE=$(cat /tmp/upload_response.json)
+            echo "📝 API Response:"
+            echo "$RESPONSE"
+            
+            # Validate JSON format
+            if echo "$RESPONSE" | grep -q '^{.*}$'; then
+              # Check if upload was successful
+              if echo "$RESPONSE" | grep -q '"status":"success"'; then
+                # Extract URL from JSON response using jq if available, otherwise grep
+                if command -v jq &> /dev/null; then
+                  URL=$(echo "$RESPONSE" | jq -r '.data.url' 2>/dev/null || echo "")
+                  if [ "$URL" = "null" ] || [ -z "$URL" ]; then
+                    echo "⚠️  jq parsing failed, trying grep fallback"
+                    URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
+                  fi
+                else
+                  URL=$(echo "$RESPONSE" | grep -oP '(?<="url":")[^"]*' || echo "")
+                fi
+                
+                if [ -n "$URL" ] && [ "$URL" != "null" ]; then
+                  # Convert to download link (replace /XXXXX/ with /dl/XXXXX/)
+                  DOWNLOAD_URL=$(echo $URL | sed 's|tmpfiles.org/|tmpfiles.org/dl/|')
+                  echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+                  echo "upload_status=success" >> $GITHUB_OUTPUT
+                  echo "✅ Upload successful! Download URL: $DOWNLOAD_URL"
+                else
+                  echo "upload_status=failed" >> $GITHUB_OUTPUT
+                  echo "❌ Failed to extract URL from response"
+                  echo "🔍 Full response for debugging: $RESPONSE"
+                fi
+              else
+                echo "upload_status=failed" >> $GITHUB_OUTPUT
+                echo "❌ Upload failed - API returned non-success status"
+                echo "🔍 Full response for debugging: $RESPONSE"
+              fi
+            else
+              echo "upload_status=failed" >> $GITHUB_OUTPUT
+              echo "❌ Invalid JSON response received"
+              echo "🔍 Raw response for debugging:"
+              echo "$RESPONSE"
+              if [ -f /tmp/curl_stderr.log ]; then
+                echo "🔍 Curl stderr output:"
+                cat /tmp/curl_stderr.log
+              fi
+            fi
+          else
+            echo "upload_status=failed" >> $GITHUB_OUTPUT
+            echo "❌ No response file created - upload may have failed"
+            if [ -f /tmp/curl_stderr.log ]; then
+              echo "🔍 Curl stderr output:"
+              cat /tmp/curl_stderr.log
+            fi
+          fi
+
       - name: Comment PR with APK
-        if: github.event_name == 'pull_request'
+        if: steps.check_commit.outputs.should_run == 'true' && github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
             const analysis = fs.readFileSync('apk-analysis.txt', 'utf8');
+            
+            // Determine build type and get appropriate outputs
+            const buildType = '${{ github.event.inputs.build_type || 'debug' }}';
+            const isDebug = buildType === 'debug';
+            
+            const password = isDebug ? '${{ steps.create-zip-debug.outputs.password }}' : '${{ steps.create-zip-release.outputs.password }}';
+            const downloadUrl = isDebug ? '${{ steps.upload-debug.outputs.download_url }}' : '${{ steps.upload-release.outputs.download_url }}';
+            const uploadStatus = isDebug ? '${{ steps.upload-debug.outputs.upload_status }}' : '${{ steps.upload-release.outputs.upload_status }}';
+            const zipSize = isDebug ? '${{ steps.create-zip-debug.outputs.zip_size }}' : '${{ steps.create-zip-release.outputs.zip_size }}';
+            const apkMd5 = isDebug ? '${{ steps.create-zip-debug.outputs.apk_md5 }}' : '${{ steps.create-zip-release.outputs.apk_md5 }}';
+            
+            // Determine correct APK filename
+            const apkFileName = isDebug ? 'app-debug.apk' : 'app-release-unsigned.apk';
+            const zipFileName = isDebug ? 'yektayar-app-debug-secure.zip' : 'yektayar-app-release-secure.zip';
+
+            let downloadSection = '';
+            if (uploadStatus === 'success' && downloadUrl) {
+              downloadSection = `### 📥 Quick Download (Temporary Link)
+
+            **Download URL**: ${downloadUrl}  
+            **Password**: \`${password}\`  
+            **ZIP Size**: ${zipSize}  
+            **APK MD5**: \`${apkMd5}\`
+
+            > **Note**: The ZIP file contains only \`${apkFileName}\` (no folder structure). Password is current build datetime in ISO format. Link expires after a period of time.
+
+            `;
+            } else {
+              downloadSection = `### 📥 Download Note
+
+            Temporary upload to tmpfiles.org was not available. Please use the GitHub Artifacts download below.
+
+            `;
+            }
 
             const body = `## ✅ Android APK Built Successfully!
 
+            ${downloadSection}
+
+            ### 📦 Artifact Download
+
             Download the artifact from the [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
 
-            ### APK Analysis
+            ### 📊 APK Analysis
 
             \`\`\`
             ${analysis}
             \`\`\`
+
+            ### 📖 Installation
+
+            1. Download and extract: \`unzip -P "${password}" ${zipFileName}\`
+            2. Install: \`adb install ${apkFileName}\`
             `;
 
             github.rest.issues.createComment({
