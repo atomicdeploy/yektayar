@@ -18,7 +18,7 @@ const isLoading = ref(false)
 const navigationId = ref(0)
 
 // Show loading indicator during route transitions
-const beforeEachGuard = router.beforeEach((_to, _from, next) => {
+const removeBeforeEach = router.beforeEach((_to, _from, next) => {
   // Only show loading for tab navigation routes
   if (_to.path.startsWith('/tabs/') && _from.path.startsWith('/tabs/')) {
     navigationId.value++
@@ -27,7 +27,7 @@ const beforeEachGuard = router.beforeEach((_to, _from, next) => {
   next()
 })
 
-const afterEachGuard = router.afterEach(() => {
+const removeAfterEach = router.afterEach(() => {
   const currentNavId = navigationId.value
   // Add a small delay to ensure smooth transition
   setTimeout(() => {
@@ -40,8 +40,8 @@ const afterEachGuard = router.afterEach(() => {
 
 // Clean up router guards when component is unmounted
 onBeforeUnmount(() => {
-  beforeEachGuard()
-  afterEachGuard()
+  removeBeforeEach()
+  removeAfterEach()
 })
 </script>
 
