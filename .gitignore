@@ -114,6 +114,8 @@ tmp/
 **/android/captures
 **/android/*.apk
 **/android/*.aab
+*.apk
+*.aab
 
 # iOS/Capacitor (for future)
 **/ios/App/Pods
