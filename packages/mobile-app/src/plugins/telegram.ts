@@ -1,3 +1,5 @@
+/// <reference path="../types/telegram-webapp.d.ts" />
+
 import { App, reactive } from 'vue'
 import { logger } from '@yektayar/shared'
 

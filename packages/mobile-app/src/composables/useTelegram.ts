@@ -9,7 +9,17 @@ export function useTelegram() {
 
   /**
    * Send data to the bot. The data will be sent to the bot in a service message.
-   * Once this method is called, the Web App will be closed.
+   * 
+   * WARNING: Once this method is called, the Web App will be closed immediately.
+   * Make sure to save any important state before calling this function.
+   * 
+   * @param payload - String data to send (max 4096 bytes). Usually JSON-encoded data.
+   * 
+   * @example
+   * telegram.sendData(JSON.stringify({ 
+   *   action: 'order_completed', 
+   *   orderId: '12345' 
+   * }))
    */
   function sendData(payload: string) {
     if (!state.available || !state.webApp) {

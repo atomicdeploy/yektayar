@@ -270,8 +270,21 @@ export async function stopTelegramBot(): Promise<void> {
 
 /**
  * Verify Telegram WebApp init data using the bot token
- * @param initData - The initData string from Telegram WebApp
- * @returns true if valid, false otherwise
+ * 
+ * SECURITY: This function must be called server-side to validate that the initData
+ * string from a Telegram WebApp is authentic and hasn't been tampered with.
+ * 
+ * The verification uses HMAC-SHA256 with the bot token as the secret key, following
+ * Telegram's official specification: https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app
+ * 
+ * @param initData - The initData string from Telegram WebApp (e.g., "query_id=...&user=...&hash=...")
+ * @returns true if the initData is valid and authentic, false otherwise
+ * 
+ * @example
+ * const isValid = verifyTelegramInitData(request.body.initData)
+ * if (!isValid) {
+ *   return { error: 'Invalid Telegram user' }
+ * }
  */
 export function verifyTelegramInitData(initData: string): boolean {
   const botToken = process.env.TELEGRAM_BOT_TOKEN
@@ -320,10 +333,7 @@ export function verifyTelegramInitData(initData: string): boolean {
     const isValid = calculatedHash === hash
 
     if (!isValid) {
-      logger.warn('Invalid Telegram initData hash', {
-        expected: calculatedHash,
-        received: hash
-      })
+      logger.warn('Invalid Telegram initData hash - verification failed')
     } else {
       logger.success('Telegram initData verified successfully')
     }
