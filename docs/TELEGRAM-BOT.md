@@ -9,6 +9,83 @@ The YektaYar Telegram bot provides:
 - **User Communication**: Send messages to users and channels
 - **Bot Commands**: Interactive commands for status and management
 - **Webhook Support**: Production-ready webhook integration
+- **Mini App Integration**: Run YektaYar mobile-app as a Telegram mini app (Web App)
+
+## Telegram Mini App
+
+YektaYar mobile-app can be opened as a Telegram mini app (Web App) directly inside Telegram. This provides a seamless experience where users can access the full mobile app without leaving Telegram.
+
+### Features
+- Native integration with Telegram UI (MainButton, BackButton, HapticFeedback)
+- Automatic theme matching (light/dark mode)
+- Access to Telegram user data
+- Secure server-side verification of user identity
+- Data exchange with the bot
+
+### Quick Setup
+
+1. **Configure Bot Menu Button:**
+   - Open [@BotFather](https://t.me/BotFather) in Telegram
+   - Send `/mybots` and select your bot
+   - Go to "Bot Settings" → "Menu Button"
+   - Select "Configure Menu Button"
+   - Enter URL: `https://app.yektayar.ir`
+
+2. **Test the Mini App:**
+   - Open your bot in Telegram
+   - Click the menu button (bottom-left)
+   - The mobile-app should open inside Telegram
+
+### Adding Web App Button to Messages
+
+You can also send messages with a button that opens the mini app:
+
+```typescript
+import { sendMessage } from '../services/telegramService'
+
+await sendMessage(chatId, 'Welcome to YektaYar!', {
+  reply_markup: {
+    inline_keyboard: [[
+      {
+        text: '🚀 Open App',
+        web_app: { url: 'https://app.yektayar.ir' }
+      }
+    ]]
+  }
+})
+```
+
+### Verifying Mini App Users
+
+When users open the mini app from Telegram, you can verify their identity:
+
+```typescript
+// In your API endpoint
+import { verifyTelegramInitData } from '../services/telegramService'
+
+app.post('/api/user/profile', async ({ body, headers }) => {
+  const { initData } = body
+  
+  // Verify the user is coming from Telegram
+  const isValid = verifyTelegramInitData(initData)
+  
+  if (!isValid) {
+    return { error: 'Invalid Telegram user' }
+  }
+  
+  // Parse user data from initData
+  const params = new URLSearchParams(initData)
+  const user = JSON.parse(params.get('user') || '{}')
+  
+  // Now you can trust user.id, user.first_name, etc.
+  // ...
+})
+```
+
+### Complete Documentation
+
+For detailed documentation on mini app integration, usage examples, and troubleshooting, see:
+- [Telegram Mini App Documentation](../packages/mobile-app/docs/TELEGRAM_MINI_APP.md)
 
 ## Quick Start
 
@@ -95,6 +172,28 @@ GET /api/telegram/status
   }
 }
 ```
+
+### Verify Telegram WebApp InitData
+
+```http
+POST /api/telegram/verify-init-data
+Content-Type: application/json
+
+{
+  "initData": "query_id=...&user=...&auth_date=...&hash=..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "initData verified successfully",
+  "valid": true
+}
+```
+
+This endpoint verifies that the initData string from a Telegram WebApp is authentic and hasn't been tampered with. Use this to validate users when they access your app from Telegram.
 
 ### Send Message to Specific Chat
 
