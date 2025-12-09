@@ -52,7 +52,7 @@
     <!-- Users Table -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
       <div v-if="isLoading" class="p-8 text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
+        <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
         <p class="mt-4 text-gray-600 dark:text-gray-400">{{ t('loading') }}</p>
       </div>
 
@@ -206,6 +206,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { usePermissionsStore } from '@/stores/permissions'
 import { logger } from '@yektayar/shared'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { t } = useI18n()
 const permissionsStore = usePermissionsStore()

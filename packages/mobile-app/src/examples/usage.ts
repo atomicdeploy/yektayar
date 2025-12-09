@@ -6,8 +6,10 @@
  */
 
 import config from '@/config';
+import apiClient from '@/api';
 import { registerPlugin } from '@capacitor/core';
 import type { DeviceInfoPlugin } from '@/plugins/device-info';
+import { logger } from '@yektayar/shared';
 
 const deviceInfo = registerPlugin<DeviceInfoPlugin>('DeviceInfoPlugin');
 
@@ -28,11 +30,23 @@ export function isProduction(): boolean {
 }
 
 /**
- * Make an API request with the configured base URL
+ * Make an API request using the unified API client
+ * 
+ * IMPORTANT: Always use the unified API client from @/api instead of
+ * direct fetch() calls. The API client handles authentication,
+ * error handling, and provides a consistent interface.
+ * 
+ * NOTE: Do NOT prepend '/api' to endpoints - the baseURL already includes it.
+ * 
+ * ✅ Correct: apiClient.get('/assessments')
+ * ❌ Wrong:   apiClient.get('/api/assessments')
  */
-export async function apiRequest(endpoint: string, options?: RequestInit): Promise<Response> {
-  const url = `${config.apiBaseUrl}${endpoint}`;
-  return fetch(url, options);
+export async function apiRequest<T>(endpoint: string): Promise<T> {
+  const response = await apiClient.get<T>(endpoint);
+  if (!response.success) {
+    throw new Error(response.error || 'API request failed');
+  }
+  return response.data!;
 }
 
 // ===== Native Plugin Usage =====
@@ -43,10 +57,10 @@ export async function apiRequest(endpoint: string, options?: RequestInit): Promi
 export async function getDeviceInfo() {
   try {
     const info = await deviceInfo.getDeviceInfo();
-    console.log('Device Info:', info);
+    logger.info('Device Info:', info);
     return info;
   } catch (error) {
-    console.error('Failed to get device info:', error);
+    logger.error('Failed to get device info:', error);
     return null;
   }
 }
@@ -57,11 +71,11 @@ export async function getDeviceInfo() {
 export async function logDeviceInfo() {
   const info = await getDeviceInfo();
   if (info) {
-    console.log('===== Device Information =====');
-    console.log(`App Version: ${info.appVersion}`);
-    console.log(`Device: ${info.deviceManufacturer} ${info.deviceModel}`);
-    console.log(`Android: ${info.androidVersion} (SDK ${info.androidSDK})`);
-    console.log('==============================');
+    logger.info('===== Device Information =====');
+    logger.info(`App Version: ${info.appVersion}`);
+    logger.info(`Device: ${info.deviceManufacturer} ${info.deviceModel}`);
+    logger.info(`Android: ${info.androidVersion} (SDK ${info.androidSDK})`);
+    logger.info('==============================');
   }
 }
 
@@ -71,13 +85,13 @@ export async function logDeviceInfo() {
  * Initialize app with environment and device info
  */
 export async function initializeApp() {
-  console.log('Initializing YektaYar Mobile App...');
-  console.log(`Environment: ${config.environment}`);
-  console.log(`API Base URL: ${config.apiBaseUrl}`);
+  logger.info('Initializing YektaYar Mobile App...');
+  logger.info(`Environment: ${config.environment}`);
+  logger.info(`API Base URL: ${config.apiBaseUrl}`);
   
   await logDeviceInfo();
   
-  console.log('App initialized successfully!');
+  logger.info('App initialized successfully!');
 }
 
 // Example: Usage in a Vue component
@@ -92,12 +106,12 @@ onMounted(async () => {
   
   // Use API URL
   const apiUrl = getApiUrl();
-  console.log('Using API:', apiUrl);
+  logger.info('Using API:', apiUrl);
   
   // Get device info
   const deviceInfo = await getDeviceInfo();
   if (deviceInfo) {
-    console.log('Running on:', deviceInfo.deviceModel);
+    logger.info('Running on:', deviceInfo.deviceModel);
   }
 });
 </script>

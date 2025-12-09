@@ -57,11 +57,20 @@ install_service() {
     
     echo -e "${YELLOW}Installing $service_name...${NC}"
     
+    # Determine bun path - check as deploy user
+    if command -v bun >/dev/null 2>&1; then
+        BUN_PATH=$(dirname $(which bun))
+    elif [ -d "/home/$DEPLOY_USER/.bun/bin" ]; then
+        BUN_PATH="/home/$DEPLOY_USER/.bun/bin"
+    else
+        BUN_PATH="$HOME/.bun/bin"
+    fi
+    
     # Update paths in service file
-    sed -e "s|/home/runner/.bun/bin/bun|$(which bun 2>/dev/null || echo '/home/runner/.bun/bin/bun')|g" \
-        -e "s|/home/deploy/Projects/YektaYar|$PROJECT_PATH|g" \
-        -e "s|User=deploy|User=$DEPLOY_USER|g" \
-        -e "s|Group=deploy|Group=$DEPLOY_GROUP|g" \
+    sed -e "s|__BUN_PATH__|$BUN_PATH|g" \
+        -e "s|__PROJECT_PATH__|$PROJECT_PATH|g" \
+        -e "s|__USER__|$DEPLOY_USER|g" \
+        -e "s|__GROUP__|$DEPLOY_GROUP|g" \
         "$service_file" > "$SYSTEMD_DIR/$service_name.service"
     
     # Set permissions

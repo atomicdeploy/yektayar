@@ -1,10 +1,10 @@
 {
-  "name": "YektaYar",
-  "short_name": "YektaYar",
-  "description": "YektaYar Mental Health Care Platform",
+  "name": "یکتایار",
+  "short_name": "یکتایار",
+  "description": "پلتفرم مراقبت سلامت روان یکتایار",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#01183a",
   "theme_color": "#d4a43e",
   "orientation": "portrait-primary",
   "icons": [
@@ -46,6 +46,48 @@
     },
     {
       "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-16x16-dark.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32-dark.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-48x48-dark.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-64x64-dark.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-128x128-dark.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192x192-dark.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-256x256-dark.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512-dark.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
