@@ -492,11 +492,11 @@ export async function sendVOTP(
     normalizedRecipient = '98' + recipient;
   }
   
-  const endpoint = 'https://edge.ippanel.com/v1/api/send/votp/';
+  const endpoint = 'https://edge.ippanel.com/v1/api/votp/send';
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${config.apiKey}`
+    'Authorization': `apikey ${config.apiKey}`
   };
   
   const body = {
@@ -545,17 +545,17 @@ export async function sendWebserviceSMS(
   recipients: string[]
 ): Promise<any> {
   const config = getSMSConfig();
-  const endpoint = 'https://edge.ippanel.com/v1/api/webservice/send';
+  const endpoint = 'https://edge.ippanel.com/v1/api/send';
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${config.apiKey}`
+    'Authorization': `apikey ${config.apiKey}`
   };
   
   const body = {
-    message,
-    sender,
-    recipients
+    originator: sender,
+    recipients,
+    message
   };
   
   const response = await fetch(endpoint, {
@@ -602,15 +602,15 @@ export async function sendURLBasedSMS(
   
   // Build URL with query parameters
   const params = new URLSearchParams({
-    message,
-    sender,
-    recipients: recipients.join(',')
+    originator: sender,
+    recipients: recipients.join(','),
+    message
   });
   
   const endpoint = `https://edge.ippanel.com/v1/api/send?${params.toString()}`;
   
   const headers: Record<string, string> = {
-    'Authorization': `Bearer ${config.apiKey}`
+    'Authorization': `apikey ${config.apiKey}`
   };
   
   const response = await fetch(endpoint, {
