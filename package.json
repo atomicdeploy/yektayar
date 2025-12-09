@@ -43,7 +43,7 @@
     "telegram:setup": "./scripts/manage-telegram-bot.sh setup",
     "telegram:config": "./scripts/manage-telegram-bot.sh config",
     "telegram:test": "./scripts/manage-telegram-bot.sh test",
-    "telegram:test-message": "./scripts/manage-telegram-bot.sh test-message"
+    "telegram:test-message": "./scripts/manage-telegram-bot.sh test-message",
     "android:build": "npm run build:mobile && cd packages/mobile-app && npm run cap:sync && npm run android:build:debug",
     "android:analyze": "bash scripts/analyze-apk.sh",
     "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs",
@@ -76,6 +76,7 @@
     "eslint-plugin-vue": "^10.6.2",
     "globals": "^16.5.0",
     "sharp": "^0.34.5",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.1",
     "vitest": "^4.0.15",
