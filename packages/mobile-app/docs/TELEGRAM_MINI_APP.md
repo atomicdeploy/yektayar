@@ -202,11 +202,18 @@ import { useTelegram } from '@/composables/useTelegram'
 const telegram = useTelegram()
 
 function handleClick() {
-  // Provide haptic feedback
-  telegram.hapticFeedback('impact', 'light')
-  
-  // Or notification feedback
-  telegram.hapticFeedback('notification', 'success')
+  // Provide impact haptic feedback
+  telegram.hapticImpact('light')
+}
+
+function handleSuccess() {
+  // Provide notification haptic feedback
+  telegram.hapticNotification('success')
+}
+
+function handleSelectionChange() {
+  // Provide selection changed feedback
+  telegram.hapticSelection()
 }
 </script>
 ```
@@ -413,7 +420,9 @@ telegram.setMainButton(text, onClick?)             // Show main button
 telegram.hideMainButton()                          // Hide main button
 telegram.showBackButton(onClick?)                  // Show back button
 telegram.hideBackButton()                          // Hide back button
-telegram.hapticFeedback(type, style?)              // Trigger haptic
+telegram.hapticImpact(style)                       // Trigger impact haptic (light, medium, heavy, rigid, soft)
+telegram.hapticNotification(type)                  // Trigger notification haptic (error, success, warning)
+telegram.hapticSelection()                         // Trigger selection changed haptic
 telegram.openLink(url, tryInstantView?)            // Open external link
 telegram.openTelegramLink(url)                     // Open t.me link
 telegram.showAlert(message, callback?)             // Show alert

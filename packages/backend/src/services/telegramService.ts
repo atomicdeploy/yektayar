@@ -1,5 +1,6 @@
 import { Telegraf, Context } from 'telegraf'
 import { logger } from '@yektayar/shared'
+import crypto from 'crypto'
 
 let bot: Telegraf | null = null
 let isInitialized = false
@@ -305,7 +306,6 @@ export function verifyTelegramInitData(initData: string): boolean {
       .join('\n')
 
     // Calculate secret_key = HMAC_SHA256(bot_token, "WebAppData")
-    const crypto = require('crypto')
     const secretKey = crypto
       .createHmac('sha256', 'WebAppData')
       .update(botToken)

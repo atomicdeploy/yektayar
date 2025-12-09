@@ -89,20 +89,27 @@ export function useTelegram() {
   }
 
   /**
-   * Trigger haptic feedback
+   * Trigger haptic feedback - impact style
    */
-  function hapticFeedback(type: 'impact' | 'notification' | 'selection', style?: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft' | 'error' | 'success' | 'warning') {
+  function hapticImpact(style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') {
     if (!state.available || !state.webApp) return
-    
-    const haptic = state.webApp.HapticFeedback
-    
-    if (type === 'impact' && (style === 'light' || style === 'medium' || style === 'heavy' || style === 'rigid' || style === 'soft')) {
-      haptic.impactOccurred(style)
-    } else if (type === 'notification' && (style === 'error' || style === 'success' || style === 'warning')) {
-      haptic.notificationOccurred(style)
-    } else if (type === 'selection') {
-      haptic.selectionChanged()
-    }
+    state.webApp.HapticFeedback.impactOccurred(style)
+  }
+
+  /**
+   * Trigger haptic feedback - notification style
+   */
+  function hapticNotification(type: 'error' | 'success' | 'warning') {
+    if (!state.available || !state.webApp) return
+    state.webApp.HapticFeedback.notificationOccurred(type)
+  }
+
+  /**
+   * Trigger haptic feedback - selection changed
+   */
+  function hapticSelection() {
+    if (!state.available || !state.webApp) return
+    state.webApp.HapticFeedback.selectionChanged()
   }
 
   /**
@@ -190,7 +197,9 @@ export function useTelegram() {
     hideMainButton,
     showBackButton,
     hideBackButton,
-    hapticFeedback,
+    hapticImpact,
+    hapticNotification,
+    hapticSelection,
     openLink,
     openTelegramLink,
     showAlert,
