@@ -333,12 +333,9 @@ export function verifyTelegramInitData(initData: string): boolean {
     const isValid = calculatedHash === hash
 
     if (!isValid) {
-      // In development, provide more details for debugging
+      // In development, provide minimal context for debugging
       if (process.env.NODE_ENV === 'development') {
-        logger.warn('Invalid Telegram initData hash - verification failed', {
-          dataCheckString: dataCheckString.substring(0, 50) + '...',
-          authDate: data.auth_date
-        })
+        logger.warn('Invalid Telegram initData hash - verification failed (check auth_date)')
       } else {
         logger.warn('Invalid Telegram initData hash - verification failed')
       }
