@@ -160,6 +160,35 @@ export function validatePhoneNumber(phoneNumber: string): boolean {
 }
 
 /**
+ * Normalize phone number to international format (989xxxxxxxxx)
+ * @param phoneNumber Phone number in various formats
+ * @returns Normalized phone number
+ */
+export function normalizePhoneNumber(phoneNumber: string): string {
+  let normalized = phoneNumber;
+  
+  if (phoneNumber.startsWith('0')) {
+    normalized = '98' + phoneNumber.substring(1);
+  } else if (phoneNumber.startsWith('+98')) {
+    normalized = phoneNumber.substring(1);
+  } else if (!phoneNumber.startsWith('98')) {
+    normalized = '98' + phoneNumber;
+  }
+  
+  return normalized;
+}
+
+/**
+ * Mask phone number for logging (shows first 5 and last 2 digits)
+ * @param phoneNumber Phone number to mask
+ * @returns Masked phone number
+ */
+export function maskPhoneNumber(phoneNumber: string): string {
+  if (phoneNumber.length < 7) return phoneNumber;
+  return phoneNumber.substring(0, 5) + '***' + phoneNumber.substring(phoneNumber.length - 2);
+}
+
+/**
  * Send OTP SMS using FarazSMS pattern-based API
  * 
  * @param phoneNumber Recipient phone number (09xxxxxxxxx format)
@@ -238,7 +267,7 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
     }
 
     console.log('SMS sent successfully:', {
-      phoneNumber: phoneNumber.substring(0, 5) + '***' + phoneNumber.substring(phoneNumber.length - 2),
+      phoneNumber: maskPhoneNumber(phoneNumber),
       timestamp: new Date().toISOString()
     });
 
@@ -475,6 +504,7 @@ export async function fetchInboxMessages(): Promise<any> {
  * @param recipient Recipient phone number in format 989xxxxxxxxx (without +)
  * @returns Promise with VOTP send result
  * @see {@link https://ippanelcom.github.io/Edge-Document/docs/send/votp/ | IPPanel VOTP Documentation}
+ * @note Uses 'apikey' authentication format for IPPanel Edge API
  */
 export async function sendVOTP(
   code: string | number,
@@ -483,20 +513,13 @@ export async function sendVOTP(
   const config = getSMSConfig();
   
   // Normalize phone number to international format (989xxxxxxxxx)
-  let normalizedRecipient = recipient;
-  if (recipient.startsWith('0')) {
-    normalizedRecipient = '98' + recipient.substring(1);
-  } else if (recipient.startsWith('+98')) {
-    normalizedRecipient = recipient.substring(1);
-  } else if (!recipient.startsWith('98')) {
-    normalizedRecipient = '98' + recipient;
-  }
+  const normalizedRecipient = normalizePhoneNumber(recipient);
   
   const endpoint = 'https://edge.ippanel.com/v1/api/votp/send';
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `apikey ${config.apiKey}`
+    'Authorization': `apikey ${config.apiKey}` // IPPanel uses 'apikey' format
   };
   
   const body = {
@@ -522,7 +545,7 @@ export async function sendVOTP(
   
   const result = await response.json();
   console.log('VOTP sent successfully:', {
-    recipient: normalizedRecipient.substring(0, 5) + '***' + normalizedRecipient.substring(normalizedRecipient.length - 2),
+    recipient: maskPhoneNumber(normalizedRecipient),
     timestamp: new Date().toISOString()
   });
   
@@ -538,6 +561,7 @@ export async function sendVOTP(
  * @param recipients Array of recipient phone numbers
  * @returns Promise with webservice SMS result
  * @see {@link https://ippanelcom.github.io/Edge-Document/docs/send/webservice/ | IPPanel Webservice Documentation}
+ * @note Uses 'apikey' authentication format for IPPanel Edge API
  */
 export async function sendWebserviceSMS(
   message: string,
@@ -549,7 +573,7 @@ export async function sendWebserviceSMS(
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `apikey ${config.apiKey}`
+    'Authorization': `apikey ${config.apiKey}` // IPPanel uses 'apikey' format
   };
   
   const body = {
@@ -592,6 +616,7 @@ export async function sendWebserviceSMS(
  * @param recipients Array of recipient phone numbers
  * @returns Promise with URL-based SMS result
  * @see {@link https://ippanelcom.github.io/Edge-Document/docs/send/url/ | IPPanel URL Documentation}
+ * @note Uses 'apikey' authentication format for IPPanel Edge API
  */
 export async function sendURLBasedSMS(
   message: string,
@@ -610,7 +635,7 @@ export async function sendURLBasedSMS(
   const endpoint = `https://edge.ippanel.com/v1/api/send?${params.toString()}`;
   
   const headers: Record<string, string> = {
-    'Authorization': `apikey ${config.apiKey}`
+    'Authorization': `apikey ${config.apiKey}` // IPPanel uses 'apikey' format
   };
   
   const response = await fetch(endpoint, {
@@ -648,6 +673,7 @@ export async function sendURLBasedSMS(
  * @param schedule Optional schedule time (format: 'YYYY-MM-DD HH:mm:ss')
  * @returns Promise with sample SMS result
  * @see {@link https://docs.iranpayamak.com/send-sample-sms-13909966e0 | IranPayamak Sample SMS Documentation}
+ * @note Uses 'Api-Key' header format for IranPayamak API
  */
 export async function sendSampleSMS(
   text: string,
@@ -660,7 +686,7 @@ export async function sendSampleSMS(
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Api-Key': config.apiKey
+    'Api-Key': config.apiKey // IranPayamak uses 'Api-Key' header format
   };
   
   const body: any = {
@@ -708,6 +734,7 @@ export async function sendSampleSMS(
  * @param schedule Optional schedule time (format: 'YYYY-MM-DD HH:mm:ss')
  * @returns Promise with simple SMS result
  * @see {@link https://docs.iranpayamak.com/send-simple-sms-13909967e0 | IranPayamak Simple SMS Documentation}
+ * @note Uses 'Api-Key' header format for IranPayamak API
  */
 export async function sendSimpleSMS(
   text: string,
@@ -721,7 +748,7 @@ export async function sendSimpleSMS(
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Api-Key': config.apiKey
+    'Api-Key': config.apiKey // IranPayamak uses 'Api-Key' header format
   };
   
   const body: any = {

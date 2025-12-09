@@ -37,6 +37,7 @@ import {
   sendSampleSMS,
   sendSimpleSMS,
   validatePhoneNumber,
+  normalizePhoneNumber,
   sendOTPSMS
 } from '../packages/backend/src/services/smsService';
 
@@ -159,9 +160,11 @@ function showHelp() {
 }
 
 /**
- * Normalize phone number
+ * Normalize phone number (use imported function from smsService)
  */
-function normalizePhoneNumber(phone: string): string {
+function normalizePhone(phone: string): string {
+  // Import and use the service's normalizePhoneNumber
+  // This is a simple wrapper that removes non-digits first
   let normalized = phone.replace(/\D/g, '');
   if (normalized.startsWith('98')) {
     normalized = '0' + normalized.substring(2);
@@ -537,7 +540,7 @@ async function runTests(phoneNumber: string, options: {
   printHeader('Comprehensive SMS & OTP Testing');
   
   // Validate phone number
-  const normalized = normalizePhoneNumber(phoneNumber);
+  const normalized = normalizePhone(phoneNumber);
   if (!validatePhoneNumber(normalized)) {
     printError(`Invalid phone number format: ${phoneNumber}`);
     printInfo('Expected format: 09xxxxxxxxx or +989xxxxxxxxx');
