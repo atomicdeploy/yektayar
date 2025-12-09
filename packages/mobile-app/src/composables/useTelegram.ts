@@ -29,7 +29,7 @@ export function useTelegram() {
     
     try {
       state.webApp.sendData(payload)
-      logger.info('Data sent to Telegram bot', { payload })
+      logger.info('Data sent to Telegram bot')
     } catch (error) {
       logger.error('Failed to send data to Telegram bot', error)
     }

@@ -78,7 +78,7 @@ export default {
         version: webApp.version,
         platform: webApp.platform,
         colorScheme: webApp.colorScheme,
-        user: webApp.initDataUnsafe?.user?.first_name || 'Unknown'
+        hasUser: !!webApp.initDataUnsafe?.user
       })
     } catch (err) {
       logger.error('Error initializing Telegram WebApp', err)
