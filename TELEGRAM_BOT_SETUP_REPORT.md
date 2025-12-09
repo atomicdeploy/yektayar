@@ -33,8 +33,8 @@
 - ✅ Set `TELEGRAM_ADMIN_CHAT_ID` to group chat ID: `-2716125555`
 
 ### 3. Test Scripts Created
-- ✅ `scripts/test-telegram-bot.ts` - Full bot setup and testing script
-- ✅ `scripts/send-telegram-test-messages.ts` - Simple message sender script
+- ✅ `tests/scripts/test-telegram-bot.ts` - Full bot setup and testing script
+- ✅ `tests/scripts/send-telegram-test-messages.ts` - Simple message sender script
 
 ### 4. Profile Picture
 - ✅ Downloaded from: http://tmpfiles.org/dl/14760311/38f45ea9-68ad-4f71-ad18-37961a5a42e2.png
@@ -76,7 +76,7 @@
 Once the bot is added to the group, run:
 ```bash
 cd /home/runner/work/yektayar/yektayar
-npx tsx scripts/send-telegram-test-messages.ts
+npx tsx tests/scripts/send-telegram-test-messages.ts
 ```
 
 This will send 5 test messages to verify:

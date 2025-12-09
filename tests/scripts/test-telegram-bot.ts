@@ -15,7 +15,7 @@ import { InputFile } from 'telegraf/types'
 
 // Configuration
 const BOT_TOKEN = process.env.TELEGRAM_API_KEY || process.env.TELEGRAM_BOT_TOKEN
-const GROUP_CHAT_ID = '-2716125555' // The group chat ID
+const GROUP_CHAT_ID = '-1002716125555' // The group chat ID
 const PROFILE_PICTURE_URL = 'http://tmpfiles.org/dl/14760311/38f45ea9-68ad-4f71-ad18-37961a5a42e2.png'
 const PROFILE_PICTURE_PATH = '/tmp/bot_profile.png'
 
@@ -289,6 +289,7 @@ async function main() {
       console.log('   5. Add the bot to the group')
       console.log('   6. Run this script again to send test messages')
       console.log('\n   Group Chat ID:', GROUP_CHAT_ID)
+      console.log('\n   Note: The correct group ID is -1002716125555 (with 100 prefix)')
     }
 
     console.log('\n📝 Bot Profile Setup Complete:')

@@ -7,7 +7,7 @@
 import { Telegraf } from 'telegraf'
 
 const BOT_TOKEN = process.env.TELEGRAM_API_KEY || process.env.TELEGRAM_BOT_TOKEN
-const GROUP_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || '-2716125555'
+const GROUP_CHAT_ID = process.env.TELEGRAM_ADMIN_CHAT_ID || '-1002716125555'
 
 if (!BOT_TOKEN) {
   console.error('❌ Bot token not found!')
