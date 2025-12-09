@@ -461,3 +461,301 @@ export async function fetchInboxMessages(): Promise<any> {
   const endpoint = 'http://rest.ippanel.com/v1/messages/inbox';
   return makeAuthenticatedRequest(endpoint, 'GET');
 }
+
+// ============================================================================
+// Extended SMS API Functions
+// Implementation of additional FarazSMS/IPPanel capabilities
+// ============================================================================
+
+/**
+ * Send Voice OTP (VOTP)
+ * Sends OTP via voice call instead of SMS
+ * 
+ * @param code OTP code to be delivered by voice (can be string or number)
+ * @param recipient Recipient phone number in format 989xxxxxxxxx (without +)
+ * @returns Promise with VOTP send result
+ * @see {@link https://ippanelcom.github.io/Edge-Document/docs/send/votp/ | IPPanel VOTP Documentation}
+ */
+export async function sendVOTP(
+  code: string | number,
+  recipient: string
+): Promise<any> {
+  const config = getSMSConfig();
+  
+  // Normalize phone number to international format (989xxxxxxxxx)
+  let normalizedRecipient = recipient;
+  if (recipient.startsWith('0')) {
+    normalizedRecipient = '98' + recipient.substring(1);
+  } else if (recipient.startsWith('+98')) {
+    normalizedRecipient = recipient.substring(1);
+  } else if (!recipient.startsWith('98')) {
+    normalizedRecipient = '98' + recipient;
+  }
+  
+  const endpoint = 'https://edge.ippanel.com/v1/api/send/votp/';
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${config.apiKey}`
+  };
+  
+  const body = {
+    code: code.toString(),
+    recipient: normalizedRecipient
+  };
+  
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('VOTP API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`VOTP API request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json();
+  console.log('VOTP sent successfully:', {
+    recipient: normalizedRecipient.substring(0, 5) + '***' + normalizedRecipient.substring(normalizedRecipient.length - 2),
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
+}
+
+/**
+ * Send Webservice SMS
+ * Sends SMS via IPPanel webservice API
+ * 
+ * @param message Message text to send
+ * @param sender Sender line number
+ * @param recipients Array of recipient phone numbers
+ * @returns Promise with webservice SMS result
+ * @see {@link https://ippanelcom.github.io/Edge-Document/docs/send/webservice/ | IPPanel Webservice Documentation}
+ */
+export async function sendWebserviceSMS(
+  message: string,
+  sender: string,
+  recipients: string[]
+): Promise<any> {
+  const config = getSMSConfig();
+  const endpoint = 'https://edge.ippanel.com/v1/api/webservice/send';
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${config.apiKey}`
+  };
+  
+  const body = {
+    message,
+    sender,
+    recipients
+  };
+  
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Webservice SMS API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`Webservice SMS API request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json();
+  console.log('Webservice SMS sent successfully:', {
+    recipientCount: recipients.length,
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
+}
+
+/**
+ * Send URL-based SMS
+ * Alternative method using URL parameters for sending SMS
+ * 
+ * @param message Message text to send
+ * @param sender Sender line number
+ * @param recipients Array of recipient phone numbers
+ * @returns Promise with URL-based SMS result
+ * @see {@link https://ippanelcom.github.io/Edge-Document/docs/send/url/ | IPPanel URL Documentation}
+ */
+export async function sendURLBasedSMS(
+  message: string,
+  sender: string,
+  recipients: string[]
+): Promise<any> {
+  const config = getSMSConfig();
+  
+  // Build URL with query parameters
+  const params = new URLSearchParams({
+    message,
+    sender,
+    recipients: recipients.join(',')
+  });
+  
+  const endpoint = `https://edge.ippanel.com/v1/api/send?${params.toString()}`;
+  
+  const headers: Record<string, string> = {
+    'Authorization': `Bearer ${config.apiKey}`
+  };
+  
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    headers
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('URL-based SMS API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`URL-based SMS API request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json();
+  console.log('URL-based SMS sent successfully:', {
+    recipientCount: recipients.length,
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
+}
+
+/**
+ * Send Sample SMS
+ * Sends a test SMS to the account owner for testing/debugging purposes
+ * Useful for CLI and admin panel troubleshooting and SMS gateway health checks
+ * 
+ * @param text Message text to send
+ * @param lineNumber Sender line number (optional, uses config if not provided)
+ * @param numberFormat Number format: 'english' or 'persian' (default: 'english')
+ * @param schedule Optional schedule time (format: 'YYYY-MM-DD HH:mm:ss')
+ * @returns Promise with sample SMS result
+ * @see {@link https://docs.iranpayamak.com/send-sample-sms-13909966e0 | IranPayamak Sample SMS Documentation}
+ */
+export async function sendSampleSMS(
+  text: string,
+  lineNumber?: string,
+  numberFormat: 'english' | 'persian' = 'english',
+  schedule?: string
+): Promise<FarazSMSResponse> {
+  const config = getSMSConfig();
+  const endpoint = 'https://api.iranpayamak.com/ws/v1/sms/sample';
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Api-Key': config.apiKey
+  };
+  
+  const body: any = {
+    text,
+    line_number: lineNumber || config.lineNumber,
+    number_format: numberFormat
+  };
+  
+  if (schedule) {
+    body.schedule = schedule;
+  }
+  
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Sample SMS API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`Sample SMS API request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json() as FarazSMSResponse;
+  console.log('Sample SMS sent successfully to account owner:', {
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
+}
+
+/**
+ * Send Simple SMS
+ * Sends a simple SMS message to one or more recipients
+ * 
+ * @param text Message text to send
+ * @param recipients Array of recipient phone numbers (format: 09xxxxxxxxx)
+ * @param lineNumber Sender line number (optional, uses config if not provided)
+ * @param numberFormat Number format: 'english' or 'persian' (default: 'english')
+ * @param schedule Optional schedule time (format: 'YYYY-MM-DD HH:mm:ss')
+ * @returns Promise with simple SMS result
+ * @see {@link https://docs.iranpayamak.com/send-simple-sms-13909967e0 | IranPayamak Simple SMS Documentation}
+ */
+export async function sendSimpleSMS(
+  text: string,
+  recipients: string[],
+  lineNumber?: string,
+  numberFormat: 'english' | 'persian' = 'english',
+  schedule?: string
+): Promise<FarazSMSResponse> {
+  const config = getSMSConfig();
+  const endpoint = 'https://api.iranpayamak.com/ws/v1/sms/simple';
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Api-Key': config.apiKey
+  };
+  
+  const body: any = {
+    text,
+    line_number: lineNumber || config.lineNumber,
+    recipients,
+    number_format: numberFormat
+  };
+  
+  if (schedule) {
+    body.schedule = schedule;
+  }
+  
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Simple SMS API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`Simple SMS API request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json() as FarazSMSResponse;
+  console.log('Simple SMS sent successfully:', {
+    recipientCount: recipients.length,
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
+}
