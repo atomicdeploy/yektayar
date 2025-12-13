@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
 import config from '@/config'
-import { logger, getWebSocketPathFromEnv } from '@yektayar/shared'
+import { logger, getWebSocketPathFromEnv, detectTimezone, detectLanguage } from '@yektayar/shared'
 import apiClient from '@/api'
 
 const API_URL = config.apiBaseUrl
@@ -13,6 +13,8 @@ export interface Session {
   userId: string | null
   isLoggedIn: boolean
   expiresAt: string
+  language?: string
+  timezone?: string
 }
 
 export const useSessionStore = defineStore('session', () => {
@@ -60,10 +62,27 @@ export const useSessionStore = defineStore('session', () => {
 
       // Acquire a new session
       logger.custom(logger.emoji('rocket'), 'Acquiring new session...', 'cyan')
-      const response = await apiClient.post<{ token: string; expiresAt: string }>(
+      
+      // Detect client locale information
+      const clientLanguage = detectLanguage()
+      const clientTimezone = detectTimezone()
+      
+      logger.info('Detected locale:', { language: clientLanguage, timezone: clientTimezone })
+      
+      const response = await apiClient.post<{ 
+        token: string
+        expiresAt: string
+        language?: string
+        timezone?: string
+      }>(
         '/auth/acquire-session',
         {},
-        { skipAuth: true }
+        { 
+          skipAuth: true,
+          headers: {
+            'X-Timezone': clientTimezone
+          }
+        }
       )
       
       if (!response.success || !response.data) {
@@ -75,7 +94,9 @@ export const useSessionStore = defineStore('session', () => {
         token: response.data.token,
         userId: null,
         isLoggedIn: false,
-        expiresAt: response.data.expiresAt
+        expiresAt: response.data.expiresAt,
+        language: response.data.language || clientLanguage,
+        timezone: response.data.timezone || clientTimezone
       }
 
       // Persist to localStorage and API client
@@ -107,6 +128,8 @@ export const useSessionStore = defineStore('session', () => {
         userId: string | null
         isLoggedIn: boolean
         expiresAt: string
+        language?: string
+        timezone?: string
       }>('/auth/session')
 
       if (!response.success || !response.data) {
@@ -118,7 +141,9 @@ export const useSessionStore = defineStore('session', () => {
         token: response.data.token,
         userId: response.data.userId,
         isLoggedIn: response.data.isLoggedIn,
-        expiresAt: response.data.expiresAt
+        expiresAt: response.data.expiresAt,
+        language: response.data.language,
+        timezone: response.data.timezone
       }
 
       return true
