@@ -119,6 +119,23 @@ desktop-app/
 4. Configuration is used to set the API base URL and environment
 5. The app runs the admin panel with the configured settings
 
+## Keyboard Shortcuts
+
+The desktop app includes the following keyboard shortcuts:
+
+### File Menu
+- **Ctrl+R** (Cmd+R on Mac) - Reload the application
+- **Alt+F4** - Exit the application
+
+### View Menu
+- **Ctrl+Shift+I** (Cmd+Shift+I on Mac) - Toggle Developer Tools
+- **Ctrl+0** (Cmd+0 on Mac) - Reset zoom to actual size
+- **Ctrl++** (Cmd++ on Mac) - Zoom in
+- **Ctrl+-** (Cmd+- on Mac) - Zoom out
+
+### Help Menu
+- About dialog with version information
+
 ## Troubleshooting
 
 ### Issue: App doesn't connect to API

@@ -17,6 +17,17 @@ on:
   push:
     branches:
       - main
+      - master
+      - develop
+    paths:
+      - 'packages/desktop-app/**'
+      - 'packages/admin-panel/**'
+      - '.github/workflows/build-windows-desktop.yml'
+  # Also run on pull requests for testing
+  pull_request:
+    branches:
+      - main
+      - master
       - develop
     paths:
       - 'packages/desktop-app/**'
@@ -122,6 +133,47 @@ jobs:
               echo "type=portable" >> $GITHUB_OUTPUT
             fi
           fi
+
+      - name: Generate Build Summary
+        if: always()
+        shell: bash
+        run: |
+          echo "## Electron Desktop App Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Build Information" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] || [ "${{ github.event.inputs.build_type }}" == "installer" ]; then
+            cd packages/desktop-app/dist
+            if ls *.exe 1> /dev/null 2>&1; then
+              for exe in *.exe; do
+                size=$(du -h "$exe" | cut -f1)
+                echo "- **Installer:** \`$exe\` (Size: $size)" >> $GITHUB_STEP_SUMMARY
+              done
+            else
+              echo "- ⚠️ No installer files found" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            if [ -d "packages/desktop-app/dist/win-unpacked" ]; then
+              size=$(du -sh packages/desktop-app/dist/win-unpacked | cut -f1)
+              echo "- **Portable Build:** \`win-unpacked\` (Size: $size)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ⚠️ No portable build found" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Build Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Node.js Version:** 24.x" >> $GITHUB_STEP_SUMMARY
+          echo "- **Electron Version:** ^33.2.1" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Platform:** Windows x64" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Type:** NSIS Installer" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package Version:** ${{ steps.package-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Features" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Runtime configuration via .env and config.json" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Application menu with keyboard shortcuts" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Context isolation and secure IPC" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Desktop shortcuts and Start Menu integration" >> $GITHUB_STEP_SUMMARY
 
       - name: Comment PR with Desktop App
         if: github.event_name == 'pull_request'

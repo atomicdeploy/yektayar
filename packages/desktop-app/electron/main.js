@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
@@ -45,6 +45,93 @@ function getEnvironment() {
          'production';
 }
 
+// Create application menu
+function createApplicationMenu() {
+  const template = [
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Reload',
+          accelerator: 'CmdOrCtrl+R',
+          click: () => {
+            if (mainWindow) mainWindow.reload();
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Exit',
+          accelerator: 'Alt+F4',
+          click: () => {
+            app.quit();
+          }
+        }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: 'CmdOrCtrl+Shift+I',
+          click: () => {
+            if (mainWindow) mainWindow.webContents.toggleDevTools();
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Actual Size',
+          accelerator: 'CmdOrCtrl+0',
+          click: () => {
+            if (mainWindow) mainWindow.webContents.setZoomLevel(0);
+          }
+        },
+        {
+          label: 'Zoom In',
+          accelerator: 'CmdOrCtrl+Plus',
+          click: () => {
+            if (mainWindow) {
+              const currentZoom = mainWindow.webContents.getZoomLevel();
+              mainWindow.webContents.setZoomLevel(currentZoom + 1);
+            }
+          }
+        },
+        {
+          label: 'Zoom Out',
+          accelerator: 'CmdOrCtrl+-',
+          click: () => {
+            if (mainWindow) {
+              const currentZoom = mainWindow.webContents.getZoomLevel();
+              mainWindow.webContents.setZoomLevel(currentZoom - 1);
+            }
+          }
+        }
+      ]
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'About',
+          click: () => {
+            const { dialog } = require('electron');
+            const packageJson = require('../package.json');
+            dialog.showMessageBox(mainWindow, {
+              type: 'info',
+              title: 'About YektaYar Admin',
+              message: 'YektaYar Admin Panel',
+              detail: `Version ${packageJson.version}\n\nDesktop application for YektaYar admin panel.\n\nCopyright © 2025 YektaYar`
+            });
+          }
+        }
+      ]
+    }
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
+
 function createWindow() {
   const apiUrl = getApiUrl();
   const environment = getEnvironment();
@@ -64,8 +151,13 @@ function createWindow() {
       nodeIntegration: false,
       enableRemoteModule: false
     },
-    icon: path.join(__dirname, '../build/icon.png')
+    icon: path.join(__dirname, '../build/icon.png'),
+    title: 'YektaYar Admin Panel',
+    backgroundColor: '#1a1a2e'
   });
+
+  // Create application menu
+  createApplicationMenu();
 
   // Determine the path to the web content
   // In production (packaged app), files are in resources/app
