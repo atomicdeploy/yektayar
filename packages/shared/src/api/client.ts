@@ -37,15 +37,26 @@ export class ApiClient {
     this.baseURL = config.baseURL
     this.deviceInfoProvider = config.deviceInfoProvider
 
+    // Detect if running in a browser environment
+    // In browsers, setting User-Agent header causes: "Refused to set unsafe header 'User-Agent'"
+    const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined'
+    
+    // Build headers - only set User-Agent in non-browser environments
+    const headers: Record<string, string> = {
+      'Accept': 'application/json',
+      ...config.headers,
+    }
+    
+    // Only add User-Agent header in Node.js or React Native environments
+    if (!isBrowser) {
+      headers['User-Agent'] = `${packageJson.name}/${packageJson.version}`
+    }
+
     // Create axios instance with base configuration
     this.axiosInstance = axios.create({
       baseURL: config.baseURL,
       timeout: config.timeout || 30000,
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': `${packageJson.name}/${packageJson.version}`,
-        ...config.headers,
-      },
+      headers,
     })
 
     this.setupInterceptors()
