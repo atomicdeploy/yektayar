@@ -236,24 +236,24 @@ If you encounter any issues:
 
 ## Additional API Endpoints
 
-### IPPanel REST API v1 (api2.ippanel.com)
+### IPPanel REST API (api2.ippanel.com)
 
-For compatibility with legacy implementations (e.g., AutoHotkey), we also support the REST API v1 endpoints:
+For compatibility with legacy implementations (e.g., AutoHotkey), we also support the REST API endpoints via the `RestAPI` namespace:
 
 #### Send Single SMS
 ```typescript
-import { sendSingleSMS } from './services/smsService';
+import { RestAPI } from './services/smsService';
 
-await sendSingleSMS('09197103488', 'Your message here');
+await RestAPI.sendSingle('09197103488', 'Your message here');
 ```
 
 **Endpoint:** `https://api2.ippanel.com/api/v1/sms/send/webservice/single`
 
-#### Send Pattern SMS (REST v1)
+#### Send Pattern SMS
 ```typescript
-import { sendPatternSMSv1 } from './services/smsService';
+import { RestAPI } from './services/smsService';
 
-await sendPatternSMSv1(
+await RestAPI.sendPattern(
   '09197103488',
   'pattern_code',
   { 'verification-code': '123456' }
@@ -262,4 +262,4 @@ await sendPatternSMSv1(
 
 **Endpoint:** `https://api2.ippanel.com/api/v1/sms/pattern/normal/send`
 
-Both functions use the same FarazSMS API key and credentials, just different endpoint formats for backward compatibility.
+The `RestAPI` namespace provides clean access to legacy endpoints using the same FarazSMS API key and credentials.

@@ -6,8 +6,7 @@
 import { 
   sendOTPSMS, 
   sendPatternSMS, 
-  sendSingleSMS, 
-  sendPatternSMSv1 
+  RestAPI
 } from '../packages/backend/src/services/smsService';
 
 async function finalTest() {
@@ -51,11 +50,11 @@ async function finalTest() {
     failed++;
   }
 
-  // Test 3: REST API v1 - sendSingleSMS
-  console.log('🧪 Test 3: REST API v1 - sendSingleSMS() (Legacy AHK compat)');
+  // Test 3: REST API - sendSingle
+  console.log('🧪 Test 3: REST API - RestAPI.sendSingle() (Legacy AHK compat)');
   console.log('─'.repeat(79));
   try {
-    await sendSingleSMS(recipient, 'Test from REST API v1');
+    await RestAPI.sendSingle(recipient, 'Test from REST API v1');
     console.log('✅ PASSED\n');
     passed++;
   } catch (error: any) {
@@ -63,11 +62,11 @@ async function finalTest() {
     failed++;
   }
 
-  // Test 4: REST API v1 - sendPatternSMSv1
-  console.log('🧪 Test 4: REST API v1 - sendPatternSMSv1() (Legacy AHK compat)');
+  // Test 4: REST API - sendPattern
+  console.log('🧪 Test 4: REST API - RestAPI.sendPattern() (Legacy AHK compat)');
   console.log('─'.repeat(79));
   try {
-    await sendPatternSMSv1(recipient, patternCode, { 'verification-code': '333333' });
+    await RestAPI.sendPattern(recipient, patternCode, { 'verification-code': '333333' });
     console.log('✅ PASSED\n');
     passed++;
   } catch (error: any) {
@@ -89,7 +88,7 @@ async function finalTest() {
     console.log('  🎉 All APIs working correctly!');
     console.log();
     console.log('  ✓ Edge API (edge.ippanel.com) - Working');
-    console.log('  ✓ REST API v1 (api2.ippanel.com) - Working');
+    console.log('  ✓ REST API (api2.ippanel.com) - Working');
     console.log('  ✓ Legacy AutoHotkey compatibility - Verified');
     console.log('  ✓ FarazSMS provider integration - Complete');
     console.log();

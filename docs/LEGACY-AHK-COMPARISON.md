@@ -118,8 +118,8 @@ headers := Map(
 
 | Test | Method | Status | Message ID |
 |------|--------|--------|------------|
-| Single SMS | sendSingleSMS() | ✅ PASS | 1293158255 |
-| Pattern SMS | sendPatternSMSv1() | ✅ PASS | 1293158269 |
+| Single SMS | RestAPI.sendSingle() | ✅ PASS | 1293170662 |
+| Pattern SMS | RestAPI.sendPattern() | ✅ PASS | 1293170672 |
 
 ### Edge API Endpoints (edge.ippanel.com)
 
@@ -139,12 +139,12 @@ sms.sendSingle("09197103488", "Hello World")
 sms.sendPattern("09197103488", "pattern_code", Map("var", "value"))
 ```
 
-**New Code:**
+**New Code (Namespaced):**
 ```typescript
-import { sendSingleSMS, sendPatternSMSv1 } from './services/smsService';
+import { RestAPI } from './services/smsService';
 
-await sendSingleSMS('09197103488', 'Hello World');
-await sendPatternSMSv1('09197103488', 'pattern_code', { 'var': 'value' });
+await RestAPI.sendSingle('09197103488', 'Hello World');
+await RestAPI.sendPattern('09197103488', 'pattern_code', { 'var': 'value' });
 ```
 
 **Or use the recommended Edge API:**

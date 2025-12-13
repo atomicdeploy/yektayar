@@ -4,7 +4,7 @@
  * Matches legacy AutoHotkey implementation
  */
 
-import { sendSingleSMS, sendPatternSMSv1 } from '../packages/backend/src/services/smsService';
+import { RestAPI } from '../packages/backend/src/services/smsService';
 
 async function testRESTAPIv1() {
   console.log('='.repeat(80));
@@ -29,7 +29,7 @@ async function testRESTAPIv1() {
     console.log(`  Message: ${message}`);
     console.log();
 
-    const result = await sendSingleSMS(recipient, message);
+    const result = await RestAPI.sendSingle(recipient, message);
     
     console.log('✅ SUCCESS!');
     console.log(`  Status: ${result.status}`);
@@ -53,7 +53,7 @@ async function testRESTAPIv1() {
     console.log(`  Variables:`, variable);
     console.log();
 
-    const result = await sendPatternSMSv1(recipient, patternCode, variable);
+    const result = await RestAPI.sendPattern(recipient, patternCode, variable);
     
     console.log('✅ SUCCESS!');
     console.log(`  Status: ${result.status}`);
