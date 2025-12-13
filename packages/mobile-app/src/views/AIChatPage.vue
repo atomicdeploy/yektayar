@@ -275,7 +275,8 @@ const sendMessage = async (customText?: string) => {
   if (!text) return
 
   messageText.value = ''
-  await sendAIMessage(text)
+  // Pass current locale to AI service
+  await sendAIMessage(text, locale.value)
   
   // Scroll to bottom after sending
   await nextTick()

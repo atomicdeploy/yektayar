@@ -147,7 +147,7 @@ export function useAIChat() {
   /**
    * Send a message to the AI
    */
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (content: string, locale: string = 'en') => {
     if (!content.trim() || isSending.value) {
       return
     }
@@ -175,14 +175,15 @@ export function useAIChat() {
             .map(m => ({
               role: m.role,
               content: m.content
-            }))
+            })),
+          locale: locale
         })
         
         userMessage.sent = true
       } else {
         // Fallback to REST API if socket not connected
         logger.warn('Socket not connected, using REST API fallback')
-        await sendMessageViaREST(content)
+        await sendMessageViaREST(content, locale)
         userMessage.sent = true
       }
     } catch (error) {
@@ -204,7 +205,7 @@ export function useAIChat() {
   /**
    * Fallback method to send message via REST API
    */
-  const sendMessageViaREST = async (content: string) => {
+  const sendMessageViaREST = async (content: string, locale: string = 'en') => {
     isTyping.value = true
 
     try {
@@ -218,7 +219,8 @@ export function useAIChat() {
             .map(m => ({
               role: m.role,
               content: m.content
-            }))
+            })),
+          locale: locale
         }
       )
 

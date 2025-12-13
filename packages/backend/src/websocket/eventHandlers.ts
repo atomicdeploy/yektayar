@@ -116,7 +116,7 @@ export function handleMessage(send: MessageSender, sessionData: WebSocketSession
  */
 export async function handleAIChat(send: MessageSender, sessionData: WebSocketSessionData, chatData: any) {
   try {
-    const { message, conversationHistory } = chatData
+    const { message, conversationHistory, locale } = chatData
     const messageId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
     logger.info(`AI chat request from ${sessionData.socketId}:`, message)
@@ -130,9 +130,9 @@ export async function handleAIChat(send: MessageSender, sessionData: WebSocketSe
     // Import AI service dynamically
     const { streamAIResponseChunks } = await import('../services/aiService')
 
-    // Stream the response
+    // Stream the response with locale support
     let fullResponse = ''
-    for await (const chunk of streamAIResponseChunks(message, conversationHistory)) {
+    for await (const chunk of streamAIResponseChunks(message, conversationHistory, locale || 'en')) {
       fullResponse += chunk
       send({
         event: 'ai:response:chunk',

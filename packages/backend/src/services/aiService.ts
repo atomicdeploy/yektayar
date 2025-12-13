@@ -5,7 +5,7 @@
 
 import { logger } from '@yektayar/shared'
 
-const POLLINATIONS_API_URL = 'https://text.pollinations.ai'
+const POLLINATIONS_API_URL = 'https://text.pollinations.ai/v1/chat/completions'
 const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production'
 
 interface ConversationMessage {
@@ -23,13 +23,30 @@ export interface AIDebugInfo {
   contentType?: string
   isFallback?: boolean
   timestamp?: string
+  streaming?: boolean
 }
 
 /**
- * System prompt for the AI counselor
- * Defines the AI's role, personality, and guidelines
+ * Get system prompt based on locale
+ * Uses i18n translations for proper language support
  */
-const SYSTEM_PROMPT = `You are a compassionate and professional mental health AI counselor named YektaYar AI. Your role is to provide supportive, empathetic, and helpful guidance to users seeking mental health support.
+function getSystemPrompt(locale: string = 'en'): string {
+  // Import translations dynamically to get system prompt
+  try {
+    const translations = require('@yektayar/shared/src/i18n/translations.json')
+    const lang = locale.startsWith('fa') ? 'fa' : 'en'
+    return translations[lang]?.ai?.system_prompt || getDefaultSystemPrompt()
+  } catch (error) {
+    logger.warn('Failed to load i18n translations, using default prompt')
+    return getDefaultSystemPrompt()
+  }
+}
+
+/**
+ * Default system prompt (fallback)
+ */
+function getDefaultSystemPrompt(): string {
+  return `You are a compassionate and professional mental health AI counselor named YektaYar AI. Your role is to provide supportive, empathetic, and helpful guidance to users seeking mental health support.
 
 Guidelines:
 1. Always be empathetic, warm, and non-judgmental
@@ -51,23 +68,29 @@ Your responses should be:
 - Focused on the user's wellbeing
 
 Remember: You are here to support, guide, and encourage users on their mental wellness journey.`
+}
 
 /**
  * Stream AI response from pollinations.ai
  * @param message User's message
  * @param conversationHistory Previous conversation context (optional)
+ * @param locale User's locale for proper language support (default: 'en')
  * @returns Object with AI response and optional debug info
  */
 export async function streamAIResponse(
   message: string,
-  conversationHistory?: ConversationMessage[]
+  conversationHistory?: ConversationMessage[],
+  locale: string = 'en'
 ): Promise<{ response: string; debug?: AIDebugInfo }> {
   const debugInfo: AIDebugInfo = IS_DEVELOPMENT ? { timestamp: new Date().toISOString() } : {}
   
   try {
+    // Get system prompt based on locale
+    const systemPrompt = getSystemPrompt(locale)
+    
     // Build conversation context
     const messages: ConversationMessage[] = [
-      { role: 'system', content: SYSTEM_PROMPT }
+      { role: 'system', content: systemPrompt }
     ]
 
     // Add conversation history if provided (last 10 messages for context)
@@ -79,40 +102,23 @@ export async function streamAIResponse(
     // Add current user message
     messages.push({ role: 'user', content: message })
 
-    // Create the prompt for pollinations.ai
-    // Pollinations expects a simple text prompt, so we'll format the conversation
-    let prompt = SYSTEM_PROMPT + '\n\n'
-    
-    if (conversationHistory && conversationHistory.length > 0) {
-      prompt += 'Previous conversation:\n'
-      conversationHistory.slice(-5).forEach(msg => {
-        const role = msg.role === 'user' ? 'User' : 'Assistant'
-        prompt += `${role}: ${msg.content}\n`
-      })
-      prompt += '\n'
-    }
-    
-    prompt += `User: ${message}\nAssistant:`
-
     if (IS_DEVELOPMENT) {
       debugInfo.apiUrl = POLLINATIONS_API_URL
       debugInfo.requestMethod = 'POST'
+      debugInfo.streaming = false
     }
 
-    // Make request to pollinations.ai
+    // Make request to pollinations.ai with streaming support
     const response = await fetch(POLLINATIONS_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          ...messages.slice(1) // Skip the system message we already added
-        ],
-        model: 'openai', // or 'mistral', 'llama' depending on availability
-        seed: Math.floor(Math.random() * 1000000),
-        jsonMode: false
+        messages: messages,
+        model: 'openai',
+        stream: false, // For non-streaming responses
+        seed: Math.floor(Math.random() * 1000000)
       })
     })
 
@@ -123,26 +129,10 @@ export async function streamAIResponse(
     }
 
     if (!response.ok) {
-      // If the JSON API doesn't work, try the simple text API
       if (IS_DEVELOPMENT) {
-        debugInfo.error = `POST request failed with status ${response.status}, trying GET fallback`
+        debugInfo.error = `POST request failed with status ${response.status}`
       }
-      
-      const simpleUrl = `${POLLINATIONS_API_URL}?prompt=${encodeURIComponent(prompt)}`
-      const simpleResponse = await fetch(simpleUrl)
-      
-      if (IS_DEVELOPMENT) {
-        debugInfo.apiUrl = simpleUrl
-        debugInfo.requestMethod = 'GET'
-        debugInfo.responseStatus = simpleResponse.status
-        debugInfo.contentType = simpleResponse.headers.get('content-type') || undefined
-      }
-      
-      if (!simpleResponse.ok) {
-        throw new Error(`Pollinations API error: ${simpleResponse.status} ${simpleResponse.statusText}`)
-      }
-      const text = await simpleResponse.text()
-      return { response: text.trim(), debug: IS_DEVELOPMENT ? debugInfo : undefined }
+      throw new Error(`Pollinations API error: ${response.status} ${response.statusText}`)
     }
 
     // Try to parse as JSON first, but fallback to text if it fails
@@ -198,30 +188,97 @@ export async function streamAIResponse(
 }
 
 /**
+ * Stream AI response with real SSE from Pollinations.ai
+ * This uses actual Server-Sent Events from the API
+ */
+export async function* streamAIResponseSSE(
+  message: string,
+  conversationHistory?: ConversationMessage[],
+  locale: string = 'en'
+): AsyncGenerator<string, void, unknown> {
+  try {
+    const systemPrompt = getSystemPrompt(locale)
+    const messages: ConversationMessage[] = [
+      { role: 'system', content: systemPrompt }
+    ]
+
+    if (conversationHistory && conversationHistory.length > 0) {
+      messages.push(...conversationHistory.slice(-10))
+    }
+    messages.push({ role: 'user', content: message })
+
+    const response = await fetch(POLLINATIONS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: messages,
+        model: 'openai',
+        stream: true, // Enable streaming
+        seed: Math.floor(Math.random() * 1000000)
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error(`Pollinations API error: ${response.status}`)
+    }
+
+    // Process SSE stream
+    const reader = response.body?.getReader()
+    const decoder = new TextDecoder()
+    
+    if (!reader) {
+      throw new Error('No response body available')
+    }
+
+    let buffer = ''
+    
+    while (true) {
+      const { done, value } = await reader.read()
+      
+      if (done) break
+      
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6)
+          if (data === '[DONE]') continue
+          
+          try {
+            const parsed = JSON.parse(data)
+            const content = parsed.choices?.[0]?.delta?.content
+            if (content) {
+              yield content
+            }
+          } catch (e) {
+            // Skip malformed JSON
+          }
+        }
+      }
+    }
+  } catch (error) {
+    logger.error('Error in streamAIResponseSSE:', error)
+    yield generateFallbackResponse(message)
+  }
+}
+
+/**
  * Generate a streaming AI response (for WebSocket)
  * This will chunk the response for real-time streaming
  */
 export async function* streamAIResponseChunks(
   message: string,
-  conversationHistory?: ConversationMessage[]
+  conversationHistory?: ConversationMessage[],
+  locale: string = 'en'
 ): AsyncGenerator<string, void, unknown> {
   try {
-    // Get the full response
-    const result = await streamAIResponse(message, conversationHistory)
-    const fullResponse = result.response
-    
-    // Split into words for streaming effect
-    const words = fullResponse.split(' ')
-    
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i]
-      const chunk = i === words.length - 1 ? word : word + ' '
-      
-      // Yield each word with a small delay simulation
+    // Use SSE streaming for real-time response
+    for await (const chunk of streamAIResponseSSE(message, conversationHistory, locale)) {
       yield chunk
-      
-      // Small delay to simulate streaming (can be removed in production)
-      await new Promise(resolve => setTimeout(resolve, 50))
     }
   } catch (error) {
     logger.error('Error in streamAIResponseChunks:', error)
@@ -231,19 +288,26 @@ export async function* streamAIResponseChunks(
 
 /**
  * Generate a fallback response when AI service is unavailable
+ * Returns locale-specific fallback
  */
-function generateFallbackResponse(_message: string): string {
-  const responses = [
-    "Thank you for reaching out. I'm here to support you. While I'm experiencing some technical difficulties at the moment, I want you to know that what you're feeling is valid and important. Could you tell me more about what's on your mind?",
-    
-    "I appreciate you sharing with me. Although I'm having trouble connecting to my full resources right now, I'm still here for you. Remember that seeking help is a sign of strength, and taking care of your mental health is important.",
-    
-    "I'm experiencing some technical challenges, but I want to acknowledge your message. Your mental wellbeing matters, and it's brave of you to reach out. Please know that you're not alone, and professional support is available if you need it.",
-    
-    "Thank you for trusting me with your thoughts. While I'm having some connectivity issues, I encourage you to continue this conversation. If you're in crisis or need immediate support, please reach out to a mental health professional or crisis hotline."
-  ]
+function generateFallbackResponse(_message: string, locale: string = 'en'): string {
+  const fallbackResponses = {
+    en: [
+      "Thank you for reaching out. I'm here to support you. While I'm experiencing some technical difficulties at the moment, I want you to know that what you're feeling is valid and important. Could you tell me more about what's on your mind?",
+      "I appreciate you sharing with me. Although I'm having trouble connecting to my full resources right now, I'm still here for you. Remember that seeking help is a sign of strength, and taking care of your mental health is important.",
+      "I'm experiencing some technical challenges, but I want to acknowledge your message. Your mental wellbeing matters, and it's brave of you to reach out. Please know that you're not alone, and professional support is available if you need it.",
+      "Thank you for trusting me with your thoughts. While I'm having some connectivity issues, I encourage you to continue this conversation. If you're in crisis or need immediate support, please reach out to a mental health professional or crisis hotline."
+    ],
+    fa: [
+      "ممنون که با من صحبت می‌کنی. الان یه کم مشکل فنی دارم، ولی می‌خوام بدونی که احساسات تو واقعی و مهم هستن. می‌خوای بیشتر بهم بگی چی توی ذهنته؟",
+      "خیلی ممنون که باهام به اشتراک گذاشتی. الان یه کم مشکل دارم برای اتصال، ولی اینجام برای تو. یادت باشه که درخواست کمک نشونه قدرت هست و مراقبت از سلامت روانت خیلی مهمه.",
+      "الان یه چالش فنی دارم، ولی می‌خوام پیامت رو تأیید کنم. سلامتی روانت مهمه و شجاعانه بود که تماس گرفتی. بدون که تنها نیستی و در صورت نیاز می‌تونی به متخصصین مراجعه کنی.",
+      "ممنون که افکارت رو باهام در میون گذاشتی. الان یه کم مشکل اتصال دارم، ولی خوشحال میشم بیشتر صحبت کنیم. اگه در بحران هستی یا نیاز به کمک فوری داری، لطفاً با متخصص سلامت روان یا خط بحران تماس بگیر."
+    ]
+  }
   
-  // Return a random fallback response
+  const lang = locale.startsWith('fa') ? 'fa' : 'en'
+  const responses = fallbackResponses[lang]
   return responses[Math.floor(Math.random() * responses.length)]
 }
 

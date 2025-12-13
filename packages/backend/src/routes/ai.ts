@@ -7,9 +7,10 @@ const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production'
 export const aiRoutes = new Elysia({ prefix: '/api/ai' })
   .post('/chat', async ({ body, set }) => {
     try {
-      const { message, conversationHistory } = body as {
+      const { message, conversationHistory, locale } = body as {
         message: string
         conversationHistory?: Array<{ role: string; content: string }>
+        locale?: string
       }
 
       if (!message || typeof message !== 'string') {
@@ -20,8 +21,8 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
         }
       }
 
-      // Get AI response from pollinations.ai
-      const result = await streamAIResponse(message, conversationHistory)
+      // Get AI response from pollinations.ai with locale support
+      const result = await streamAIResponse(message, conversationHistory, locale || 'en')
 
       return {
         success: true,
@@ -50,12 +51,13 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
       conversationHistory: t.Optional(t.Array(t.Object({
         role: t.String(),
         content: t.String()
-      })))
+      }))),
+      locale: t.Optional(t.String())
     }),
     detail: {
       tags: ['AI'],
       summary: 'Send a message to the AI counselor',
-      description: 'Sends a message to the AI and receives a response using pollinations.ai'
+      description: 'Sends a message to the AI and receives a response using pollinations.ai with locale support (en/fa)'
     }
   })
   .get('/status', () => {
