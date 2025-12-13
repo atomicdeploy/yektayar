@@ -240,6 +240,14 @@ export function maskPhoneNumber(phoneNumber: string): string {
  * @param phoneNumber Recipient phone number (09xxxxxxxxx format)
  * @param otp OTP code to send
  * @returns Promise<boolean> Success status
+ * 
+ * @note This function uses 'verification-code' as the pattern parameter name.
+ *       Ensure your IPPanel pattern template uses this exact variable name.
+ *       For custom parameter names, use sendPatternSMS() instead.
+ * 
+ * @example
+ * // Pattern template should contain: "Your code: %verification-code%"
+ * await sendOTPSMS('09197103488', '123456');
  */
 export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<boolean> {
   try {
@@ -273,6 +281,9 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
 
     if (isEdgeAPI) {
       // IPPanel Edge API format (default and recommended)
+      // Note: Uses 'verification-code' as the pattern variable name.
+      // This must match the variable name defined in your IPPanel pattern template.
+      // For custom parameter names, use sendPatternSMS() instead.
       const edgeBody: IPPanelEdgePatternRequest = {
         sending_type: 'pattern',
         from_number: config.lineNumber,
