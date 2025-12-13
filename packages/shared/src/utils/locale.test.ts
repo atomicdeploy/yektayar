@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import {
   detectLanguage,
   detectTimezone,
@@ -58,7 +58,7 @@ describe('Locale Detection Utilities', () => {
 
     it('should return default language when navigator is undefined', () => {
       const originalNavigator = global.navigator
-      // @ts-ignore
+      // @ts-expect-error Testing undefined navigator
       delete global.navigator
       
       expect(detectLanguage()).toBe(DEFAULT_LANGUAGE)

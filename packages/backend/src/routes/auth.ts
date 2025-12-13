@@ -1,9 +1,9 @@
 import { Elysia } from 'elysia'
-import { query, getDatabase } from '../services/database'
+import { getDatabase } from '../services/database'
 import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
-import { logger, getBestLanguageMatch, detectTimezone } from '@yektayar/shared'
+import { logger, getBestLanguageMatch } from '@yektayar/shared'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request: _request }) => {

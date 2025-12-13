@@ -93,7 +93,7 @@ export function detectTimezone(): string {
   try {
     // Use Intl.DateTimeFormat to get timezone
     return Intl.DateTimeFormat().resolvedOptions().timeZone
-  } catch (error) {
+  } catch (_error) {
     // Fallback to UTC if detection fails
     return 'UTC'
   }
@@ -127,7 +127,7 @@ export function getTimezoneInfo(timezone?: string): TimezoneInfo {
       offset,
       offsetString
     }
-  } catch (error) {
+  } catch (_error) {
     return {
       timezone: 'UTC',
       offset: 0,
@@ -218,7 +218,7 @@ export function formatDateByLocale(
   
   try {
     return new Intl.DateTimeFormat(locale, options).format(date)
-  } catch (error) {
+  } catch (_error) {
     return date.toISOString()
   }
 }
