@@ -85,10 +85,10 @@ export async function streamAIResponse(
   const debugInfo: AIDebugInfo = IS_DEVELOPMENT ? { timestamp: new Date().toISOString() } : {}
   
   try {
-    // Get system prompt based on locale
+    // Get system prompt based on locale (from i18n translations)
     const systemPrompt = getSystemPrompt(locale)
     
-    // Build conversation context
+    // Build conversation context with system prompt
     const messages: ConversationMessage[] = [
       { role: 'system', content: systemPrompt }
     ]
@@ -108,7 +108,8 @@ export async function streamAIResponse(
       debugInfo.streaming = false
     }
 
-    // Make request to pollinations.ai with streaming support
+    // Make request to pollinations.ai v1/chat/completions endpoint
+    // Uses OpenAI-compatible API format
     const response = await fetch(POLLINATIONS_API_URL, {
       method: 'POST',
       headers: {
@@ -116,8 +117,8 @@ export async function streamAIResponse(
       },
       body: JSON.stringify({
         messages: messages,
-        model: 'openai',
-        stream: false, // For non-streaming responses
+        model: 'openai', // Available: openai, openai-large, mistral, llama
+        stream: false, // For non-streaming responses (use streamAIResponseSSE for streaming)
         seed: Math.floor(Math.random() * 1000000)
       })
     })
@@ -135,7 +136,8 @@ export async function streamAIResponse(
       throw new Error(`Pollinations API error: ${response.status} ${response.statusText}`)
     }
 
-    // Try to parse as JSON first, but fallback to text if it fails
+    // Try to parse response - handle both JSON and plain text responses
+    // Pollinations API may return either format depending on configuration
     const contentType = response.headers.get('content-type')
     let aiResponse = ''
     
@@ -143,10 +145,11 @@ export async function streamAIResponse(
       try {
         const data = await response.json() as any
         
-        // Extract the response text from JSON
+        // Extract the response text from JSON (OpenAI-compatible format)
         if (typeof data === 'string') {
           aiResponse = data
         } else if (data.choices && data.choices[0]?.message?.content) {
+          // Standard OpenAI format: data.choices[0].message.content
           aiResponse = data.choices[0].message.content
         } else if (data.response) {
           aiResponse = data.response
@@ -156,7 +159,7 @@ export async function streamAIResponse(
           aiResponse = JSON.stringify(data)
         }
       } catch (jsonError) {
-        // If JSON parsing fails, try to get text
+        // If JSON parsing fails, fallback to plain text
         if (IS_DEVELOPMENT) {
           debugInfo.error = 'JSON parsing failed, falling back to text'
           debugInfo.errorDetails = jsonError instanceof Error ? jsonError.message : String(jsonError)
@@ -165,7 +168,7 @@ export async function streamAIResponse(
         aiResponse = await response.text()
       }
     } else {
-      // Content is not JSON, get as text directly
+      // Content is plain text, not JSON - read directly
       aiResponse = await response.text()
     }
 
@@ -173,6 +176,7 @@ export async function streamAIResponse(
   } catch (error) {
     logger.error('Error in streamAIResponse:', error)
     
+    // Provide debug info in development mode
     if (IS_DEVELOPMENT) {
       debugInfo.isFallback = true
       debugInfo.error = 'API request failed, using fallback response'
@@ -189,7 +193,8 @@ export async function streamAIResponse(
 
 /**
  * Stream AI response with real SSE from Pollinations.ai
- * This uses actual Server-Sent Events from the API
+ * This uses actual Server-Sent Events from the API for real-time streaming
+ * Used by WebSocket handlers to provide streaming responses to frontend
  */
 export async function* streamAIResponseSSE(
   message: string,
@@ -197,16 +202,19 @@ export async function* streamAIResponseSSE(
   locale: string = 'en'
 ): AsyncGenerator<string, void, unknown> {
   try {
+    // Get locale-specific system prompt from i18n
     const systemPrompt = getSystemPrompt(locale)
     const messages: ConversationMessage[] = [
       { role: 'system', content: systemPrompt }
     ]
 
+    // Add conversation history for context (last 10 messages)
     if (conversationHistory && conversationHistory.length > 0) {
       messages.push(...conversationHistory.slice(-10))
     }
     messages.push({ role: 'user', content: message })
 
+    // Request streaming response from Pollinations API
     const response = await fetch(POLLINATIONS_API_URL, {
       method: 'POST',
       headers: {
@@ -215,7 +223,7 @@ export async function* streamAIResponseSSE(
       body: JSON.stringify({
         messages: messages,
         model: 'openai',
-        stream: true, // Enable streaming
+        stream: true, // Enable SSE streaming
         seed: Math.floor(Math.random() * 1000000)
       })
     })
@@ -224,7 +232,7 @@ export async function* streamAIResponseSSE(
       throw new Error(`Pollinations API error: ${response.status}`)
     }
 
-    // Process SSE stream
+    // Process Server-Sent Events (SSE) stream
     const reader = response.body?.getReader()
     const decoder = new TextDecoder()
     
@@ -234,35 +242,40 @@ export async function* streamAIResponseSSE(
 
     let buffer = ''
     
+    // Read and process SSE chunks as they arrive
     while (true) {
       const { done, value } = await reader.read()
       
       if (done) break
       
+      // Decode incoming bytes and split into lines
       buffer += decoder.decode(value, { stream: true })
       const lines = buffer.split('\n')
-      buffer = lines.pop() || ''
+      buffer = lines.pop() || '' // Keep incomplete line in buffer
       
+      // Process each complete SSE line
       for (const line of lines) {
         if (line.startsWith('data: ')) {
-          const data = line.slice(6)
-          if (data === '[DONE]') continue
+          const data = line.slice(6) // Remove 'data: ' prefix
+          if (data === '[DONE]') continue // SSE completion signal
           
           try {
+            // Parse SSE JSON chunk (OpenAI-compatible format)
             const parsed = JSON.parse(data)
             const content = parsed.choices?.[0]?.delta?.content
             if (content) {
-              yield content
+              yield content // Yield text chunk to caller
             }
           } catch (e) {
-            // Skip malformed JSON
+            // Skip malformed JSON chunks (can happen with SSE)
           }
         }
       }
     }
   } catch (error) {
     logger.error('Error in streamAIResponseSSE:', error)
-    yield generateFallbackResponse(message)
+    // Return locale-aware fallback on error
+    yield generateFallbackResponse(message, locale)
   }
 }
 
