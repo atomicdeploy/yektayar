@@ -3,9 +3,11 @@ package com.yektayar.app;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.provider.Settings;
 
 /**
@@ -149,11 +151,27 @@ public class DeviceInfo {
     
     /**
      * Get DisplayMetrics helper
+     * Uses modern WindowMetrics API for Android 11+ (API 30+)
+     * Falls back to deprecated getDefaultDisplay() for older versions
      */
     private DisplayMetrics getDisplayMetrics() {
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
-        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11 (API 30) and above - use WindowMetrics
+            WindowMetrics windowMetrics = windowManager.getCurrentWindowMetrics();
+            Rect bounds = windowMetrics.getBounds();
+            displayMetrics.widthPixels = bounds.width();
+            displayMetrics.heightPixels = bounds.height();
+            // Get density from resources
+            displayMetrics.density = context.getResources().getDisplayMetrics().density;
+            displayMetrics.densityDpi = context.getResources().getDisplayMetrics().densityDpi;
+        } else {
+            // Android 10 (API 29) and below - use deprecated method
+            windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+        }
+        
         return displayMetrics;
     }
 }

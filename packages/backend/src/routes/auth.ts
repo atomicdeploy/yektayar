@@ -5,6 +5,7 @@ import { createAnonymousSession, validateSessionToken, invalidateSession, linkUs
 import { extractToken } from '../middleware/tokenExtractor'
 import { logger, getBestLanguageMatch, normalizeTimezone, DeviceInfo } from '@yektayar/shared'
 import { getClientIpAddress } from '../utils/ipAddress'
+import { validateDeviceInfo, isValidObjectSize } from '../utils/deviceInfoValidation'
 
 // Define request body types
 interface AcquireSessionBody {
@@ -20,7 +21,23 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       
       // Get device info from body if provided
       const requestBody = body as AcquireSessionBody
-      const deviceInfo = requestBody?.deviceInfo || {}
+      let deviceInfo = requestBody?.deviceInfo || {}
+      
+      // Validate device info size to prevent DoS attacks
+      if (!isValidObjectSize(deviceInfo, 100)) {
+        logger.warn('Device info object too large, rejecting', {
+          size: JSON.stringify(deviceInfo).length
+        })
+        deviceInfo = {}
+      }
+      
+      // Validate and sanitize device info
+      try {
+        deviceInfo = validateDeviceInfo(deviceInfo)
+      } catch (error) {
+        logger.warn('Invalid device info structure:', error)
+        deviceInfo = {}
+      }
       
       // Extract device info from custom headers
       const deviceHeaders = {
