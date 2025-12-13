@@ -268,7 +268,7 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
     try {
       if (config.apiEndpoint) {
         const url = new URL(config.apiEndpoint);
-        isEdgeAPI = url.hostname === 'edge.ippanel.com' && url.protocol === 'https:';
+        isEdgeAPI = url.hostname === 'edge.ippanel.com';
       }
     } catch {
       // Invalid URL format, treat as legacy
