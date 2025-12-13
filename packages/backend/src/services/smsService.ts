@@ -9,8 +9,40 @@
  */
 
 /**
- * FarazSMS pattern-based SMS request body
- * Supports both iranpayamak.com and ippanel.com API formats
+ * IPPanel Edge API pattern-based SMS request body
+ * This is the default and recommended format
+ */
+interface IPPanelEdgePatternRequest {
+  /** Sending type - always "pattern" for pattern-based SMS */
+  sending_type: 'pattern';
+  /** Sender line number (e.g., "+983000505") */
+  from_number: string;
+  /** Pattern code/UID from IPPanel panel */
+  code: string;
+  /** Array of recipient phone numbers in international format */
+  recipients: string[];
+  /** Pattern variables to fill in the template */
+  params: Record<string, string>;
+}
+
+/**
+ * IPPanel Edge API response
+ */
+interface IPPanelEdgeResponse {
+  data: {
+    message_outbox_ids: number[];
+  };
+  meta: {
+    status: boolean;
+    message: string;
+    message_parameters: any[];
+    message_code: string;
+  };
+}
+
+/**
+ * FarazSMS pattern-based SMS request body (Legacy)
+ * Supports iranpayamak.com API formats (for backward compatibility)
  */
 interface FarazSMSPatternRequest {
   /** Pattern UID from FarazSMS panel */
@@ -26,7 +58,7 @@ interface FarazSMSPatternRequest {
 }
 
 /**
- * FarazSMS API response (iranpayamak.com format)
+ * FarazSMS API response (iranpayamak.com format - Legacy)
  */
 interface FarazSMSResponse {
   status: string;
@@ -126,13 +158,14 @@ interface SMSConfig {
 
 /**
  * Get SMS configuration from environment variables
- * Supports both iranpayamak.com and ippanel.com API formats
+ * Defaults to IPPanel Edge API (recommended)
  */
 function getSMSConfig(): SMSConfig {
   const apiKey = process.env.FARAZSMS_API_KEY;
   const patternCode = process.env.FARAZSMS_PATTERN_CODE;
   const lineNumber = process.env.FARAZSMS_LINE_NUMBER;
-  const apiEndpoint = process.env.FARAZSMS_API_ENDPOINT || 'https://api.iranpayamak.com/ws/v1/sms/pattern';
+  // Default to Edge API endpoint (recommended)
+  const apiEndpoint = process.env.FARAZSMS_API_ENDPOINT || 'https://edge.ippanel.com/v1/api/send';
   const authFormat = (process.env.FARAZSMS_AUTH_FORMAT as 'Api-Key' | 'AccessKey') || 'Api-Key';
 
   if (!apiKey) {
@@ -201,7 +234,8 @@ export function maskPhoneNumber(phoneNumber: string): string {
 }
 
 /**
- * Send OTP SMS using FarazSMS pattern-based API
+ * Send OTP SMS using IPPanel Edge API (pattern-based)
+ * Uses Edge API by default, which is the recommended and most reliable endpoint
  * 
  * @param phoneNumber Recipient phone number (09xxxxxxxxx format)
  * @param otp OTP code to send
@@ -217,26 +251,47 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
     // Get configuration
     const config = getSMSConfig();
 
-    // Prepare request body
-    const requestBody: FarazSMSPatternRequest = {
-      code: config.patternCode,
-      attributes: {
-        otp: otp
-      },
-      recipient: phoneNumber,
-      line_number: config.lineNumber,
-      number_format: 'english'
-    };
+    // Convert phone number to international format for Edge API
+    const internationalPhone = '+' + normalizePhoneNumber(phoneNumber);
 
-    // Prepare headers with authentication based on format
-    const headers: Record<string, string> = {
+    // Detect if using Edge API endpoint
+    const isEdgeAPI = config.apiEndpoint?.includes('edge.ippanel.com');
+
+    let requestBody: any;
+    let headers: Record<string, string> = {
       'Content-Type': 'application/json'
     };
-    
-    if (config.authFormat === 'AccessKey') {
-      headers['Authorization'] = `AccessKey ${config.apiKey}`;
+
+    if (isEdgeAPI) {
+      // IPPanel Edge API format (default and recommended)
+      requestBody = {
+        sending_type: 'pattern',
+        from_number: config.lineNumber,
+        code: config.patternCode,
+        recipients: [internationalPhone],
+        params: {
+          'verification-code': otp
+        }
+      };
+      // Edge API uses direct Authorization header with API key
+      headers['Authorization'] = config.apiKey;
     } else {
-      headers['Api-Key'] = config.apiKey;
+      // Legacy format for backward compatibility (iranpayamak.com)
+      requestBody = {
+        code: config.patternCode,
+        attributes: {
+          otp: otp
+        },
+        recipient: phoneNumber,
+        line_number: config.lineNumber,
+        number_format: 'english'
+      };
+      // Legacy API uses Api-Key or AccessKey header
+      if (config.authFormat === 'AccessKey') {
+        headers['Authorization'] = `AccessKey ${config.apiKey}`;
+      } else {
+        headers['Api-Key'] = config.apiKey;
+      }
     }
 
     // Make API request with configurable endpoint and auth format
@@ -249,15 +304,16 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
     // Check if request was successful
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('FarazSMS API error:', {
+      console.error('SMS API error:', {
         status: response.status,
         statusText: response.statusText,
         body: errorText,
-        endpoint: config.apiEndpoint
+        endpoint: config.apiEndpoint,
+        isEdgeAPI
       });
       
       // Provide helpful error messages based on status code
-      let errorMessage = `FarazSMS API request failed: ${response.status} ${response.statusText}`;
+      let errorMessage = `SMS API request failed: ${response.status} ${response.statusText}`;
       if (response.status === 401) {
         errorMessage += ' - Invalid API key. Please check FARAZSMS_API_KEY in your environment variables.';
       } else if (response.status === 400) {
@@ -269,19 +325,39 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
       throw new Error(errorMessage);
     }
 
-    // Parse response
-    const result = await response.json() as FarazSMSResponse;
+    // Parse response based on API type
+    const result = await response.json();
 
-    // Check response status
-    if (result.status !== 'success') {
-      console.error('FarazSMS API returned non-success status:', result);
-      throw new Error(`FarazSMS API returned error: ${result.messages || 'Unknown error'}`);
+    if (isEdgeAPI) {
+      // IPPanel Edge API response format
+      const edgeResult = result as IPPanelEdgeResponse;
+      
+      // Check response status
+      if (!edgeResult.meta?.status) {
+        console.error('IPPanel Edge API returned non-success status:', edgeResult);
+        throw new Error(`IPPanel Edge API returned error: ${edgeResult.meta?.message || 'Unknown error'}`);
+      }
+
+      console.log('SMS sent successfully via Edge API:', {
+        phoneNumber: maskPhoneNumber(phoneNumber),
+        messageIds: edgeResult.data.message_outbox_ids,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      // Legacy API response format
+      const legacyResult = result as FarazSMSResponse;
+      
+      // Check response status
+      if (legacyResult.status !== 'success') {
+        console.error('Legacy API returned non-success status:', legacyResult);
+        throw new Error(`Legacy API returned error: ${legacyResult.messages || 'Unknown error'}`);
+      }
+
+      console.log('SMS sent successfully via Legacy API:', {
+        phoneNumber: maskPhoneNumber(phoneNumber),
+        timestamp: new Date().toISOString()
+      });
     }
-
-    console.log('SMS sent successfully:', {
-      phoneNumber: maskPhoneNumber(phoneNumber),
-      timestamp: new Date().toISOString()
-    });
 
     return true;
   } catch (error) {
@@ -503,28 +579,69 @@ export async function sendSMS(
 
 /**
  * Send pattern-based SMS with generic values type
- * This is the generic version compatible with @aspianet/faraz-sms
+ * Uses IPPanel Edge API by default for best reliability
  * 
  * @param patternCode Pattern UID from FarazSMS panel
  * @param originator Sender line number
  * @param recipient Recipient phone number
  * @param values Pattern variables (generic type)
- * @returns Promise<IFarazSendPatternResult>
- * @see {@link http://docs.ippanel.com/#operation/SendPattern}
+ * @param useEdgeAPI Use Edge API (default: true) or legacy REST API
+ * @returns Promise<IFarazSendPatternResult | IPPanelEdgeResponse>
+ * @see {@link https://edge.ippanel.com/ | IPPanel Edge API}
+ * @see {@link http://docs.ippanel.com/#operation/SendPattern | IPPanel REST API (legacy)}
  */
 export async function sendPatternSMS<T = Record<string, string>>(
   patternCode: string,
   originator: string,
   recipient: string,
-  values: T
-): Promise<IFarazSendPatternResult> {
-  const endpoint = 'http://rest.ippanel.com/v1/messages/patterns/send';
-  return makeAuthenticatedRequest<IFarazSendPatternResult>(endpoint, 'POST', {
-    pattern_code: patternCode,
-    originator,
-    recipient,
-    values
-  });
+  values: T,
+  useEdgeAPI: boolean = true
+): Promise<IFarazSendPatternResult | IPPanelEdgeResponse> {
+  if (useEdgeAPI) {
+    // Use Edge API (default and recommended)
+    const apiKey = getAPIKey();
+    const endpoint = 'https://edge.ippanel.com/v1/api/send';
+    
+    // Convert recipient to international format if needed
+    const internationalRecipient = recipient.startsWith('+') 
+      ? recipient 
+      : '+' + normalizePhoneNumber(recipient);
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': apiKey
+    };
+    
+    const body = {
+      sending_type: 'pattern',
+      from_number: originator,
+      code: patternCode,
+      recipients: [internationalRecipient],
+      params: values as Record<string, string>
+    };
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`IPPanel Edge API error: ${response.status} - ${errorText}`);
+    }
+    
+    return await response.json() as IPPanelEdgeResponse;
+  } else {
+    // Use legacy REST API
+    const endpoint = 'http://rest.ippanel.com/v1/messages/patterns/send';
+    return makeAuthenticatedRequest<IFarazSendPatternResult>(endpoint, 'POST', {
+      pattern_code: patternCode,
+      originator,
+      recipient,
+      values
+    });
+  }
 }
 
 /**
