@@ -1,0 +1,184 @@
+name: Build Windows Desktop App
+
+on:
+  # Only run on manual trigger by default to save resources
+  # Windows desktop builds should be triggered deliberately
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'installer'
+        type: choice
+        options:
+          - installer
+          - portable
+  # Auto-run only on pushes to main/develop that modify desktop-app or admin-panel
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'packages/desktop-app/**'
+      - 'packages/admin-panel/**'
+      - '.github/workflows/build-windows-desktop.yml'
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
+jobs:
+  build-windows-desktop:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Generate icons
+        run: npm run generate:icons
+
+      - name: Build admin panel
+        run: |
+          cd packages/admin-panel
+          npm run build
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL || 'https://api.yektayar.ir' }}
+          VITE_ENVIRONMENT: production
+
+      - name: Build Desktop App Installer
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'installer'
+        run: |
+          cd packages/desktop-app
+          npm run build:electron
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Desktop App Portable
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'portable'
+        run: |
+          cd packages/desktop-app
+          npm run build:electron:dir
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get package version
+        id: package-version
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./packages/desktop-app/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Package version: $VERSION"
+
+      - name: Upload Installer Artifact
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'installer'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-desktop-installer
+          path: packages/desktop-app/dist/*.exe
+          retention-days: 30
+
+      - name: Upload Portable Build
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'portable'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-desktop-portable
+          path: packages/desktop-app/dist/win-unpacked/**/*
+          retention-days: 30
+
+      - name: Get artifact info
+        id: artifact-info
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" != "workflow_dispatch" ] || [ "${{ github.event.inputs.build_type }}" == "installer" ]; then
+            EXE_PATH=$(ls packages/desktop-app/dist/*.exe | head -n 1)
+            if [ -f "$EXE_PATH" ]; then
+              SIZE=$(du -h "$EXE_PATH" | cut -f1)
+              NAME=$(basename "$EXE_PATH")
+              echo "name=$NAME" >> $GITHUB_OUTPUT
+              echo "size=$SIZE" >> $GITHUB_OUTPUT
+              echo "type=installer" >> $GITHUB_OUTPUT
+            fi
+          else
+            PORTABLE_DIR="packages/desktop-app/dist/win-unpacked"
+            if [ -d "$PORTABLE_DIR" ]; then
+              SIZE=$(du -sh "$PORTABLE_DIR" | cut -f1)
+              echo "name=win-unpacked" >> $GITHUB_OUTPUT
+              echo "size=$SIZE" >> $GITHUB_OUTPUT
+              echo "type=portable" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Comment PR with Desktop App
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const artifactName = '${{ steps.artifact-info.outputs.name }}';
+            const artifactSize = '${{ steps.artifact-info.outputs.size }}';
+            const artifactType = '${{ steps.artifact-info.outputs.type }}';
+            const version = '${{ steps.package-version.outputs.version }}';
+
+            const typeLabel = artifactType === 'installer' ? 'Installer (.exe)' : 'Portable (unpacked)';
+
+            const body = `## ✅ Windows Desktop App Built Successfully!
+
+            **Version:** ${version}
+            **Build Type:** ${typeLabel}
+            **Artifact Name:** ${artifactName}
+            **Size:** ${artifactSize}
+
+            Download the artifact from the [Actions tab](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+            ### Installation Notes
+
+            ${artifactType === 'installer' ? `
+            - Run the \`.exe\` installer
+            - Choose installation directory (default: \`C:\\Program Files\\YektaYar Admin\`)
+            - Desktop and Start Menu shortcuts will be created
+            ` : `
+            - Extract the portable build
+            - Run \`YektaYar Admin.exe\` from the extracted folder
+            - No installation required
+            `}
+
+            ### Configuration
+
+            After installation, create a \`.env\` file or \`config.json\` in the installation directory:
+
+            \`\`\`env
+            API_BASE_URL=https://api.yektayar.ir
+            ENVIRONMENT=production
+            \`\`\`
+
+            Or:
+
+            \`\`\`json
+            {
+              "apiBaseUrl": "https://api.yektayar.ir",
+              "environment": "production"
+            }
+            \`\`\`
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
