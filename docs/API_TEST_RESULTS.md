@@ -165,11 +165,11 @@ This document summarizes the test results for various SMS balance and credit end
 Based on these findings, the following functions have been implemented:
 
 ### ✅ Working Functions
-- `getUserCredit()` - Gets credit from IPPanel REST API (WORKING)
+- `getCredit()` - Gets credit from IPPanel REST API (WORKING - recommended)
+- `getUserCredit()` - Legacy function, same as getCredit() (DEPRECATED)
 
 ### ⚠️ Implemented but Non-functional
 - `getAccountBalance()` - IranPayamak balance (API key not valid)
-- `getEdgeCredit()` - IPPanel Edge credit (endpoint not found)
 
 ### 📝 Note
-The `getUserCredit()` function should be used as the primary method for checking account credit/balance with the current API key.
+The `getCredit()` function should be used as the primary method for checking account credit/balance with the current API key.

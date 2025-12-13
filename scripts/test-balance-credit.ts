@@ -3,9 +3,9 @@
  * Balance and Credit Testing Script
  * 
  * Tests SMS account balance and credit retrieval from:
- * - IranPayamak API (account balance)
- * - IPPanel REST API (user credit)
- * - IPPanel Edge API (edge credit)
+ * - IranPayamak API (legacy account balance)
+ * - IPPanel REST API (legacy user credit)
+ * - Default API (current account credit)
  * 
  * Usage:
  *   bun scripts/test-balance-credit.ts [options]
@@ -14,7 +14,7 @@
  *   --all              Test all endpoints (default)
  *   --iranpayamak      Test IranPayamak balance only
  *   --ippanel          Test IPPanel REST credit only
- *   --edge             Test IPPanel Edge credit only
+ *   --edge             Test default credit API only
  *   --help             Show help message
  * 
  * Examples:
@@ -30,7 +30,7 @@
 import {
   getAccountBalance,
   getUserCredit,
-  getEdgeCredit
+  getCredit
 } from '../packages/backend/src/services/smsService';
 
 /**
@@ -121,7 +121,7 @@ function showHelp() {
   console.log('  --all              Test all endpoints (default)');
   console.log('  --iranpayamak      Test IranPayamak balance only');
   console.log('  --ippanel          Test IPPanel REST credit only');
-  console.log('  --edge             Test IPPanel Edge credit only');
+  console.log('  --edge             Test default credit API only');
   console.log('  --help             Show this help message');
   console.log();
   
@@ -139,7 +139,7 @@ function showHelp() {
   console.log('Documentation:');
   console.log('  - IranPayamak Balance: https://docs.iranpayamak.com/account-balance-13717911e0');
   console.log('  - IPPanel Credit: http://docs.ippanel.com/#operation/GetCredit');
-  console.log('  - IPPanel Edge Credit: https://ippanelcom.github.io/Edge-Document/docs/payment/my-credit');
+  console.log('  - Default Credit API: https://ippanelcom.github.io/Edge-Document/docs/payment/my-credit');
   console.log();
   
   process.exit(0);
@@ -222,16 +222,16 @@ async function testIPPanelCredit(): Promise<TestResult> {
 }
 
 /**
- * Test IPPanel Edge API Credit
+ * Test account credit (default API)
  */
 async function testEdgeCredit(): Promise<TestResult> {
-  const testName = 'IPPanel Edge API Credit';
+  const testName = 'Account Credit (Default API)';
   const startTime = Date.now();
   
   try {
     printInfo(`Testing ${testName}...`);
     
-    const result = await getEdgeCredit();
+    const result = await getCredit();
     const duration = Date.now() - startTime;
     
     printSuccess(`${testName} retrieved successfully`);
@@ -241,7 +241,7 @@ async function testEdgeCredit(): Promise<TestResult> {
     return {
       name: testName,
       status: 'success',
-      message: 'Edge credit retrieved successfully',
+      message: 'Credit retrieved successfully',
       duration,
       data: result
     };
