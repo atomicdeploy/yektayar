@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
@@ -114,7 +114,6 @@ function createApplicationMenu() {
         {
           label: 'About',
           click: () => {
-            const { dialog } = require('electron');
             const packageJson = require('../package.json');
             dialog.showMessageBox(mainWindow, {
               type: 'info',
