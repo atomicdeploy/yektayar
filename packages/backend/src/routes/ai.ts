@@ -2,6 +2,8 @@ import { Elysia, t } from 'elysia'
 import { streamAIResponse } from '../services/aiService'
 import { logger } from '@yektayar/shared'
 
+const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production'
+
 export const aiRoutes = new Elysia({ prefix: '/api/ai' })
   .post('/chat', async ({ body, set }) => {
     try {
@@ -19,12 +21,13 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
       }
 
       // Get AI response from pollinations.ai
-      const response = await streamAIResponse(message, conversationHistory)
+      const result = await streamAIResponse(message, conversationHistory)
 
       return {
         success: true,
-        response: response,
-        timestamp: new Date().toISOString()
+        response: result.response,
+        timestamp: new Date().toISOString(),
+        ...(IS_DEVELOPMENT && result.debug ? { debug: result.debug } : {})
       }
     } catch (error) {
       logger.error('AI chat error:', error)
@@ -32,7 +35,13 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
       return {
         success: false,
         error: 'Failed to get AI response',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
+        ...(IS_DEVELOPMENT ? { 
+          debug: { 
+            error: 'Route handler exception',
+            errorDetails: error instanceof Error ? error.stack : String(error)
+          } 
+        } : {})
       }
     }
   }, {

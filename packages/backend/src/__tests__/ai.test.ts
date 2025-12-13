@@ -19,21 +19,27 @@ describe('AI Service - Pollinations Integration', () => {
 
   it('should handle a simple message and return a response', async () => {
     const message = 'Hello, how are you?'
-    const response = await streamAIResponse(message)
+    const result = await streamAIResponse(message)
     
-    expect(response).toBeDefined()
-    expect(typeof response).toBe('string')
-    expect(response.length).toBeGreaterThan(0)
+    expect(result).toBeDefined()
+    expect(result.response).toBeDefined()
+    expect(typeof result.response).toBe('string')
+    expect(result.response.length).toBeGreaterThan(0)
     
     // AI should respond with a greeting or acknowledge the message
-    expect(response.length).toBeGreaterThan(10)
+    expect(result.response.length).toBeGreaterThan(10)
+    
+    // In development, we should have debug info
+    if (process.env.NODE_ENV !== 'production') {
+      expect(result.debug).toBeDefined()
+    }
   }, 30000) // 30 second timeout for API call
 
   it('should handle mental health related queries', async () => {
     const message = 'I am feeling stressed. Can you help me?'
-    const response = await streamAIResponse(message)
+    const result = await streamAIResponse(message)
     
-    expect(response).toBeDefined()
+    expect(result.response).toBeDefined()
     expect(typeof response).toBe('string')
     expect(response.length).toBeGreaterThan(20)
     
@@ -48,9 +54,9 @@ describe('AI Service - Pollinations Integration', () => {
     ]
     
     const message = 'What is my name?'
-    const response = await streamAIResponse(message, conversationHistory)
+    const result = await streamAIResponse(message, conversationHistory)
     
-    expect(response).toBeDefined()
+    expect(result.response).toBeDefined()
     expect(typeof response).toBe('string')
     expect(response.length).toBeGreaterThan(0)
     
@@ -62,9 +68,9 @@ describe('AI Service - Pollinations Integration', () => {
     const message = ''
     
     try {
-      const response = await streamAIResponse(message)
+      const result = await streamAIResponse(message)
       // Should either return a fallback or handle empty message
-      expect(response).toBeDefined()
+      expect(result.response).toBeDefined()
     } catch (error) {
       // If it throws, that's also acceptable behavior
       expect(error).toBeDefined()
@@ -74,9 +80,9 @@ describe('AI Service - Pollinations Integration', () => {
   it('should return fallback response on API failure', async () => {
     // This tests the fallback mechanism
     const message = 'Test message'
-    const response = await streamAIResponse(message)
+    const result = await streamAIResponse(message)
     
-    expect(response).toBeDefined()
+    expect(result.response).toBeDefined()
     expect(typeof response).toBe('string')
     
     // Even if API fails, we should get a fallback response
@@ -100,14 +106,14 @@ describe('AI Service Health Check', () => {
 describe('AI Service Response Quality', () => {
   it('should provide appropriate responses for anxiety', async () => {
     const message = 'I have been feeling very anxious lately.'
-    const response = await streamAIResponse(message)
+    const result = await streamAIResponse(message)
     
-    expect(response).toBeDefined()
+    expect(result.response).toBeDefined()
     expect(response.length).toBeGreaterThan(30)
     
     // Check that response is supportive (contains common supportive words)
     const supportiveWords = ['understand', 'help', 'support', 'anxiety', 'feel', 'cope', 'manage']
-    const lowerResponse = response.toLowerCase()
+    const lowerResponse = result.response.toLowerCase()
     const hasSupportiveContent = supportiveWords.some(word => lowerResponse.includes(word))
     
     // The response should show empathy
@@ -116,14 +122,14 @@ describe('AI Service Response Quality', () => {
 
   it('should provide appropriate responses for stress management', async () => {
     const message = 'What are some ways to manage stress?'
-    const response = await streamAIResponse(message)
+    const result = await streamAIResponse(message)
     
-    expect(response).toBeDefined()
+    expect(result.response).toBeDefined()
     expect(response.length).toBeGreaterThan(30)
     
     // Response should contain practical advice
     const practicalWords = ['stress', 'relaxation', 'exercise', 'breathing', 'technique', 'help', 'manage', 'practice']
-    const lowerResponse = response.toLowerCase()
+    const lowerResponse = result.response.toLowerCase()
     const hasPracticalContent = practicalWords.some(word => lowerResponse.includes(word))
     
     expect(hasPracticalContent).toBe(true)
@@ -131,15 +137,15 @@ describe('AI Service Response Quality', () => {
 
   it('should maintain professional tone', async () => {
     const message = 'Can you give me some advice?'
-    const response = await streamAIResponse(message)
+    const result = await streamAIResponse(message)
     
-    expect(response).toBeDefined()
+    expect(result.response).toBeDefined()
     expect(response.length).toBeGreaterThan(20)
     
     // Response should be professional and supportive
     // It should not contain inappropriate language
     const inappropriateWords = ['stupid', 'dumb', 'idiot', 'loser']
-    const lowerResponse = response.toLowerCase()
+    const lowerResponse = result.response.toLowerCase()
     const hasInappropriateContent = inappropriateWords.some(word => lowerResponse.includes(word))
     
     expect(hasInappropriateContent).toBe(false)

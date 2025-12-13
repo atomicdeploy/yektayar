@@ -6,10 +6,23 @@
 import { logger } from '@yektayar/shared'
 
 const POLLINATIONS_API_URL = 'https://text.pollinations.ai'
+const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production'
 
 interface ConversationMessage {
   role: string
   content: string
+}
+
+export interface AIDebugInfo {
+  error?: string
+  errorDetails?: any
+  apiUrl?: string
+  requestMethod?: string
+  responseStatus?: number
+  responseHeaders?: Record<string, string>
+  contentType?: string
+  isFallback?: boolean
+  timestamp?: string
 }
 
 /**
@@ -43,12 +56,14 @@ Remember: You are here to support, guide, and encourage users on their mental we
  * Stream AI response from pollinations.ai
  * @param message User's message
  * @param conversationHistory Previous conversation context (optional)
- * @returns AI response as a string
+ * @returns Object with AI response and optional debug info
  */
 export async function streamAIResponse(
   message: string,
   conversationHistory?: ConversationMessage[]
-): Promise<string> {
+): Promise<{ response: string; debug?: AIDebugInfo }> {
+  const debugInfo: AIDebugInfo = IS_DEVELOPMENT ? { timestamp: new Date().toISOString() } : {}
+  
   try {
     // Build conversation context
     const messages: ConversationMessage[] = [
@@ -79,6 +94,11 @@ export async function streamAIResponse(
     
     prompt += `User: ${message}\nAssistant:`
 
+    if (IS_DEVELOPMENT) {
+      debugInfo.apiUrl = POLLINATIONS_API_URL
+      debugInfo.requestMethod = 'POST'
+    }
+
     // Make request to pollinations.ai
     const response = await fetch(POLLINATIONS_API_URL, {
       method: 'POST',
@@ -96,14 +116,33 @@ export async function streamAIResponse(
       })
     })
 
+    if (IS_DEVELOPMENT) {
+      debugInfo.responseStatus = response.status
+      debugInfo.contentType = response.headers.get('content-type') || undefined
+      debugInfo.responseHeaders = Object.fromEntries(response.headers.entries())
+    }
+
     if (!response.ok) {
       // If the JSON API doesn't work, try the simple text API
-      const simpleResponse = await fetch(`${POLLINATIONS_API_URL}?prompt=${encodeURIComponent(prompt)}`)
+      if (IS_DEVELOPMENT) {
+        debugInfo.error = `POST request failed with status ${response.status}, trying GET fallback`
+      }
+      
+      const simpleUrl = `${POLLINATIONS_API_URL}?prompt=${encodeURIComponent(prompt)}`
+      const simpleResponse = await fetch(simpleUrl)
+      
+      if (IS_DEVELOPMENT) {
+        debugInfo.apiUrl = simpleUrl
+        debugInfo.requestMethod = 'GET'
+        debugInfo.responseStatus = simpleResponse.status
+        debugInfo.contentType = simpleResponse.headers.get('content-type') || undefined
+      }
+      
       if (!simpleResponse.ok) {
         throw new Error(`Pollinations API error: ${simpleResponse.status} ${simpleResponse.statusText}`)
       }
       const text = await simpleResponse.text()
-      return text.trim()
+      return { response: text.trim(), debug: IS_DEVELOPMENT ? debugInfo : undefined }
     }
 
     // Try to parse as JSON first, but fallback to text if it fails
@@ -128,6 +167,10 @@ export async function streamAIResponse(
         }
       } catch (jsonError) {
         // If JSON parsing fails, try to get text
+        if (IS_DEVELOPMENT) {
+          debugInfo.error = 'JSON parsing failed, falling back to text'
+          debugInfo.errorDetails = jsonError instanceof Error ? jsonError.message : String(jsonError)
+        }
         logger.warn('Failed to parse JSON response, falling back to text')
         aiResponse = await response.text()
       }
@@ -136,12 +179,21 @@ export async function streamAIResponse(
       aiResponse = await response.text()
     }
 
-    return aiResponse.trim()
+    return { response: aiResponse.trim(), debug: IS_DEVELOPMENT ? debugInfo : undefined }
   } catch (error) {
     logger.error('Error in streamAIResponse:', error)
     
+    if (IS_DEVELOPMENT) {
+      debugInfo.isFallback = true
+      debugInfo.error = 'API request failed, using fallback response'
+      debugInfo.errorDetails = error instanceof Error ? error.message : String(error)
+    }
+    
     // Provide a fallback response
-    return generateFallbackResponse(message)
+    return { 
+      response: generateFallbackResponse(message), 
+      debug: IS_DEVELOPMENT ? debugInfo : undefined 
+    }
   }
 }
 
@@ -155,7 +207,8 @@ export async function* streamAIResponseChunks(
 ): AsyncGenerator<string, void, unknown> {
   try {
     // Get the full response
-    const fullResponse = await streamAIResponse(message, conversationHistory)
+    const result = await streamAIResponse(message, conversationHistory)
+    const fullResponse = result.response
     
     // Split into words for streaming effect
     const words = fullResponse.split(' ')
