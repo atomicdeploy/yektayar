@@ -31,6 +31,8 @@
     "test:websocket": "node tests/scripts/test-websocket.mjs",
     "socketio:test": "node scripts/socketio-tui.js",
     "ai:test": "node scripts/pollination-ai-tui.js",
+    "sms:tui": "node scripts/sms-tui.js",
+    "sms:cli": "node scripts/sms-cli.js",
     "db:cli": "bash scripts/db-cli.sh",
     "db:setup": "bash scripts/setup-postgresql.sh",
     "db:init": "bash scripts/db-health.sh init",

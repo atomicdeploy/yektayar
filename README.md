@@ -254,11 +254,29 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 
-#### Testing
+#### Testing & Tools
 - **[Socket.IO Test Script](tests/scripts/test-socketio.sh)** - Interactive TUI for testing Socket.IO functionality
   ```bash
   ./tests/scripts/test-socketio.sh
   ```
+
+- **SMS Management Tools** - CLI and TUI for SMS operations
+  ```bash
+  # Interactive TUI for SMS management
+  npm run sms:tui
+  
+  # Non-interactive CLI for automation
+  npm run sms:cli -- help
+  npm run sms:cli -- balance
+  npm run sms:cli -- otp --to 09121234567
+  ```
+  Features:
+  - Get credit balance (IPPanel/IranPayamak)
+  - Send single SMS
+  - Send pattern-based OTP
+  - Send Voice OTP (VOTP)
+  - Fetch inbox messages
+  - Send sample/simple SMS (bulk support)
 
 ---
 
@@ -289,6 +307,10 @@ This mono repo addresses all requirements from the issue:
 - `npm run test` - Test all packages
 - `npm run clean` - Clean all build artifacts
 - `npm run db:cli` - Connect to database using pgcli or psql
+- `npm run sms:tui` - Interactive SMS management TUI
+- `npm run sms:cli -- <command>` - Non-interactive SMS CLI
+- `npm run socketio:test` - Socket.IO testing TUI
+- `npm run ai:test` - AI chatbot testing TUI
 
 ### Package-specific Scripts
 - `npm run dev:backend` - Backend only
