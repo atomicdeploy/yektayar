@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/admin-panel/desktop-app"
   ],
   "scripts": {
     "postinstall": "npm run build -w @yektayar/shared && node scripts/check-requirements.js",
@@ -15,10 +16,12 @@
     "dev:backend": "npm run dev -w @yektayar/backend",
     "dev:admin": "npm run dev -w @yektayar/admin-panel",
     "dev:mobile": "npm run dev -w @yektayar/mobile-app",
+    "dev:desktop": "npm run dev -w @yektayar/desktop-app",
     "build": "npm run build --workspaces --if-present",
     "build:backend": "npm run build -w @yektayar/backend",
     "build:admin": "npm run build -w @yektayar/admin-panel",
     "build:mobile": "npm run build -w @yektayar/mobile-app",
+    "build:desktop": "npm run build -w @yektayar/desktop-app",
     "lint": "eslint packages --ext .ts,.js,.vue && npm run lint --workspaces --if-present",
     "lint:fix": "eslint packages --ext .ts,.js,.vue --fix && npm run lint --workspaces --if-present",
     "validate:i18n": "node scripts/validate-i18n-keys.mjs",
