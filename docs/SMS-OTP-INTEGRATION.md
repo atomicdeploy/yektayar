@@ -1,32 +1,45 @@
 # SMS OTP Integration Guide
 
-This document describes the SMS OTP integration using FarazSMS provider for user authentication.
+This document describes the SMS OTP integration using FarazSMS provider (IPPanel Edge API) for user authentication.
 
 ## Overview
 
-The YektaYar platform uses SMS OTP (One-Time Password) for secure user authentication. The implementation uses FarazSMS (iranpayamak.com) as the SMS provider with pattern-based messages for fast delivery.
+The YektaYar platform uses SMS OTP (One-Time Password) for secure user authentication. The implementation uses **FarazSMS provider**, which operates on **IPPanel Edge API** infrastructure, with pattern-based messages for fast and reliable delivery.
+
+### Provider Information
+- **Provider:** FarazSMS (powered by IPPanel)
+- **Primary API:** IPPanel Edge API (`https://edge.ippanel.com`)
+- **REST API v1:** api2.ippanel.com (legacy AutoHotkey compatibility)
+- **Legacy Support:** IranPayamak API (still supported for backward compatibility)
+- **Default Endpoint:** `https://edge.ippanel.com/v1/api/send`
+
+**Note:** FarazSMS and IPPanel are the same service provider with different branding. All IPPanel APIs work with FarazSMS credentials.
 
 ## Features
 
 - ✅ Pattern-based SMS for fast OTP delivery (typically < 5 seconds)
+- ✅ **IPPanel Edge API integration (default, recommended)**
+- ✅ Legacy API support for backward compatibility
 - ✅ OTP generation with cryptographically secure random numbers
 - ✅ Rate limiting to prevent abuse (60 seconds between requests)
 - ✅ OTP expiration (5 minutes validity)
 - ✅ Maximum verification attempts (3 attempts)
 - ✅ Automatic cleanup of expired OTPs
 - ✅ Phone number validation (Iranian format)
-- ✅ CLI testing tool
+- ✅ CLI testing tools
 
 ## Architecture
 
 ### Services
 
 #### SMS Service (`services/smsService.ts`)
-Handles communication with FarazSMS API:
-- Pattern-based SMS sending
-- Phone number validation
+Handles communication with IPPanel Edge API and legacy APIs:
+- **Edge API pattern-based SMS sending (default)**
+- Legacy API support for backward compatibility
+- Phone number validation and normalization
 - Configuration management
 - Error handling and logging
+- Automatic endpoint detection
 
 #### OTP Service (`services/otpService.ts`)
 Manages OTP lifecycle:
@@ -108,43 +121,47 @@ Content-Type: application/json
 Add the following to your `.env` file:
 
 ```bash
-# FarazSMS Configuration (Required)
+# IPPanel/FarazSMS Configuration (Required)
 FARAZSMS_API_KEY=your_api_key_here
-FARAZSMS_PATTERN_CODE=your_pattern_uid
-FARAZSMS_LINE_NUMBER=your_line_number
+FARAZSMS_PATTERN_CODE=your_pattern_code
+FARAZSMS_LINE_NUMBER=+983000505
 
 # Advanced Configuration (Optional)
-# FARAZSMS_API_ENDPOINT=https://api.iranpayamak.com/ws/v1/sms/pattern
-# FARAZSMS_AUTH_FORMAT=Api-Key
+# FARAZSMS_API_ENDPOINT=https://edge.ippanel.com/v1/api/send  # Default (recommended)
+# FARAZSMS_AUTH_FORMAT=Api-Key  # Only for legacy endpoints
 ```
 
 **Advanced Options:**
-- `FARAZSMS_API_ENDPOINT`: Custom API endpoint (supports both iranpayamak.com and ippanel.com formats)
-- `FARAZSMS_AUTH_FORMAT`: Authentication header format (`Api-Key` or `AccessKey`)
+- `FARAZSMS_API_ENDPOINT`: Custom API endpoint (default: `https://edge.ippanel.com/v1/api/send`)
+  - **Edge API (default):** `https://edge.ippanel.com/v1/api/send` ✅ Recommended
+  - **Legacy REST API:** `http://rest.ippanel.com/v1/messages/patterns/send`
+  - **Legacy IranPayamak:** `https://api.iranpayamak.com/ws/v1/sms/pattern`
+- `FARAZSMS_AUTH_FORMAT`: Authentication header format for legacy endpoints only (`Api-Key` or `AccessKey`)
 
-**Note:** The implementation supports both FarazSMS API formats for maximum compatibility.
+**Note:** The implementation automatically detects the API endpoint and uses the appropriate format (Edge API or legacy).
 
-### FarazSMS Setup
+### IPPanel Setup
 
 1. **Register an Account**
-   - Go to [FarazSMS](https://farazsms.com/)
+   - Go to [IPPanel](https://ippanel.com/) or [FarazSMS](https://farazsms.com/)
    - Create an account and verify your identity
 
 2. **Get API Key**
-   - Login to [FarazSMS Panel](https://panel.farazsms.com/)
+   - Login to [IPPanel Panel](https://ippanel.com/) or [FarazSMS Panel](https://panel.farazsms.com/)
    - Navigate to API Settings
    - Copy your API key
 
 3. **Create OTP Pattern**
    - Go to "Pattern-Based SMS" section
    - Create a new pattern for OTP
-   - Example Persian: `کد تایید شما: %otp%`
-   - Example English: `Your verification code is: %otp%`
+   - Example Persian: `کد تایید شما: %verification-code%`
+   - Example English: `Your verification code is: %verification-code%`
+   - **Important:** Use `verification-code` as the variable name for Edge API compatibility
    - Submit for approval (usually approved within hours)
-   - Once approved, copy the Pattern UID
+   - Once approved, copy the Pattern Code/UID
 
 4. **Get Line Number**
-   - Your assigned line number is shown in the panel
+   - Your assigned line number is shown in the panel (e.g., `+983000505`)
    - Use this as `FARAZSMS_LINE_NUMBER`
 
 ### Using manage-env.sh
@@ -152,14 +169,14 @@ FARAZSMS_LINE_NUMBER=your_line_number
 You can use the environment management script to set these values:
 
 ```bash
-# Set FarazSMS API Key
+# Set IPPanel/FarazSMS API Key
 ./scripts/manage-env.sh set FARAZSMS_API_KEY "your_api_key" --force
 
 # Set Pattern Code
-./scripts/manage-env.sh set FARAZSMS_PATTERN_CODE "your_pattern_uid" --force
+./scripts/manage-env.sh set FARAZSMS_PATTERN_CODE "your_pattern_code" --force
 
 # Set Line Number
-./scripts/manage-env.sh set FARAZSMS_LINE_NUMBER "50002191307530" --force
+./scripts/manage-env.sh set FARAZSMS_LINE_NUMBER "+983000505" --force
 
 # Validate configuration
 ./scripts/manage-env.sh validate
