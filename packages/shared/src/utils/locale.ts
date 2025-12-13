@@ -109,11 +109,17 @@ export function getTimezoneInfo(timezone?: string): TimezoneInfo {
   const tz = timezone || detectTimezone()
   
   try {
-    // Get current date for offset calculation
+    // Get current date
     const now = new Date()
     
-    // Calculate offset in minutes
-    const offset = -now.getTimezoneOffset()
+    // Calculate offset for the specific timezone using Intl API
+    // Get UTC time
+    const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }))
+    // Get local time in the specified timezone
+    const tzDate = new Date(now.toLocaleString('en-US', { timeZone: tz }))
+    
+    // Calculate offset in minutes (timezone time - UTC time)
+    const offset = Math.round((tzDate.getTime() - utcDate.getTime()) / (1000 * 60))
     
     // Format offset as string (e.g., '+03:30', '-05:00')
     const sign = offset >= 0 ? '+' : '-'

@@ -123,9 +123,22 @@ describe('Locale Detection Utilities', () => {
       expect(info.offsetString).toMatch(/^[+-]\d{2}:\d{2}$/)
     })
 
-    it('should accept custom timezone', () => {
-      const info = getTimezoneInfo('Asia/Tehran')
-      expect(info.timezone).toBe('Asia/Tehran')
+    it('should accept custom timezone and calculate correct offset', () => {
+      const tehranInfo = getTimezoneInfo('Asia/Tehran')
+      expect(tehranInfo.timezone).toBe('Asia/Tehran')
+      expect(typeof tehranInfo.offset).toBe('number')
+      expect(tehranInfo.offsetString).toMatch(/^[+-]\d{2}:\d{2}$/)
+      
+      const nycInfo = getTimezoneInfo('America/New_York')
+      expect(nycInfo.timezone).toBe('America/New_York')
+      expect(typeof nycInfo.offset).toBe('number')
+      expect(nycInfo.offsetString).toMatch(/^[+-]\d{2}:\d{2}$/)
+      
+      // UTC should have zero offset
+      const utcInfo = getTimezoneInfo('UTC')
+      expect(utcInfo.timezone).toBe('UTC')
+      expect(utcInfo.offset).toBe(0)
+      expect(utcInfo.offsetString).toBe('+00:00')
     })
   })
 

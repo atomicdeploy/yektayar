@@ -370,14 +370,18 @@ npm test -- locale.test.ts
 - Language detection from browser settings
 - Fallback to default language
 - Timezone detection using Intl API
+- Timezone offset calculation for specific timezones
 - Accept-Language header parsing
 - Language quality score prioritization
 - Date formatting by locale
+- Language and timezone validation
+- Safe normalization functions
 - Edge cases and error handling
 
 **Test Results:**
-- ✅ 23 tests passing
+- ✅ 30 tests passing
 - ✅ All detection scenarios covered
+- ✅ Validation functions tested
 - ✅ Error handling validated
 
 ## Browser Compatibility
