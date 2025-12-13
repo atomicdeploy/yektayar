@@ -22,11 +22,14 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 **Development & Setup:**
 - **[Getting Started](guides/GETTING-STARTED.md)** - Complete developer onboarding
 - **[Development Guide](guides/DEVELOPMENT.md)** - Detailed development practices and environment setup
+- **[Installation Guide](guides/INSTALLATION.md)** - Complete platform installation guide
 - **[Quick Start](guides/QUICK-START.md)** - Fast setup for the current monorepo
 - **[Quick Reference](guides/QUICK-REFERENCE.md)** - Essential code snippets and daily checklist
 - **[Setup Guide](guides/SETUP.md)** - Complete setup instructions
+- **[Visual Testing Guide](guides/VISUAL-TESTING-GUIDE.md)** - Guide for testing UI changes
 
 **Configuration:**
+- **[API Base URL Configuration](guides/API-BASE-URL.md)** - API endpoint configuration
 - **[Environment Configuration](guides/ENV-GUIDE.md)** - Environment variables and configuration
 - **[Bun vs NPM](guides/BUN-VS-NPM.md)** - Understanding runtime choices
 - **[Database Structure](guides/DATABASE-STRUCTURE.md)** - Database schema and relationships
@@ -49,8 +52,13 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - **[Health Check Implementation](implementation/HEALTH-CHECK-IMPLEMENTATION.md)** - Health endpoints
 - **[Hero Image Preloading](implementation/HERO-IMAGE-PRELOADING-SUMMARY.md)** - Image optimization
 - **[Icon Implementation](implementation/ICON-IMPLEMENTATION.md)** - Icons and logos
+- **[Installation Report](implementation/INSTALLATION-REPORT.md)** - Installation implementation report
+- **[Language & Timezone Detection](implementation/LANGUAGE-TIMEZONE-DETECTION.md)** - Automatic locale detection
 - **[Linting & Testing](implementation/LINTING-TESTING-SUMMARY.md)** - Code quality tools
+- **[Modal Styling Fix](implementation/MODAL-STYLING-FIX-SUMMARY.md)** - Modal styling and dark mode
 - **[OverlayScrollbars](implementation/OVERLAYSCROLLBARS-IMPLEMENTATION.md)** - Custom scrollbars
+- **[Refactoring Summary](implementation/REFACTORING-SUMMARY.md)** - API client refactoring
+- **[Security Summary](implementation/SECURITY-SUMMARY.md)** - Security scan results
 - **[Speech Recognition](implementation/SPEECH-RECOGNITION-IMPLEMENTATION.md)** - Voice input
 - **[Token Extraction](implementation/IMPLEMENTATION-TOKEN-EXTRACTION.md)** - Auth token handling
 - **[WebSocket Implementation](implementation/WEBSOCKET-IMPLEMENTATION-SUMMARY.md)** - Real-time communication
@@ -75,7 +83,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - **[Fix Summary](troubleshooting/FIX-SUMMARY.md)** - Bun double-listen issue
 - **[Stop Fix Summary](troubleshooting/STOP-FIX-SUMMARY.md)** - Dev runner stop issue
 - **[Solution](troubleshooting/SOLUTION.md)** - Database health check fix
-- **[Solutions](troubleshooting/solutions.md)** - Various solutions
+- **[Solutions](troubleshooting/SOLUTIONS.md)** - Various solutions
 
 **Debugging & Investigation:**
 - **[Database Health Troubleshooting](troubleshooting/DATABASE-HEALTH-TROUBLESHOOTING.md)** - DB health issues
@@ -154,6 +162,7 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 
 **Focus on:**
 - [Quick Start](guides/QUICK-START.md) - Get running quickly
+- [Language & Timezone Detection](implementation/LANGUAGE-TIMEZONE-DETECTION.md) - Locale detection
 - [Socket.IO Guide](api/SOCKETIO-GUIDE.md) - Real-time features
 - [Session Quick Start](api/SESSION-QUICK-START.md) - Authentication
 - [OverlayScrollbars Guide](implementation/OVERLAYSCROLLBARS.md) - UI components
@@ -193,4 +202,4 @@ See [Implementation Roadmap](../ROADMAP.md) for project planning and progress.
 
 ---
 
-**Last Updated:** 2025-12-02
+**Last Updated:** 2025-12-13

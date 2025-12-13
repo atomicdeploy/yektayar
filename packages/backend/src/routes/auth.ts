@@ -1,9 +1,9 @@
 import { Elysia } from 'elysia'
-import { query, getDatabase } from '../services/database'
+import { getDatabase } from '../services/database'
 import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
-import { logger } from '@yektayar/shared'
+import { logger, getBestLanguageMatch, normalizeTimezone } from '@yektayar/shared'
 import { getClientIpAddress } from '../utils/ipAddress'
 
 // Define request body types
@@ -64,9 +64,19 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         mergedDeviceInfo.languages = mergedDeviceInfo.languages.split(',').map((l: string) => l.trim())
       }
       
+      // Detect language from Accept-Language header
+      const acceptLanguage = headers['accept-language'] || ''
+      const detectedLanguage = acceptLanguage ? getBestLanguageMatch(acceptLanguage) : 'fa'
+      
+      // Client can send timezone in a custom header - validate it
+      const clientTimezone = headers['x-timezone'] || 'UTC'
+      const validatedTimezone = normalizeTimezone(clientTimezone)
+      
       const metadata = {
         userAgent,
         ip,
+        language: detectedLanguage,
+        timezone: validatedTimezone,
         deviceInfo: mergedDeviceInfo,
         requestHeaders: {
           platform: headers['sec-ch-ua-platform'] || 'unknown',
@@ -80,7 +90,9 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         success: true,
         data: {
           token: session.token,
-          expiresAt: session.expiresAt.toISOString()
+          expiresAt: session.expiresAt.toISOString(),
+          language: detectedLanguage,
+          timezone: validatedTimezone
         }
       }
     } catch (error) {
@@ -127,7 +139,9 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
           token: session.token,
           userId: session.userId,
           isLoggedIn: session.isLoggedIn,
-          expiresAt: session.expiresAt.toISOString()
+          expiresAt: session.expiresAt.toISOString(),
+          language: session.metadata?.language || 'fa',
+          timezone: session.metadata?.timezone || 'UTC'
         }
       }
     } catch (error) {
