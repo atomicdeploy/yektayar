@@ -72,6 +72,32 @@ export default {
     no_users: 'کاربری یافت نشد',
   },
   
+  // Pages
+  pages_page: {
+    title: 'مدیریت صفحات',
+    subtitle: 'مشاهده و ویرایش محتوای صفحات',
+    add_page: 'صفحه جدید',
+    edit_page: 'ویرایش صفحه',
+    create_page: 'ایجاد صفحه جدید',
+    page_title: 'عنوان',
+    slug: 'Slug',
+    content: 'محتوا (Markdown)',
+    created_at: 'تاریخ ایجاد',
+    updated_at: 'تاریخ بروزرسانی',
+    actions: 'عملیات',
+    loading: 'در حال بارگذاری صفحات...',
+    no_pages: 'صفحه‌ای وجود ندارد',
+    no_pages_message: 'برای شروع یک صفحه جدید ایجاد کنید',
+    title_placeholder: 'عنوان صفحه',
+    slug_placeholder: 'about-us',
+    slug_hint: 'URL slug (فقط حروف انگلیسی، اعداد و dash)',
+    content_placeholder: '# عنوان\n\nمحتوای صفحه...',
+    cancel: 'انصراف',
+    save: 'ذخیره',
+    edit: 'ویرایش',
+    delete: 'حذف',
+  },
+  
   // Roles
   roles: {
     admin: 'مدیر',

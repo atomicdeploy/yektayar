@@ -72,6 +72,32 @@ export default {
     no_users: 'No users found',
   },
   
+  // Pages
+  pages_page: {
+    title: 'Pages Management',
+    subtitle: 'View and edit page content',
+    add_page: 'New Page',
+    edit_page: 'Edit Page',
+    create_page: 'Create New Page',
+    page_title: 'Title',
+    slug: 'Slug',
+    content: 'Content (Markdown)',
+    created_at: 'Created At',
+    updated_at: 'Updated At',
+    actions: 'Actions',
+    loading: 'Loading pages...',
+    no_pages: 'No pages found',
+    no_pages_message: 'Create your first page to get started',
+    title_placeholder: 'Page title',
+    slug_placeholder: 'about-us',
+    slug_hint: 'URL slug (letters, numbers, and dashes only)',
+    content_placeholder: '# Title\n\nPage content...',
+    cancel: 'Cancel',
+    save: 'Save',
+    edit: 'Edit',
+    delete: 'Delete',
+  },
+  
   // Roles
   roles: {
     admin: 'Admin',
