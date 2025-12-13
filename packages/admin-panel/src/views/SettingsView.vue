@@ -105,7 +105,7 @@
               target="_blank"
               class="info-link"
             >
-              <ArrowTopRightOnSquareIcon class="w-4 h-4 ml-4" />
+              <ArrowTopRightOnSquareIcon class="w-4 h-4 ms-1" />
               مشاهده در نقشه
             </a>
           </div>
@@ -121,12 +121,12 @@
             <LoadingSpinner size="32px" class="text-primary-500 mx-auto" />
           </div>
 
-          <div v-else-if="tickets.length === 0" class="empty-state p-20-40">
+          <div v-else-if="tickets.length === 0" class="empty-state py-10 px-5">
             <ChatBubbleLeftRightIcon class="w-12 h-12 text-gray-400" />
-            <p class="mt-8">تیکتی وجود ندارد</p>
+            <p class="mt-2">تیکتی وجود ندارد</p>
           </div>
 
-          <div v-else class="flex-column gap-12">
+          <div v-else class="flex flex-col gap-3">
             <div 
               v-for="ticket in tickets.slice(0, 5)" 
               :key="ticket.id"
@@ -167,12 +167,12 @@
             <LoadingSpinner size="32px" class="text-primary-500 mx-auto" />
           </div>
 
-          <div v-else-if="recentPages.length === 0" class="empty-state p-20-40">
+          <div v-else-if="recentPages.length === 0" class="empty-state py-10 px-5">
             <DocumentTextIcon class="w-12 h-12 text-gray-400" />
-            <p class="mt-8">صفحه‌ای وجود ندارد</p>
+            <p class="mt-2">صفحه‌ای وجود ندارد</p>
           </div>
 
-          <div v-else class="flex-column gap-12">
+          <div v-else class="flex flex-col gap-3">
             <router-link 
               v-for="page in recentPages.slice(0, 5)" 
               :key="page.id"
@@ -188,7 +188,7 @@
     </div>
 
     <!-- Save Button -->
-    <div class="mt-24">
+    <div class="mt-6">
       <button
         @click="saveSettings"
         :disabled="saving"

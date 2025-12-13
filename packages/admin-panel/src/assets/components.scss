@@ -796,37 +796,7 @@
     flex-shrink: 0;
   }
 
-  /* Layout utility classes */
-  .flex-column {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .flex-row {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .items-center {
-    align-items: center;
-  }
-
-  .items-start {
-    align-items: flex-start;
-  }
-
-  .justify-between {
-    justify-content: space-between;
-  }
-
-  .gap-12 {
-    gap: 12px;
-  }
-
-  .gap-16 {
-    gap: 16px;
-  }
-
+  /* Grid layout utilities specific to this app */
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -840,25 +810,9 @@
     gap: 24px;
   }
 
-  /* Text utility classes */
+  /* Text utility classes not in Tailwind */
   .text-mono {
     font-family: var(--font-mono);
-  }
-
-  .text-xs {
-    font-size: 12px;
-  }
-
-  .text-sm {
-    font-size: 13px;
-  }
-
-  .text-base {
-    font-size: 14px;
-  }
-
-  .font-semibold {
-    font-weight: 600;
   }
 
   .text-primary {
@@ -875,52 +829,6 @@
 
   .text-blue {
     color: rgb(59, 130, 246);
-  }
-
-  /* Spacing utility classes */
-  .mt-4 {
-    margin-top: 4px;
-  }
-
-  .mt-8 {
-    margin-top: 8px;
-  }
-
-  .mt-24 {
-    margin-top: 24px;
-  }
-
-  .mb-0 {
-    margin-bottom: 0;
-  }
-
-  .mb-8 {
-    margin-bottom: 8px;
-  }
-
-  .mb-24 {
-    margin-bottom: 24px;
-  }
-
-  .ml-4 {
-    margin-left: 4px;
-  }
-
-  .p-12 {
-    padding: 12px;
-  }
-
-  .p-20-40 {
-    padding: 40px 20px;
-  }
-
-  /* Border and background utilities */
-  .rounded-8 {
-    border-radius: 8px;
-  }
-
-  .bg-secondary {
-    background: var(--bg-secondary);
   }
 
   /* Activity item styles */

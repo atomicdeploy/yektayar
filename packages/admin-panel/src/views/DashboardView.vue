@@ -81,7 +81,7 @@
             />
 
             <!-- Recent Activities -->
-            <div v-if="element.id === 'recent-activities'" class="flex-column gap-12">
+            <div v-if="element.id === 'recent-activities'" class="flex flex-col gap-3">
               <div
                 v-for="activity in dashboardStore.recentActivities"
                 :key="activity.id"
@@ -91,19 +91,19 @@
                   :class="['activity-indicator', getActivityColor(activity.type)]"
                 ></div>
                 <div class="activity-content">
-                  <p class="text-base text-primary">{{ activity.description }}</p>
-                  <p class="text-xs text-secondary mt-4">
+                  <p class="text-sm text-primary">{{ activity.description }}</p>
+                  <p class="text-xs text-secondary mt-1">
                     {{ formatTimestamp(activity.timestamp) }}
                   </p>
                 </div>
               </div>
-              <div v-if="dashboardStore.recentActivities.length === 0" class="empty-state p-20-40">
+              <div v-if="dashboardStore.recentActivities.length === 0" class="empty-state py-10 px-5">
                 {{ t('dashboard_page.no_activities') }}
               </div>
             </div>
 
             <!-- System Status -->
-            <div v-if="element.id === 'system-status'" class="flex-column gap-16">
+            <div v-if="element.id === 'system-status'" class="flex flex-col gap-4">
               <div class="status-item">
                 <div class="status-item-content">
                   <div class="status-dot status-dot-green"></div>
