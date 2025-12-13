@@ -1,5 +1,5 @@
 import { Elysia, t } from 'elysia'
-import { streamAIResponse } from '../services/aiService'
+import { streamAIResponse, checkAIServiceHealth } from '../services/aiService'
 import { logger } from '@yektayar/shared'
 
 const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production'
@@ -24,26 +24,42 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
       // Get AI response from pollinations.ai with locale support
       const result = await streamAIResponse(message, conversationHistory, locale || 'en')
 
-      return {
+      const response: any = {
         success: true,
         response: result.response,
-        timestamp: new Date().toISOString(),
-        ...(IS_DEVELOPMENT && result.debug ? { debug: result.debug } : {})
+        timestamp: new Date().toISOString()
       }
+
+      // Include metadata if available (x-* headers)
+      if (result.metadata) {
+        response.metadata = result.metadata
+      }
+
+      // Only include debug info in development mode
+      if (IS_DEVELOPMENT && result.debug) {
+        response.debug = result.debug
+      }
+
+      return response
     } catch (error) {
       logger.error('AI chat error:', error)
       set.status = 500
-      return {
+      
+      const errorResponse: any = {
         success: false,
         error: 'Failed to get AI response',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        ...(IS_DEVELOPMENT ? { 
-          debug: { 
-            error: 'Route handler exception',
-            errorDetails: error instanceof Error ? error.stack : String(error)
-          } 
-        } : {})
+        message: error instanceof Error ? error.message : 'Unknown error'
       }
+
+      // Only include debug info in development mode
+      if (IS_DEVELOPMENT) {
+        errorResponse.debug = {
+          error: 'Route handler exception',
+          errorDetails: error instanceof Error ? error.stack : String(error)
+        }
+      }
+
+      return errorResponse
     }
   }, {
     body: t.Object({
@@ -60,10 +76,13 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
       description: 'Sends a message to the AI and receives a response using pollinations.ai with locale support (en/fa)'
     }
   })
-  .get('/status', () => {
+  .get('/status', async () => {
+    // Actually check if the AI service is operational
+    const isOperational = await checkAIServiceHealth()
+    
     return {
       success: true,
-      status: 'operational',
+      status: isOperational ? 'operational' : 'degraded',
       provider: 'pollinations.ai',
       timestamp: new Date().toISOString()
     }
@@ -71,6 +90,6 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
     detail: {
       tags: ['AI'],
       summary: 'Check AI service status',
-      description: 'Returns the current status of the AI service'
+      description: 'Returns the current status of the AI service by making a test request to Pollinations API'
     }
   })

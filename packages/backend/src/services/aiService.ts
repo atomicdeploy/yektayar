@@ -26,6 +26,16 @@ export interface AIDebugInfo {
   streaming?: boolean
 }
 
+export interface AIResponseMetadata {
+  modelUsed?: string
+  tokensUsed?: {
+    prompt?: number
+    completion?: number
+    reasoning?: number
+    total?: number
+  }
+}
+
 /**
  * Get system prompt based on locale
  * Uses i18n translations for proper language support
@@ -81,8 +91,9 @@ export async function streamAIResponse(
   message: string,
   conversationHistory?: ConversationMessage[],
   locale: string = 'en'
-): Promise<{ response: string; debug?: AIDebugInfo }> {
+): Promise<{ response: string; metadata?: AIResponseMetadata; debug?: AIDebugInfo }> {
   const debugInfo: AIDebugInfo = IS_DEVELOPMENT ? { timestamp: new Date().toISOString() } : {}
+  const metadata: AIResponseMetadata = {}
   
   try {
     // Get system prompt based on locale (from i18n translations)
@@ -114,6 +125,7 @@ export async function streamAIResponse(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'User-Agent': 'YektaYar/1.0 (Mental Health Platform)',
       },
       body: JSON.stringify({
         messages: messages,
@@ -127,6 +139,26 @@ export async function streamAIResponse(
       debugInfo.responseStatus = response.status
       debugInfo.contentType = response.headers.get('content-type') || undefined
       debugInfo.responseHeaders = Object.fromEntries(response.headers.entries())
+    }
+
+    // Extract metadata from response headers (x-* headers from Pollinations)
+    const modelUsed = response.headers.get('x-model-used')
+    const promptTokens = response.headers.get('x-usage-prompt-text-tokens')
+    const completionTokens = response.headers.get('x-usage-completion-text-tokens')
+    const reasoningTokens = response.headers.get('x-usage-completion-reasoning-tokens')
+    const totalTokens = response.headers.get('x-usage-total-tokens')
+
+    if (modelUsed) {
+      metadata.modelUsed = modelUsed
+    }
+
+    if (promptTokens || completionTokens || reasoningTokens || totalTokens) {
+      metadata.tokensUsed = {
+        prompt: promptTokens ? parseInt(promptTokens, 10) : undefined,
+        completion: completionTokens ? parseInt(completionTokens, 10) : undefined,
+        reasoning: reasoningTokens ? parseInt(reasoningTokens, 10) : undefined,
+        total: totalTokens ? parseInt(totalTokens, 10) : undefined
+      }
     }
 
     if (!response.ok) {
@@ -172,7 +204,11 @@ export async function streamAIResponse(
       aiResponse = await response.text()
     }
 
-    return { response: aiResponse.trim(), debug: IS_DEVELOPMENT ? debugInfo : undefined }
+    return { 
+      response: aiResponse.trim(), 
+      metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
+      debug: IS_DEVELOPMENT ? debugInfo : undefined 
+    }
   } catch (error) {
     logger.error('Error in streamAIResponse:', error)
     
@@ -185,7 +221,8 @@ export async function streamAIResponse(
     
     // Provide a fallback response
     return { 
-      response: generateFallbackResponse(message), 
+      response: generateFallbackResponse(message, locale), 
+      metadata: undefined,
       debug: IS_DEVELOPMENT ? debugInfo : undefined 
     }
   }
@@ -219,6 +256,7 @@ export async function* streamAIResponseSSE(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'User-Agent': 'YektaYar/1.0 (Mental Health Platform)',
       },
       body: JSON.stringify({
         messages: messages,
@@ -326,21 +364,34 @@ function generateFallbackResponse(_message: string, locale: string = 'en'): stri
 
 /**
  * Health check for AI service
+ * Tests the Pollinations API with a specific test query
  */
 export async function checkAIServiceHealth(): Promise<boolean> {
   try {
-    const response = await fetch(POLLINATIONS_API_URL, {
-      method: 'POST',
+    // Use the specific test URL to verify operational state
+    const testUrl = 'https://text.pollinations.ai/Return+a+valid+json+only+stating+operational=true+without+markdown'
+    const response = await fetch(testUrl, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        messages: [
-          { role: 'user', content: 'Hello' }
-        ]
-      })
+        'User-Agent': 'YektaYar/1.0 (Mental Health Platform)',
+      }
     })
-    return response.ok
+    
+    if (!response.ok) {
+      return false
+    }
+
+    // Try to parse the response as JSON
+    const text = await response.text()
+    try {
+      const data = JSON.parse(text)
+      // Check if operational key is true
+      return data.operational === true
+    } catch (parseError) {
+      // If we can't parse as JSON or operational is not true, return false
+      logger.warn('AI service health check: Invalid JSON response')
+      return false
+    }
   } catch (error) {
     logger.error('AI service health check failed:', error)
     return false
