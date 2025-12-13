@@ -539,43 +539,15 @@ export async function getAccountBalance(): Promise<any> {
 }
 
 /**
- * Get credit from IPPanel Edge API
- * Returns the current credit for the account using the Edge API
+ * Get account credit/balance
+ * Returns the current credit for the account
  * 
- * @returns Promise with credit information
- * @see {@link https://ippanelcom.github.io/Edge-Document/docs/payment/my-credit | IPPanel Edge My Credit Documentation}
- * @note Uses 'apikey' authentication format for IPPanel Edge API
+ * @returns Promise<IFarazCreditResult> with credit information
+ * @see {@link http://docs.ippanel.com/#operation/GetCredit | IPPanel Credit API}
  */
-export async function getEdgeCredit(): Promise<any> {
-  const apiKey = getAPIKey();
-  const endpoint = 'https://edge.ippanel.com/v1/api/payment/my-credit';
-  
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'Authorization': `apikey ${apiKey}`
-  };
-  
-  const response = await fetch(endpoint, {
-    method: 'GET',
-    headers
-  });
-  
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error('IPPanel Edge credit API error:', {
-      status: response.status,
-      statusText: response.statusText,
-      body: errorText
-    });
-    throw new Error(`IPPanel Edge credit API request failed: ${response.status} ${response.statusText}`);
-  }
-  
-  const result = await response.json();
-  console.log('Edge credit retrieved successfully:', {
-    timestamp: new Date().toISOString()
-  });
-  
-  return result;
+export async function getCredit(): Promise<IFarazCreditResult> {
+  const endpoint = 'http://rest.ippanel.com/v1/credit';
+  return makeAuthenticatedRequest<IFarazCreditResult>(endpoint, 'GET');
 }
 
 /**
