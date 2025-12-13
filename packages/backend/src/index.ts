@@ -172,7 +172,11 @@ const isNode = !isBun
 
 logger.custom('🚀', `YektaYar API Server running at http://${hostname}:${port}`, 'cyan')
 logger.custom('📚', `API Documentation available at http://${hostname}:${port}/swagger`, 'cyan')
-logger.custom('⚡', `Runtime: Bun ${Bun.version}`, 'cyan')
+if (isBun) {
+  logger.custom('⚡', `Runtime: Bun ${Bun.version}`, 'cyan')
+} else {
+  logger.custom('⚡', `Runtime: Node.js ${process.version}`, 'cyan')
+}
 
 let httpServer: any
 let io: SocketIOServer | undefined
