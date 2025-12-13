@@ -47,7 +47,7 @@ await apiClient.get('https://external-api.com/data', {
 ### 5. Improved Documentation
 
 **Created:**
-- `docs/API_BASE_URL.md` - Comprehensive guide with:
+- [`docs/guides/API-BASE-URL.md`](../guides/API-BASE-URL.md) - Comprehensive guide with:
   - Configuration format examples
   - How to view/update base URL
   - Usage examples (correct vs incorrect)
@@ -124,7 +124,7 @@ await apiClient.get('/api/users')
    - `.env.example` - Enhanced documentation
 
 5. **Documentation:**
-   - `docs/API_BASE_URL.md` - New comprehensive guide
+   - [`docs/guides/API-BASE-URL.md`](../guides/API-BASE-URL.md) - New comprehensive guide
 
 6. **Tests:**
    - `tests/api-client.test.ts` - New test file
@@ -152,6 +152,6 @@ None - The changes are backward compatible as long as `API_BASE_URL` in `.env` i
 
 ## Related Documentation
 
-- [API Base URL Configuration Guide](../docs/API_BASE_URL.md)
-- [API Client Source](../packages/shared/src/api/client.ts)
-- [Environment Variables Example](../.env.example)
+- [API Base URL Configuration Guide](../guides/API-BASE-URL.md)
+- [API Client Source](../../packages/shared/src/api/client.ts)
+- [Environment Variables Example](../../.env.example)
