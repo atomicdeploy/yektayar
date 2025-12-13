@@ -12,6 +12,7 @@ import { logger } from '@yektayar/shared'
 import translations from '@yektayar/shared/i18n/translations.json'
 import 'overlayscrollbars/overlayscrollbars.css'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
+import TelegramPlugin from './plugins/telegram'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -219,6 +220,7 @@ async function initializeApp() {
   app.use(createPinia())
   app.use(router)
   app.use(i18n)
+  app.use(TelegramPlugin)
   
   // Register OverlayScrollbars component globally
   app.component('OverlayScrollbarsComponent', OverlayScrollbarsComponent)

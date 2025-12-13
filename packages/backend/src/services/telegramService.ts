@@ -1,4 +1,6 @@
 import { Telegraf, Context } from 'telegraf'
+import { logger } from '@yektayar/shared'
+import crypto from 'crypto'
 
 let bot: Telegraf | null = null
 let isInitialized = false
@@ -15,12 +17,12 @@ export function initializeTelegramBot(
   webhookUrl?: string
 ): Telegraf | null {
   if (isInitialized && bot) {
-    console.log('📱 Telegram bot already initialized')
+    logger.info('Telegram bot already initialized')
     return bot
   }
 
   if (!token || token === 'your_telegram_bot_token_here') {
-    console.warn('⚠️  Telegram bot token not configured. Bot functionality disabled.')
+    logger.warn('Telegram bot token not configured. Bot functionality disabled.')
     return null
   }
 
@@ -32,19 +34,19 @@ export function initializeTelegramBot(
     if (useWebhook && webhookUrl) {
       // Webhook mode (for production)
       bot.telegram.setWebhook(webhookUrl)
-      console.log('📱 Telegram bot initialized in webhook mode')
-      console.log(`🔗 Webhook URL: ${webhookUrl}`)
+      logger.info('Telegram bot initialized in webhook mode')
+      logger.info(`Webhook URL: ${webhookUrl}`)
     } else {
       // Polling mode (for development)
       bot.launch()
-      console.log('📱 Telegram bot initialized in polling mode')
+      logger.info('Telegram bot initialized in polling mode')
     }
 
     isInitialized = true
     
     return bot
   } catch (error) {
-    console.error('❌ Failed to initialize Telegram bot:', error)
+    logger.error('Failed to initialize Telegram bot:', error)
     return null
   }
 }
@@ -170,7 +172,7 @@ export async function sendMessage(
   options?: any
 ): Promise<boolean> {
   if (!bot || !isInitialized) {
-    console.warn('⚠️  Telegram bot not initialized. Message not sent.')
+    logger.warn('Telegram bot not initialized. Message not sent.')
     return false
   }
 
@@ -178,7 +180,7 @@ export async function sendMessage(
     await bot.telegram.sendMessage(chatId, message, options)
     return true
   } catch (error) {
-    console.error('❌ Failed to send Telegram message:', error)
+    logger.error('Failed to send Telegram message:', error)
     return false
   }
 }
@@ -195,7 +197,7 @@ export async function sendAdminNotification(
   const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID
 
   if (!adminChatId || adminChatId === 'your_admin_chat_id_here') {
-    console.warn('⚠️  Admin chat ID not configured. Notification not sent.')
+    logger.warn('Admin chat ID not configured. Notification not sent.')
     return false
   }
 
@@ -230,7 +232,7 @@ export async function sendChannelMessage(
   const channelId = process.env.TELEGRAM_CHANNEL_ID
 
   if (!channelId) {
-    console.warn('⚠️  Channel ID not configured. Message not sent.')
+    logger.warn('Channel ID not configured. Message not sent.')
     return false
   }
 
@@ -243,14 +245,14 @@ export async function sendChannelMessage(
  */
 export async function handleWebhookUpdate(update: any): Promise<void> {
   if (!bot) {
-    console.warn('⚠️  Bot not initialized. Cannot process webhook update.')
+    logger.warn('Bot not initialized. Cannot process webhook update.')
     return
   }
 
   try {
     await bot.handleUpdate(update)
   } catch (error) {
-    console.error('❌ Failed to process webhook update:', error)
+    logger.error('Failed to process webhook update:', error)
   }
 }
 
@@ -262,6 +264,88 @@ export async function stopTelegramBot(): Promise<void> {
     await bot.stop()
     bot = null
     isInitialized = false
-    console.log('📱 Telegram bot stopped')
+    logger.info('Telegram bot stopped')
+  }
+}
+
+/**
+ * Verify Telegram WebApp init data using the bot token
+ * 
+ * SECURITY: This function must be called server-side to validate that the initData
+ * string from a Telegram WebApp is authentic and hasn't been tampered with.
+ * 
+ * The verification uses HMAC-SHA256 with the bot token as the secret key, following
+ * Telegram's official specification: https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app
+ * 
+ * @param initData - The initData string from Telegram WebApp (e.g., "query_id=...&user=...&hash=...")
+ * @returns true if the initData is valid and authentic, false otherwise
+ * 
+ * @example
+ * const isValid = verifyTelegramInitData(request.body.initData)
+ * if (!isValid) {
+ *   return { error: 'Invalid Telegram user' }
+ * }
+ */
+export function verifyTelegramInitData(initData: string): boolean {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN
+
+  if (!botToken || botToken === 'your_telegram_bot_token_here') {
+    logger.warn('Bot token not configured. Cannot verify initData.')
+    return false
+  }
+
+  try {
+    // Parse initData into key-value pairs
+    const params = new URLSearchParams(initData)
+    const data: Record<string, string> = {}
+    const hash = params.get('hash')
+
+    if (!hash) {
+      logger.warn('No hash found in initData')
+      return false
+    }
+
+    // Collect all parameters except hash
+    params.forEach((value, key) => {
+      if (key !== 'hash') {
+        data[key] = value
+      }
+    })
+
+    // Create data_check_string by sorting keys lexicographically and joining "key=value\n"
+    const dataCheckString = Object.keys(data)
+      .sort()
+      .map(key => `${key}=${data[key]}`)
+      .join('\n')
+
+    // Calculate secret_key = HMAC_SHA256(bot_token, "WebAppData")
+    const secretKey = crypto
+      .createHmac('sha256', 'WebAppData')
+      .update(botToken)
+      .digest()
+
+    // Calculate data hash = HMAC_SHA256(secret_key, data_check_string)
+    const calculatedHash = crypto
+      .createHmac('sha256', secretKey)
+      .update(dataCheckString)
+      .digest('hex')
+
+    const isValid = calculatedHash === hash
+
+    if (!isValid) {
+      // In development, provide minimal context for debugging
+      if (process.env.NODE_ENV === 'development') {
+        logger.warn('Invalid Telegram initData hash - verification failed (check auth_date)')
+      } else {
+        logger.warn('Invalid Telegram initData hash - verification failed')
+      }
+    } else {
+      logger.success('Telegram initData verified successfully')
+    }
+
+    return isValid
+  } catch (error) {
+    logger.error('Error verifying Telegram initData:', error)
+    return false
   }
 }

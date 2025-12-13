@@ -4,8 +4,10 @@ import {
   sendMessage,
   sendAdminNotification,
   sendChannelMessage,
-  handleWebhookUpdate
+  handleWebhookUpdate,
+  verifyTelegramInitData
 } from '../services/telegramService'
+import { logger } from '@yektayar/shared'
 
 export const telegramRoutes = new Elysia({ prefix: '/api/telegram' })
   // Get bot status
@@ -52,7 +54,7 @@ export const telegramRoutes = new Elysia({ prefix: '/api/telegram' })
         }
       }
     } catch (error) {
-      console.error('Error in /send endpoint:', error)
+      logger.error('Error in /send endpoint:', error)
       return {
         success: false,
         error: 'Internal server error',
@@ -92,7 +94,7 @@ export const telegramRoutes = new Elysia({ prefix: '/api/telegram' })
         }
       }
     } catch (error) {
-      console.error('Error in /notify-admin endpoint:', error)
+      logger.error('Error in /notify-admin endpoint:', error)
       return {
         success: false,
         error: 'Internal server error',
@@ -132,7 +134,7 @@ export const telegramRoutes = new Elysia({ prefix: '/api/telegram' })
         }
       }
     } catch (error) {
-      console.error('Error in /channel endpoint:', error)
+      logger.error('Error in /channel endpoint:', error)
       return {
         success: false,
         error: 'Internal server error',
@@ -149,10 +151,49 @@ export const telegramRoutes = new Elysia({ prefix: '/api/telegram' })
         success: true
       }
     } catch (error) {
-      console.error('Error in webhook endpoint:', error)
+      logger.error('Error in webhook endpoint:', error)
       return {
         success: false,
         error: 'Failed to process webhook',
+        message: String(error)
+      }
+    }
+  })
+
+  // Verify Telegram WebApp initData (security endpoint)
+  .post('/verify-init-data', async ({ body }) => {
+    try {
+      const { initData } = body as { initData: string }
+
+      if (!initData) {
+        return {
+          success: false,
+          error: 'Missing initData',
+          message: 'initData is required'
+        }
+      }
+
+      const isValid = verifyTelegramInitData(initData)
+
+      if (isValid) {
+        return {
+          success: true,
+          message: 'initData verified successfully',
+          valid: true
+        }
+      } else {
+        return {
+          success: false,
+          error: 'Invalid initData',
+          message: 'The provided initData could not be verified',
+          valid: false
+        }
+      }
+    } catch (error) {
+      logger.error('Error in verify-init-data endpoint:', error)
+      return {
+        success: false,
+        error: 'Internal server error',
         message: String(error)
       }
     }
