@@ -339,6 +339,10 @@ ion-chip {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
   &.active {
     --background: var(--ion-color-primary);
