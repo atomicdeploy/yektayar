@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/admin-panel/desktop-app"
   ],
   "scripts": {
     "postinstall": "npm run build -w @yektayar/shared && node scripts/check-requirements.js",

@@ -4,7 +4,7 @@ This guide explains how to build the Windows desktop application.
 
 ## Prerequisites
 
-- **Node.js** >= 18.0.0
+- **Node.js** >= 20.x
 - **npm** >= 9.0.0
 - **Windows OS** (required for building Windows .exe)
   - Or WSL2 with Windows build tools

@@ -17,7 +17,7 @@ const ROOT_DIR = join(__dirname, '..');
 const ASSETS_DIR = join(ROOT_DIR, 'assets', 'logo');
 const ADMIN_PUBLIC_DIR = join(ROOT_DIR, 'packages', 'admin-panel', 'public');
 const MOBILE_PUBLIC_DIR = join(ROOT_DIR, 'packages', 'mobile-app', 'public');
-const DESKTOP_BUILD_DIR = join(ROOT_DIR, 'packages', 'desktop-app', 'build');
+const DESKTOP_BUILD_DIR = join(ROOT_DIR, 'packages', 'admin-panel', 'desktop-app', 'build');
 
 // Icon sizes for various purposes
 const ICON_SIZES = [

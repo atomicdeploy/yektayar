@@ -20,7 +20,7 @@ on:
       - master
       - develop
     paths:
-      - 'packages/desktop-app/**'
+      - 'packages/admin-panel/desktop-app/**'
       - 'packages/admin-panel/**'
       - '.github/workflows/build-windows-desktop.yml'
   # Also run on pull requests for testing
@@ -30,7 +30,7 @@ on:
       - master
       - develop
     paths:
-      - 'packages/desktop-app/**'
+      - 'packages/admin-panel/desktop-app/**'
       - 'packages/admin-panel/**'
       - '.github/workflows/build-windows-desktop.yml'
 
@@ -60,6 +60,14 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Validate API_BASE_URL secret
+        run: |
+          if [ -z "${{ secrets.API_BASE_URL }}" ]; then
+            echo "::error::API_BASE_URL secret is not set. Please configure it in repository secrets."
+            echo "Without this secret, the desktop app cannot be built with the correct backend URL."
+            exit 1
+          fi
+
       - name: Generate icons
         run: npm run generate:icons
 
@@ -68,13 +76,13 @@ jobs:
           cd packages/admin-panel
           npm run build
         env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL || 'https://api.yektayar.ir' }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
           VITE_ENVIRONMENT: production
 
       - name: Build Desktop App Installer
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.build_type == 'installer'
         run: |
-          cd packages/desktop-app
+          cd packages/admin-panel/desktop-app
           npm run build:electron
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +90,7 @@ jobs:
       - name: Build Desktop App Portable
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'portable'
         run: |
-          cd packages/desktop-app
+          cd packages/admin-panel/desktop-app
           npm run build:electron:dir
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,7 +99,7 @@ jobs:
         id: package-version
         shell: bash
         run: |
-          VERSION=$(node -p "require('./packages/desktop-app/package.json').version")
+          VERSION=$(node -p "require('./packages/admin-panel/desktop-app/package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Package version: $VERSION"
 
@@ -100,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-desktop-installer
-          path: packages/desktop-app/dist/*.exe
+          path: packages/admin-panel/desktop-app/dist/*.exe
           retention-days: 30
 
       - name: Upload Portable Build
@@ -108,7 +116,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-desktop-portable
-          path: packages/desktop-app/dist/win-unpacked/**/*
+          path: packages/admin-panel/desktop-app/dist/win-unpacked/**/*
           retention-days: 30
 
       - name: Get artifact info
@@ -116,7 +124,7 @@ jobs:
         shell: bash
         run: |
           if [ "${{ github.event_name }}" != "workflow_dispatch" ] || [ "${{ github.event.inputs.build_type }}" == "installer" ]; then
-            EXE_PATH=$(ls packages/desktop-app/dist/*.exe | head -n 1)
+            EXE_PATH=$(ls packages/admin-panel/desktop-app/dist/*.exe | head -n 1)
             if [ -f "$EXE_PATH" ]; then
               SIZE=$(du -h "$EXE_PATH" | cut -f1)
               NAME=$(basename "$EXE_PATH")
@@ -125,7 +133,7 @@ jobs:
               echo "type=installer" >> $GITHUB_OUTPUT
             fi
           else
-            PORTABLE_DIR="packages/desktop-app/dist/win-unpacked"
+            PORTABLE_DIR="packages/admin-panel/desktop-app/dist/win-unpacked"
             if [ -d "$PORTABLE_DIR" ]; then
               SIZE=$(du -sh "$PORTABLE_DIR" | cut -f1)
               echo "name=win-unpacked" >> $GITHUB_OUTPUT
@@ -143,7 +151,7 @@ jobs:
           echo "### Build Information" >> $GITHUB_STEP_SUMMARY
           
           if [ "${{ github.event_name }}" != "workflow_dispatch" ] || [ "${{ github.event.inputs.build_type }}" == "installer" ]; then
-            cd packages/desktop-app/dist
+            cd packages/admin-panel/desktop-app/dist
             if ls *.exe 1> /dev/null 2>&1; then
               for exe in *.exe; do
                 size=$(du -h "$exe" | cut -f1)
@@ -153,8 +161,8 @@ jobs:
               echo "- ⚠️ No installer files found" >> $GITHUB_STEP_SUMMARY
             fi
           else
-            if [ -d "packages/desktop-app/dist/win-unpacked" ]; then
-              size=$(du -sh packages/desktop-app/dist/win-unpacked | cut -f1)
+            if [ -d "packages/admin-panel/desktop-app/dist/win-unpacked" ]; then
+              size=$(du -sh packages/admin-panel/desktop-app/dist/win-unpacked | cut -f1)
               echo "- **Portable Build:** \`win-unpacked\` (Size: $size)" >> $GITHUB_STEP_SUMMARY
             else
               echo "- ⚠️ No portable build found" >> $GITHUB_STEP_SUMMARY

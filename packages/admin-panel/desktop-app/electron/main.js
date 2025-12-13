@@ -170,7 +170,7 @@ function createWindow() {
     // Development: Try multiple locations
     const devPaths = [
       path.join(__dirname, '../build/index.html'),
-      path.join(__dirname, '../../admin-panel/dist/index.html')
+      path.join(__dirname, '../../dist/index.html')
     ];
     
     indexPath = devPaths.find(p => fs.existsSync(p));

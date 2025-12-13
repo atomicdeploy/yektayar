@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npm run build:web && electron .",
     "build": "npm run build:web && npm run build:electron",
-    "build:web": "echo 'Building admin panel...' && cd ../admin-panel && npm run build",
+    "build:web": "echo 'Building admin panel...' && cd .. && npm run build",
     "build:electron": "echo 'Packaging with electron-builder...' && electron-builder --win",
     "build:electron:dir": "echo 'Building unpacked directory...' && electron-builder --win --dir"
   },
@@ -29,9 +29,9 @@
     },
     "files": [
       "electron/**/*",
-      "!electron/**/*.map",
+      "!electron/**/*map",
       {
-        "from": "../admin-panel/dist",
+        "from": "../dist",
         "to": "build",
         "filter": ["**/*"]
       }

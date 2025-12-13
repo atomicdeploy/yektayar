@@ -225,12 +225,12 @@ npm run build
 npm run build:desktop    # Builds admin panel and packages as .exe
 
 # Or manually from desktop-app directory
-cd packages/desktop-app
+cd packages/admin-panel/desktop-app
 npm run build:web        # Build admin panel
 npm run build:electron   # Create Windows installer
 ```
 
-The Windows installer will be created in `packages/desktop-app/dist/`. For detailed instructions, see **[packages/desktop-app/README.md](packages/desktop-app/README.md)**.
+The Windows installer will be created in `packages/admin-panel/desktop-app/dist/`. For detailed instructions, see **[packages/admin-panel/desktop-app/README.md](packages/admin-panel/desktop-app/README.md)**.
 
 ### Build Mobile App (Android APK)
 
@@ -335,7 +335,7 @@ For a quick web server setup with reverse proxy configurations:
 
 - **[Ubuntu 24.04 Deployment Guide](docs/deployment/UBUNTU-24-DEPLOYMENT.md)** - Complete VPS deployment instructions
 - **[Mobile App Build Guide](packages/mobile-app/BUILD_APK.md)** - Android APK build instructions
-- **[Desktop App Guide](packages/desktop-app/README.md)** - Windows .exe build instructions
+- **[Desktop App Guide](packages/admin-panel/desktop-app/README.md)** - Windows .exe build instructions
 - **[Web Server Configuration](config/webserver/README.md)** - Detailed web server configuration guide
 
 ### Deployment Overview
