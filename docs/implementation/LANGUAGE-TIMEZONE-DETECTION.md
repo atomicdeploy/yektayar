@@ -74,7 +74,7 @@ When a client acquires a session, the server:
 
 **Request Headers:**
 ```http
-GET /api/auth/acquire-session
+POST /api/auth/acquire-session
 Accept-Language: fa-IR,fa;q=0.9,en;q=0.8
 X-Timezone: Asia/Tehran
 ```
