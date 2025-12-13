@@ -150,8 +150,13 @@ export function useAIChat() {
   /**
    * Send a message to the AI
    */
-  const sendMessage = async (content: string, locale: string = 'en') => {
+  const sendMessage = async (content: string, locale: string) => {
     if (!content.trim() || isSending.value) {
+      return
+    }
+
+    if (!locale || typeof locale !== 'string') {
+      logger.error('[AI Chat] Locale is required but not provided')
       return
     }
 
@@ -209,7 +214,7 @@ export function useAIChat() {
   /**
    * Fallback method to send message via REST API
    */
-  const sendMessageViaREST = async (content: string, locale: string = 'en') => {
+  const sendMessageViaREST = async (content: string, locale: string) => {
     isTyping.value = true
 
     try {
@@ -243,11 +248,16 @@ export function useAIChat() {
       // Check if the API call was successful
       if (!response.success) {
         logger.error('[AI Chat] API returned error:', response.error)
-        throw new Error(response.error || 'Failed to get AI response')
+        throw new Error(response.error || 'API request failed')
+      }
+
+      // Validate response structure
+      if (!response.response) {
+        throw new Error('Invalid API response: missing response field')
       }
 
       // The response is in the 'response' field of the backend response
-      const aiResponse = response.response || t('messages.ai_no_response')
+      const aiResponse = response.response
       
       logger.success('[AI Chat] Received AI response via REST API')
 

@@ -40,7 +40,7 @@ export interface AIResponseMetadata {
  * Get system prompt based on locale
  * Uses i18n translations for proper language support
  */
-function getSystemPrompt(locale: string = 'en'): string {
+function getSystemPrompt(locale: string): string {
   // Import translations dynamically to get system prompt
   try {
     const translations = require('@yektayar/shared/src/i18n/translations.json')
@@ -90,7 +90,7 @@ Remember: You are here to support, guide, and encourage users on their mental we
 export async function streamAIResponse(
   message: string,
   conversationHistory?: ConversationMessage[],
-  locale: string = 'en'
+  locale: string
 ): Promise<{ response: string; metadata?: AIResponseMetadata; debug?: AIDebugInfo }> {
   const debugInfo: AIDebugInfo = IS_DEVELOPMENT ? { timestamp: new Date().toISOString() } : {}
   const metadata: AIResponseMetadata = {}
@@ -177,18 +177,12 @@ export async function streamAIResponse(
       try {
         const data = await response.json() as any
         
-        // Extract the response text from JSON (OpenAI-compatible format)
-        if (typeof data === 'string') {
-          aiResponse = data
-        } else if (data.choices && data.choices[0]?.message?.content) {
+        // Extract the response text from JSON (OpenAI-compatible format only)
+        if (data.choices && data.choices[0]?.message?.content) {
           // Standard OpenAI format: data.choices[0].message.content
           aiResponse = data.choices[0].message.content
-        } else if (data.response) {
-          aiResponse = data.response
-        } else if (data.text) {
-          aiResponse = data.text
         } else {
-          aiResponse = JSON.stringify(data)
+          throw new Error('Invalid response format from Pollinations API')
         }
       } catch (jsonError) {
         // If JSON parsing fails, fallback to plain text
@@ -196,7 +190,7 @@ export async function streamAIResponse(
           debugInfo.error = 'JSON parsing failed, falling back to text'
           debugInfo.errorDetails = jsonError instanceof Error ? jsonError.message : String(jsonError)
         }
-        logger.warn('Failed to parse JSON response, falling back to text')
+        logger.warn('[AI Service] Failed to parse JSON response, falling back to text')
         aiResponse = await response.text()
       }
     } else {
@@ -236,7 +230,7 @@ export async function streamAIResponse(
 export async function* streamAIResponseSSE(
   message: string,
   conversationHistory?: ConversationMessage[],
-  locale: string = 'en'
+  locale: string
 ): AsyncGenerator<string, void, unknown> {
   try {
     // Get locale-specific system prompt from i18n
@@ -324,7 +318,7 @@ export async function* streamAIResponseSSE(
 export async function* streamAIResponseChunks(
   message: string,
   conversationHistory?: ConversationMessage[],
-  locale: string = 'en'
+  locale: string
 ): AsyncGenerator<string, void, unknown> {
   try {
     // Use SSE streaming for real-time response
@@ -341,7 +335,7 @@ export async function* streamAIResponseChunks(
  * Generate a fallback response when AI service is unavailable
  * Returns locale-specific fallback
  */
-function generateFallbackResponse(_message: string, locale: string = 'en'): string {
+function generateFallbackResponse(_message: string, locale: string): string {
   const fallbackResponses = {
     en: [
       "Thank you for reaching out. I'm here to support you. While I'm experiencing some technical difficulties at the moment, I want you to know that what you're feeling is valid and important. Could you tell me more about what's on your mind?",

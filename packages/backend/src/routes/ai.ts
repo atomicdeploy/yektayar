@@ -10,7 +10,7 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
       const { message, conversationHistory, locale } = body as {
         message: string
         conversationHistory?: Array<{ role: string; content: string }>
-        locale?: string
+        locale: string
       }
 
       if (!message || typeof message !== 'string') {
@@ -21,8 +21,16 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
         }
       }
 
+      if (!locale || typeof locale !== 'string') {
+        set.status = 400
+        return {
+          success: false,
+          error: 'Locale is required'
+        }
+      }
+
       // Get AI response from pollinations.ai with locale support
-      const result = await streamAIResponse(message, conversationHistory, locale || 'en')
+      const result = await streamAIResponse(message, conversationHistory, locale)
 
       const response: any = {
         success: true,
@@ -30,7 +38,7 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
         timestamp: new Date().toISOString()
       }
 
-      // Include metadata if available (x-* headers)
+      // Include metadata (always present from API)
       if (result.metadata) {
         response.metadata = result.metadata
       }
@@ -68,12 +76,12 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
         role: t.String(),
         content: t.String()
       }))),
-      locale: t.Optional(t.String())
+      locale: t.String({ minLength: 2, maxLength: 5 })
     }),
     detail: {
       tags: ['AI'],
       summary: 'Send a message to the AI counselor',
-      description: 'Sends a message to the AI and receives a response using pollinations.ai with locale support (en/fa)'
+      description: 'Sends a message to the AI and receives a response using pollinations.ai with locale support (en/fa) - locale is required'
     }
   })
   .get('/status', async () => {
