@@ -149,6 +149,18 @@ function getSMSConfig(): SMSConfig {
 }
 
 /**
+ * Get API key from environment variables (for balance/credit checks that don't need full config)
+ * @internal
+ */
+function getAPIKey(): string {
+  const apiKey = process.env.FARAZSMS_API_KEY;
+  if (!apiKey) {
+    throw new Error('FARAZSMS_API_KEY is not configured in environment variables');
+  }
+  return apiKey;
+}
+
+/**
  * Validate Iranian phone number format
  * @param phoneNumber Phone number to validate
  * @returns true if valid, false otherwise
@@ -333,16 +345,17 @@ async function makeAuthenticatedRequest<T>(
   method: 'GET' | 'POST' = 'GET',
   body?: any
 ): Promise<T> {
-  const config = getSMSConfig();
+  const apiKey = getAPIKey();
+  const authFormat = (process.env.FARAZSMS_AUTH_FORMAT as 'Api-Key' | 'AccessKey') || 'AccessKey';
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json'
   };
   
-  if (config.authFormat === 'AccessKey') {
-    headers['Authorization'] = `AccessKey ${config.apiKey}`;
+  if (authFormat === 'AccessKey') {
+    headers['Authorization'] = `AccessKey ${apiKey}`;
   } else {
-    headers['Api-Key'] = config.apiKey;
+    headers['Api-Key'] = apiKey;
   }
 
   const options: RequestInit = {
@@ -376,7 +389,7 @@ export async function getAuthenticatedUser(): Promise<IFarazAuthResult> {
 }
 
 /**
- * Get user's remaining credit/balance
+ * Get user's remaining credit/balance (IPPanel REST API)
  * 
  * @returns Promise<IFarazCreditResult>
  * @see {@link http://docs.ippanel.com/#operation/GetCredit}
@@ -384,6 +397,86 @@ export async function getAuthenticatedUser(): Promise<IFarazAuthResult> {
 export async function getUserCredit(): Promise<IFarazCreditResult> {
   const endpoint = 'http://rest.ippanel.com/v1/credit';
   return makeAuthenticatedRequest<IFarazCreditResult>(endpoint, 'GET');
+}
+
+/**
+ * Get account balance from IranPayamak API
+ * Returns the current credit/balance for the account
+ * 
+ * @returns Promise with balance information
+ * @see {@link https://docs.iranpayamak.com/account-balance-13717911e0 | IranPayamak Account Balance Documentation}
+ * @note Uses 'Api-Key' header format for IranPayamak API
+ */
+export async function getAccountBalance(): Promise<any> {
+  const apiKey = getAPIKey();
+  const endpoint = 'https://api.iranpayamak.com/ws/v1/account/balance';
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Api-Key': apiKey
+  };
+  
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    headers
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('IranPayamak balance API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`IranPayamak balance API request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json();
+  console.log('Account balance retrieved successfully:', {
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
+}
+
+/**
+ * Get credit from IPPanel Edge API
+ * Returns the current credit for the account using the Edge API
+ * 
+ * @returns Promise with credit information
+ * @see {@link https://ippanelcom.github.io/Edge-Document/docs/payment/my-credit | IPPanel Edge My Credit Documentation}
+ * @note Uses 'apikey' authentication format for IPPanel Edge API
+ */
+export async function getEdgeCredit(): Promise<any> {
+  const apiKey = getAPIKey();
+  const endpoint = 'https://edge.ippanel.com/v1/api/payment/my-credit';
+  
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Authorization': `apikey ${apiKey}`
+  };
+  
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    headers
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('IPPanel Edge credit API error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`IPPanel Edge credit API request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json();
+  console.log('Edge credit retrieved successfully:', {
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
 }
 
 /**
@@ -510,7 +603,7 @@ export async function sendVOTP(
   code: string | number,
   recipient: string
 ): Promise<any> {
-  const config = getSMSConfig();
+  const apiKey = getAPIKey();
   
   // Normalize phone number to international format (989xxxxxxxxx)
   const normalizedRecipient = normalizePhoneNumber(recipient);
@@ -519,7 +612,7 @@ export async function sendVOTP(
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `apikey ${config.apiKey}` // IPPanel uses 'apikey' format
+    'Authorization': `apikey ${apiKey}` // IPPanel uses 'apikey' format
   };
   
   const body = {
@@ -568,12 +661,12 @@ export async function sendWebserviceSMS(
   sender: string,
   recipients: string[]
 ): Promise<any> {
-  const config = getSMSConfig();
+  const apiKey = getAPIKey();
   const endpoint = 'https://edge.ippanel.com/v1/api/send';
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Authorization': `apikey ${config.apiKey}` // IPPanel uses 'apikey' format
+    'Authorization': `apikey ${apiKey}` // IPPanel uses 'apikey' format
   };
   
   const body = {
@@ -623,7 +716,7 @@ export async function sendURLBasedSMS(
   sender: string,
   recipients: string[]
 ): Promise<any> {
-  const config = getSMSConfig();
+  const apiKey = getAPIKey();
   
   // Build URL with query parameters
   const params = new URLSearchParams({
@@ -635,7 +728,7 @@ export async function sendURLBasedSMS(
   const endpoint = `https://edge.ippanel.com/v1/api/send?${params.toString()}`;
   
   const headers: Record<string, string> = {
-    'Authorization': `apikey ${config.apiKey}` // IPPanel uses 'apikey' format
+    'Authorization': `apikey ${apiKey}` // IPPanel uses 'apikey' format
   };
   
   const response = await fetch(endpoint, {
@@ -681,17 +774,23 @@ export async function sendSampleSMS(
   numberFormat: 'english' | 'persian' = 'english',
   schedule?: string
 ): Promise<FarazSMSResponse> {
-  const config = getSMSConfig();
+  const apiKey = getAPIKey();
   const endpoint = 'https://api.iranpayamak.com/ws/v1/sms/sample';
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Api-Key': config.apiKey // IranPayamak uses 'Api-Key' header format
+    'Api-Key': apiKey // IranPayamak uses 'Api-Key' header format
   };
+  
+  // Use provided lineNumber or try to get from environment
+  const senderLineNumber = lineNumber || process.env.FARAZSMS_LINE_NUMBER;
+  if (!senderLineNumber) {
+    throw new Error('Line number is required. Either provide it as parameter or set FARAZSMS_LINE_NUMBER environment variable.');
+  }
   
   const body: any = {
     text,
-    line_number: lineNumber || config.lineNumber,
+    line_number: senderLineNumber,
     number_format: numberFormat
   };
   
@@ -743,17 +842,23 @@ export async function sendSimpleSMS(
   numberFormat: 'english' | 'persian' = 'english',
   schedule?: string
 ): Promise<FarazSMSResponse> {
-  const config = getSMSConfig();
+  const apiKey = getAPIKey();
   const endpoint = 'https://api.iranpayamak.com/ws/v1/sms/simple';
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'Api-Key': config.apiKey // IranPayamak uses 'Api-Key' header format
+    'Api-Key': apiKey // IranPayamak uses 'Api-Key' header format
   };
+  
+  // Use provided lineNumber or try to get from environment
+  const senderLineNumber = lineNumber || process.env.FARAZSMS_LINE_NUMBER;
+  if (!senderLineNumber) {
+    throw new Error('Line number is required. Either provide it as parameter or set FARAZSMS_LINE_NUMBER environment variable.');
+  }
   
   const body: any = {
     text,
-    line_number: lineNumber || config.lineNumber,
+    line_number: senderLineNumber,
     recipients,
     number_format: numberFormat
   };
