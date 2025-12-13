@@ -1058,6 +1058,10 @@ interface IPPanelRESTResponse {
  * @param sender Sender line number (optional, uses config if not provided)
  * @returns Promise with REST API response
  * @see {@link https://api2.ippanel.com | IPPanel REST API v1}
+ * 
+ * @note The API expects recipient as an array in the request body, but this
+ *       function accepts a single recipient string for simplicity. The array
+ *       wrapping is handled automatically.
  */
 export async function sendSingleSMS(
   recipient: string,
@@ -1115,12 +1119,15 @@ export async function sendSingleSMS(
  * Send pattern SMS using IPPanel REST API v1 (api2.ippanel.com)
  * This matches the legacy AutoHotkey implementation
  * 
- * @param recipient Recipient phone number
+ * @param recipient Recipient phone number (single recipient as string)
  * @param code Pattern code
  * @param variable Pattern variables object
  * @param sender Sender line number (optional, uses config if not provided)
  * @returns Promise with REST API response
  * @see {@link https://api2.ippanel.com | IPPanel REST API v1}
+ * 
+ * @note Unlike sendSingleSMS, this API expects recipient as a string (not array).
+ *       This is the correct format for the pattern endpoint.
  */
 export async function sendPatternSMSv1(
   recipient: string,
