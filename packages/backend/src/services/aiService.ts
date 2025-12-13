@@ -106,21 +106,34 @@ export async function streamAIResponse(
       return text.trim()
     }
 
-    // Parse JSON response
-    const data = await response.json() as any
-    
-    // Extract the response text
+    // Try to parse as JSON first, but fallback to text if it fails
+    const contentType = response.headers.get('content-type')
     let aiResponse = ''
-    if (typeof data === 'string') {
-      aiResponse = data
-    } else if (data.choices && data.choices[0]?.message?.content) {
-      aiResponse = data.choices[0].message.content
-    } else if (data.response) {
-      aiResponse = data.response
-    } else if (data.text) {
-      aiResponse = data.text
+    
+    if (contentType?.includes('application/json')) {
+      try {
+        const data = await response.json() as any
+        
+        // Extract the response text from JSON
+        if (typeof data === 'string') {
+          aiResponse = data
+        } else if (data.choices && data.choices[0]?.message?.content) {
+          aiResponse = data.choices[0].message.content
+        } else if (data.response) {
+          aiResponse = data.response
+        } else if (data.text) {
+          aiResponse = data.text
+        } else {
+          aiResponse = JSON.stringify(data)
+        }
+      } catch (jsonError) {
+        // If JSON parsing fails, try to get text
+        logger.warn('Failed to parse JSON response, falling back to text')
+        aiResponse = await response.text()
+      }
     } else {
-      aiResponse = JSON.stringify(data)
+      // Content is not JSON, get as text directly
+      aiResponse = await response.text()
     }
 
     return aiResponse.trim()
