@@ -47,7 +47,7 @@ REQUIRED_VARS=(
     "WEBSOCKET_PORT"
     "RATE_LIMIT_WINDOW"
     "RATE_LIMIT_MAX_REQUESTS"
-    "VITE_API_BASE_URL"
+    "API_BASE_URL"
     "VITE_ENVIRONMENT"
 )
 
@@ -526,8 +526,8 @@ basic_interactive_setup() {
     
     echo -e "\n${CYAN}=== Frontend Configuration ===${NC}\n"
     
-    read -r -p "Frontend API Base URL [${VITE_API_BASE_URL}]: " input
-    [ -n "$input" ] && sed -i "s|^VITE_API_BASE_URL=.*|VITE_API_BASE_URL=${input}|" "$temp_env"
+    read -r -p "Frontend API Base URL [${API_BASE_URL}]: " input
+    [ -n "$input" ] && sed -i "s|^API_BASE_URL=.*|API_BASE_URL=${input}|" "$temp_env"
     
     read -r -p "Frontend Environment (development/production) [${VITE_ENVIRONMENT}]: " input
     [ -n "$input" ] && sed -i "s|^VITE_ENVIRONMENT=.*|VITE_ENVIRONMENT=${input}|" "$temp_env"
@@ -695,8 +695,8 @@ tui_frontend_config() {
     local temp_env="$2"
     source "$temp_env"
     
-    local new_api_url=$($dialog_cmd --title "Frontend API URL" --inputbox "Enter API base URL:" 10 60 "$VITE_API_BASE_URL" 3>&1 1>&2 2>&3)
-    [ $? -eq 0 ] && [ -n "$new_api_url" ] && sed -i "s|^VITE_API_BASE_URL=.*|VITE_API_BASE_URL=${new_api_url}|" "$temp_env"
+    local new_api_url=$($dialog_cmd --title "Frontend API URL" --inputbox "Enter API base URL:" 10 60 "$API_BASE_URL" 3>&1 1>&2 2>&3)
+    [ $? -eq 0 ] && [ -n "$new_api_url" ] && sed -i "s|^API_BASE_URL=.*|API_BASE_URL=${new_api_url}|" "$temp_env"
     
     local new_env=$($dialog_cmd --title "Frontend Environment" --menu "Select environment:" 12 60 2 \
         "development" "Development mode" \

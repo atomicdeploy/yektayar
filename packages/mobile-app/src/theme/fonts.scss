@@ -1,0 +1,39 @@
+/* Sahel Font - Regular */
+@font-face {
+  font-family: 'Sahel';
+  src: url('/fonts/Sahel.woff2') format('woff2'),
+       url('/fonts/Sahel.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Sahel Font - Light */
+@font-face {
+  font-family: 'Sahel';
+  src: url('/fonts/Sahel-Light.woff2') format('woff2'),
+       url('/fonts/Sahel-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Sahel Font - Bold */
+@font-face {
+  font-family: 'Sahel';
+  src: url('/fonts/Sahel-Bold.woff2') format('woff2'),
+       url('/fonts/Sahel-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* IranNastaliq Font - For special taglines */
+@font-face {
+  font-family: 'IranNastaliq';
+  src: url('/fonts/IranNastaliq.woff2') format('woff2'),
+       url('/fonts/IranNastaliq.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block; /* Prevent display until font loads */
+}

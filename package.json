@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "description": "YektaYar - Mental Health Care Platform",
   "private": true,
+  "type": "module",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "npm run build -w @yektayar/shared",
+    "postinstall": "npm run build -w @yektayar/shared && node scripts/check-requirements.js",
+    "check:requirements": "node scripts/check-requirements.js",
+    "install:deps": "node scripts/install-dependencies.js",
     "dev": "npm run dev --workspaces --if-present",
     "dev:backend": "npm run dev -w @yektayar/backend",
     "dev:admin": "npm run dev -w @yektayar/admin-panel",
@@ -16,13 +19,31 @@
     "build:backend": "npm run build -w @yektayar/backend",
     "build:admin": "npm run build -w @yektayar/admin-panel",
     "build:mobile": "npm run build -w @yektayar/mobile-app",
-    "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "test:deps": "node scripts/test-dependencies.js",
+    "lint": "eslint packages --ext .ts,.js,.vue && npm run lint --workspaces --if-present",
+    "lint:fix": "eslint packages --ext .ts,.js,.vue --fix && npm run lint --workspaces --if-present",
+    "validate:i18n": "node scripts/validate-i18n-keys.mjs",
+    "validate:i18n:strict": "node scripts/validate-i18n-keys.mjs --strict --show-unused",
+    "test": "vitest run && npm run test --workspaces --if-present",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:deps": "node tests/scripts/test-dependencies.cjs",
+    "test:websocket": "node tests/scripts/test-websocket.mjs",
+    "socketio:test": "node scripts/socketio-tui.js",
+    "ai:test": "node scripts/pollination-ai-tui.js",
+    "db:cli": "bash scripts/db-cli.sh",
+    "db:setup": "bash scripts/setup-postgresql.sh",
+    "db:init": "bash scripts/db-health.sh init",
+    "db:health": "bash scripts/db-health.sh check",
+    "db:debug": "bash scripts/db-health.sh debug",
     "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist",
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
-    "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android"
+    "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android",
+    "android:build": "npm run build:mobile && cd packages/mobile-app && npm run cap:sync && npm run android:build:debug",
+    "android:analyze": "bash scripts/analyze-apk.sh",
+    "generate:desktop-icons": "node scripts/generate-desktop-icons.mjs",
+    "list-routes": "node scripts/list-routes.mjs"
   },
   "keywords": [
     "mental-health",
@@ -35,13 +56,36 @@
   "author": "YektaYar Team",
   "license": "PROPRIETARY",
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=20.19.0",
     "npm": ">=9.0.0"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
+    "@eslint/js": "^9.39.1",
+    "@ionic/cli": "^7.2.1",
     "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/parser": "^8.48.1",
+    "@vitest/ui": "^4.0.15",
+    "eslint": "^9.39.1",
+    "eslint-plugin-vitest": "^0.5.4",
+    "eslint-plugin-vue": "^10.6.2",
+    "globals": "^16.5.0",
     "sharp": "^0.34.5",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.49.0",
+    "vitest": "^4.0.15",
+    "vue-eslint-parser": "^10.2.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "socket.io-client": "^4.8.1"
+  },
+  "overrides": {
+    "cookie": ">=0.7.0",
+    "tmp": ">=0.2.4",
+    "eslint-plugin-vitest": {
+      "@typescript-eslint/utils": "^8.0.0"
+    }
   }
 }

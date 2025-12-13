@@ -44,6 +44,11 @@ print_error() {
     exit 1
 }
 
+# Function to print warning messages
+print_warning() {
+    echo -e "${YELLOW}⚠️  Warning: $1${NC}"
+}
+
 # Check if running on Ubuntu/Debian
 if [ ! -f /etc/debian_version ]; then
     print_error "This script is designed for Ubuntu/Debian systems only."

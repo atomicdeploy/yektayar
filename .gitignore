@@ -57,7 +57,7 @@ lerna-debug.log*
 
 # OS
 Thumbs.db
-Desktop.ini
+# Desktop.ini - Now tracked for folder customization
 
 # IDE
 .project
@@ -121,4 +121,3 @@ tmp/
 **/ios/App/build
 **/ios/App/*.xcworkspace
 !**/ios/App/*.xcworkspace/contents.xcworkspacedata
-

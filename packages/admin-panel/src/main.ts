@@ -3,29 +3,40 @@ import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import App from './App.vue'
 import router from './router'
-import './assets/main.css'
+import './assets/main.scss'
 import config from './config'
-import { validateApi } from './config/validation'
-import ErrorScreen from './components/ErrorScreen.vue'
+import { ErrorScreen } from '@yektayar/shared/components'
+import { parseSolutionsMarkdown, findSolutionForError, validateApi, getPackageVersion, missingHandler, installMissingKeyHandler } from '@yektayar/shared'
 import { useSessionStore } from './stores/session'
 import { useErrorStore } from './stores/error'
 import { messages } from './locales'
 import { logger } from '@yektayar/shared'
+import 'overlayscrollbars/overlayscrollbars.css'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
+
+// Get version from environment variable
+const APP_VERSION = getPackageVersion()
 
 // Log startup information
 logger.startup('YektaYar Admin Panel', {
   'API URL': config.apiBaseUrl,
   'Environment': import.meta.env.MODE || 'development',
-  'Version': '0.1.0'
+  'Version': APP_VERSION
 })
 
-// i18n configuration
+// i18n configuration with missing key handler
 const i18n = createI18n({
   legacy: false,
   locale: 'fa',
   fallbackLocale: 'en',
   messages,
+  missing: missingHandler,
 })
+
+// Install missing key handler for development
+if (import.meta.env.DEV) {
+  installMissingKeyHandler()
+}
 
 // Validate API configuration and reachability before mounting the app
 async function initializeApp() {
@@ -37,13 +48,23 @@ async function initializeApp() {
   if (!validationResult.isValid) {
     logger.error('❌ API Configuration Error:', validationResult.error)
     
+    // Parse solutions if available in development mode
+    let solution = null
+    if (import.meta.env.DEV && import.meta.env.SOLUTIONS_MD) {
+      const solutionsData = parseSolutionsMarkdown(import.meta.env.SOLUTIONS_MD)
+      solution = findSolutionForError(solutionsData, validationResult.error || '', validationResult.errorType)
+    }
+    
     // Create and mount error screen
     const errorApp = createApp(ErrorScreen, {
       title: 'API Configuration Error',
       message: 'Cannot start the admin panel due to API configuration issues.',
-      details: validationResult.error
+      details: validationResult.error,
+      solution: solution,
+      errorType: validationResult.errorType
     })
     
+    errorApp.use(i18n)
     errorApp.mount('#app')
     return
   }
@@ -58,6 +79,9 @@ async function initializeApp() {
   app.use(pinia)
   app.use(router)
   app.use(i18n)
+  
+  // Register OverlayScrollbars component globally
+  app.component('OverlayScrollbarsComponent', OverlayScrollbarsComponent)
 
   // Setup global error handlers
   const errorStore = useErrorStore(pinia)

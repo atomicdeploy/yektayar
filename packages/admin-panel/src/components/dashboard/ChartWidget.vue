@@ -1,12 +1,6 @@
 <template>
-  <div class="relative">
+  <div>
     <canvas ref="chartCanvas"></canvas>
-    <div
-      v-if="loading"
-      class="absolute inset-0 bg-white dark:bg-gray-800 bg-opacity-50 flex items-center justify-center rounded-lg"
-    >
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-    </div>
   </div>
 </template>
 
