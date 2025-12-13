@@ -131,7 +131,7 @@ function getAPIConfig() {
   const patternCode = process.env.FARAZSMS_PATTERN_CODE;
   
   if (!apiKey) {
-    printError('FARAZSMS_API_KEY is not configured in environment variables');
+    printError('FARAZSMS_API_KEY is not configured.\nPlease set it in your .env file or export it as an environment variable:\n  export FARAZSMS_API_KEY="your_api_key"');
   }
   
   return { apiKey, lineNumber, patternCode };
@@ -219,7 +219,7 @@ async function sendSingleSMS(recipient, message) {
   const { apiKey, lineNumber } = getAPIConfig();
   
   if (!lineNumber) {
-    printError('FARAZSMS_LINE_NUMBER is required for sending SMS');
+    printError('FARAZSMS_LINE_NUMBER is not configured.\nPlease set it in your .env file or export it as an environment variable:\n  export FARAZSMS_LINE_NUMBER="+983000505"');
   }
   
   const endpoint = 'https://edge.ippanel.com/v1/api/send';
@@ -258,10 +258,10 @@ async function sendPatternOTP(recipient, otpCode) {
   const { apiKey, lineNumber, patternCode } = getAPIConfig();
   
   if (!lineNumber) {
-    printError('FARAZSMS_LINE_NUMBER is required');
+    printError('FARAZSMS_LINE_NUMBER is not configured.\nPlease set it in your .env file or export it as an environment variable:\n  export FARAZSMS_LINE_NUMBER="+983000505"');
   }
   if (!patternCode) {
-    printError('FARAZSMS_PATTERN_CODE is required');
+    printError('FARAZSMS_PATTERN_CODE is not configured.\nPlease set it in your .env file or export it as an environment variable:\n  export FARAZSMS_PATTERN_CODE="your_pattern_code"');
   }
   
   const internationalPhone = '+' + normalizePhoneNumber(recipient);
@@ -361,7 +361,7 @@ async function sendSampleSMS(message) {
   const { apiKey, lineNumber } = getAPIConfig();
   
   if (!lineNumber) {
-    printError('FARAZSMS_LINE_NUMBER is required');
+    printError('FARAZSMS_LINE_NUMBER is not configured.\nPlease set it in your .env file or export it as an environment variable:\n  export FARAZSMS_LINE_NUMBER="+983000505"');
   }
   
   const endpoint = 'https://api.iranpayamak.com/ws/v1/sms/sample';
@@ -408,7 +408,7 @@ async function sendSimpleSMS(recipients, message) {
   const { apiKey, lineNumber } = getAPIConfig();
   
   if (!lineNumber) {
-    printError('FARAZSMS_LINE_NUMBER is required');
+    printError('FARAZSMS_LINE_NUMBER is not configured.\nPlease set it in your .env file or export it as an environment variable:\n  export FARAZSMS_LINE_NUMBER="+983000505"');
   }
   
   const endpoint = 'https://api.iranpayamak.com/ws/v1/sms/simple';

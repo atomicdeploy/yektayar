@@ -163,6 +163,40 @@ function getAPIConfig() {
 }
 
 /**
+ * Get or prompt for line number
+ */
+async function getLineNumber() {
+  let lineNumber = process.env.FARAZSMS_LINE_NUMBER;
+  
+  if (!lineNumber) {
+    printWarning('FARAZSMS_LINE_NUMBER is not configured in environment variables');
+    lineNumber = await getUserInput('Please enter your sender line number: ');
+    if (!lineNumber) {
+      throw new Error('Line number is required for this operation');
+    }
+  }
+  
+  return lineNumber;
+}
+
+/**
+ * Get or prompt for pattern code
+ */
+async function getPatternCode() {
+  let patternCode = process.env.FARAZSMS_PATTERN_CODE;
+  
+  if (!patternCode) {
+    printWarning('FARAZSMS_PATTERN_CODE is not configured in environment variables');
+    patternCode = await getUserInput('Please enter your pattern code: ');
+    if (!patternCode) {
+      throw new Error('Pattern code is required for this operation');
+    }
+  }
+  
+  return patternCode;
+}
+
+/**
  * Validate Iranian phone number format
  */
 function validatePhoneNumber(phoneNumber) {
@@ -258,11 +292,8 @@ async function sendSingleSMS(recipient, message) {
   try {
     print(`Sending SMS to ${recipient}...`, 'cyan', emojis.send);
     
-    const { apiKey, lineNumber } = getAPIConfig();
-    
-    if (!lineNumber) {
-      throw new Error('FARAZSMS_LINE_NUMBER is required for sending SMS');
-    }
+    const { apiKey } = getAPIConfig();
+    const lineNumber = await getLineNumber();
     
     const endpoint = 'https://edge.ippanel.com/v1/api/send';
     
@@ -302,14 +333,9 @@ async function sendPatternOTP(recipient, otpCode) {
   try {
     print(`Sending pattern OTP to ${recipient}...`, 'cyan', emojis.pattern);
     
-    const { apiKey, lineNumber, patternCode } = getAPIConfig();
-    
-    if (!lineNumber) {
-      throw new Error('FARAZSMS_LINE_NUMBER is required');
-    }
-    if (!patternCode) {
-      throw new Error('FARAZSMS_PATTERN_CODE is required');
-    }
+    const { apiKey } = getAPIConfig();
+    const lineNumber = await getLineNumber();
+    const patternCode = await getPatternCode();
     
     // Convert phone number to international format
     const internationalPhone = '+' + normalizePhoneNumber(recipient);
@@ -445,11 +471,8 @@ async function sendSampleSMS(message) {
   try {
     print('Sending sample SMS to account owner...', 'cyan', emojis.send);
     
-    const { apiKey, lineNumber } = getAPIConfig();
-    
-    if (!lineNumber) {
-      throw new Error('FARAZSMS_LINE_NUMBER is required');
-    }
+    const { apiKey } = getAPIConfig();
+    const lineNumber = await getLineNumber();
     
     const endpoint = 'https://api.iranpayamak.com/ws/v1/sms/sample';
     
@@ -489,11 +512,8 @@ async function sendSimpleSMS(recipients, message) {
   try {
     print(`Sending simple SMS to ${recipients.length} recipient(s)...`, 'cyan', emojis.send);
     
-    const { apiKey, lineNumber } = getAPIConfig();
-    
-    if (!lineNumber) {
-      throw new Error('FARAZSMS_LINE_NUMBER is required');
-    }
+    const { apiKey } = getAPIConfig();
+    const lineNumber = await getLineNumber();
     
     const endpoint = 'https://api.iranpayamak.com/ws/v1/sms/simple';
     
