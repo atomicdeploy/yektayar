@@ -1,0 +1,39 @@
+[
+  {
+    "name": "علی محمدی",
+    "email": "ali@example.com",
+    "phone": "09121234567",
+    "type": "admin",
+    "bio": "مدیر سیستم",
+    "passwordHash": "$2b$10$abcdefghijklmnopqrstuv"
+  },
+  {
+    "name": "دکتر سارا احمدی",
+    "email": "sara@example.com",
+    "phone": "09129876543",
+    "type": "psychologist",
+    "bio": "روانشناس بالینی با ۱۰ سال تجربه",
+    "specialization": "روانشناسی بالینی"
+  },
+  {
+    "name": "محمد رضایی",
+    "email": "mohammad@example.com",
+    "phone": "09135551234",
+    "type": "patient",
+    "bio": null
+  },
+  {
+    "name": "فاطمه کریمی",
+    "email": "fatemeh@example.com",
+    "phone": "09141112233",
+    "type": "patient",
+    "bio": null
+  },
+  {
+    "name": "رضا حسینی",
+    "email": "reza@example.com",
+    "phone": "09151234567",
+    "type": "patient",
+    "bio": null
+  }
+]

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <main class="main-view">
     <!-- Header -->
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ t('dashboard_page.title') }}</h1>
@@ -133,7 +133,7 @@
         </template>
       </draggable>
     </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">

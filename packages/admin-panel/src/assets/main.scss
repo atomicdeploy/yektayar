@@ -29,8 +29,13 @@
   --color-navy-800: #010b23;
   --color-navy-900: #00061b;
 
+  --font-family-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
   /* Custom font family */
-  --font-family-sans: Vazirmatn, system-ui, -apple-system, sans-serif;
+  --font-family-sans: Sahel, Vazirmatn, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif, var(--font-family-emoji);
+
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace, var(--font-family-emoji);
 }
 
 /* Configure dark mode to use class selector instead of media query */
@@ -53,6 +58,9 @@
   --primary-color: #d4a43e;
   --primary-rgb: 212, 164, 62;
   --primary-gradient: linear-gradient(135deg, #d4a43e 0%, #ba8b2d 100%);
+
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
 }
 
 .dark {
@@ -86,8 +94,7 @@
 
   body {
     margin: 0;
-    font-family: 'Sahel', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: var(--font-family-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -108,6 +115,9 @@
     -webkit-touch-callout: none;
   }
 }
+
+/* Import shared component styles */
+@import './components.scss';
 
 /* OverlayScrollbars Custom Styling - Light Theme */
 .os-theme-yektayar.os-scrollbar-horizontal,

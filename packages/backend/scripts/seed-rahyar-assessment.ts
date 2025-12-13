@@ -545,7 +545,7 @@ async function seedRahyarAssessment() {
   try {
     logger.info('Starting Rahyar assessment data seeding...')
 
-    // Check if test already exists
+    // Check if assessment already exists
     const existing = await db`
       SELECT id FROM assessments WHERE title = ${rahyarAssessment.title}
     `
@@ -556,13 +556,13 @@ async function seedRahyarAssessment() {
     }
 
     // Insert the Rahyar assessment
-    const [test] = await db`
+    const [assessment] = await db`
       INSERT INTO assessments (title, description, questions)
       VALUES (${rahyarAssessment.title}, ${rahyarAssessment.description}, ${db.json(rahyarAssessment.questions)})
       RETURNING *
     `
 
-    logger.success(`Rahyar assessment created with ID: ${test.id}`)
+    logger.success(`Rahyar assessment created with ID: ${assessment.id}`)
     logger.info(`Title: ${rahyarAssessment.title}`)
     logger.info(`Questions: ${rahyarAssessment.questions.length}`)
     logger.info(`Sections: 9`)

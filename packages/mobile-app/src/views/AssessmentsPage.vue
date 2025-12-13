@@ -27,7 +27,7 @@
       >
         <div class="content-wrapper">
           <!-- Hero Banner -->
-          <div class="tests-hero">
+          <div class="assessments-hero">
             <div class="hero-icon-wrapper">
               <ion-icon :icon="documentText"></ion-icon>
             </div>
@@ -370,7 +370,7 @@ onMounted(() => {
 }
 
 /* Hero Banner */
-.tests-hero {
+.assessments-hero {
   background: var(--accent-gradient);
   padding: 2rem 1.5rem;
   text-align: center;
@@ -378,7 +378,7 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.tests-hero::before {
+.assessments-hero::before {
   content: '';
   position: absolute;
   top: -50%;
@@ -408,7 +408,7 @@ onMounted(() => {
   color: white;
 }
 
-.tests-hero h2 {
+.assessments-hero h2 {
   font-size: 1.75rem;
   font-weight: 700;
   color: white;
@@ -417,7 +417,7 @@ onMounted(() => {
   z-index: 1;
 }
 
-.tests-hero p {
+.assessments-hero p {
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.95);
   margin: 0;
