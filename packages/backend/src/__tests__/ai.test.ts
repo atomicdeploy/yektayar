@@ -40,8 +40,8 @@ describe('AI Service - Pollinations Integration', () => {
     const result = await streamAIResponse(message)
     
     expect(result.response).toBeDefined()
-    expect(typeof response).toBe('string')
-    expect(response.length).toBeGreaterThan(20)
+    expect(typeof result.response).toBe('string')
+    expect(result.response.length).toBeGreaterThan(20)
     
     // Response should be supportive
     // AI responses should contain helpful content
@@ -57,8 +57,8 @@ describe('AI Service - Pollinations Integration', () => {
     const result = await streamAIResponse(message, conversationHistory)
     
     expect(result.response).toBeDefined()
-    expect(typeof response).toBe('string')
-    expect(response.length).toBeGreaterThan(0)
+    expect(typeof result.response).toBe('string')
+    expect(result.response.length).toBeGreaterThan(0)
     
     // AI should ideally remember the name from context
     // However, pollinations.ai may not always maintain perfect context
@@ -83,10 +83,10 @@ describe('AI Service - Pollinations Integration', () => {
     const result = await streamAIResponse(message)
     
     expect(result.response).toBeDefined()
-    expect(typeof response).toBe('string')
+    expect(typeof result.response).toBe('string')
     
     // Even if API fails, we should get a fallback response
-    expect(response.length).toBeGreaterThan(0)
+    expect(result.response.length).toBeGreaterThan(0)
   }, 30000)
 })
 
@@ -109,7 +109,7 @@ describe('AI Service Response Quality', () => {
     const result = await streamAIResponse(message)
     
     expect(result.response).toBeDefined()
-    expect(response.length).toBeGreaterThan(30)
+    expect(result.response.length).toBeGreaterThan(30)
     
     // Check that response is supportive (contains common supportive words)
     const supportiveWords = ['understand', 'help', 'support', 'anxiety', 'feel', 'cope', 'manage']
@@ -125,7 +125,7 @@ describe('AI Service Response Quality', () => {
     const result = await streamAIResponse(message)
     
     expect(result.response).toBeDefined()
-    expect(response.length).toBeGreaterThan(30)
+    expect(result.response.length).toBeGreaterThan(30)
     
     // Response should contain practical advice
     const practicalWords = ['stress', 'relaxation', 'exercise', 'breathing', 'technique', 'help', 'manage', 'practice']
@@ -140,7 +140,7 @@ describe('AI Service Response Quality', () => {
     const result = await streamAIResponse(message)
     
     expect(result.response).toBeDefined()
-    expect(response.length).toBeGreaterThan(20)
+    expect(result.response.length).toBeGreaterThan(20)
     
     // Response should be professional and supportive
     // It should not contain inappropriate language
