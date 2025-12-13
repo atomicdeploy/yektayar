@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client'
 import config from '@/config'
 import { logger, getWebSocketPathFromEnv, detectTimezone, detectLanguage } from '@yektayar/shared'
 import apiClient from '@/api'
+import { getCapacitorDeviceInfo } from '@/utils/deviceInfo'
 
 const API_URL = config.apiBaseUrl
 const STORAGE_KEY = 'yektayar_session_token'
@@ -60,7 +61,12 @@ export const useSessionStore = defineStore('session', () => {
         }
       }
 
-      // Acquire a new session
+      // Collect comprehensive device information
+      logger.info('Collecting device information...')
+      const deviceInfo = await getCapacitorDeviceInfo()
+      logger.debug('Device info collected:', deviceInfo)
+
+      // Acquire a new session with device information
       logger.custom(logger.emoji('rocket'), 'Acquiring new session...', 'cyan')
       
       // Detect client locale information
@@ -76,7 +82,7 @@ export const useSessionStore = defineStore('session', () => {
         timezone?: string
       }>(
         '/auth/acquire-session',
-        {},
+        { deviceInfo }, // Send device info in the request body
         { 
           skipAuth: true,
           headers: {

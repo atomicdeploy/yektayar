@@ -4,13 +4,65 @@ import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
 import { logger, getBestLanguageMatch, normalizeTimezone } from '@yektayar/shared'
+import { getClientIpAddress } from '../utils/ipAddress'
+
+// Define request body types
+interface AcquireSessionBody {
+  deviceInfo?: Record<string, any>
+}
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
-  .post('/acquire-session', async ({ headers, request: _request }) => {
+  .post('/acquire-session', async ({ headers, request: _request, body }) => {
     try {
       // Extract metadata from request
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
+      
+      // Get device info from body if provided
+      const requestBody = body as AcquireSessionBody
+      const deviceInfo = requestBody?.deviceInfo || {}
+      
+      // Extract device info from custom headers
+      const deviceHeaders = {
+        platform: headers['x-device-platform'],
+        deviceModel: headers['x-device-model'],
+        deviceManufacturer: headers['x-device-manufacturer'],
+        osName: headers['x-os-name'],
+        osVersion: headers['x-os-version'],
+        appVersion: headers['x-app-version'],
+        screenSize: headers['x-screen-size'],
+        screenDensity: headers['x-screen-density'],
+        viewportSize: headers['x-viewport-size'],
+        language: headers['x-device-language'],
+        languages: headers['x-device-languages'],
+        timezone: headers['x-device-timezone'],
+        timezoneOffset: headers['x-device-timezone-offset'],
+        deviceId: headers['x-device-id'],
+        connectionType: headers['x-connection-type'],
+        capabilities: headers['x-device-capabilities'],
+      }
+      
+      // Merge device info from body and headers
+      const mergedDeviceInfo = {
+        ...deviceInfo,
+        ...Object.fromEntries(
+          Object.entries(deviceHeaders).filter(([_, v]) => v !== undefined)
+        ),
+      }
+      
+      // Parse capabilities if it's a JSON string
+      if (typeof mergedDeviceInfo.capabilities === 'string') {
+        try {
+          mergedDeviceInfo.capabilities = JSON.parse(mergedDeviceInfo.capabilities)
+        } catch (e) {
+          // Keep as string if parsing fails
+        }
+      }
+      
+      // Parse languages array if it's a comma-separated string
+      if (typeof mergedDeviceInfo.languages === 'string') {
+        mergedDeviceInfo.languages = mergedDeviceInfo.languages.split(',').map((l: string) => l.trim())
+      }
       
       // Detect language from Accept-Language header
       const acceptLanguage = headers['accept-language'] || ''
@@ -25,7 +77,8 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         ip,
         language: detectedLanguage,
         timezone: validatedTimezone,
-        deviceInfo: {
+        deviceInfo: mergedDeviceInfo,
+        requestHeaders: {
           platform: headers['sec-ch-ua-platform'] || 'unknown',
           mobile: headers['sec-ch-ua-mobile'] === '?1'
         }
@@ -228,7 +281,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
 
       // Create session for logged-in user
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
       
       const metadata = {
         userAgent,
@@ -376,7 +429,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
 
       // Create session for logged-in user
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
       
       const metadata = {
         userAgent,
