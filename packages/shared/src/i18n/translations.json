@@ -40,7 +40,9 @@
     "messages": {
       "no_messages": "پیامی وجود ندارد",
       "type_message": "پیام خود را بنویسید...",
-      "send": "ارسال"
+      "send": "ارسال",
+      "ai_error": "متأسفانه نتوانستم پیام شما را ارسال کنم. لطفاً دوباره تلاش کنید.",
+      "ai_no_response": "متأسفانه نتوانستم پاسخی تولید کنم."
     },
     "appointments": {
       "book": "رزرو نوبت",
@@ -222,7 +224,9 @@
     "messages": {
       "no_messages": "No messages",
       "type_message": "Type your message...",
-      "send": "Send"
+      "send": "Send",
+      "ai_error": "Sorry, I could not send your message. Please try again.",
+      "ai_no_response": "Sorry, I could not generate a response."
     },
     "appointments": {
       "book": "Book Appointment",
