@@ -160,6 +160,18 @@ export function isSupportedLanguage(language: string): language is SupportedLang
 }
 
 /**
+ * Normalize language code to supported language
+ * Safely converts a language string to a supported language or returns default
+ * 
+ * @param language Language code to normalize
+ * @returns Supported language or default
+ */
+export function normalizeLanguage(language: string): SupportedLanguage {
+  const normalized = language.toLowerCase().split('-')[0]
+  return isSupportedLanguage(normalized) ? normalized : DEFAULT_LANGUAGE
+}
+
+/**
  * Parse Accept-Language header (server-side)
  * 
  * @param acceptLanguage Accept-Language header value
@@ -193,12 +205,51 @@ export function getBestLanguageMatch(acceptLanguage: string): SupportedLanguage 
   const languages = parseAcceptLanguage(acceptLanguage)
   
   for (const { language } of languages) {
-    if (isSupportedLanguage(language)) {
-      return language
+    const normalized = normalizeLanguage(language)
+    if (isSupportedLanguage(normalized)) {
+      return normalized
     }
   }
   
   return DEFAULT_LANGUAGE
+}
+
+/**
+ * Locale to country code mapping
+ * Maps language codes to their primary locale identifiers
+ */
+const LOCALE_MAPPING: Record<SupportedLanguage, string> = {
+  fa: 'fa-IR',
+  en: 'en-US'
+}
+
+/**
+ * Validate IANA timezone identifier
+ * 
+ * @param timezone Timezone string to validate
+ * @returns True if valid IANA timezone
+ */
+export function isValidTimezone(timezone: string): boolean {
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: timezone })
+    return true
+  } catch (_error) {
+    return false
+  }
+}
+
+/**
+ * Normalize timezone to valid IANA identifier
+ * 
+ * @param timezone Timezone to normalize
+ * @returns Valid timezone or UTC fallback
+ */
+export function normalizeTimezone(timezone: string): string {
+  if (!timezone || timezone.trim() === '') {
+    return 'UTC'
+  }
+  
+  return isValidTimezone(timezone) ? timezone : 'UTC'
 }
 
 /**
@@ -214,7 +265,7 @@ export function formatDateByLocale(
   language: SupportedLanguage = DEFAULT_LANGUAGE,
   options?: Intl.DateTimeFormatOptions
 ): string {
-  const locale = language === 'fa' ? 'fa-IR' : 'en-US'
+  const locale = LOCALE_MAPPING[language]
   
   try {
     return new Intl.DateTimeFormat(locale, options).format(date)

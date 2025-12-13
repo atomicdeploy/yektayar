@@ -6,6 +6,9 @@ import {
   getTimezoneInfo,
   detectLocaleInfo,
   isSupportedLanguage,
+  normalizeLanguage,
+  isValidTimezone,
+  normalizeTimezone,
   parseAcceptLanguage,
   getBestLanguageMatch,
   formatDateByLocale,
@@ -148,6 +151,57 @@ describe('Locale Detection Utilities', () => {
       expect(isSupportedLanguage('fr')).toBe(false)
       expect(isSupportedLanguage('de')).toBe(false)
       expect(isSupportedLanguage('es')).toBe(false)
+    })
+  })
+
+  describe('normalizeLanguage', () => {
+    it('should normalize supported language codes', () => {
+      expect(normalizeLanguage('fa')).toBe('fa')
+      expect(normalizeLanguage('en')).toBe('en')
+      expect(normalizeLanguage('FA')).toBe('fa')
+      expect(normalizeLanguage('EN')).toBe('en')
+    })
+
+    it('should handle locale variants', () => {
+      expect(normalizeLanguage('en-US')).toBe('en')
+      expect(normalizeLanguage('en-GB')).toBe('en')
+      expect(normalizeLanguage('fa-IR')).toBe('fa')
+    })
+
+    it('should return default for unsupported languages', () => {
+      expect(normalizeLanguage('fr')).toBe(DEFAULT_LANGUAGE)
+      expect(normalizeLanguage('de-DE')).toBe(DEFAULT_LANGUAGE)
+      expect(normalizeLanguage('invalid')).toBe(DEFAULT_LANGUAGE)
+    })
+  })
+
+  describe('isValidTimezone', () => {
+    it('should validate correct IANA timezones', () => {
+      expect(isValidTimezone('UTC')).toBe(true)
+      expect(isValidTimezone('Asia/Tehran')).toBe(true)
+      expect(isValidTimezone('America/New_York')).toBe(true)
+      expect(isValidTimezone('Europe/London')).toBe(true)
+    })
+
+    it('should reject invalid timezones', () => {
+      expect(isValidTimezone('Invalid/Timezone')).toBe(false)
+      expect(isValidTimezone('NotATimezone')).toBe(false)
+      expect(isValidTimezone('')).toBe(false)
+    })
+  })
+
+  describe('normalizeTimezone', () => {
+    it('should accept valid timezones', () => {
+      expect(normalizeTimezone('Asia/Tehran')).toBe('Asia/Tehran')
+      expect(normalizeTimezone('UTC')).toBe('UTC')
+      expect(normalizeTimezone('America/New_York')).toBe('America/New_York')
+    })
+
+    it('should fallback to UTC for invalid timezones', () => {
+      expect(normalizeTimezone('Invalid/Timezone')).toBe('UTC')
+      expect(normalizeTimezone('NotATimezone')).toBe('UTC')
+      expect(normalizeTimezone('')).toBe('UTC')
+      expect(normalizeTimezone('   ')).toBe('UTC')
     })
   })
 

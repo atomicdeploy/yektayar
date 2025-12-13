@@ -3,7 +3,7 @@ import { getDatabase } from '../services/database'
 import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
-import { logger, getBestLanguageMatch } from '@yektayar/shared'
+import { logger, getBestLanguageMatch, normalizeTimezone } from '@yektayar/shared'
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post('/acquire-session', async ({ headers, request: _request }) => {
@@ -16,14 +16,15 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       const acceptLanguage = headers['accept-language'] || ''
       const detectedLanguage = acceptLanguage ? getBestLanguageMatch(acceptLanguage) : 'fa'
       
-      // Client can send timezone in a custom header
+      // Client can send timezone in a custom header - validate it
       const clientTimezone = headers['x-timezone'] || 'UTC'
+      const validatedTimezone = normalizeTimezone(clientTimezone)
       
       const metadata = {
         userAgent,
         ip,
         language: detectedLanguage,
-        timezone: clientTimezone,
+        timezone: validatedTimezone,
         deviceInfo: {
           platform: headers['sec-ch-ua-platform'] || 'unknown',
           mobile: headers['sec-ch-ua-mobile'] === '?1'
@@ -38,7 +39,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
           token: session.token,
           expiresAt: session.expiresAt.toISOString(),
           language: detectedLanguage,
-          timezone: clientTimezone
+          timezone: validatedTimezone
         }
       }
     } catch (error) {
