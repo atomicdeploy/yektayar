@@ -60,7 +60,7 @@ A fully automated installation process was established that covers:
 
 | Missing Script | Purpose | Priority | Workaround |
 |---------------|---------|----------|------------|
-| None identified | All necessary scripts exist | N/A | Manual steps documented in INSTALLATION.md |
+| None identified | All necessary scripts exist | N/A | Manual steps documented in [INSTALLATION.md](../guides/INSTALLATION.md) |
 
 ### 3. Issues Encountered and Fixed
 
@@ -152,7 +152,7 @@ A fully automated installation process was established that covers:
 
 #### New Documentation:
 
-1. **INSTALLATION.md** (Root level)
+1. **[INSTALLATION.md](../guides/INSTALLATION.md)** (docs/guides/)
    - Complete installation guide
    - Quick start with automated script
    - Manual installation steps
@@ -358,7 +358,7 @@ sudo ./scripts/manage-services.sh logs backend
 ## Appendix B: File Changes Summary
 
 ### Files Created:
-- `INSTALLATION.md` - Comprehensive installation guide
+- [`INSTALLATION.md`](../guides/INSTALLATION.md) - Comprehensive installation guide
 - `scripts/install-complete.sh` - Master installation script
 
 ### Files Modified:
