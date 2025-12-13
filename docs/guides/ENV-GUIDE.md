@@ -160,12 +160,32 @@ Priority order: `.env.local` > `.env.production` > `.env`
 | `API_BASE_URL` | Yes | `http://localhost:3000` | Backend API base URL |
 | `VITE_ENVIRONMENT` | Yes | `development` | Environment name |
 
+### SMS Provider Configuration (FarazSMS)
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `FARAZSMS_API_KEY` | Yes (for SMS) | - | API Key from FarazSMS panel |
+| `FARAZSMS_PATTERN_CODE` | Yes (for SMS) | - | Pattern UID for OTP template |
+| `FARAZSMS_LINE_NUMBER` | Yes (for SMS) | - | Sender line number assigned by FarazSMS |
+
+**Setting up FarazSMS:**
+1. Register at [FarazSMS](https://farazsms.com/)
+2. Get your API key from the panel
+3. Create an OTP pattern template (e.g., "کد تایید شما: %otp%")
+4. After approval, use the pattern UID as `FARAZSMS_PATTERN_CODE`
+5. Note your assigned line number for `FARAZSMS_LINE_NUMBER`
+
+**Testing SMS:**
+```bash
+# Test SMS sending
+bun scripts/test-sms.ts 09121234567
+```
+
 ### Optional API Keys
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `AI_API_KEY` | No | - | AI service API key (future use) |
-| `SMS_GATEWAY_API_KEY` | No | - | SMS gateway key (future use) |
 | `EMAIL_API_KEY` | No | - | Email service key (future use) |
 
 ## Management Script

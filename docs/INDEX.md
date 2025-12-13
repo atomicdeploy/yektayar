@@ -167,6 +167,98 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 
 ### For Backend Developers
 
+#### Security & Compliance
+- **[Security Policy](../SECURITY.md)** - Security practices and vulnerability reporting
+
+---
+
+## 📋 Documentation by Topic
+
+### Architecture
+- [Architecture Overview](ARCHITECTURE.md) - Complete system design with prototype/production phases and alternative approaches
+- [Requirements Review](REQUIREMENTS-REVIEW.md) - Requirements analysis
+
+### Development
+- [Development Guide](../DEVELOPMENT.md) - Development practices and prototype sprint guide
+- [Getting Started Guide](GETTING-STARTED.md) - Onboarding guide
+- [Quick Reference](QUICK-REFERENCE.md) - Code snippets & patterns
+- [SMS OTP Integration](SMS-OTP-INTEGRATION.md) - SMS OTP setup and usage guide
+
+### Setup & Deployment
+- [Setup Guide](SETUP.md) - Complete setup instructions
+- [Ubuntu 24.04 Deployment](UBUNTU-24-DEPLOYMENT.md) - VPS deployment
+- [Network Configuration](NETWORK-CONFIGURATION.md) - Network setup
+- [Bun vs NPM](BUN-VS-NPM.md) - Runtime guide
+
+### Project Management
+- [Implementation Roadmap](../ROADMAP.md) - Production roadmap with prototype sprint details
+- [Quick Start](../QUICK-START.md) - Quick setup
+
+---
+
+## 🗂️ Complete File Structure
+
+```
+yektayar/
+├── README.md                      # Main project overview
+├── ROADMAP.md                     # Implementation roadmap (includes prototype sprint)
+├── DEVELOPMENT.md                 # Development guide (includes prototype sprint details)
+├── QUICK-START.md                 # Quick start for monorepo
+├── SECURITY.md                    # Security policy
+├── CONTRIBUTING.md                # Contributing guidelines
+│
+└── docs/                          # Documentation directory
+    ├── INDEX.md                   # This file - documentation hub
+    ├── README.md                  # Documentation overview
+    │
+    ├── GETTING-STARTED.md         # New developer onboarding
+    ├── QUICK-REFERENCE.md         # Code snippets & daily checklist
+    │
+    ├── ARCHITECTURE.md            # System architecture (all phases & alternatives)
+    ├── REQUIREMENTS-REVIEW.md     # Requirements analysis
+    │
+    ├── SETUP.md                   # Setup guide (all phases)
+    ├── UBUNTU-24-DEPLOYMENT.md    # Ubuntu VPS deployment
+    ├── NETWORK-CONFIGURATION.md   # Network configuration
+    └── BUN-VS-NPM.md             # Bun vs NPM guide
+```
+
+---
+
+## 📖 Reading Paths
+
+### Path 1: New Developer (Full Onboarding)
+1. [Project Overview](../README.md) - 10 min
+2. [Getting Started Guide](GETTING-STARTED.md) - 15 min
+3. [Architecture Overview](ARCHITECTURE.md) - Focus on prototype/production sections - 20 min
+4. [Development Guide](../DEVELOPMENT.md) - 20 min
+5. [Quick Reference](QUICK-REFERENCE.md) - 5 min (keep open)
+
+**Time:** ~1.5 hours
+
+### Path 2: Quick Start (Get Running Fast)
+1. [Quick Start Guide](../QUICK-START.md) - 5 min
+2. [Development Guide](../DEVELOPMENT.md) - Skim setup section - 10 min
+3. [Quick Reference](QUICK-REFERENCE.md) - 5 min
+
+**Time:** ~20 minutes
+
+### Path 3: Prototype Development
+1. [Getting Started Guide](GETTING-STARTED.md) - 15 min
+2. [Architecture Overview](ARCHITECTURE.md) - Prototype sections - 15 min
+3. [Development Guide](../DEVELOPMENT.md) - Prototype Sprint Guide section - 15 min
+4. [Quick Reference](QUICK-REFERENCE.md) - 5 min (keep open)
+5. [Implementation Roadmap](../ROADMAP.md) - Prototype Sprint section - Reference as needed
+
+**Time:** ~50 minutes + ongoing reference
+
+### Path 4: Production Deployment
+1. [Architecture Overview](ARCHITECTURE.md) - 20 min
+2. [Setup Guide](SETUP.md) - Production section - 30 min
+3. [Ubuntu 24.04 Deployment](UBUNTU-24-DEPLOYMENT.md) - 30 min
+4. [Network Configuration](NETWORK-CONFIGURATION.md) - 10 min
+
+**Time:** ~1.5 hours
 **Focus on:**
 - [Database Structure](guides/DATABASE-STRUCTURE.md) - Database schema
 - [API Documentation](api/) - All API endpoints

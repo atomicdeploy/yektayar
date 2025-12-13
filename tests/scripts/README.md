@@ -8,6 +8,84 @@ Most test scripts can be run directly or via npm scripts defined in the root `pa
 
 ## Available Test Scripts
 
+### SMS & OTP Tests
+
+#### `test-all-sms.ts`
+Comprehensive test suite for all SMS functions including pattern SMS, regular SMS, VOTP, and balance checking.
+
+**Usage:**
+```bash
+bun tests/scripts/test-all-sms.ts
+```
+
+#### `test-balance-credit.ts`
+Tests SMS credit balance checking functionality across different API formats.
+
+**Usage:**
+```bash
+bun tests/scripts/test-balance-credit.ts
+```
+
+#### `test-pattern-otp.ts`
+Tests pattern-based OTP sending functionality.
+
+**Usage:**
+```bash
+bun tests/scripts/test-pattern-otp.ts
+```
+
+#### `test-sms-extended.ts`
+Extended SMS testing including VOTP (Voice OTP) and various SMS formats.
+
+**Usage:**
+```bash
+bun tests/scripts/test-sms-extended.ts
+```
+
+#### `test-sms-functions.ts`
+Unit tests for individual SMS service functions.
+
+**Usage:**
+```bash
+bun tests/scripts/test-sms-functions.ts
+```
+
+#### `test-edge-pattern.js`
+Tests IPPanel Edge API pattern sending.
+
+**Usage:**
+```bash
+node tests/scripts/test-edge-pattern.js
+```
+
+#### `test-integration-complete.ts`
+Complete integration test for all SMS features.
+
+**Usage:**
+```bash
+bun tests/scripts/test-integration-complete.ts
+```
+
+#### `test-final-all-apis.ts`
+Final validation of all SMS API endpoints.
+
+**Usage:**
+```bash
+bun tests/scripts/test-final-all-apis.ts
+```
+
+#### `test-rest-api-v1.ts`
+REST API v1 endpoint testing.
+
+**Usage:**
+```bash
+bun tests/scripts/test-rest-api-v1.ts
+```
+
+**Note:** For user-facing SMS testing, use the main test script: `bun scripts/test-sms.ts [phone] [options]`
+
+See [docs/guides/SMS-OTP-INTEGRATION.md](../../docs/guides/SMS-OTP-INTEGRATION.md) for full SMS documentation.
+
 ### Database & API Tests
 
 #### `test-health-db.cjs`

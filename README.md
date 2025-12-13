@@ -6,8 +6,8 @@
 
 **Mental Health Care Platform - Mono Repo**
 
-> **Version:** 0.1.0  
-> **Status:** In Development  
+> **Version:** 0.1.0
+> **Status:** In Development
 > **Architecture:** Mono Repo with Backend (Elysia.js), Admin Panel (Vue.js), Mobile App (Ionic + Capacitor)
 
 ---
@@ -38,6 +38,7 @@ YektaYar is a comprehensive mental health care platform that connects users with
 ### Core Features
 
 - ✅ User authentication (OTP-based, session management)
+- ✅ SMS OTP integration with FarazSMS for secure authentication
 - ✅ AI chatbot for mental health support
 - ✅ Appointment booking with professionals
 - ✅ Psychological assessments
@@ -181,7 +182,7 @@ npm run test:ui           # Interactive UI
 npm run test:coverage     # Generate coverage report
 ```
 
-**Important:** 
+**Important:**
 - ⚠️ Always use `logger` utility instead of `console.*`
 - ⚠️ Validate i18n keys before committing new translations
 - ✅ All tests must pass before committing
@@ -246,17 +247,36 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 - **[Bun vs NPM](docs/guides/BUN-VS-NPM.md)** - Runtime comparison guide
 
 #### Additional Resources
+- **[SMS OTP Integration Guide](docs/SMS-OTP-INTEGRATION.md)** - FarazSMS setup and usage
 - **[Socket.IO Connection Guide](docs/api/SOCKETIO-GUIDE.md)** - Real-time WebSocket communication setup and usage
 - **[Requirements Review](docs/REQUIREMENTS-REVIEW.md)** - Comprehensive requirements analysis
 - **[CORS Fix Documentation](CORS-FIX.md)** - CORS OPTIONS verb support implementation
 - **[Security Policy](SECURITY.md)** - Security practices and reporting
 - **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
 
-#### Testing
+#### Testing & Tools
 - **[Socket.IO Test Script](tests/scripts/test-socketio.sh)** - Interactive TUI for testing Socket.IO functionality
   ```bash
   ./tests/scripts/test-socketio.sh
   ```
+
+- **SMS Management Tools** - CLI and TUI for SMS operations
+  ```bash
+  # Interactive TUI for SMS management
+  npm run sms:tui
+  
+  # Non-interactive CLI for automation
+  npm run sms:cli -- help
+  npm run sms:cli -- balance
+  npm run sms:cli -- otp --to 09121234567
+  ```
+  Features:
+  - Get credit balance (IPPanel/IranPayamak)
+  - Send single SMS
+  - Send pattern-based OTP
+  - Send Voice OTP (VOTP)
+  - Fetch inbox messages
+  - Send sample/simple SMS (bulk support)
 
 ---
 
@@ -264,17 +284,17 @@ For detailed instructions on building Android APKs, see **[packages/mobile-app/B
 
 This mono repo addresses all requirements from the issue:
 
-✅ **Mono repo structure** with packages for backend, admin, mobile, and shared code  
-✅ **Backend**: Elysia.js (fast, modern, TypeScript-first)  
-✅ **Admin Panel**: Vue.js with Vite  
-✅ **Mobile App**: Ionic + Capacitor + Vue.js  
-✅ **Shared code**: Types, schemas, utilities, i18n  
-✅ **No React**: All React/Spark remnants removed  
-✅ **Node.js/TypeScript**: Consistent across all packages  
-✅ **Simple structure**: Easy to understand and extend  
-✅ **Fast prototyping**: Minimal boilerplate, ready to develop  
-✅ **i18n support**: Persian (primary) + English (secondary)  
-✅ **RTL support**: Built into Vue.js and Ionic  
+✅ **Mono repo structure** with packages for backend, admin, mobile, and shared code
+✅ **Backend**: Elysia.js (fast, modern, TypeScript-first)
+✅ **Admin Panel**: Vue.js with Vite
+✅ **Mobile App**: Ionic + Capacitor + Vue.js
+✅ **Shared code**: Types, schemas, utilities, i18n
+✅ **No React**: All React/Spark remnants removed
+✅ **Node.js/TypeScript**: Consistent across all packages
+✅ **Simple structure**: Easy to understand and extend
+✅ **Fast prototyping**: Minimal boilerplate, ready to develop
+✅ **i18n support**: Persian (primary) + English (secondary)
+✅ **RTL support**: Built into Vue.js and Ionic
 
 ---
 
@@ -287,6 +307,10 @@ This mono repo addresses all requirements from the issue:
 - `npm run test` - Test all packages
 - `npm run clean` - Clean all build artifacts
 - `npm run db:cli` - Connect to database using pgcli or psql
+- `npm run sms:tui` - Interactive SMS management TUI
+- `npm run sms:cli -- <command>` - Non-interactive SMS CLI
+- `npm run socketio:test` - Socket.IO testing TUI
+- `npm run ai:test` - AI chatbot testing TUI
 
 ### Package-specific Scripts
 - `npm run dev:backend` - Backend only
@@ -359,5 +383,5 @@ This is a proprietary project in prototype phase. Team members only.
 
 ---
 
-**Last Updated**: 2025-11-10  
+**Last Updated**: 2025-11-10
 **Version**: 0.1.0
