@@ -54,9 +54,9 @@ export function detectLanguage(): SupportedLanguage {
   // Extract language code (e.g., 'en-US' -> 'en', 'fa-IR' -> 'fa')
   const langCode = browserLang.toLowerCase().split('-')[0]
   
-  // Check if it's a supported language
-  if (SUPPORTED_LANGUAGES.includes(langCode as SupportedLanguage)) {
-    return langCode as SupportedLanguage
+  // Check if it's a supported language using type guard
+  if (isSupportedLanguage(langCode)) {
+    return langCode
   }
 
   // Default to Persian
@@ -162,7 +162,7 @@ export function detectLocaleInfo(): LocaleInfo {
  * @returns True if language is supported
  */
 export function isSupportedLanguage(language: string): language is SupportedLanguage {
-  return SUPPORTED_LANGUAGES.includes(language as SupportedLanguage)
+  return (SUPPORTED_LANGUAGES as readonly string[]).includes(language)
 }
 
 /**
