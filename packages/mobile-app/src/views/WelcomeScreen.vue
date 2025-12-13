@@ -217,12 +217,12 @@ const errorMessage = ref<string | null>(null)
 // Exit animation state - simple flag for whole-screen fade
 const isExiting = ref(false)
 
-// Refs for elements that need to exit
-const ctaButtonRef = ref<HTMLElement | null>(null)
-const termsContainerRef = ref<HTMLElement | null>(null)
-const heroContainerRef = ref<HTMLElement | null>(null)
-const headerRef = ref<HTMLElement | null>(null)
-const disclaimerRef = ref<HTMLElement | null>(null)
+// Refs for elements that need to exit (reserved for future animations)
+// const ctaButtonRef = ref<HTMLElement | null>(null)
+// const termsContainerRef = ref<HTMLElement | null>(null)
+// const heroContainerRef = ref<HTMLElement | null>(null)
+// const headerRef = ref<HTMLElement | null>(null)
+// const disclaimerRef = ref<HTMLElement | null>(null)
 const errorMessageRef = ref<HTMLElement | null>(null)
 
 // Scroll reminder state

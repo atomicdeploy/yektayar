@@ -190,7 +190,7 @@ const { locale } = useI18n()
 
 // Refs
 const contentRef = ref()
-const messagesContainer = ref()
+// const messagesContainer = ref() // Unused for now - reserved for future scroll functionality
 const messageText = ref('')
 
 // AI Chat composable
