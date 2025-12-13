@@ -7,6 +7,7 @@ This directory contains reverse proxy configurations for Apache, Nginx, and Cadd
 The YektaYar platform consists of multiple services running on different ports:
 
 - **Backend API** (`api.yektayar.ir`) → `localhost:3000`
+- **WebSocket Server** (`ws.yektayar.ir`) → `localhost:3500` (Socket.IO + Native WebSocket)
 - **Admin Panel** (`panel.yektayar.ir`) → `localhost:5173`
 - **Mobile App** (`app.yektayar.ir`) → `localhost:8100`
 - **Static Files** (`static.yektayar.ir`) → `/var/www/yektayar/static`
@@ -56,17 +57,20 @@ sudo ./scripts/install-caddy.sh
 config/webserver/
 ├── apache/
 │   ├── api.yektayar.ir.conf
+│   ├── ws.yektayar.ir.conf
 │   ├── panel.yektayar.ir.conf
 │   ├── app.yektayar.ir.conf
 │   └── static.yektayar.ir.conf
 ├── nginx/
 │   ├── api.yektayar.ir.conf
+│   ├── ws.yektayar.ir.conf
 │   ├── panel.yektayar.ir.conf
 │   ├── app.yektayar.ir.conf
 │   └── static.yektayar.ir.conf
 ├── caddy/
 │   ├── Caddyfile
 │   ├── api.yektayar.ir
+│   ├── ws.yektayar.ir
 │   ├── panel.yektayar.ir
 │   ├── app.yektayar.ir
 │   └── static.yektayar.ir
@@ -95,6 +99,7 @@ If you prefer to configure manually without using the installation scripts:
 3. **Enable sites:**
    ```bash
    sudo a2ensite api.yektayar.ir.conf
+   sudo a2ensite ws.yektayar.ir.conf
    sudo a2ensite panel.yektayar.ir.conf
    sudo a2ensite app.yektayar.ir.conf
    sudo a2ensite static.yektayar.ir.conf
@@ -116,6 +121,7 @@ If you prefer to configure manually without using the installation scripts:
    ```bash
    sudo apt install certbot python3-certbot-apache
    sudo certbot --apache -d api.yektayar.ir
+   sudo certbot --apache -d ws.yektayar.ir
    sudo certbot --apache -d panel.yektayar.ir
    sudo certbot --apache -d app.yektayar.ir
    sudo certbot --apache -d static.yektayar.ir
@@ -136,6 +142,7 @@ If you prefer to configure manually without using the installation scripts:
 3. **Enable sites:**
    ```bash
    sudo ln -s /etc/nginx/sites-available/api.yektayar.ir.conf /etc/nginx/sites-enabled/
+   sudo ln -s /etc/nginx/sites-available/ws.yektayar.ir.conf /etc/nginx/sites-enabled/
    sudo ln -s /etc/nginx/sites-available/panel.yektayar.ir.conf /etc/nginx/sites-enabled/
    sudo ln -s /etc/nginx/sites-available/app.yektayar.ir.conf /etc/nginx/sites-enabled/
    sudo ln -s /etc/nginx/sites-available/static.yektayar.ir.conf /etc/nginx/sites-enabled/
@@ -157,6 +164,7 @@ If you prefer to configure manually without using the installation scripts:
    ```bash
    sudo apt install certbot python3-certbot-nginx
    sudo certbot --nginx -d api.yektayar.ir
+   sudo certbot --nginx -d ws.yektayar.ir
    sudo certbot --nginx -d panel.yektayar.ir
    sudo certbot --nginx -d app.yektayar.ir
    sudo certbot --nginx -d static.yektayar.ir
@@ -219,6 +227,7 @@ Before SSL certificates can be obtained, you need to configure DNS records:
 
 ```
 A    api.yektayar.ir      → YOUR_SERVER_IP
+A    ws.yektayar.ir       → YOUR_SERVER_IP
 A    panel.yektayar.ir    → YOUR_SERVER_IP
 A    app.yektayar.ir      → YOUR_SERVER_IP
 A    static.yektayar.ir   → YOUR_SERVER_IP
@@ -266,11 +275,82 @@ No manual intervention required!
 
 ---
 
+## 🔌 WebSocket Domain Configuration
+
+The platform provides a dedicated domain (`ws.yektayar.ir`) for WebSocket and Socket.IO connections. This allows for:
+- Separate scaling and load balancing of WebSocket traffic
+- Better monitoring and logging of real-time connections
+- Cleaner architecture separating REST API from WebSocket traffic
+
+### Backend Setup
+
+The backend runs two servers:
+1. **Main API Server** (default port 3000) - Handles REST API + Socket.IO on `/socket.io/` path
+2. **Dedicated WebSocket Server** (default port 3500) - Handles both Socket.IO and native WebSocket
+
+To start the dedicated WebSocket server:
+```bash
+cd packages/backend
+
+# Development mode
+npm run dev:ws
+
+# Production mode
+npm run start:ws
+```
+
+### Supported Protocols
+
+The `ws.yektayar.ir` domain supports both protocols simultaneously:
+
+#### Socket.IO
+Connect to: `wss://ws.yektayar.ir/socket.io/`
+- Full Socket.IO client support
+- Automatic reconnection
+- Fallback to polling if WebSocket fails
+- Same authentication and events as main server
+
+#### Native WebSocket
+Connect to: `wss://ws.yektayar.ir/ws?token=YOUR_TOKEN`
+- Standard WebSocket protocol (RFC 6455)
+- Authentication via query parameter or Authorization header
+- JSON message format: `{"event": "eventName", "data": {...}}`
+- Same events as Socket.IO for compatibility
+
+### Testing WebSocket Connection
+
+```bash
+# Test Socket.IO endpoint
+curl https://ws.yektayar.ir/socket.io/
+
+# Test native WebSocket (requires wscat)
+npm install -g wscat
+wscat -c "wss://ws.yektayar.ir/ws?token=YOUR_TOKEN"
+
+# Send a ping message (native WebSocket)
+> {"event":"ping"}
+
+# You should receive a pong response
+< {"event":"pong","data":{"timestamp":"2024-..."}}
+```
+
+### Configuration
+
+Set the WebSocket port in your `.env` file:
+```env
+WEBSOCKET_PORT=3500
+```
+
+The reverse proxy configurations for Apache, Nginx, and Caddy are already set up to route `ws.yektayar.ir` to this port.
+
+---
+
 ## 🧪 Testing Your Configuration
 
 ### 1. Test DNS Resolution
 ```bash
 nslookup api.yektayar.ir
+nslookup ws.yektayar.ir
 nslookup panel.yektayar.ir
 nslookup app.yektayar.ir
 nslookup static.yektayar.ir
@@ -308,6 +388,39 @@ echo "Test file" | sudo tee /var/www/yektayar/static/test.txt
 # Access via browser or curl
 curl https://static.yektayar.ir/test.txt
 ```
+
+### 5. Compare Installed Configs with Repository
+
+Use the configuration comparison script to check if your installed webserver configurations match the repository:
+
+```bash
+./scripts/compare-webserver-configs.sh
+```
+
+**What it does:**
+- Detects installed webservers (Apache, Nginx, Caddy)
+- Compares installed configurations with repository versions
+- Shows differences between configs
+- Provides step-by-step update instructions
+- Warns about outdated configurations
+
+**When to use:**
+- After pulling updates from the repository
+- Before and after webserver updates
+- When troubleshooting configuration issues
+- When migrating to a new server
+
+**Example output:**
+```
+✅ Detected webservers: nginx 
+========================================
+Checking nginx configurations
+========================================
+✅ api.yektayar.ir.conf - Up to date
+❌ panel.yektayar.ir.conf - Differs from repository
+```
+
+The script will interactively ask if you want to see differences and update instructions.
 
 ---
 

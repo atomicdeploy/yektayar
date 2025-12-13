@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useSessionStore } from './session'
-import config from '@/config'
 import { logger } from '@yektayar/shared'
+import apiClient from '@/api'
 
 export interface DashboardStats {
   totalUsers: number
@@ -50,19 +50,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
   async function fetchStats() {
     isLoading.value = true
     try {
-      const response = await fetch(`${config.apiBaseUrl}/api/dashboard/stats`, {
-        headers: {
-          Authorization: `Bearer ${sessionStore.sessionToken}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch stats')
-      }
-
-      const data = await response.json()
-      if (data.success) {
-        stats.value = data.data
+      const response = await apiClient.get<DashboardStats>('/dashboard/stats')
+      
+      if (response.success && response.data) {
+        stats.value = response.data
       }
     } catch (error) {
       logger.error('Error fetching dashboard stats:', error)
@@ -80,19 +71,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchUserGrowth() {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/api/dashboard/user-growth`, {
-        headers: {
-          Authorization: `Bearer ${sessionStore.sessionToken}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch user growth data')
-      }
-
-      const data = await response.json()
-      if (data.success) {
-        userGrowthData.value = data.data
+      const response = await apiClient.get<{ labels: string[]; data: number[] }>('/dashboard/user-growth')
+      
+      if (response.success && response.data) {
+        userGrowthData.value = response.data
       }
     } catch (error) {
       logger.error('Error fetching user growth data:', error)
@@ -106,19 +88,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchAppointmentStats() {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/api/dashboard/appointment-stats`, {
-        headers: {
-          Authorization: `Bearer ${sessionStore.sessionToken}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch appointment stats')
-      }
-
-      const data = await response.json()
-      if (data.success) {
-        appointmentStatsData.value = data.data
+      const response = await apiClient.get<{ labels: string[]; data: number[] }>('/dashboard/appointment-stats')
+      
+      if (response.success && response.data) {
+        appointmentStatsData.value = response.data
       }
     } catch (error) {
       logger.error('Error fetching appointment stats:', error)
@@ -132,19 +105,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
   async function fetchRecentActivities() {
     try {
-      const response = await fetch(`${config.apiBaseUrl}/api/dashboard/recent-activities`, {
-        headers: {
-          Authorization: `Bearer ${sessionStore.sessionToken}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch recent activities')
-      }
-
-      const data = await response.json()
-      if (data.success) {
-        recentActivities.value = data.data.map((item: any) => ({
+      const response = await apiClient.get<ActivityItem[]>('/dashboard/recent-activities')
+      
+      if (response.success && response.data) {
+        recentActivities.value = response.data.map((item: any) => ({
           ...item,
           timestamp: new Date(item.timestamp),
         }))

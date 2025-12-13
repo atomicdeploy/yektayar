@@ -27,24 +27,30 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin">
-          <ul class="space-y-2">
-            <li v-for="item in visibleNavItems" :key="item.to">
-              <router-link
-                :to="item.to"
-                :class="[
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                  isActive(item.to)
-                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
-                ]"
-              >
-                <component :is="item.icon" class="w-5 h-5" />
-                <span class="font-medium">{{ t(item.label) }}</span>
-              </router-link>
-            </li>
-          </ul>
-        </nav>
+        <OverlayScrollbarsComponent
+          class="flex-1 px-4 py-6"
+          :options="{ scrollbars: { theme: 'os-theme-yektayar', visibility: 'auto', autoHide: 'leave', autoHideDelay: 800 } }"
+          defer
+        >
+          <nav>
+            <ul class="space-y-2">
+              <li v-for="item in visibleNavItems" :key="item.to">
+                <router-link
+                  :to="item.to"
+                  :class="[
+                    'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                    isActive(item.to)
+                      ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
+                  ]"
+                >
+                  <component :is="item.icon" class="w-5 h-5" />
+                  <span class="font-medium">{{ t(item.label) }}</span>
+                </router-link>
+              </li>
+            </ul>
+          </nav>
+        </OverlayScrollbarsComponent>
 
         <!-- User section -->
         <div class="border-t border-gray-200 dark:border-gray-700 p-4">
@@ -88,13 +94,15 @@
         </div>
 
         <div class="flex items-center gap-4">
-          <!-- Dark mode toggle -->
+          <!-- Theme toggle -->
           <button
-            @click="toggleDark()"
+            @click="toggleTheme()"
+            :title="currentTheme === 'auto' ? 'سیستم (پیش‌فرض)' : currentTheme === 'dark' ? 'حالت تاریک' : 'حالت روشن'"
             class="p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            <SunIcon v-if="isDark" class="w-5 h-5" />
-            <MoonIcon v-else class="w-5 h-5" />
+            <ComputerDesktopIcon v-if="currentTheme === 'auto'" class="w-5 h-5" />
+            <MoonIcon v-else-if="currentTheme === 'dark'" class="w-5 h-5" />
+            <SunIcon v-else class="w-5 h-5" />
           </button>
 
           <!-- Connection status -->
@@ -132,7 +140,7 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { useDark, useToggle } from '@vueuse/core'
+import { useTheme } from '@/composables/useTheme'
 import {
   HomeIcon,
   UsersIcon,
@@ -146,6 +154,9 @@ import {
   UserIcon,
   SunIcon,
   MoonIcon,
+  DocumentTextIcon,
+  ClipboardDocumentCheckIcon,
+  ComputerDesktopIcon,
 } from '@heroicons/vue/24/outline'
 import { useSessionStore } from '@/stores/session'
 import { usePermissionsStore } from '@/stores/permissions'
@@ -156,8 +167,7 @@ const router = useRouter()
 const sessionStore = useSessionStore()
 const permissionsStore = usePermissionsStore()
 
-const isDark = useDark()
-const toggleDark = useToggle(isDark)
+const { currentTheme, toggleTheme } = useTheme()
 
 const isSidebarOpen = ref(false)
 const isRTL = computed(() => locale.value === 'fa')
@@ -198,6 +208,18 @@ const navItems = [
     label: 'nav.courses',
     icon: AcademicCapIcon,
     permission: 'view_courses' as const,
+  },
+  {
+    to: '/assessments',
+    label: 'nav.assessments',
+    icon: ClipboardDocumentCheckIcon,
+    permission: 'view_assessments' as const,
+  },
+  {
+    to: '/pages',
+    label: 'nav.pages',
+    icon: DocumentTextIcon,
+    permission: 'view_pages' as const,
   },
   {
     to: '/reports',

@@ -52,7 +52,7 @@ function removeError(id: string) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .notification-enter-active,
 .notification-leave-active {
   transition: all 0.3s ease;
