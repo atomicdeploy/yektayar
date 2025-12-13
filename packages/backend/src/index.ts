@@ -11,6 +11,8 @@ import { messageRoutes } from './routes/messages'
 import { appointmentRoutes } from './routes/appointments'
 import { courseRoutes } from './routes/courses'
 import { dashboardRoutes } from './routes/dashboard'
+import { telegramRoutes } from './routes/telegram'
+import { initializeTelegramBot } from './services/telegramService'
 import { pageRoutes } from './routes/pages'
 import { logger } from '@yektayar/shared'
 import { settingsRoutes } from './routes/settings'
@@ -91,6 +93,7 @@ app
           { name: 'Appointments', description: 'Appointment booking endpoints' },
           { name: 'Courses', description: 'Educational content endpoints' },
           { name: 'Dashboard', description: 'Dashboard statistics endpoints' },
+          { name: 'Telegram', description: 'Telegram bot integration endpoints' },
           { name: 'Pages', description: 'Content pages endpoints' },
           { name: 'Settings', description: 'Application settings endpoints' },
           { name: 'Support', description: 'Support tickets and messaging endpoints' },
@@ -118,7 +121,8 @@ app
     features: {
       rest: true,
       websocket: true,
-      sessionAcquisition: true
+      sessionAcquisition: true,
+      telegram: true
     }
   }))
   .get('/health', () => ({
@@ -150,6 +154,7 @@ app
   .use(appointmentRoutes)
   .use(courseRoutes)
   .use(dashboardRoutes)
+  .use(telegramRoutes)
   .use(pageRoutes)
   .use(settingsRoutes)
   .use(supportRoutes)
@@ -176,6 +181,17 @@ logger.custom('⚡', `Runtime: Bun ${Bun.version}`, 'cyan')
 
 let httpServer: any
 let io: SocketIOServer | undefined
+
+// Initialize Telegram bot
+const telegramToken = process.env.TELEGRAM_BOT_TOKEN
+const telegramWebhookUrl = process.env.TELEGRAM_WEBHOOK_URL
+
+if (telegramToken && telegramToken !== 'your_telegram_bot_token_here') {
+  const useWebhook = Boolean(telegramWebhookUrl)
+  initializeTelegramBot(telegramToken, useWebhook, telegramWebhookUrl)
+} else {
+  console.log('ℹ️  Telegram bot not configured. Set TELEGRAM_BOT_TOKEN to enable.')
+}
 
 if (isBun) {
   // Bun runtime: Bun natively supports Socket.IO via @socket.io/bun-engine

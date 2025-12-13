@@ -84,6 +84,13 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - **[Solution](troubleshooting/SOLUTION.md)** - Database health check fix
 - **[Solutions](troubleshooting/SOLUTIONS.md)** - Various solutions
 
+### Setup & Deployment
+- [Setup Guide](SETUP.md) - Complete setup instructions
+- [Ubuntu 24.04 Deployment](UBUNTU-24-DEPLOYMENT.md) - VPS deployment
+- [Network Configuration](NETWORK-CONFIGURATION.md) - Network setup
+- [Bun vs NPM](BUN-VS-NPM.md) - Runtime guide
+- [Telegram Bot Integration](TELEGRAM-BOT.md) - Telegram bot setup and usage
+
 **Debugging & Investigation:**
 - **[Database Health Troubleshooting](troubleshooting/DATABASE-HEALTH-TROUBLESHOOTING.md)** - DB health issues
 - **[Investigation Summary](troubleshooting/INVESTIGATION-SUMMARY.md)** - DB hanging investigation
@@ -96,6 +103,34 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 - **[Verification Results](troubleshooting/VERIFICATION-RESULTS.md)** - Configuration verification
 
 ---
+
+## 🗂️ Complete File Structure
+
+```
+yektayar/
+├── README.md                      # Main project overview
+├── ROADMAP.md                     # Implementation roadmap (includes prototype sprint)
+├── DEVELOPMENT.md                 # Development guide (includes prototype sprint details)
+├── QUICK-START.md                 # Quick start for monorepo
+├── SECURITY.md                    # Security policy
+├── CONTRIBUTING.md                # Contributing guidelines
+│
+└── docs/                          # Documentation directory
+    ├── INDEX.md                   # This file - documentation hub
+    ├── README.md                  # Documentation overview
+    │
+    ├── GETTING-STARTED.md         # New developer onboarding
+    ├── QUICK-REFERENCE.md         # Code snippets & daily checklist
+    │
+    ├── ARCHITECTURE.md            # System architecture (all phases & alternatives)
+    ├── REQUIREMENTS-REVIEW.md     # Requirements analysis
+    │
+    ├── SETUP.md                   # Setup guide (all phases)
+    ├── UBUNTU-24-DEPLOYMENT.md    # Ubuntu VPS deployment
+    ├── NETWORK-CONFIGURATION.md   # Network configuration
+    ├── BUN-VS-NPM.md             # Bun vs NPM guide
+    └── TELEGRAM-BOT.md           # Telegram bot integration
+```
 
 ### 🚀 Deployment
 
@@ -142,6 +177,17 @@ Welcome to YektaYar's complete documentation. This index helps you find the righ
 ## 📋 Documentation by Role
 
 ### For New Developers
+
+- **Authentication**: [Architecture](ARCHITECTURE.md), [Development Guide](../DEVELOPMENT.md)
+- **Database**: [Architecture](ARCHITECTURE.md), [Setup Guide](SETUP.md), [Ubuntu Deployment](UBUNTU-24-DEPLOYMENT.md)
+- **i18n/Internationalization**: [Getting Started](GETTING-STARTED.md), [Quick Reference](QUICK-REFERENCE.md), [Architecture](ARCHITECTURE.md)
+- **RTL/LTR**: [Getting Started](GETTING-STARTED.md), [Quick Reference](QUICK-REFERENCE.md)
+- **PWA**: [Getting Started](GETTING-STARTED.md), [Development Guide](../DEVELOPMENT.md)
+- **Deployment**: [Setup Guide](SETUP.md), [Ubuntu Deployment](UBUNTU-24-DEPLOYMENT.md)
+- **API**: [Architecture](ARCHITECTURE.md), [Development Guide](../DEVELOPMENT.md)
+- **WebSocket**: [Architecture](ARCHITECTURE.md), [Setup Guide](SETUP.md)
+- **Telegram Bot**: [Telegram Bot Integration](TELEGRAM-BOT.md), [Scripts README](../scripts/README.md)
+- **Prototype Sprint**: [Development Guide](../DEVELOPMENT.md), [Roadmap](../ROADMAP.md)
 
 **Start here in order:**
 1. [Project Overview](../README.md) - What is YektaYar?
