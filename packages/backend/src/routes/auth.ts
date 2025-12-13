@@ -55,6 +55,10 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         try {
           mergedDeviceInfo.capabilities = JSON.parse(mergedDeviceInfo.capabilities)
         } catch (e) {
+          logger.warn('Failed to parse device capabilities JSON:', {
+            error: e,
+            original: mergedDeviceInfo.capabilities
+          })
           // Keep as string if parsing fails
         }
       }
