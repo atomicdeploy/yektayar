@@ -116,10 +116,15 @@ export function handleMessage(send: MessageSender, sessionData: WebSocketSession
  */
 export async function handleAIChat(send: MessageSender, sessionData: WebSocketSessionData, chatData: any) {
   try {
-    const { message, conversationHistory } = chatData
+    const { message, conversationHistory, locale } = chatData
     const messageId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
-    logger.info(`AI chat request from ${sessionData.socketId}:`, message)
+    // Validate required fields
+    if (!message || typeof message !== 'string') {
+      throw new Error('Message is required')
+    }
+
+    logger.info('[AI Chat] WebSocket chat request from', sessionData.socketId)
 
     // Emit start event
     send({
@@ -130,9 +135,9 @@ export async function handleAIChat(send: MessageSender, sessionData: WebSocketSe
     // Import AI service dynamically
     const { streamAIResponseChunks } = await import('../services/aiService')
 
-    // Stream the response
+    // Stream the response with locale support (defaults to 'fa')
     let fullResponse = ''
-    for await (const chunk of streamAIResponseChunks(message, conversationHistory)) {
+    for await (const chunk of streamAIResponseChunks(message, conversationHistory, locale || 'fa')) {
       fullResponse += chunk
       send({
         event: 'ai:response:chunk',
@@ -146,12 +151,12 @@ export async function handleAIChat(send: MessageSender, sessionData: WebSocketSe
       data: { messageId, fullResponse }
     })
 
-    logger.info(`AI response completed for ${sessionData.socketId}`)
+    logger.success('[AI Chat] WebSocket response completed for', sessionData.socketId)
   } catch (error) {
-    logger.error('AI chat error:', error)
+    logger.error('[AI Chat] WebSocket chat error:', error)
     send({
       event: 'ai:response:error',
-      data: { error: 'Failed to generate response. Please try again.' }
+      data: { error: error instanceof Error ? error.message : 'Failed to generate response' }
     })
   }
 }

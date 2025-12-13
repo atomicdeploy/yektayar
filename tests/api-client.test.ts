@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { ApiClient } from '../packages/shared/src/api/client'
 import packageJson from '../packages/shared/package.json'
 
@@ -57,5 +57,48 @@ describe('ApiClient URL Normalization', () => {
     expect(axiosInstance.defaults.headers['X-Custom-Header']).toBe('test-value')
     expect(axiosInstance.defaults.headers['Accept']).toBe('application/json')
     expect(axiosInstance.defaults.headers['User-Agent']).toBe(`${packageJson.name}/${packageJson.version}`)
+  })
+
+  it('should not set User-Agent header in browser environment', () => {
+    // Mock browser environment by defining window
+    const originalWindow = (global as any).window
+    ;(global as any).window = { document: {} }
+    
+    const client = new ApiClient({
+      baseURL: 'http://localhost:3000/api',
+      storageKey: 'test_token'
+    })
+    
+    const axiosInstance = client.getAxiosInstance()
+    expect(axiosInstance.defaults.headers['User-Agent']).toBeUndefined()
+    expect(axiosInstance.defaults.headers['Accept']).toBe('application/json')
+    
+    // Restore original state
+    if (originalWindow === undefined) {
+      delete (global as any).window
+    } else {
+      ;(global as any).window = originalWindow
+    }
+  })
+
+  it('should set User-Agent header in non-browser environment (Node.js)', () => {
+    // This test runs in Node.js by default where window is undefined
+    // Store and delete window if it exists
+    const originalWindow = (global as any).window
+    delete (global as any).window
+    
+    const client = new ApiClient({
+      baseURL: 'http://localhost:3000/api',
+      storageKey: 'test_token'
+    })
+    
+    const axiosInstance = client.getAxiosInstance()
+    expect(axiosInstance.defaults.headers['User-Agent']).toBe(`${packageJson.name}/${packageJson.version}`)
+    expect(axiosInstance.defaults.headers['Accept']).toBe('application/json')
+    
+    // Restore original state
+    if (originalWindow !== undefined) {
+      ;(global as any).window = originalWindow
+    }
   })
 })
