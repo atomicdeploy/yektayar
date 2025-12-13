@@ -346,7 +346,7 @@ async function makeAuthenticatedRequest<T>(
   body?: any
 ): Promise<T> {
   const apiKey = getAPIKey();
-  const authFormat = (process.env.FARAZSMS_AUTH_FORMAT as 'Api-Key' | 'AccessKey') || 'Api-Key';
+  const authFormat = (process.env.FARAZSMS_AUTH_FORMAT as 'Api-Key' | 'AccessKey') || 'AccessKey';
   
   const headers: Record<string, string> = {
     'Content-Type': 'application/json'
