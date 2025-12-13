@@ -17,10 +17,16 @@ async function testPatternOTP() {
   console.log('='.repeat(70));
   console.log();
   
-  const patternCode = process.env.FARAZSMS_PATTERN_CODE || 'qql5tsrnbccp4uu';
+  const patternCode = process.env.FARAZSMS_PATTERN_CODE;
   const phoneNumber = '09197103488';
   const verificationCode = 'test1234';
   const originator = process.env.FARAZSMS_LINE_NUMBER || '+983000505'; // IPPanel line number format
+  
+  if (!patternCode) {
+    console.error('❌ FARAZSMS_PATTERN_CODE environment variable is required');
+    console.log('Please set FARAZSMS_PATTERN_CODE in your environment');
+    process.exit(1);
+  }
   
   console.log('Configuration:');
   console.log(`  Pattern Code: ${patternCode}`);

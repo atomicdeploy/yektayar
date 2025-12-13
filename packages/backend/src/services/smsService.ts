@@ -1,11 +1,12 @@
 /**
- * SMS Service - FarazSMS Provider
+ * SMS Service - FarazSMS Provider (IPPanel Edge API)
  * 
- * Handles sending SMS messages through FarazSMS (iranpayamak.com) provider
+ * Handles sending SMS messages through FarazSMS provider, which uses IPPanel Edge API
+ * FarazSMS and IPPanel are the same service provider with different branding
  * Uses pattern-based SMS API for fast OTP delivery
  * 
- * @see {@link https://docs.iranpayamak.com/ | FarazSMS Official Documentation}
- * @see {@link http://docs.ippanel.com/ | IPPanel REST API Documentation}
+ * @see {@link https://edge.ippanel.com/ | IPPanel Edge API Documentation}
+ * @see {@link https://ippanel.com/ | FarazSMS/IPPanel Official Site}
  */
 
 /**
@@ -1025,6 +1026,150 @@ export async function sendSimpleSMS(
   const result = await response.json() as FarazSMSResponse;
   console.log('Simple SMS sent successfully:', {
     recipientCount: recipients.length,
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
+}
+
+// ============================================================================
+// IPPanel REST API v1 Functions (api2.ippanel.com)
+// Matches legacy AutoHotkey implementation for compatibility
+// ============================================================================
+
+/**
+ * IPPanel REST API v1 Response
+ */
+interface IPPanelRESTResponse {
+  status: string;
+  code: number;
+  error_message: string;
+  data: {
+    message_id: number;
+  };
+}
+
+/**
+ * Send single SMS using IPPanel REST API v1 (api2.ippanel.com)
+ * This matches the legacy AutoHotkey implementation
+ * 
+ * @param recipient Single recipient phone number
+ * @param message Message text to send
+ * @param sender Sender line number (optional, uses config if not provided)
+ * @returns Promise with REST API response
+ * @see {@link https://api2.ippanel.com | IPPanel REST API v1}
+ */
+export async function sendSingleSMS(
+  recipient: string,
+  message: string,
+  sender?: string
+): Promise<IPPanelRESTResponse> {
+  const apiKey = getAPIKey();
+  const senderLineNumber = sender || process.env.FARAZSMS_LINE_NUMBER;
+  
+  if (!senderLineNumber) {
+    throw new Error('Sender line number is required. Either provide it as parameter or set FARAZSMS_LINE_NUMBER environment variable.');
+  }
+  
+  const endpoint = 'https://api2.ippanel.com/api/v1/sms/send/webservice/single';
+  
+  const headers: Record<string, string> = {
+    'accept': 'application/json',
+    'apikey': apiKey,
+    'Content-Type': 'application/json'
+  };
+  
+  const body = {
+    message,
+    sender: senderLineNumber,
+    recipient: [recipient]
+  };
+  
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('IPPanel REST API v1 single SMS error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`IPPanel REST API v1 single SMS request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json() as IPPanelRESTResponse;
+  console.log('Single SMS sent successfully via REST API v1:', {
+    recipient: maskPhoneNumber(recipient),
+    messageId: result.data.message_id,
+    timestamp: new Date().toISOString()
+  });
+  
+  return result;
+}
+
+/**
+ * Send pattern SMS using IPPanel REST API v1 (api2.ippanel.com)
+ * This matches the legacy AutoHotkey implementation
+ * 
+ * @param recipient Recipient phone number
+ * @param code Pattern code
+ * @param variable Pattern variables object
+ * @param sender Sender line number (optional, uses config if not provided)
+ * @returns Promise with REST API response
+ * @see {@link https://api2.ippanel.com | IPPanel REST API v1}
+ */
+export async function sendPatternSMSv1(
+  recipient: string,
+  code: string,
+  variable: Record<string, string>,
+  sender?: string
+): Promise<IPPanelRESTResponse> {
+  const apiKey = getAPIKey();
+  const senderLineNumber = sender || process.env.FARAZSMS_LINE_NUMBER;
+  
+  if (!senderLineNumber) {
+    throw new Error('Sender line number is required. Either provide it as parameter or set FARAZSMS_LINE_NUMBER environment variable.');
+  }
+  
+  const endpoint = 'https://api2.ippanel.com/api/v1/sms/pattern/normal/send';
+  
+  const headers: Record<string, string> = {
+    'accept': 'application/json',
+    'apikey': apiKey,
+    'Content-Type': 'application/json'
+  };
+  
+  const body = {
+    code,
+    sender: senderLineNumber,
+    recipient,
+    variable
+  };
+  
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body)
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('IPPanel REST API v1 pattern SMS error:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: errorText
+    });
+    throw new Error(`IPPanel REST API v1 pattern SMS request failed: ${response.status} ${response.statusText}`);
+  }
+  
+  const result = await response.json() as IPPanelRESTResponse;
+  console.log('Pattern SMS sent successfully via REST API v1:', {
+    recipient: maskPhoneNumber(recipient),
+    messageId: result.data.message_id,
     timestamp: new Date().toISOString()
   });
   

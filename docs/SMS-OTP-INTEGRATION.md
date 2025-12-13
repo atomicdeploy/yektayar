@@ -1,15 +1,19 @@
 # SMS OTP Integration Guide
 
-This document describes the SMS OTP integration using IPPanel Edge API for user authentication.
+This document describes the SMS OTP integration using FarazSMS provider (IPPanel Edge API) for user authentication.
 
 ## Overview
 
-The YektaYar platform uses SMS OTP (One-Time Password) for secure user authentication. The implementation uses **IPPanel Edge API** as the primary SMS provider with pattern-based messages for fast and reliable delivery.
+The YektaYar platform uses SMS OTP (One-Time Password) for secure user authentication. The implementation uses **FarazSMS provider**, which operates on **IPPanel Edge API** infrastructure, with pattern-based messages for fast and reliable delivery.
 
 ### Provider Information
-- **Primary Provider:** IPPanel Edge API (`https://edge.ippanel.com`)
+- **Provider:** FarazSMS (powered by IPPanel)
+- **Primary API:** IPPanel Edge API (`https://edge.ippanel.com`)
+- **REST API v1:** api2.ippanel.com (legacy AutoHotkey compatibility)
 - **Legacy Support:** IranPayamak API (still supported for backward compatibility)
 - **Default Endpoint:** `https://edge.ippanel.com/v1/api/send`
+
+**Note:** FarazSMS and IPPanel are the same service provider with different branding. All IPPanel APIs work with FarazSMS credentials.
 
 ## Features
 

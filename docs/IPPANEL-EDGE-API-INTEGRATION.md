@@ -1,8 +1,10 @@
-# IPPanel Edge API Integration - Implementation Summary
+# FarazSMS Provider (IPPanel Edge API) Integration - Implementation Summary
 
 ## Overview
 
-The YektaYar SMS service has been updated to use the **IPPanel Edge API** by default. This provides better reliability, performance, and a more modern API interface compared to the legacy endpoints.
+The YektaYar SMS service has been updated to use the **FarazSMS provider** (powered by **IPPanel Edge API**) by default. This provides better reliability, performance, and a more modern API interface compared to the legacy endpoints.
+
+**Important Note:** FarazSMS and IPPanel are the same service provider. FarazSMS is the brand name, while IPPanel provides the API infrastructure. All APIs (Edge API, REST API v1, legacy REST) work with FarazSMS credentials.
 
 ## What Changed
 
@@ -231,3 +233,33 @@ If you encounter any issues:
 
 **Last Updated:** 2025-12-13  
 **Status:** ✅ Production Ready
+
+## Additional API Endpoints
+
+### IPPanel REST API v1 (api2.ippanel.com)
+
+For compatibility with legacy implementations (e.g., AutoHotkey), we also support the REST API v1 endpoints:
+
+#### Send Single SMS
+```typescript
+import { sendSingleSMS } from './services/smsService';
+
+await sendSingleSMS('09197103488', 'Your message here');
+```
+
+**Endpoint:** `https://api2.ippanel.com/api/v1/sms/send/webservice/single`
+
+#### Send Pattern SMS (REST v1)
+```typescript
+import { sendPatternSMSv1 } from './services/smsService';
+
+await sendPatternSMSv1(
+  '09197103488',
+  'pattern_code',
+  { 'verification-code': '123456' }
+);
+```
+
+**Endpoint:** `https://api2.ippanel.com/api/v1/sms/pattern/normal/send`
+
+Both functions use the same FarazSMS API key and credentials, just different endpoint formats for backward compatibility.
