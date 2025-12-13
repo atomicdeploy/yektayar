@@ -323,7 +323,7 @@ The tools use three different API endpoints:
 
 ### 2. IPPanel REST API
 - Used for: Credit balance, Inbox
-- Endpoint: `http://rest.ippanel.com/v1/`
+- Endpoint: `https://rest.ippanel.com/v1/`
 - Auth: `Authorization: AccessKey <key>`
 
 ### 3. IranPayamak API
