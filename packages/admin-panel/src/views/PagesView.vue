@@ -3,8 +3,8 @@
     <!-- Header -->
     <div class="view-header">
       <div class="header-content">
-        <h1>مدیریت صفحات</h1>
-        <p class="subtitle">مشاهده و ویرایش محتوای صفحات</p>
+        <h1>{{ t('pages_page.title') }}</h1>
+        <p class="subtitle">{{ t('pages_page.subtitle') }}</p>
       </div>
       <div class="header-actions">
         <button
@@ -12,7 +12,7 @@
           class="btn btn-primary"
         >
           <PlusIcon class="w-5 h-5" />
-          صفحه جدید
+          {{ t('pages_page.add_page') }}
         </button>
       </div>
     </div>
@@ -20,7 +20,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
       <LoadingSpinner size="48px" class="text-primary-500 mx-auto" />
-      <p>در حال بارگذاری صفحات...</p>
+      <p>{{ t('pages_page.loading') }}</p>
     </div>
 
     <!-- Pages List -->
@@ -28,11 +28,11 @@
       <table>
         <thead>
           <tr>
-            <th>عنوان</th>
-            <th>Slug</th>
-            <th>تاریخ ایجاد</th>
-            <th>تاریخ بروزرسانی</th>
-            <th>عملیات</th>
+            <th>{{ t('pages_page.page_title') }}</th>
+            <th>{{ t('pages_page.slug') }}</th>
+            <th>{{ t('pages_page.created_at') }}</th>
+            <th>{{ t('pages_page.updated_at') }}</th>
+            <th>{{ t('pages_page.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -50,14 +50,14 @@
                 <button
                   @click="editPage(page)"
                   class="btn-icon"
-                  title="ویرایش"
+                  :title="t('pages_page.edit')"
                 >
                   <PencilIcon class="w-5 h-5" />
                 </button>
                 <button
                   @click="deletePage(page)"
                   class="btn-icon btn-danger"
-                  title="حذف"
+                  :title="t('pages_page.delete')"
                 >
                   <TrashIcon class="w-5 h-5" />
                 </button>
@@ -71,14 +71,14 @@
     <!-- Empty State -->
     <div v-else class="empty-state">
       <DocumentTextIcon class="w-16 h-16 text-gray-400" />
-      <h3>صفحه‌ای وجود ندارد</h3>
-      <p>برای شروع یک صفحه جدید ایجاد کنید</p>
+      <h3>{{ t('pages_page.no_pages') }}</h3>
+      <p>{{ t('pages_page.no_pages_message') }}</p>
       <button
         @click="createNewPage"
         class="btn btn-primary"
       >
         <PlusIcon class="w-5 h-5" />
-        صفحه جدید
+        {{ t('pages_page.add_page') }}
       </button>
     </div>
 
@@ -86,52 +86,52 @@
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal-content modal-large">
         <div class="modal-header">
-          <h2>{{ editingPage?.id ? 'ویرایش صفحه' : 'ایجاد صفحه جدید' }}</h2>
+          <h2>{{ editingPage?.id ? t('pages_page.edit_page') : t('pages_page.create_page') }}</h2>
           <button class="btn-close" @click="showModal = false">×</button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="savePage">
             <div class="form-group">
-              <label>عنوان</label>
+              <label>{{ t('pages_page.page_title') }}</label>
               <input
                 v-model="editingPage.title"
                 type="text"
                 required
-                placeholder="عنوان صفحه"
+                :placeholder="t('pages_page.title_placeholder')"
               />
             </div>
 
             <div class="form-group">
-              <label>Slug</label>
+              <label>{{ t('pages_page.slug') }}</label>
               <input
                 v-model="editingPage.slug"
                 type="text"
                 required
                 :disabled="!!editingPage.id"
-                placeholder="about-us"
+                :placeholder="t('pages_page.slug_placeholder')"
               />
               <p class="helper-text">
-                URL slug (فقط حروف انگلیسی، اعداد و dash)
+                {{ t('pages_page.slug_hint') }}
               </p>
             </div>
 
             <div class="form-group">
-              <label>محتوا (Markdown)</label>
+              <label>{{ t('pages_page.content') }}</label>
               <textarea
                 v-model="editingPage.content"
                 rows="12"
                 required
-                placeholder="# عنوان&#10;&#10;محتوای صفحه..."
+                :placeholder="t('pages_page.content_placeholder')"
                 class="modal-textarea"
               ></textarea>
             </div>
 
             <div class="form-actions">
               <button type="button" class="btn btn-secondary" @click="showModal = false">
-                انصراف
+                {{ t('pages_page.cancel') }}
               </button>
               <button type="submit" class="btn btn-info" :disabled="saving">
-                {{ saving ? 'در حال ذخیره...' : 'ذخیره' }}
+                {{ saving ? t('loading') : t('pages_page.save') }}
               </button>
             </div>
           </form>
@@ -143,10 +143,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { PlusIcon, PencilIcon, TrashIcon, DocumentTextIcon } from '@heroicons/vue/24/outline'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import apiClient from '@/api'
 import { logger } from '@yektayar/shared'
+
+const { t } = useI18n()
 
 interface Page {
   id?: number
