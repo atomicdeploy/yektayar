@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background color for dark mode -->
+    <item android:drawable="@color/splash_background_dark"/>
+    
+    <!-- Logo (centered) -->
+    <item>
+        <bitmap
+            android:src="@drawable/splash_logo_dark"
+            android:gravity="center"/>
+    </item>
+    
+    <!-- Tagline (bottom) -->
+    <item>
+        <bitmap
+            android:src="@drawable/splash_tagline_dark"
+            android:gravity="bottom|center_horizontal"
+            android:bottom="80dp"/>
+    </item>
+</layer-list>

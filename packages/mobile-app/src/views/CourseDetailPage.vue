@@ -263,6 +263,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useSecureMode } from '@/composables/useSecureMode'
 import {
   IonPage,
   IonHeader,
@@ -301,6 +302,9 @@ import {
 const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
+
+// Enable secure mode to prevent screenshots in course content
+useSecureMode()
 
 const activeTab = ref('overview')
 const expandedModules = ref(new Set<string>())

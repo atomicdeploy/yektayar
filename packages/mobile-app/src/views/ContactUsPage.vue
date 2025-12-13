@@ -64,7 +64,7 @@
           </div>
           <div class="contact-content">
             <h3>{{ locale === 'fa' ? 'ایمیل' : 'Email' }}</h3>
-            <p class="contact-value">{{ contactInfo.email || 'info@yektayar.com' }}</p>
+            <p class="contact-value">{{ contactInfo.email || 'info@yektayar.ir' }}</p>
             <p class="contact-description">{{ locale === 'fa' ? 'ارسال ایمیل به تیم پشتیبانی' : 'Send email to support team' }}</p>
           </div>
         </ion-card>
@@ -233,7 +233,7 @@ function callPhone() {
 }
 
 function sendEmail() {
-  const email = contactInfo.value.email || 'info@yektayar.com'
+  const email = contactInfo.value.email || 'info@yektayar.ir'
   window.open(`mailto:${email}`, '_system')
 }
 
