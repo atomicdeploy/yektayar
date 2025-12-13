@@ -755,12 +755,11 @@
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 16px;
-  }
 
-  .info-box-blue {
-    background: rgba(59, 130, 246, 0.1);
-    border-radius: 8px;
-    padding: 16px;
+    &.info {
+      background: rgba(59, 130, 246, 0.1);
+      margin-bottom: 0;
+    }
   }
 
   .info-link {
@@ -959,6 +958,11 @@
     font-size: 14px;
     color: var(--text-secondary);
     margin-bottom: 8px;
+
+    &.info {
+      color: rgb(59, 130, 246);
+      margin-bottom: 0;
+    }
   }
 
   .info-list {
@@ -966,11 +970,6 @@
     color: var(--text-secondary);
     list-style: decimal;
     padding-right: 20px;
-  }
-
-  .info-box-blue-text {
-    font-size: 14px;
-    color: rgb(59, 130, 246);
   }
 
   /* Slug text style */

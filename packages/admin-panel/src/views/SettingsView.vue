@@ -95,8 +95,8 @@
             </ol>
           </div>
 
-          <div class="info-box-blue">
-            <p class="info-box-blue-text">
+          <div class="info-box info">
+            <p class="info-text info">
               <strong>موقعیت فعلی:</strong><br />
               {{ settings.contact_map_lat }}, {{ settings.contact_map_lng }}
             </p>
