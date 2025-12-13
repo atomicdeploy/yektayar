@@ -220,7 +220,9 @@ async function initializeApp() {
   app.use(createPinia())
   app.use(router)
   app.use(i18n)
-  app.use(TelegramPlugin)
+  
+  // Install Telegram plugin (async)
+  await TelegramPlugin.install(app)
   
   // Register OverlayScrollbars component globally
   app.component('OverlayScrollbarsComponent', OverlayScrollbarsComponent)
