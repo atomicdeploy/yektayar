@@ -40,6 +40,7 @@
     "install:all": "npm install",
     "generate:icons": "node scripts/generate-icons.js",
     "generate:android-assets": "cd packages/mobile-app && npx @capacitor/assets generate --android",
+    "telegram:setup-complete": "./scripts/setup-telegram.sh",
     "telegram:setup": "./scripts/manage-telegram-bot.sh setup",
     "telegram:config": "./scripts/manage-telegram-bot.sh config",
     "telegram:test": "./scripts/manage-telegram-bot.sh test",

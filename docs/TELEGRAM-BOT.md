@@ -89,6 +89,29 @@ For detailed documentation on mini app integration, usage examples, and troubles
 
 ## Quick Start
 
+### Automated Setup (Recommended) 🆕
+
+**Use the all-in-one setup script for complete Telegram integration:**
+
+```bash
+npm run telegram:setup-complete
+```
+
+This interactive script will guide you through:
+- ✅ Creating your Telegram bot with @BotFather
+- ✅ Configuring bot token and admin chat
+- ✅ Setting up mini app integration
+- ✅ Testing bot functionality
+- ✅ Getting next steps and documentation links
+
+**Perfect for first-time setup or when you need both bot and mini app configured.**
+
+---
+
+### Manual Setup
+
+If you prefer step-by-step manual configuration:
+
 ### 1. Create a Telegram Bot
 
 1. Open Telegram and search for `@BotFather`

@@ -4,7 +4,54 @@ This directory contains scripts and service configurations for deploying and man
 
 ## Contents
 
-### Telegram Bot Management
+### Telegram Integration
+
+#### `setup-telegram.sh` 🆕
+
+**Complete all-in-one setup script for Telegram bot and mini app integration.**
+
+This comprehensive script guides you through the entire Telegram setup process, including bot creation, configuration, and mini app integration.
+
+**Usage:**
+```bash
+./scripts/setup-telegram.sh
+# or via npm
+npm run telegram:setup-complete
+```
+
+**What it does:**
+- ✅ Guides through Telegram bot creation with @BotFather
+- ✅ Configures bot token and validates it
+- ✅ Sets up admin chat ID for notifications
+- ✅ Explains mini app configuration steps
+- ✅ Tests bot connectivity and sends test message
+- ✅ Provides complete setup summary and next steps
+
+**Features:**
+- 🎨 Beautiful interactive CLI with color-coded output
+- 📋 Step-by-step guided setup process
+- 🔒 Secure token validation and storage
+- ✅ Automatic connection testing
+- 📱 Mini app integration guidance
+- 📚 Links to relevant documentation
+
+**Perfect for:**
+- First-time Telegram setup
+- Complete bot and mini app configuration
+- Understanding the full integration workflow
+
+**Example Session:**
+```bash
+npm run telegram:setup-complete
+
+# The script will guide you through:
+# 1. Bot creation instructions
+# 2. Token configuration and validation
+# 3. Admin chat setup
+# 4. Mini app menu button configuration
+# 5. Testing and verification
+# 6. Summary and next steps
+```
 
 #### `manage-telegram-bot.sh`
 
