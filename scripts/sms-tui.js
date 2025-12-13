@@ -195,7 +195,7 @@ async function getCreditBalance() {
     print('Fetching account credit balance...', 'cyan', emojis.hourglass);
     
     const { apiKey } = getAPIConfig();
-    const endpoint = 'http://rest.ippanel.com/v1/credit';
+    const endpoint = 'https://rest.ippanel.com/v1/credit';
     
     const headers = {
       'Content-Type': 'application/json',
@@ -401,7 +401,7 @@ async function fetchInbox() {
     print('Fetching inbox messages...', 'cyan', emojis.inbox);
     
     const { apiKey } = getAPIConfig();
-    const endpoint = 'http://rest.ippanel.com/v1/messages/inbox';
+    const endpoint = 'https://rest.ippanel.com/v1/messages/inbox';
     
     const headers = {
       'Content-Type': 'application/json',

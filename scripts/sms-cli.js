@@ -167,7 +167,7 @@ function normalizePhoneNumber(phoneNumber) {
  */
 async function getCreditBalance() {
   const { apiKey } = getAPIConfig();
-  const endpoint = 'http://rest.ippanel.com/v1/credit';
+  const endpoint = 'https://rest.ippanel.com/v1/credit';
   
   const headers = {
     'Content-Type': 'application/json',
@@ -336,7 +336,7 @@ async function sendVoiceOTP(recipient, otpCode) {
  */
 async function fetchInbox() {
   const { apiKey } = getAPIConfig();
-  const endpoint = 'http://rest.ippanel.com/v1/messages/inbox';
+  const endpoint = 'https://rest.ippanel.com/v1/messages/inbox';
   
   const headers = {
     'Content-Type': 'application/json',

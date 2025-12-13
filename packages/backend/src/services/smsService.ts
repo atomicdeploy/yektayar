@@ -483,7 +483,7 @@ async function makeAuthenticatedRequest<T>(
  * @see {@link http://docs.ippanel.com/#section/Authentication}
  */
 export async function getAuthenticatedUser(): Promise<IFarazAuthResult> {
-  const endpoint = 'http://rest.ippanel.com/v1/user';
+  const endpoint = 'https://rest.ippanel.com/v1/user';
   return makeAuthenticatedRequest<IFarazAuthResult>(endpoint, 'GET');
 }
 
@@ -494,7 +494,7 @@ export async function getAuthenticatedUser(): Promise<IFarazAuthResult> {
  * @see {@link http://docs.ippanel.com/#operation/GetCredit}
  */
 export async function getUserCredit(): Promise<IFarazCreditResult> {
-  const endpoint = 'http://rest.ippanel.com/v1/credit';
+  const endpoint = 'https://rest.ippanel.com/v1/credit';
   return makeAuthenticatedRequest<IFarazCreditResult>(endpoint, 'GET');
 }
 
@@ -546,7 +546,7 @@ export async function getAccountBalance(): Promise<any> {
  * @see {@link http://docs.ippanel.com/#operation/GetCredit | IPPanel Credit API}
  */
 export async function getCredit(): Promise<IFarazCreditResult> {
-  const endpoint = 'http://rest.ippanel.com/v1/credit';
+  const endpoint = 'https://rest.ippanel.com/v1/credit';
   return makeAuthenticatedRequest<IFarazCreditResult>(endpoint, 'GET');
 }
 
@@ -564,7 +564,7 @@ export async function sendSMS(
   recipients: string[],
   message: string
 ): Promise<IFarazSendSMSResult> {
-  const endpoint = 'http://rest.ippanel.com/v1/messages';
+  const endpoint = 'https://rest.ippanel.com/v1/messages';
   return makeAuthenticatedRequest<IFarazSendSMSResult>(endpoint, 'POST', {
     originator,
     recipients,
@@ -629,7 +629,7 @@ export async function sendPatternSMS<T = Record<string, string>>(
     return await response.json() as IPPanelEdgeResponse;
   } else {
     // Use legacy REST API
-    const endpoint = 'http://rest.ippanel.com/v1/messages/patterns/send';
+    const endpoint = 'https://rest.ippanel.com/v1/messages/patterns/send';
     return makeAuthenticatedRequest<IFarazSendPatternResult>(endpoint, 'POST', {
       pattern_code: patternCode,
       originator,
@@ -653,7 +653,7 @@ export async function createPattern(
   description: string,
   isShared: boolean = false
 ): Promise<any> {
-  const endpoint = 'http://rest.ippanel.com/v1/messages/patterns';
+  const endpoint = 'https://rest.ippanel.com/v1/messages/patterns';
   return makeAuthenticatedRequest(endpoint, 'POST', {
     pattern,
     description,
@@ -669,7 +669,7 @@ export async function createPattern(
  * @see {@link http://docs.ippanel.com/#operation/GetSMS}
  */
 export async function getSMSDetails(bulkId: number): Promise<IFarazGetSMSResult> {
-  const endpoint = `http://rest.ippanel.com/v1/messages/${bulkId}`;
+  const endpoint = `https://rest.ippanel.com/v1/messages/${bulkId}`;
   return makeAuthenticatedRequest<IFarazGetSMSResult>(endpoint, 'GET');
 }
 
@@ -681,7 +681,7 @@ export async function getSMSDetails(bulkId: number): Promise<IFarazGetSMSResult>
  * @see {@link http://docs.ippanel.com/#operation/GetMessageRecipientsStatus}
  */
 export async function getMessageRecipientsStatus(bulkId: number): Promise<any> {
-  const endpoint = `http://rest.ippanel.com/v1/messages/${bulkId}/recipients`;
+  const endpoint = `https://rest.ippanel.com/v1/messages/${bulkId}/recipients`;
   return makeAuthenticatedRequest(endpoint, 'GET');
 }
 
@@ -692,7 +692,7 @@ export async function getMessageRecipientsStatus(bulkId: number): Promise<any> {
  * @see {@link http://docs.ippanel.com/#operation/FetchInboxMessages}
  */
 export async function fetchInboxMessages(): Promise<any> {
-  const endpoint = 'http://rest.ippanel.com/v1/messages/inbox';
+  const endpoint = 'https://rest.ippanel.com/v1/messages/inbox';
   return makeAuthenticatedRequest(endpoint, 'GET');
 }
 
