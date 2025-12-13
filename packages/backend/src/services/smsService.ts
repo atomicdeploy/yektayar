@@ -254,8 +254,8 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
     // Convert phone number to international format for Edge API
     const internationalPhone = '+' + normalizePhoneNumber(phoneNumber);
 
-    // Detect if using Edge API endpoint
-    const isEdgeAPI = config.apiEndpoint?.includes('edge.ippanel.com');
+    // Detect if using Edge API endpoint (secure hostname check)
+    const isEdgeAPI = config.apiEndpoint?.startsWith('https://edge.ippanel.com/');
 
     let requestBody: IPPanelEdgePatternRequest | FarazSMSPatternRequest;
     let headers: Record<string, string> = {
