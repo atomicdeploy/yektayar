@@ -3,12 +3,12 @@ import { getDatabase } from '../services/database'
 import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
-import { logger, getBestLanguageMatch, normalizeTimezone } from '@yektayar/shared'
+import { logger, getBestLanguageMatch, normalizeTimezone, DeviceInfo } from '@yektayar/shared'
 import { getClientIpAddress } from '../utils/ipAddress'
 
 // Define request body types
 interface AcquireSessionBody {
-  deviceInfo?: Record<string, any>
+  deviceInfo?: Partial<DeviceInfo>
 }
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
