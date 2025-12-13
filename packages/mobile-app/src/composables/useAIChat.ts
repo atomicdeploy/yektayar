@@ -209,7 +209,12 @@ export function useAIChat() {
     isTyping.value = true
 
     try {
-      const response = await apiClient.post<{ response?: string; message?: string }>(
+      const response = await apiClient.post<{ 
+        success: boolean
+        response?: string
+        message?: string
+        error?: string
+      }>(
         '/ai/chat',
         {
           message: content,
@@ -224,17 +229,19 @@ export function useAIChat() {
         }
       )
 
-      if (!response.success || !response.data) {
+      // Check if the API call was successful
+      if (!response.success) {
         throw new Error(response.error || 'Failed to get AI response')
       }
 
-      const data = response.data
+      // The response is in the 'response' field of the backend response
+      const aiResponse = response.response || 'Sorry, I could not generate a response.'
       
       // Add AI response
       messages.value.push({
         id: `ai-${Date.now()}`,
         role: 'assistant',
-        content: data.response || data.message || 'Sorry, I could not generate a response.',
+        content: aiResponse,
         timestamp: new Date()
       })
     } catch (error) {
