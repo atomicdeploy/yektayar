@@ -85,10 +85,10 @@
           </div>
 
           <div class="info-box">
-            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">
+            <p class="info-text">
               برای دریافت مختصات:
             </p>
-            <ol style="font-size: 14px; color: var(--text-secondary); list-style: decimal; padding-right: 20px;">
+            <ol class="info-list">
               <li>به Google Maps بروید</li>
               <li>روی موقعیت مورد نظر کلیک راست کنید</li>
               <li>مختصات را کپی کنید</li>
@@ -96,7 +96,7 @@
           </div>
 
           <div class="info-box-blue">
-            <p style="font-size: 14px; color: rgb(59, 130, 246);">
+            <p class="info-box-blue-text">
               <strong>موقعیت فعلی:</strong><br />
               {{ settings.contact_map_lat }}, {{ settings.contact_map_lng }}
             </p>
@@ -105,7 +105,7 @@
               target="_blank"
               class="info-link"
             >
-              <ArrowTopRightOnSquareIcon class="w-4 h-4" style="margin-left: 4px;" />
+              <ArrowTopRightOnSquareIcon class="w-4 h-4 ml-4" />
               مشاهده در نقشه
             </a>
           </div>
@@ -121,26 +121,26 @@
             <LoadingSpinner size="32px" class="text-primary-500 mx-auto" />
           </div>
 
-          <div v-else-if="tickets.length === 0" class="empty-state" style="padding: 40px 20px;">
+          <div v-else-if="tickets.length === 0" class="empty-state p-20-40">
             <ChatBubbleLeftRightIcon class="w-12 h-12 text-gray-400" />
-            <p style="margin-top: 8px;">تیکتی وجود ندارد</p>
+            <p class="mt-8">تیکتی وجود ندارد</p>
           </div>
 
-          <div v-else style="display: flex; flex-direction: column; gap: 12px;">
+          <div v-else class="flex-column gap-12">
             <div 
               v-for="ticket in tickets.slice(0, 5)" 
               :key="ticket.id"
               class="list-item"
             >
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                <h4 style="font-weight: 600; font-size: 14px; color: var(--text-primary);">{{ ticket.subject }}</h4>
+              <div class="ticket-header">
+                <h4 class="ticket-title">{{ ticket.subject }}</h4>
                 <span :class="['status-badge', ticket.status === 'open' ? 'draft' : 'published']">
                   {{ ticket.status === 'open' ? 'باز' : 'بسته' }}
                 </span>
               </div>
-              <p style="font-size: 14px; color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{{ ticket.message }}</p>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-                <span style="font-size: 12px; color: var(--text-secondary);">{{ formatDate(ticket.created_at) }}</span>
+              <p class="ticket-message">{{ ticket.message }}</p>
+              <div class="ticket-footer">
+                <span class="ticket-date">{{ formatDate(ticket.created_at) }}</span>
                 <span :class="['status-badge', getPriorityClass(ticket.priority)]">
                   {{ getPriorityLabel(ticket.priority) }}
                 </span>
@@ -153,11 +153,11 @@
       <!-- Recent Pages -->
       <div class="card">
         <div class="card-body">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2 class="card-title" style="margin-bottom: 0;">صفحات اخیر</h2>
+          <div class="page-header">
+            <h2 class="card-title mb-0">صفحات اخیر</h2>
             <router-link
               to="/pages"
-              style="font-size: 14px; color: var(--primary-color); text-decoration: none;"
+              class="link-primary"
             >
               مشاهده همه
             </router-link>
@@ -167,21 +167,20 @@
             <LoadingSpinner size="32px" class="text-primary-500 mx-auto" />
           </div>
 
-          <div v-else-if="recentPages.length === 0" class="empty-state" style="padding: 40px 20px;">
+          <div v-else-if="recentPages.length === 0" class="empty-state p-20-40">
             <DocumentTextIcon class="w-12 h-12 text-gray-400" />
-            <p style="margin-top: 8px;">صفحه‌ای وجود ندارد</p>
+            <p class="mt-8">صفحه‌ای وجود ندارد</p>
           </div>
 
-          <div v-else style="display: flex; flex-direction: column; gap: 12px;">
+          <div v-else class="flex-column gap-12">
             <router-link 
               v-for="page in recentPages.slice(0, 5)" 
               :key="page.id"
               to="/pages"
               class="list-item"
-              style="text-decoration: none;"
             >
-              <h4 style="font-weight: 600; font-size: 14px; color: var(--text-primary);">{{ page.title }}</h4>
-              <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-family: var(--font-mono);">{{ page.slug }}</p>
+              <h4 class="page-title">{{ page.title }}</h4>
+              <p class="page-slug">{{ page.slug }}</p>
             </router-link>
           </div>
         </div>
@@ -189,7 +188,7 @@
     </div>
 
     <!-- Save Button -->
-    <div style="margin-top: 24px;">
+    <div class="mt-24">
       <button
         @click="saveSettings"
         :disabled="saving"

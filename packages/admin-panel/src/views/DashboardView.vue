@@ -9,7 +9,7 @@
     </div>
 
     <!-- Stats Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 32px;">
+    <div class="stats-grid">
       <StatCard
         :label="t('dashboard_page.total_users')"
         :value="dashboardStore.stats.totalUsers"
@@ -50,7 +50,7 @@
     <div>
       <draggable
         v-model="widgets"
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 24px;"
+        class="widgets-grid"
         :item-key="(item: Widget) => item.id"
         handle=".cursor-move"
         @start="isDragging = true"
@@ -81,51 +81,51 @@
             />
 
             <!-- Recent Activities -->
-            <div v-if="element.id === 'recent-activities'" style="display: flex; flex-direction: column; gap: 12px;">
+            <div v-if="element.id === 'recent-activities'" class="flex-column gap-12">
               <div
                 v-for="activity in dashboardStore.recentActivities"
                 :key="activity.id"
-                style="display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 8px; background: var(--bg-secondary);"
+                class="activity-item"
               >
                 <div
                   :class="['activity-indicator', getActivityColor(activity.type)]"
                 ></div>
-                <div style="flex: 1; min-width: 0;">
-                  <p style="font-size: 14px; color: var(--text-primary);">{{ activity.description }}</p>
-                  <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                <div class="activity-content">
+                  <p class="text-base text-primary">{{ activity.description }}</p>
+                  <p class="text-xs text-secondary mt-4">
                     {{ formatTimestamp(activity.timestamp) }}
                   </p>
                 </div>
               </div>
-              <div v-if="dashboardStore.recentActivities.length === 0" class="empty-state" style="padding: 40px 20px;">
+              <div v-if="dashboardStore.recentActivities.length === 0" class="empty-state p-20-40">
                 {{ t('dashboard_page.no_activities') }}
               </div>
             </div>
 
             <!-- System Status -->
-            <div v-if="element.id === 'system-status'" style="display: flex; flex-direction: column; gap: 16px;">
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: var(--bg-secondary);">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
-                  <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">API Server</span>
+            <div v-if="element.id === 'system-status'" class="flex-column gap-16">
+              <div class="status-item">
+                <div class="status-item-content">
+                  <div class="status-dot status-dot-green"></div>
+                  <span class="status-label">API Server</span>
                 </div>
-                <span style="font-size: 12px; color: var(--text-secondary);">آنلاین</span>
+                <span class="status-value">آنلاین</span>
               </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: var(--bg-secondary);">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <div :style="{ width: '12px', height: '12px', borderRadius: '50%', background: sessionStore.isSocketConnected ? '#10b981' : '#ef4444' }"></div>
-                  <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">WebSocket</span>
+              <div class="status-item">
+                <div class="status-item-content">
+                  <div :class="['status-dot', sessionStore.isSocketConnected ? 'status-dot-green' : 'status-dot-red']"></div>
+                  <span class="status-label">WebSocket</span>
                 </div>
-                <span style="font-size: 12px; color: var(--text-secondary);">
+                <span class="status-value">
                   {{ sessionStore.isSocketConnected ? 'متصل' : 'قطع شده' }}
                 </span>
               </div>
-              <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: var(--bg-secondary);">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <div style="width: 12px; height: 12px; border-radius: 50%; background: #10b981;"></div>
-                  <span style="font-size: 14px; font-weight: 600; color: var(--text-primary);">Database</span>
+              <div class="status-item">
+                <div class="status-item-content">
+                  <div class="status-dot status-dot-green"></div>
+                  <span class="status-label">Database</span>
                 </div>
-                <span style="font-size: 12px; color: var(--text-secondary);">آنلاین</span>
+                <span class="status-value">آنلاین</span>
               </div>
             </div>
           </WidgetCard>

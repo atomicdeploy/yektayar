@@ -41,7 +41,7 @@
               <strong>{{ page.title }}</strong>
             </td>
             <td>
-              <span style="font-family: var(--font-mono); font-size: 13px;">{{ page.slug }}</span>
+              <span class="slug-text">{{ page.slug }}</span>
             </td>
             <td>{{ page.created_at ? formatDate(page.created_at) : '-' }}</td>
             <td>{{ page.updated_at ? formatDate(page.updated_at) : '-' }}</td>
@@ -110,7 +110,7 @@
                 :disabled="!!editingPage.id"
                 placeholder="about-us"
               />
-              <p style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
+              <p class="helper-text">
                 URL slug (فقط حروف انگلیسی، اعداد و dash)
               </p>
             </div>
@@ -122,7 +122,7 @@
                 rows="12"
                 required
                 placeholder="# عنوان&#10;&#10;محتوای صفحه..."
-                style="font-family: var(--font-mono); font-size: 14px;"
+                class="modal-textarea"
               ></textarea>
             </div>
 
