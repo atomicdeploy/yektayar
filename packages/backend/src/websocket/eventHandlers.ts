@@ -123,10 +123,6 @@ export async function handleAIChat(send: MessageSender, sessionData: WebSocketSe
     if (!message || typeof message !== 'string') {
       throw new Error('Message is required')
     }
-    
-    if (!locale || typeof locale !== 'string') {
-      throw new Error('Locale is required')
-    }
 
     logger.info('[AI Chat] WebSocket chat request from', sessionData.socketId)
 
@@ -139,9 +135,9 @@ export async function handleAIChat(send: MessageSender, sessionData: WebSocketSe
     // Import AI service dynamically
     const { streamAIResponseChunks } = await import('../services/aiService')
 
-    // Stream the response with locale support
+    // Stream the response with locale support (defaults to 'fa')
     let fullResponse = ''
-    for await (const chunk of streamAIResponseChunks(message, conversationHistory, locale)) {
+    for await (const chunk of streamAIResponseChunks(message, conversationHistory, locale || 'fa')) {
       fullResponse += chunk
       send({
         event: 'ai:response:chunk',

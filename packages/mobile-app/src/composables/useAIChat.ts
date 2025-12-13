@@ -150,13 +150,8 @@ export function useAIChat() {
   /**
    * Send a message to the AI
    */
-  const sendMessage = async (content: string, locale: string) => {
+  const sendMessage = async (content: string, locale: string = 'fa') => {
     if (!content.trim() || isSending.value) {
-      return
-    }
-
-    if (!locale || typeof locale !== 'string') {
-      logger.error('[AI Chat] Locale is required but not provided')
       return
     }
 
@@ -214,7 +209,7 @@ export function useAIChat() {
   /**
    * Fallback method to send message via REST API
    */
-  const sendMessageViaREST = async (content: string, locale: string) => {
+  const sendMessageViaREST = async (content: string, locale: string = 'fa') => {
     isTyping.value = true
 
     try {

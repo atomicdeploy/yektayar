@@ -40,7 +40,7 @@ export interface AIResponseMetadata {
  * Get system prompt based on locale
  * Uses i18n translations for proper language support
  */
-function getSystemPrompt(locale: string): string {
+function getSystemPrompt(locale: string = 'fa'): string {
   // Import translations dynamically to get system prompt
   try {
     const translations = require('@yektayar/shared/src/i18n/translations.json')
@@ -90,7 +90,7 @@ Remember: You are here to support, guide, and encourage users on their mental we
 export async function streamAIResponse(
   message: string,
   conversationHistory?: ConversationMessage[],
-  locale: string
+  locale: string = 'fa'
 ): Promise<{ response: string; metadata?: AIResponseMetadata; debug?: AIDebugInfo }> {
   const debugInfo: AIDebugInfo = IS_DEVELOPMENT ? { timestamp: new Date().toISOString() } : {}
   const metadata: AIResponseMetadata = {}
@@ -230,7 +230,7 @@ export async function streamAIResponse(
 export async function* streamAIResponseSSE(
   message: string,
   conversationHistory?: ConversationMessage[],
-  locale: string
+  locale: string = 'fa'
 ): AsyncGenerator<string, void, unknown> {
   try {
     // Get locale-specific system prompt from i18n
@@ -318,7 +318,7 @@ export async function* streamAIResponseSSE(
 export async function* streamAIResponseChunks(
   message: string,
   conversationHistory?: ConversationMessage[],
-  locale: string
+  locale: string = 'fa'
 ): AsyncGenerator<string, void, unknown> {
   try {
     // Use SSE streaming for real-time response
@@ -335,7 +335,7 @@ export async function* streamAIResponseChunks(
  * Generate a fallback response when AI service is unavailable
  * Returns locale-specific fallback
  */
-function generateFallbackResponse(_message: string, locale: string): string {
+function generateFallbackResponse(_message: string, locale: string = 'fa'): string {
   const fallbackResponses = {
     en: [
       "Thank you for reaching out. I'm here to support you. While I'm experiencing some technical difficulties at the moment, I want you to know that what you're feeling is valid and important. Could you tell me more about what's on your mind?",
