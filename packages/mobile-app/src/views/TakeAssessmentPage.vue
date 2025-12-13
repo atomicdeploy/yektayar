@@ -304,7 +304,7 @@
             <div 
               v-for="step in totalSteps + 1" 
               :key="step"
-              :ref="el => { if (step - 1 === currentStep) activeStepRef = el }"
+              :ref="el => { if (step - 1 === currentStep) activeStepRef = el as HTMLElement | null }"
               :class="['step-indicator', { active: step - 1 === currentStep, completed: step - 1 < currentStep }]"
             ></div>
           </div>
