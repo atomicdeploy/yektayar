@@ -257,14 +257,14 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
     // Detect if using Edge API endpoint
     const isEdgeAPI = config.apiEndpoint?.includes('edge.ippanel.com');
 
-    let requestBody: any;
+    let requestBody: IPPanelEdgePatternRequest | FarazSMSPatternRequest;
     let headers: Record<string, string> = {
       'Content-Type': 'application/json'
     };
 
     if (isEdgeAPI) {
       // IPPanel Edge API format (default and recommended)
-      requestBody = {
+      const edgeBody: IPPanelEdgePatternRequest = {
         sending_type: 'pattern',
         from_number: config.lineNumber,
         code: config.patternCode,
@@ -273,11 +273,12 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
           'verification-code': otp
         }
       };
+      requestBody = edgeBody;
       // Edge API uses direct Authorization header with API key
       headers['Authorization'] = config.apiKey;
     } else {
       // Legacy format for backward compatibility (iranpayamak.com)
-      requestBody = {
+      const legacyBody: FarazSMSPatternRequest = {
         code: config.patternCode,
         attributes: {
           otp: otp
@@ -286,6 +287,7 @@ export async function sendOTPSMS(phoneNumber: string, otp: string): Promise<bool
         line_number: config.lineNumber,
         number_format: 'english'
       };
+      requestBody = legacyBody;
       // Legacy API uses Api-Key or AccessKey header
       if (config.authFormat === 'AccessKey') {
         headers['Authorization'] = `AccessKey ${config.apiKey}`;

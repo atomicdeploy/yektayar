@@ -11,6 +11,7 @@ async function testSendOTPSMS() {
   console.log('='.repeat(80));
   console.log();
 
+  // NOTE: This is hardcoded for testing only. In production, use env var or pass as argument.
   const phoneNumber = '09197103488';
   const otpCode = '999888';
 
@@ -46,6 +47,7 @@ async function testSendPatternSMS() {
 
   const patternCode = process.env.FARAZSMS_PATTERN_CODE!;
   const lineNumber = process.env.FARAZSMS_LINE_NUMBER!;
+  // NOTE: This is hardcoded for testing only. In production, use env var or pass as argument.
   const phoneNumber = '09197103488';
   const verificationCode = '777666';
 

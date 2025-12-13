@@ -43,6 +43,7 @@ async function testEdgeAPI() {
   }
 
   // Test phone number
+  // NOTE: This is hardcoded for testing only. In production, pass as argument or use env var.
   const testPhone = '09197103488';
   const testOTP = '123456';
 
