@@ -247,12 +247,12 @@ export function useAIChat() {
       }
 
       // Validate response structure
-      if (!response.response) {
+      if (!(response as any).response) {
         throw new Error('Invalid API response: missing response field')
       }
 
       // The response is in the 'response' field of the backend response
-      const aiResponse = response.response
+      const aiResponse = (response as any).response
       
       logger.success('[AI Chat] Received AI response via REST API')
 

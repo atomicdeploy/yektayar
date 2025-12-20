@@ -272,8 +272,8 @@ const fetchQuickSuggestions = async () => {
       }>
     }>('/ai/quick-suggestions')
 
-    if (response.success && response.suggestions) {
-      quickSuggestions.value = response.suggestions.map(s => ({
+    if (response.success && (response as any).suggestions) {
+      quickSuggestions.value = (response as any).suggestions.map((s: any) => ({
         id: s.id,
         title: s.title,
         text: s.text,
