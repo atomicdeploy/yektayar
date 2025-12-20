@@ -212,18 +212,22 @@ export function useAIChat() {
   const sendMessageViaREST = async (content: string, locale: string = 'fa') => {
     isTyping.value = true
 
+    // Define the response type from backend
+    interface AIChatResponse {
+      success: boolean
+      response?: string
+      message?: string
+      error?: string
+      timestamp?: string
+    }
+
     try {
       logger.info('[AI Chat] Sending message via REST API:', { 
         messageLength: content.length,
         locale 
       })
 
-      const response = await apiClient.post<{ 
-        success: boolean
-        response?: string
-        message?: string
-        error?: string
-      }>(
+      const response = await apiClient.post<AIChatResponse>(
         '/ai/chat',
         {
           message: content,
@@ -238,21 +242,26 @@ export function useAIChat() {
         }
       )
 
-      logger.debug('[AI Chat] REST API response:', { success: response.success })
+      // Note: Backend returns response directly (not wrapped in ApiResponse.data)
+      // This is by design - the backend returns { success, response, ... } directly
+      // Type assertion is necessary due to ApiClient wrapper type definition
+      const apiResponse = response as unknown as AIChatResponse
 
-      // Check if the API call was successful
-      if (!response.success) {
-        logger.error('[AI Chat] API returned error:', response.error)
-        throw new Error(response.error || 'API request failed')
+      logger.debug('[AI Chat] REST API response:', { success: apiResponse.success })
+
+      // Runtime validation: Check if the API call was successful
+      if (!apiResponse.success) {
+        logger.error('[AI Chat] API returned error:', apiResponse.error)
+        throw new Error(apiResponse.error || 'API request failed')
       }
 
-      // Validate response structure
-      if (!response.response) {
-        throw new Error('Invalid API response: missing response field')
+      // Runtime validation: Validate response structure
+      if (!apiResponse.response || typeof apiResponse.response !== 'string') {
+        throw new Error('Invalid API response: missing or invalid response field')
       }
 
       // The response is in the 'response' field of the backend response
-      const aiResponse = response.response
+      const aiResponse = apiResponse.response
       
       logger.success('[AI Chat] Received AI response via REST API')
 

@@ -93,3 +93,41 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
       description: 'Returns the current status of the AI service by making a test request to Pollinations API'
     }
   })
+  .get('/quick-suggestions', async () => {
+    try {
+      const { query } = await import('../services/database')
+      
+      // Fetch active quick suggestions ordered by order_index
+      const suggestions = await query(`
+        SELECT id, title, text, icon, order_index
+        FROM ai_quick_suggestions
+        WHERE is_active = true
+        ORDER BY order_index ASC
+      `)
+
+      return {
+        success: true,
+        suggestions: suggestions.map(s => ({
+          id: s.id,
+          title: s.title,
+          text: s.text,
+          icon: s.icon,
+          orderIndex: s.order_index
+        })),
+        timestamp: new Date().toISOString()
+      }
+    } catch (error) {
+      logger.error('Error fetching quick suggestions:', error)
+      return {
+        success: false,
+        error: 'Failed to fetch quick suggestions',
+        suggestions: []
+      }
+    }
+  }, {
+    detail: {
+      tags: ['AI'],
+      summary: 'Get AI quick suggestions',
+      description: 'Returns a list of quick suggestion prompts for the AI chat interface with i18n support'
+    }
+  })
