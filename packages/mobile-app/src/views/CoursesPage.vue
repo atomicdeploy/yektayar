@@ -465,19 +465,32 @@ ion-chip {
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 8px;
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.85) 0%,
+        rgba(0, 0, 0, 0.6) 70%,
+        rgba(0, 0, 0, 0) 100%
+      );
+      padding: 12px 12px 10px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
 
       ion-progress-bar {
-        --background: rgba(255, 255, 255, 0.3);
+        --background: rgba(255, 255, 255, 0.15);
         --progress-background: var(--ion-color-success);
-        margin-bottom: 4px;
+        --border-radius: 8px;
+        height: 6px;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
 
       .progress-text {
-        color: white;
-        font-size: 12px;
-        font-weight: 600;
+        color: #ffffff;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+        letter-spacing: 0.5px;
       }
     }
   }
