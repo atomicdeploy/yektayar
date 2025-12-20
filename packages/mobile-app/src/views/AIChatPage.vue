@@ -286,14 +286,29 @@ const fetchQuickSuggestions = async () => {
 
     // Runtime validation
     if (apiResponse.success && Array.isArray(apiResponse.suggestions)) {
-      quickSuggestions.value = apiResponse.suggestions.map(s => ({
-        id: s.id,
-        title: s.title,
-        text: s.text,
-        icon: s.icon,
-        orderIndex: s.orderIndex
-      }))
-      logger.success(`Loaded ${quickSuggestions.value.length} quick suggestions`)
+      const validSuggestions = apiResponse.suggestions.filter((s, index) => {
+        const hasRequiredFields = s && s.id != null && s.title != null && s.text != null
+        
+        if (!hasRequiredFields) {
+          logger.warn('Received malformed quick suggestion from backend', { index, suggestion: s })
+        }
+        
+        return hasRequiredFields
+      })
+      
+      if (validSuggestions.length > 0) {
+        quickSuggestions.value = validSuggestions.map(s => ({
+          id: s.id,
+          title: s.title,
+          text: s.text,
+          icon: s.icon,
+          orderIndex: s.orderIndex
+        }))
+        logger.success(`Loaded ${quickSuggestions.value.length} quick suggestions`)
+      } else {
+        logger.warn('No valid quick suggestions received from backend, using fallback')
+        useFallbackSuggestions()
+      }
     } else {
       logger.warn('Failed to load quick suggestions, using fallback')
       useFallbackSuggestions()

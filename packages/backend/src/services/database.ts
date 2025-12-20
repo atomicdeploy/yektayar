@@ -464,26 +464,26 @@ async function insertDefaultQuickSuggestions() {
 
     const quickSuggestions = [
       {
-        title: JSON.stringify({ fa: 'مدیریت استرس', en: 'Manage Stress' }),
-        text: JSON.stringify({ fa: 'چگونه می‌توانم استرس را مدیریت کنم؟', en: 'How can I manage stress?' }),
+        title: { fa: 'مدیریت استرس', en: 'Manage Stress' },
+        text: { fa: 'چگونه می‌توانم استرس را مدیریت کنم؟', en: 'How can I manage stress?' },
         icon: 'help',
         order_index: 1
       },
       {
-        title: JSON.stringify({ fa: 'بهبود خلق و خو', en: 'Improve Mood' }),
-        text: JSON.stringify({ fa: 'نکاتی برای بهبود خلق و خو', en: 'Tips for improving mood' }),
+        title: { fa: 'بهبود خلق و خو', en: 'Improve Mood' },
+        text: { fa: 'نکاتی برای بهبود خلق و خو', en: 'Tips for improving mood' },
         icon: 'happy',
         order_index: 2
       },
       {
-        title: JSON.stringify({ fa: 'احساس اضطراب', en: 'Feeling Anxious' }),
-        text: JSON.stringify({ fa: 'احساس اضطراب می‌کنم', en: 'I feel anxious' }),
+        title: { fa: 'احساس اضطراب', en: 'Feeling Anxious' },
+        text: { fa: 'احساس اضطراب می‌کنم', en: 'I feel anxious' },
         icon: 'sad',
         order_index: 3
       },
       {
-        title: JSON.stringify({ fa: 'تکنیک‌های آرامش', en: 'Relaxation Techniques' }),
-        text: JSON.stringify({ fa: 'تکنیک‌های آرامش', en: 'Relaxation techniques' }),
+        title: { fa: 'تکنیک‌های آرامش', en: 'Relaxation Techniques' },
+        text: { fa: 'تکنیک‌های آرامش', en: 'Relaxation techniques' },
         icon: 'heart',
         order_index: 4
       }
