@@ -456,7 +456,7 @@ ion-chip {
       }
 
       .image-error {
-        background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-secondary-tint));
+        background: var(--surface-2);
       }
     }
 
@@ -555,7 +555,7 @@ ion-chip {
       }
 
       .image-error {
-        background: linear-gradient(135deg, var(--ion-color-primary-tint), var(--ion-color-secondary-tint));
+        background: var(--surface-2);
       }
     }
 
