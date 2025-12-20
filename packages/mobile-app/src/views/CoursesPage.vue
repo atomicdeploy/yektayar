@@ -472,6 +472,17 @@ ion-chip {
         rgba(0, 0, 0, 0) 100%
       );
       padding: 12px 12px 10px;
+      
+      // Fallback for browsers without backdrop-filter support
+      @supports not (backdrop-filter: blur(8px)) {
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.95) 0%,
+          rgba(0, 0, 0, 0.75) 70%,
+          rgba(0, 0, 0, 0) 100%
+        );
+      }
+      
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
 
@@ -486,7 +497,7 @@ ion-chip {
       }
 
       .progress-text {
-        color: #ffffff;
+        color: var(--ion-color-primary-contrast);
         font-size: 0.6875rem;
         font-weight: 700;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
