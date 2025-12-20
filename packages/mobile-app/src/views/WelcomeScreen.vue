@@ -849,8 +849,8 @@ const startApp = async () => {
     // Success! Now trigger elegant exit animation
     isExiting.value = true
     
-    // Wait for animation to complete (800ms for smooth fade)
-    await new Promise(resolve => setTimeout(resolve, 800))
+    // Wait for animation to complete (400ms for snappy modern transition)
+    await new Promise(resolve => setTimeout(resolve, 400))
     
     // Navigate to intended destination after animation completes
     // Supports dynamic routing via ?redirect=/intended/path query parameter
@@ -914,14 +914,14 @@ const onImageError = () => {
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
-              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Elegant exit animation - fade entire screen */
+/* Elegant exit animation - fade and slide up entire screen */
 .welcome-container.exiting {
   opacity: 0;
-  transform: scale(0.98);
+  transform: translateY(-30px) scale(0.96);
   pointer-events: none;
 }
 
