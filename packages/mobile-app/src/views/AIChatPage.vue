@@ -199,6 +199,22 @@ interface QuickSuggestion {
   orderIndex?: number
 }
 
+// Type for i18n text field
+type I18nText = string | { fa: string; en: string }
+
+// API response type for quick suggestions
+interface QuickSuggestionsResponse {
+  success: boolean
+  suggestions: Array<{
+    id: number
+    title: I18nText
+    text: I18nText
+    icon: string
+    orderIndex: number
+  }>
+  timestamp?: string
+}
+
 // Refs
 const contentRef = ref()
 // const messagesContainer = ref() // Unused for now - reserved for future scroll functionality
@@ -261,19 +277,13 @@ const toggleVoiceInput = () => {
 const fetchQuickSuggestions = async () => {
   try {
     logger.info('Fetching quick suggestions from backend')
-    const response = await apiClient.get<{
-      success: boolean
-      suggestions: Array<{
-        id: number
-        title: any
-        text: any
-        icon: string
-        orderIndex: number
-      }>
-    }>('/ai/quick-suggestions')
+    const response = await apiClient.get<QuickSuggestionsResponse>('/ai/quick-suggestions')
 
-    if (response.success && (response as any).suggestions) {
-      quickSuggestions.value = (response as any).suggestions.map((s: any) => ({
+    // Backend returns response directly (not wrapped in ApiResponse.data)
+    const apiResponse = response as unknown as QuickSuggestionsResponse
+
+    if (apiResponse.success && apiResponse.suggestions) {
+      quickSuggestions.value = apiResponse.suggestions.map(s => ({
         id: s.id,
         title: s.title,
         text: s.text,
@@ -322,7 +332,7 @@ const useFallbackSuggestions = () => {
 }
 
 // Helper function to get localized text
-const getLocalizedText = (field: string | { fa: string; en: string }): string => {
+const getLocalizedText = (field: I18nText): string => {
   if (typeof field === 'string') {
     return field
   }
@@ -330,11 +340,11 @@ const getLocalizedText = (field: string | { fa: string; en: string }): string =>
 }
 
 // Send message function (updated to handle both string and i18n text)
-const sendMessage = async (customText?: string | { fa: string; en: string }) => {
+const sendMessage = async (customText?: I18nText) => {
   let text: string
   
   if (customText) {
-    text = typeof customText === 'string' ? customText : getLocalizedText(customText)
+    text = getLocalizedText(customText)
   } else {
     text = messageText.value.trim()
   }

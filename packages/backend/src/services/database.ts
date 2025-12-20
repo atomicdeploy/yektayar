@@ -448,6 +448,14 @@ async function insertDefaultUsers() {
 }
 
 /**
+ * Helper function to create i18n field value
+ * Exported for use in seeder scripts
+ */
+export function createI18nField(fa: string, en: string): string {
+  return JSON.stringify({ fa, en })
+}
+
+/**
  * Insert default quick suggestions
  */
 async function insertDefaultQuickSuggestions() {
@@ -464,26 +472,26 @@ async function insertDefaultQuickSuggestions() {
 
     const quickSuggestions = [
       {
-        title: JSON.stringify({ fa: 'مدیریت استرس', en: 'Manage Stress' }),
-        text: JSON.stringify({ fa: 'چگونه می‌توانم استرس را مدیریت کنم؟', en: 'How can I manage stress?' }),
+        title: createI18nField('مدیریت استرس', 'Manage Stress'),
+        text: createI18nField('چگونه می‌توانم استرس را مدیریت کنم؟', 'How can I manage stress?'),
         icon: 'help',
         order_index: 1
       },
       {
-        title: JSON.stringify({ fa: 'بهبود خلق و خو', en: 'Improve Mood' }),
-        text: JSON.stringify({ fa: 'نکاتی برای بهبود خلق و خو', en: 'Tips for improving mood' }),
+        title: createI18nField('بهبود خلق و خو', 'Improve Mood'),
+        text: createI18nField('نکاتی برای بهبود خلق و خو', 'Tips for improving mood'),
         icon: 'happy',
         order_index: 2
       },
       {
-        title: JSON.stringify({ fa: 'احساس اضطراب', en: 'Feeling Anxious' }),
-        text: JSON.stringify({ fa: 'احساس اضطراب می‌کنم', en: 'I feel anxious' }),
+        title: createI18nField('احساس اضطراب', 'Feeling Anxious'),
+        text: createI18nField('احساس اضطراب می‌کنم', 'I feel anxious'),
         icon: 'sad',
         order_index: 3
       },
       {
-        title: JSON.stringify({ fa: 'تکنیک‌های آرامش', en: 'Relaxation Techniques' }),
-        text: JSON.stringify({ fa: 'تکنیک‌های آرامش', en: 'Relaxation techniques' }),
+        title: createI18nField('تکنیک‌های آرامش', 'Relaxation Techniques'),
+        text: createI18nField('تکنیک‌های آرامش', 'Relaxation techniques'),
         icon: 'heart',
         order_index: 4
       }
