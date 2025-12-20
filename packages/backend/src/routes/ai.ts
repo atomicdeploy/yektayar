@@ -121,8 +121,7 @@ export const aiRoutes = new Elysia({ prefix: '/api/ai' })
       return {
         success: false,
         error: 'Failed to fetch quick suggestions',
-        suggestions: [],
-        timestamp: new Date().toISOString()
+        suggestions: []
       }
     }
   }, {
