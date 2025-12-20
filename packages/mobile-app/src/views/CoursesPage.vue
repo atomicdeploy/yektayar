@@ -67,13 +67,18 @@
                     image-class="course-thumbnail-image"
                   />
                   <div class="progress-overlay">
-                    <ion-progress-bar :value="enrollment.progress / 100"></ion-progress-bar>
-                    <span class="progress-text">{{ enrollment.progress }}%</span>
+                    <div class="progress-content">
+                      <ion-progress-bar :value="enrollment.progress / 100"></ion-progress-bar>
+                      <span class="progress-text">{{ enrollment.progress }}%</span>
+                    </div>
                   </div>
                 </div>
                 <div class="course-info-mini">
                   <h4>{{ enrollment.course.title }}</h4>
-                  <p>{{ t('courses.continue_learning') }}</p>
+                  <p class="continue-learning">
+                    <ion-icon :icon="chevronForward" class="chevron-icon"></ion-icon>
+                    {{ t('courses.continue_learning') }}
+                  </p>
                 </div>
               </router-link>
             </div>
@@ -465,43 +470,34 @@ ion-chip {
       bottom: 0;
       left: 0;
       right: 0;
-      background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.85) 0%,
-        rgba(0, 0, 0, 0.6) 70%,
-        rgba(0, 0, 0, 0) 100%
-      );
-      padding: 12px 12px 10px;
-      
-      // Fallback for browsers without backdrop-filter support
-      @supports not (backdrop-filter: blur(8px)) {
-        background: linear-gradient(
-          to top,
-          rgba(0, 0, 0, 0.95) 0%,
-          rgba(0, 0, 0, 0.75) 70%,
-          rgba(0, 0, 0, 0) 100%
-        );
-      }
-      
+      background: rgba(var(--ion-background-color-rgb, 255, 255, 255), 0.9);
+      border-top: 1px solid var(--ion-border-color);
+      padding: 8px 12px;
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
 
+      .progress-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
       ion-progress-bar {
-        --background: rgba(255, 255, 255, 0.15);
+        --background: var(--ion-color-light);
         --progress-background: var(--ion-color-success);
         --border-radius: 8px;
         height: 6px;
         border-radius: 8px;
-        margin-bottom: 6px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        flex: 1;
       }
 
       .progress-text {
-        color: var(--ion-color-primary-contrast);
-        font-size: 0.6875rem;
+        color: var(--text-primary);
+        font-size: 0.75rem;
         font-weight: 700;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-        letter-spacing: 0.5px;
+        flex-shrink: 0;
+        min-width: 35px;
+        text-align: left;
       }
     }
   }
@@ -527,6 +523,17 @@ ion-chip {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      &.continue-learning {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        .chevron-icon {
+          font-size: 1rem;
+          transform: scaleX(-1); // Flip for RTL direction
+        }
+      }
     }
   }
 }
