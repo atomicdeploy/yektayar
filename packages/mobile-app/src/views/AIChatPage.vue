@@ -196,7 +196,7 @@ interface QuickSuggestion {
   title: string | { fa: string; en: string }
   text: string | { fa: string; en: string }
   icon: string
-  orderIndex?: number
+  orderIndex: number
 }
 
 // Type for i18n text field
