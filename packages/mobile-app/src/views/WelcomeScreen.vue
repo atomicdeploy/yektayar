@@ -849,8 +849,8 @@ const startApp = async () => {
     // Success! Now trigger elegant exit animation
     isExiting.value = true
     
-    // Wait for animation to complete (400ms for snappy modern transition)
-    await new Promise(resolve => setTimeout(resolve, 400))
+    // Wait for animation to complete (375ms = 350ms transition + 25ms buffer)
+    await new Promise(resolve => setTimeout(resolve, 375))
     
     // Navigate to intended destination after animation completes
     // Supports dynamic routing via ?redirect=/intended/path query parameter
