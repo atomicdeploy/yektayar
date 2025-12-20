@@ -317,49 +317,65 @@ onMounted(() => {
 
 .search-section {
   padding: 16px;
-  background: var(--ion-background-color);
+  background: var(--ion-toolbar-background);
+  border-bottom: 1px solid var(--ion-border-color);
+
+  ion-searchbar {
+    --background: var(--surface-2);
+    --border-radius: 12px;
+    --box-shadow: none;
+    --color: var(--text-primary);
+    --placeholder-color: var(--text-tertiary);
+    --icon-color: var(--text-secondary);
+    padding: 0;
+  }
 }
 
 .categories-scroll {
-  padding: 8px 16px;
-  background: var(--ion-background-color);
+  padding: 12px 16px;
+  background: var(--ion-toolbar-background);
   border-bottom: 1px solid var(--ion-border-color);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .category-pills {
   display: flex;
   gap: 8px;
   min-width: min-content;
+  padding: 4px 0;
 }
 
 ion-chip {
-  --background: var(--ion-color-step-150, var(--ion-color-light));
-  --color: var(--ion-color-step-850, var(--ion-text-color));
+  --background: var(--surface-2);
+  --color: var(--text-primary);
+  height: 36px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   flex-shrink: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 
+  &:active {
+    transform: scale(0.95);
+  }
+
   &.active {
     --background: var(--ion-color-primary);
     --color: var(--ion-color-primary-contrast);
-  }
-}
-
-// Dark mode support for chips
-@media (prefers-color-scheme: dark) {
-  ion-chip {
-    --background: var(--ion-color-step-150);
-    --color: var(--ion-color-step-850);
+    transform: scale(1.0);
   }
 }
 
 .section {
   padding: 24px 16px;
+  background: var(--ion-background-color);
 }
 
 .section-header {
@@ -382,9 +398,9 @@ ion-chip {
 
 .section-title {
   margin: 0;
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: var(--ion-text-color);
+  color: var(--text-primary);
   flex-shrink: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -406,17 +422,21 @@ ion-chip {
 
 .course-card-mini {
   flex: 0 0 280px;
-  background: var(--ion-card-background);
+  background: var(--surface-1);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
   text-decoration: none;
   display: block;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   .course-thumbnail {
@@ -467,16 +487,22 @@ ion-chip {
 
     h4 {
       margin: 0 0 4px 0;
-      font-size: 16px;
+      font-size: 1rem;
       font-weight: 600;
-      color: var(--ion-text-color);
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     p {
       margin: 0;
-      font-size: 13px;
+      font-size: 0.8125rem;
       color: var(--ion-color-primary);
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
@@ -497,15 +523,19 @@ ion-chip {
 }
 
 .course-card {
-  background: var(--ion-card-background);
+  background: var(--surface-1);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   .course-image {
@@ -548,15 +578,16 @@ ion-chip {
 
   .course-title {
     margin: 0 0 8px 0;
-    font-size: 18px;
+    font-size: 1rem;
     font-weight: 700;
-    color: var(--ion-text-color);
+    color: var(--text-primary);
+    line-height: 1.4;
   }
 
   .course-description {
     margin: 0 0 12px 0;
-    font-size: 14px;
-    color: var(--ion-color-medium);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
     line-height: 1.5;
   }
 
@@ -569,8 +600,8 @@ ion-chip {
       display: flex;
       align-items: center;
       gap: 4px;
-      font-size: 13px;
-      color: var(--ion-color-medium);
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
 
       ion-icon {
         font-size: 16px;
@@ -586,10 +617,13 @@ ion-chip {
     border-top: 1px solid var(--ion-border-color);
 
     .course-category {
-      font-size: 12px;
+      font-size: 0.75rem;
       color: var(--ion-color-primary);
       font-weight: 600;
       text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
@@ -604,9 +638,10 @@ ion-chip {
   }
 
   .skeleton-card {
-    background: var(--ion-card-background);
+    background: var(--surface-1);
     border-radius: 16px;
     overflow: hidden;
+    box-shadow: var(--card-shadow);
   }
 }
 
@@ -622,15 +657,15 @@ ion-chip {
 
   h3 {
     margin: 20px 0 10px;
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: 600;
-    color: var(--ion-text-color);
+    color: var(--text-primary);
   }
 
   p {
     margin: 0;
-    font-size: 14px;
-    color: var(--ion-color-medium);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
   }
 }
 
