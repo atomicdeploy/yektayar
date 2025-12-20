@@ -62,8 +62,8 @@
               @click="sendMessage(suggestion.text)"
               class="suggestion-chip"
             >
-              <ion-icon :icon="suggestion.icon"></ion-icon>
-              <ion-label>{{ locale === 'fa' ? suggestion.fa : suggestion.en }}</ion-label>
+              <ion-icon :icon="iconMap[suggestion.icon] || help"></ion-icon>
+              <ion-label>{{ getLocalizedText(suggestion.title) }}</ion-label>
             </ion-chip>
           </div>
         </div>
@@ -139,7 +139,7 @@
           class="send-button"
           fill="clear"
         >
-          <ion-icon slot="icon-only" :icon="send"></ion-icon>
+          <ion-icon slot="icon-only" :icon="send" class="send-icon"></ion-icon>
         </ion-button>
       </div>
       <div v-if="isListening" class="voice-indicator">
@@ -185,13 +185,33 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useAIChat } from '@/composables/useAIChat'
 import { useSpeechRecognition } from '@/composables/useSpeechRecognition'
+import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 const { locale } = useI18n()
+
+// Interface for quick suggestions
+interface QuickSuggestion {
+  id: number
+  title: string | { fa: string; en: string }
+  text: string | { fa: string; en: string }
+  icon: string
+  orderIndex?: number
+}
 
 // Refs
 const contentRef = ref()
 // const messagesContainer = ref() // Unused for now - reserved for future scroll functionality
 const messageText = ref('')
+const quickSuggestions = ref<QuickSuggestion[]>([])
+
+// Icon map
+const iconMap: Record<string, any> = {
+  help,
+  happy,
+  sad,
+  heart,
+}
 
 // AI Chat composable
 const { 
@@ -237,41 +257,88 @@ const toggleVoiceInput = () => {
   }
 }
 
-// Quick suggestions for first-time users
-const quickSuggestions = [
-  { 
-    id: 1, 
-    icon: help, 
-    fa: 'چگونه می‌توانم استرس را مدیریت کنم؟', 
-    en: 'How can I manage stress?',
-    text: 'How can I manage stress?'
-  },
-  { 
-    id: 2, 
-    icon: happy, 
-    fa: 'نکاتی برای بهبود خلق و خو', 
-    en: 'Tips for improving mood',
-    text: 'Can you give me tips for improving my mood?'
-  },
-  { 
-    id: 3, 
-    icon: sad, 
-    fa: 'احساس اضطراب می‌کنم', 
-    en: 'I feel anxious',
-    text: 'I have been feeling anxious lately. What should I do?'
-  },
-  { 
-    id: 4, 
-    icon: heart, 
-    fa: 'تکنیک‌های آرامش', 
-    en: 'Relaxation techniques',
-    text: 'What are some relaxation techniques I can try?'
-  },
-]
+// Fetch quick suggestions from backend
+const fetchQuickSuggestions = async () => {
+  try {
+    logger.info('Fetching quick suggestions from backend')
+    const response = await apiClient.get<{
+      success: boolean
+      suggestions: Array<{
+        id: number
+        title: any
+        text: any
+        icon: string
+        orderIndex: number
+      }>
+    }>('/ai/quick-suggestions')
 
-// Send message function
-const sendMessage = async (customText?: string) => {
-  const text = customText || messageText.value.trim()
+    if (response.success && response.suggestions) {
+      quickSuggestions.value = response.suggestions.map(s => ({
+        id: s.id,
+        title: s.title,
+        text: s.text,
+        icon: s.icon,
+        orderIndex: s.orderIndex
+      }))
+      logger.success(`Loaded ${quickSuggestions.value.length} quick suggestions`)
+    } else {
+      logger.warn('Failed to load quick suggestions, using fallback')
+      useFallbackSuggestions()
+    }
+  } catch (error) {
+    logger.error('Error fetching quick suggestions:', error)
+    useFallbackSuggestions()
+  }
+}
+
+// Fallback suggestions if API fails
+const useFallbackSuggestions = () => {
+  quickSuggestions.value = [
+    { 
+      id: 1, 
+      icon: 'help', 
+      title: { fa: 'مدیریت استرس', en: 'Manage Stress' },
+      text: { fa: 'چگونه می‌توانم استرس را مدیریت کنم؟', en: 'How can I manage stress?' }
+    },
+    { 
+      id: 2, 
+      icon: 'happy', 
+      title: { fa: 'بهبود خلق و خو', en: 'Improve Mood' },
+      text: { fa: 'نکاتی برای بهبود خلق و خو', en: 'Tips for improving mood' }
+    },
+    { 
+      id: 3, 
+      icon: 'sad', 
+      title: { fa: 'احساس اضطراب', en: 'Feeling Anxious' },
+      text: { fa: 'احساس اضطراب می‌کنم', en: 'I feel anxious' }
+    },
+    { 
+      id: 4, 
+      icon: 'heart', 
+      title: { fa: 'تکنیک‌های آرامش', en: 'Relaxation Techniques' },
+      text: { fa: 'تکنیک‌های آرامش', en: 'Relaxation techniques' }
+    },
+  ]
+}
+
+// Helper function to get localized text
+const getLocalizedText = (field: string | { fa: string; en: string }): string => {
+  if (typeof field === 'string') {
+    return field
+  }
+  return locale.value === 'fa' ? field.fa : field.en
+}
+
+// Send message function (updated to handle both string and i18n text)
+const sendMessage = async (customText?: string | { fa: string; en: string }) => {
+  let text: string
+  
+  if (customText) {
+    text = typeof customText === 'string' ? customText : getLocalizedText(customText)
+  } else {
+    text = messageText.value.trim()
+  }
+  
   if (!text) return
 
   messageText.value = ''
@@ -324,6 +391,7 @@ const scrollToBottom = () => {
 
 // Lifecycle hooks
 onMounted(async () => {
+  await fetchQuickSuggestions()
   await connect()
   scrollToBottom()
 })
@@ -670,6 +738,11 @@ onUnmounted(() => {
 
 .send-button:disabled ion-icon {
   color: var(--ion-color-medium);
+}
+
+/* RTL Support - Flip send icon direction for right-to-left languages */
+[dir="rtl"] .send-icon {
+  transform: scaleX(-1);
 }
 
 /* Voice Button */
