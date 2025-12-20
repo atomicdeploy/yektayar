@@ -221,8 +221,8 @@ const contentRef = ref()
 const messageText = ref('')
 const quickSuggestions = ref<QuickSuggestion[]>([])
 
-// Icon map
-const iconMap: Record<string, any> = {
+// Icon map - maps icon names to ionicons
+const iconMap: Record<string, typeof help> = {
   help,
   happy,
   sad,
@@ -279,10 +279,13 @@ const fetchQuickSuggestions = async () => {
     logger.info('Fetching quick suggestions from backend')
     const response = await apiClient.get<QuickSuggestionsResponse>('/ai/quick-suggestions')
 
-    // Backend returns response directly (not wrapped in ApiResponse.data)
+    // Note: Backend returns response directly (not wrapped in ApiResponse.data)
+    // This is by design - the backend returns { success, suggestions, ... } directly
+    // Type assertion is necessary due to ApiClient wrapper type definition
     const apiResponse = response as unknown as QuickSuggestionsResponse
 
-    if (apiResponse.success && apiResponse.suggestions) {
+    // Runtime validation
+    if (apiResponse.success && Array.isArray(apiResponse.suggestions)) {
       quickSuggestions.value = apiResponse.suggestions.map(s => ({
         id: s.id,
         title: s.title,

@@ -64,12 +64,11 @@ async function seedAISuggestions() {
     }
 
     logger.success(`Successfully seeded ${quickSuggestions.length} quick suggestions`)
+    process.exit(0)
     
   } catch (error) {
     logger.error('Error seeding AI quick suggestions:', error)
-    throw error
-  } finally {
-    process.exit(0)
+    process.exit(1)
   }
 }
 

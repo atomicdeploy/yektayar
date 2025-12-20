@@ -242,20 +242,22 @@ export function useAIChat() {
         }
       )
 
-      // Backend returns response directly (not wrapped in ApiResponse.data)
+      // Note: Backend returns response directly (not wrapped in ApiResponse.data)
+      // This is by design - the backend returns { success, response, ... } directly
+      // Type assertion is necessary due to ApiClient wrapper type definition
       const apiResponse = response as unknown as AIChatResponse
 
       logger.debug('[AI Chat] REST API response:', { success: apiResponse.success })
 
-      // Check if the API call was successful
+      // Runtime validation: Check if the API call was successful
       if (!apiResponse.success) {
         logger.error('[AI Chat] API returned error:', apiResponse.error)
         throw new Error(apiResponse.error || 'API request failed')
       }
 
-      // Validate response structure
-      if (!apiResponse.response) {
-        throw new Error('Invalid API response: missing response field')
+      // Runtime validation: Validate response structure
+      if (!apiResponse.response || typeof apiResponse.response !== 'string') {
+        throw new Error('Invalid API response: missing or invalid response field')
       }
 
       // The response is in the 'response' field of the backend response
