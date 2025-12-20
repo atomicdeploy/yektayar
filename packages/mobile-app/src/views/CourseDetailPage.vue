@@ -609,7 +609,7 @@ onMounted(() => {
       }
 
       ion-progress-bar {
-        --background: var(--ion-color-step-150, var(--ion-color-light));
+        --background: var(--surface-2);
         --progress-background: var(--ion-color-success);
         height: 8px;
         border-radius: 4px;
@@ -987,7 +987,7 @@ onMounted(() => {
 
   .enrollment-section {
     ion-progress-bar {
-      --background: var(--ion-color-step-150);
+      --background: var(--surface-2);
     }
   }
 }

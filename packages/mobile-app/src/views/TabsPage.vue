@@ -8,14 +8,14 @@
           <ion-label>{{ t('home') }}</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="courses" href="/tabs/courses">
-          <ion-icon :icon="school" />
-          <ion-label>{{ t('courses') }}</ion-label>
-        </ion-tab-button>
-
         <ion-tab-button tab="chat" href="/tabs/chat">
           <ion-icon :icon="chatbubbles" />
           <ion-label>{{ t('chat') }}</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="courses" href="/tabs/courses">
+          <ion-icon :icon="school" />
+          <ion-label>{{ t('courses') }}</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="appointments" href="/tabs/appointments">
