@@ -76,7 +76,7 @@
                 <div class="course-info-mini">
                   <h4>{{ enrollment.course.title }}</h4>
                   <p class="continue-learning">
-                    <ion-icon :icon="chevronForward" class="chevron-icon"></ion-icon>
+                    <ion-icon :icon="locale === 'fa' ? chevronBack : chevronForward" class="chevron-icon"></ion-icon>
                     {{ t('courses.continue_learning') }}
                   </p>
                 </div>
@@ -470,7 +470,8 @@ ion-chip {
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(var(--ion-background-color-rgb, 255, 255, 255), 0.9);
+      background: var(--ion-background-color);
+      opacity: 0.95;
       border-top: 1px solid var(--ion-border-color);
       padding: 8px 12px;
       backdrop-filter: blur(8px);
@@ -531,7 +532,6 @@ ion-chip {
 
         .chevron-icon {
           font-size: 1rem;
-          transform: scaleX(-1); // Flip for RTL direction
         }
       }
     }
