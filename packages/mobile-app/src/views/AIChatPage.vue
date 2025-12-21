@@ -773,6 +773,15 @@ onUnmounted(() => {
   transform: scaleX(-1);
 }
 
+/* RTL Support - Reverse message alignment for right-to-left languages */
+[dir="rtl"] .message-wrapper.user {
+  justify-content: flex-start;
+}
+
+[dir="rtl"] .message-wrapper.assistant {
+  justify-content: flex-end;
+}
+
 /* Voice Button */
 .voice-button {
   --padding-start: 0.75rem;
