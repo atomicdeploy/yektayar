@@ -236,7 +236,7 @@ onMounted(() => {
         font-weight: 700;
         flex-shrink: 0;
         min-width: 35px;
-        text-align: left;
+        text-align: start;
       }
     }
   }
