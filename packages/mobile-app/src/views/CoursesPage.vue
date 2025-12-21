@@ -532,6 +532,7 @@ ion-chip {
 
         .chevron-icon {
           font-size: 1rem;
+          order: 1;
         }
       }
     }
