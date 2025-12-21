@@ -177,6 +177,14 @@
   --secondary-gradient: linear-gradient(135deg, #7a8fbd 0%, #8fa3c7 100%);
   --secondary-glow: 0 2px 8px rgba(143, 163, 199, 0.3);
 
+  /* Override secondary color for dark mode visibility */
+  --ion-color-secondary: #8fa3c7;
+  --ion-color-secondary-rgb: 143, 163, 199;
+  --ion-color-secondary-contrast: #000000;
+  --ion-color-secondary-contrast-rgb: 0, 0, 0;
+  --ion-color-secondary-shade: #7e90af;
+  --ion-color-secondary-tint: #9aadd0;
+
   /* Adjust Ionic component colors for dark mode */
   --ion-color-step-50: #14202f;
   --ion-color-step-100: #182638;
@@ -250,6 +258,14 @@
     --secondary-accent-medium: rgba(143, 163, 199, 0.25);
     --secondary-gradient: linear-gradient(135deg, #7a8fbd 0%, #8fa3c7 100%);
     --secondary-glow: 0 2px 8px rgba(143, 163, 199, 0.3);
+
+    /* Override secondary color for dark mode visibility */
+    --ion-color-secondary: #8fa3c7;
+    --ion-color-secondary-rgb: 143, 163, 199;
+    --ion-color-secondary-contrast: #000000;
+    --ion-color-secondary-contrast-rgb: 0, 0, 0;
+    --ion-color-secondary-shade: #7e90af;
+    --ion-color-secondary-tint: #9aadd0;
 
     /* Adjust Ionic component colors for dark mode */
     --ion-color-step-50: #14202f;
