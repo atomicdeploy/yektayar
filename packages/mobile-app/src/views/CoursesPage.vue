@@ -76,8 +76,8 @@
                 <div class="course-info-mini">
                   <h4>{{ enrollment.course.title }}</h4>
                   <p class="continue-learning">
-                    <ion-icon :icon="locale === 'fa' ? chevronBack : chevronForward" class="chevron-icon"></ion-icon>
                     {{ t('courses.continue_learning') }}
+                    <ion-icon :icon="locale === 'fa' ? chevronBack : chevronForward" class="chevron-icon"></ion-icon>
                   </p>
                 </div>
               </router-link>
@@ -532,7 +532,6 @@ ion-chip {
 
         .chevron-icon {
           font-size: 1rem;
-          order: 1;
         }
       }
     }
@@ -709,6 +708,12 @@ ion-chip {
 
   .course-card-mini {
     direction: rtl;
+
+    .course-info-mini {
+      p.continue-learning {
+        flex-direction: row-reverse;
+      }
+    }
   }
 }
 </style>

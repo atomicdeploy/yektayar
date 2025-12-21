@@ -34,8 +34,10 @@
                     image-class="course-thumbnail-image"
                   />
                   <div class="progress-overlay">
-                    <ion-progress-bar :value="enrollment.progress / 100"></ion-progress-bar>
-                    <span class="progress-text">{{ enrollment.progress }}% {{ t('courses.complete') }}</span>
+                    <div class="progress-content">
+                      <ion-progress-bar :value="enrollment.progress / 100"></ion-progress-bar>
+                      <span class="progress-text">{{ enrollment.progress }}%</span>
+                    </div>
                   </div>
                 </div>
                 <div class="course-content">
@@ -206,19 +208,35 @@ onMounted(() => {
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: var(--ion-background-color);
+      opacity: 0.95;
+      border-top: 1px solid var(--ion-border-color);
       padding: 8px 12px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+
+      .progress-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
 
       ion-progress-bar {
-        --background: rgba(255, 255, 255, 0.3);
+        --background: var(--ion-color-light);
         --progress-background: var(--ion-color-success);
-        margin-bottom: 4px;
+        --border-radius: 8px;
+        height: 6px;
+        border-radius: 8px;
+        flex: 1;
       }
 
       .progress-text {
-        color: white;
-        font-size: 12px;
-        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.75rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        min-width: 35px;
+        text-align: left;
       }
     }
   }
