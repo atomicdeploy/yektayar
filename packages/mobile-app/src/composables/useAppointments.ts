@@ -156,12 +156,8 @@ export function useAppointments() {
   })
 
   const pastAppointments = computed(() => {
-    const now = new Date()
     return appointments.value.filter(
-      (apt) => {
-        const scheduledDate = new Date(apt.scheduledAt)
-        return apt.status === 'completed' || scheduledDate < now
-      }
+      (apt) => apt.status === 'completed' || apt.status === 'cancelled'
     ).sort((a, b) => {
       const dateA = new Date(a.scheduledAt).getTime()
       const dateB = new Date(b.scheduledAt).getTime()
