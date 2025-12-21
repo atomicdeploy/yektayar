@@ -732,7 +732,7 @@ onUnmounted(() => {
 /* Message Input Container */
 .message-input-container {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
   background: var(--surface-1);
