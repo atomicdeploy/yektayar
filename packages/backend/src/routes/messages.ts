@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
-import { getDatabase } from '../services/database'
+import { query, getDatabase } from '../services/database'
+import { logger } from '@yektayar/shared'
 
 export const messageRoutes = new Elysia({ prefix: '/api/messages' })
   .get('/threads', async ({ query }) => {
@@ -88,7 +89,7 @@ export const messageRoutes = new Elysia({ prefix: '/api/messages' })
         }
       }
     } catch (error) {
-      console.error('Error fetching threads:', error)
+      logger.error('Error fetching threads:', error)
       return {
         success: false,
         error: 'Failed to fetch threads',
@@ -167,7 +168,7 @@ export const messageRoutes = new Elysia({ prefix: '/api/messages' })
         message: 'Thread created successfully'
       }
     } catch (error) {
-      console.error('Error creating thread:', error)
+      logger.error('Error creating thread:', error)
       return {
         success: false,
         error: 'Failed to create thread',
@@ -233,7 +234,7 @@ export const messageRoutes = new Elysia({ prefix: '/api/messages' })
         }
       }
     } catch (error) {
-      console.error('Error fetching thread messages:', error)
+      logger.error('Error fetching thread messages:', error)
       return {
         success: false,
         error: 'Failed to fetch messages',
@@ -307,7 +308,7 @@ export const messageRoutes = new Elysia({ prefix: '/api/messages' })
         message: 'Message sent successfully'
       }
     } catch (error) {
-      console.error('Error sending message:', error)
+      logger.error('Error sending message:', error)
       return {
         success: false,
         error: 'Failed to send message',
@@ -355,7 +356,7 @@ export const messageRoutes = new Elysia({ prefix: '/api/messages' })
         message: 'Thread status updated successfully'
       }
     } catch (error) {
-      console.error('Error updating thread:', error)
+      logger.error('Error updating thread:', error)
       return {
         success: false,
         error: 'Failed to update thread',
@@ -369,7 +370,7 @@ export const messageRoutes = new Elysia({ prefix: '/api/messages' })
       description: 'Update thread status (open/closed)'
     }
   })
-  .post('/chat', async ({ body }) => {
+  .post('/chat', async ({ body: _body }) => {
     // AI chat endpoint - placeholder for now
     return {
       success: true,

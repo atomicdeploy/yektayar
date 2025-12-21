@@ -419,7 +419,7 @@ async function handleSave() {
       router.back()
     }, 500)
     
-  } catch (error) {
+  } catch (_error) {
     const toast = await toastController.create({
       message: locale.value === 'fa' ? 'خطا در ذخیره تغییرات' : 'Error saving changes',
       duration: 3000,

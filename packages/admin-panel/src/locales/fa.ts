@@ -25,6 +25,7 @@ export default {
     appointments: 'نوبت‌ها',
     messages: 'پیام‌ها',
     courses: 'دوره‌ها',
+    assessments: 'آزمون‌ها',
     pages: 'صفحات',
     reports: 'گزارش‌ها',
     settings: 'تنظیمات',

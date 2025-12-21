@@ -212,6 +212,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 const loading = ref(true)
 const saving = ref(false)
@@ -233,7 +234,7 @@ const recentPages = ref<any[]>([])
 async function loadSettings() {
   loading.value = true
   try {
-    const response = await apiClient.get('/api/settings', { skipAuth: true })
+    const response = await apiClient.get('/settings', { skipAuth: true })
     if (response.success && response.data) {
       settings.value = {
         contact_phone: response.data.contact_phone || '',
@@ -245,7 +246,7 @@ async function loadSettings() {
       }
     }
   } catch (error) {
-    console.error('Error loading settings:', error)
+    logger.error('Error loading settings:', error)
   } finally {
     loading.value = false
   }
@@ -265,7 +266,7 @@ async function saveSettings() {
     ]
 
     for (const setting of settingsToUpdate) {
-      await apiClient.put(`/api/settings/${setting.key}`, {
+      await apiClient.put(`/settings/${setting.key}`, {
         value: setting.value,
         type: setting.type
       }, { skipAuth: true })
@@ -273,7 +274,7 @@ async function saveSettings() {
 
     alert('تنظیمات با موفقیت ذخیره شد')
   } catch (error) {
-    console.error('Error saving settings:', error)
+    logger.error('Error saving settings:', error)
     alert('خطا در ذخیره تنظیمات')
   } finally {
     saving.value = false
@@ -283,12 +284,12 @@ async function saveSettings() {
 async function loadTickets() {
   loadingTickets.value = true
   try {
-    const response = await apiClient.get('/api/support/tickets?status=open', { skipAuth: true })
+    const response = await apiClient.get('/support/tickets?status=open', { skipAuth: true })
     if (response.success) {
       tickets.value = response.data || []
     }
   } catch (error) {
-    console.error('Error loading tickets:', error)
+    logger.error('Error loading tickets:', error)
   } finally {
     loadingTickets.value = false
   }
@@ -297,12 +298,12 @@ async function loadTickets() {
 async function loadPages() {
   loadingPages.value = true
   try {
-    const response = await apiClient.get('/api/pages', { skipAuth: true })
+    const response = await apiClient.get('/pages', { skipAuth: true })
     if (response.success) {
       recentPages.value = response.data || []
     }
   } catch (error) {
-    console.error('Error loading pages:', error)
+    logger.error('Error loading pages:', error)
   } finally {
     loadingPages.value = false
   }

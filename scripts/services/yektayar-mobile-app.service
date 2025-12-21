@@ -5,13 +5,13 @@ After=network.target
 
 [Service]
 Type=simple
-User=deploy
-Group=deploy
-WorkingDirectory=/home/deploy/Projects/YektaYar/packages/mobile-app
+User=__USER__
+Group=__GROUP__
+WorkingDirectory=__PROJECT_PATH__/packages/mobile-app
 Environment="NODE_ENV=production"
 Environment="PATH=/usr/local/bin:/usr/bin:/bin"
-EnvironmentFile=-/home/deploy/Projects/YektaYar/packages/mobile-app/.env
-ExecStart=/usr/bin/npm run preview -- --host 0.0.0.0 --port 8100
+EnvironmentFile=-__PROJECT_PATH__/.env
+ExecStart=/usr/local/bin/npm run preview -- --host 0.0.0.0 --port 8100
 Restart=always
 RestartSec=10
 StandardOutput=append:/var/log/yektayar/mobile-app.log
@@ -20,10 +20,6 @@ StandardError=append:/var/log/yektayar/mobile-app-error.log
 # Security settings
 NoNewPrivileges=true
 PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=true
-ReadWritePaths=/home/deploy/Projects/YektaYar/packages/mobile-app
-ReadWritePaths=/var/log/yektayar
 
 # Resource limits
 LimitNOFILE=65536

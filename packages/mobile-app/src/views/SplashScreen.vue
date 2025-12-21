@@ -5,7 +5,7 @@
         <!-- Logo -->
         <div class="logo-container" :class="{ 'fade-in': fontsLoaded }">
           <div class="logo-circle">
-            <img src="/logo-simple.svg" alt="YektaYar Logo" class="logo-svg" />
+            <ion-icon src="/logo-simple.svg" class="logo-svg"></ion-icon>
           </div>
           <h1 class="app-title">یکتایار</h1>
           <p class="app-subtitle">همراه شما در مسیر سلامت روان</p>
@@ -29,16 +29,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { IonPage, IonContent, IonSpinner } from '@ionic/vue'
+import { IonPage, IonContent, IonSpinner, IonIcon } from '@ionic/vue'
 import { useSessionStore } from '../stores/session'
-import { logger } from '@yektayar/shared'
+import { logger, getPackageVersion } from '@yektayar/shared'
 import apiClient from '@/api'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
 const errorMessage = ref<string>('')
 const fontsLoaded = ref<boolean>(false)
-const appVersion = ref<string>('0.1.0')
+const appVersion = ref<string>(getPackageVersion())
 const apiVersion = ref<string>('')
 const heroImageLoaded = ref<boolean>(false)
 
@@ -121,7 +121,7 @@ onMounted(async () => {
     try {
       const response = await apiClient.get<{ version: string }>('/', { skipAuth: true })
       if (response.success && response.data) {
-        apiVersion.value = response.data.version || '0.1.0'
+        apiVersion.value = response.data.version || appVersion.value
       }
     } catch (versionError) {
       logger.warn('Could not fetch API version:', versionError)
@@ -163,7 +163,7 @@ onMounted(async () => {
         }
         
         router.replace(welcomeShown ? '/tabs/home' : '/welcome')
-      } catch (retryError) {
+      } catch (_retryError) {
         errorMessage.value = 'امکان برقراری ارتباط وجود ندارد.'
       }
     }, 3000)
@@ -215,6 +215,7 @@ onMounted(async () => {
 }
 
 .logo-svg {
+  font-size: 90px;
   width: 90px;
   height: 90px;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));

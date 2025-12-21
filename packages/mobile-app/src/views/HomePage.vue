@@ -36,7 +36,7 @@
         <div class="hero-content">
           <div class="logo-container">
             <div class="logo-circle">
-              <ion-icon :icon="heart" class="hero-icon"></ion-icon>
+              <ion-icon src="/logo-simple.svg" class="hero-icon"></ion-icon>
             </div>
           </div>
           <h1 class="hero-title">{{ t('welcome') }}</h1>
@@ -88,6 +88,28 @@
             <div class="action-content">
               <h3>{{ locale === 'fa' ? 'رزرو نوبت' : 'Book Appointment' }}</h3>
               <p>{{ locale === 'fa' ? 'برنامه‌ریزی جلسات' : 'Schedule your sessions' }}</p>
+            </div>
+            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+          </div>
+
+          <div class="action-card" @click="navigateToCourses">
+            <div class="action-icon-wrapper tertiary">
+              <ion-icon :icon="school" class="action-icon"></ion-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ locale === 'fa' ? 'دوره‌های آموزشی' : 'Learning Courses' }}</h3>
+              <p>{{ locale === 'fa' ? 'دسترسی به محتوای آموزشی' : 'Access educational content' }}</p>
+            </div>
+            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+          </div>
+
+          <div class="action-card" @click="navigateToAssessments">
+            <div class="action-icon-wrapper info">
+              <ion-icon :icon="documentText" class="action-icon"></ion-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ locale === 'fa' ? 'آزمون‌ها' : 'Tests' }}</h3>
+              <p>{{ locale === 'fa' ? 'ارزیابی و شناخت شخصیت' : 'Assessment and personality insights' }}</p>
             </div>
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
@@ -192,7 +214,6 @@ import {
   IonButtons,
 } from '@ionic/vue'
 import { 
-  heart, 
   chatbubbles, 
   calendar, 
   person, 
@@ -205,6 +226,8 @@ import {
   moon,
   sunny,
   mic,
+  school,
+  documentText,
 } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -218,6 +241,8 @@ const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')
 const navigateToConsultation = () => router.push('/consultation/details')
 const navigateToAppointments = () => router.push('/tabs/appointments')
+const navigateToCourses = () => router.push('/tabs/courses')
+const navigateToAssessments = () => router.push('/tabs/assessments')
 const navigateToProfile = () => router.push('/tabs/profile')
 </script>
 
@@ -277,8 +302,10 @@ const navigateToProfile = () => router.push('/tabs/profile')
 }
 
 .hero-icon {
-  font-size: 48px;
-  color: white;
+  font-size: 70px;
+  width: 70px;
+  height: 70px;
+  filter: brightness(0) invert(1);
 }
 
 .hero-title {
@@ -373,8 +400,16 @@ const navigateToProfile = () => router.push('/tabs/profile')
   background: linear-gradient(135deg, var(--ion-color-success) 0%, var(--ion-color-success-tint) 100%);
 }
 
+.action-icon-wrapper.tertiary {
+  background: linear-gradient(135deg, var(--ion-color-tertiary) 0%, var(--ion-color-tertiary-tint) 100%);
+}
+
 .action-icon-wrapper.warning {
   background: linear-gradient(135deg, #ff9500 0%, #ffb038 100%);
+}
+
+.action-icon-wrapper.info {
+  background: linear-gradient(135deg, #5856d6 0%, #7c7ae0 100%);
 }
 
 .action-icon-wrapper.ai {

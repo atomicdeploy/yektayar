@@ -1,5 +1,11 @@
 /**
  * API Client instance for Mobile App
+ * 
+ * Note: The baseURL is configured via API_BASE_URL environment variable
+ * which includes the '/api' prefix. Do NOT prepend '/api' to your endpoints.
+ * 
+ * ✅ Correct: apiClient.get('/assessments')
+ * ❌ Wrong:   apiClient.get('/api/assessments')
  */
 
 import { createApiClient } from '@yektayar/shared'

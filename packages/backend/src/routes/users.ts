@@ -1,44 +1,43 @@
 import { Elysia } from 'elysia'
-import { getDatabase } from '../services/database'
+import { query } from '../services/database'
 import bcrypt from 'bcrypt'
 import { 
   getUserPreferences, 
   updateUserPreferences 
 } from '../services/preferencesService'
 import { extractToken } from '../middleware/tokenExtractor'
+import { logger } from '@yektayar/shared'
 
 export const userRoutes = new Elysia({ prefix: '/api/users' })
-  .get('/', async ({ query }) => {
+  .get('/', async ({ query: queryParams }) => {
     try {
-      const db = getDatabase()
-      const page = parseInt(query.page as string) || 1
-      const limit = parseInt(query.limit as string) || 10
+      const page = parseInt(queryParams.page as string) || 1
+      const limit = parseInt(queryParams.limit as string) || 10
       const offset = (page - 1) * limit
-      const type = query.type as string || undefined
+      const type = queryParams.type as string || undefined
 
-      let countQuery
-      let usersQuery
+      let countResult
+      let users
 
       if (type) {
-        countQuery = db`SELECT COUNT(*) FROM users WHERE type = ${type}`
-        usersQuery = db`
+        countResult = await query<{ count: string }>('SELECT COUNT(*) FROM users WHERE type = $1', [type])
+        users = await query(`
           SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
           FROM users
-          WHERE type = ${type}
+          WHERE type = $1
           ORDER BY created_at DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `
+          LIMIT $2 OFFSET $3
+        `, [type, limit, offset])
       } else {
-        countQuery = db`SELECT COUNT(*) FROM users`
-        usersQuery = db`
+        countResult = await query<{ count: string }>('SELECT COUNT(*) FROM users')
+        users = await query(`
           SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
           FROM users
           ORDER BY created_at DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `
+          LIMIT $1 OFFSET $2
+        `, [limit, offset])
       }
 
-      const [countResult, users] = await Promise.all([countQuery, usersQuery])
       const total = parseInt(countResult[0].count)
 
       return {
@@ -52,7 +51,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         }
       }
     } catch (error) {
-      console.error('Error fetching users:', error)
+      logger.error('Error fetching users:', error)
       return {
         success: false,
         error: 'Failed to fetch users',
@@ -73,12 +72,11 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
   })
   .get('/:id', async ({ params: { id } }) => {
     try {
-      const db = getDatabase()
-      const users = await db`
+      const users = await query(`
         SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
         FROM users
-        WHERE id = ${id}
-      `
+        WHERE id = $1
+      `, [id])
 
       if (users.length === 0) {
         return {
@@ -93,7 +91,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         data: users[0]
       }
     } catch (error) {
-      console.error('Error fetching user:', error)
+      logger.error('Error fetching user:', error)
       return {
         success: false,
         error: 'Failed to fetch user',
@@ -109,7 +107,6 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
   })
   .put('/:id', async ({ params: { id }, body }) => {
     try {
-      const db = getDatabase()
       const updateData = body as any
 
       // Build dynamic update query
@@ -142,7 +139,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
       updates.push('updated_at = CURRENT_TIMESTAMP')
       values.push(id)
 
-      const result = await db.unsafe(`
+      const result = await query(`
         UPDATE users
         SET ${updates.join(', ')}
         WHERE id = $${values.length}
@@ -163,7 +160,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         message: 'User updated successfully'
       }
     } catch (error) {
-      console.error('Error updating user:', error)
+      logger.error('Error updating user:', error)
       return {
         success: false,
         error: 'Failed to update user',
@@ -179,12 +176,11 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
   })
   .delete('/:id', async ({ params: { id } }) => {
     try {
-      const db = getDatabase()
-      const result = await db`
+      const result = await query(`
         DELETE FROM users
-        WHERE id = ${id}
+        WHERE id = $1
         RETURNING id
-      `
+      `, [id])
 
       if (result.length === 0) {
         return {
@@ -199,7 +195,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         message: 'User deleted successfully'
       }
     } catch (error) {
-      console.error('Error deleting user:', error)
+      logger.error('Error deleting user:', error)
       return {
         success: false,
         error: 'Failed to delete user',
@@ -215,12 +211,11 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
   })
   .get('/:id/profile', async ({ params: { id } }) => {
     try {
-      const db = getDatabase()
-      const users = await db`
+      const users = await query(`
         SELECT id, email, phone, name, type, avatar, bio, specialization, is_active, created_at, updated_at
         FROM users
-        WHERE id = ${id}
-      `
+        WHERE id = $1
+      `, [id])
 
       if (users.length === 0) {
         return {
@@ -232,25 +227,25 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
 
       // If psychologist, get their appointments count
       if (users[0].type === 'psychologist') {
-        const appointmentStats = await db`
+        const appointmentStats = await query(`
           SELECT 
             COUNT(*) as total_appointments,
             COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_appointments
           FROM appointments
-          WHERE psychologist_id = ${id}
-        `
+          WHERE psychologist_id = $1
+        `, [id])
         users[0].stats = appointmentStats[0]
       }
 
       // If patient, get their course enrollments
       if (users[0].type === 'patient') {
-        const enrollmentStats = await db`
+        const enrollmentStats = await query(`
           SELECT 
             COUNT(*) as total_enrollments,
             COUNT(CASE WHEN completed = true THEN 1 END) as completed_courses
           FROM course_enrollments
-          WHERE user_id = ${id}
-        `
+          WHERE user_id = $1
+        `, [id])
         users[0].stats = enrollmentStats[0]
       }
 
@@ -259,7 +254,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         data: users[0]
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error)
+      logger.error('Error fetching user profile:', error)
       return {
         success: false,
         error: 'Failed to fetch user profile',
@@ -291,7 +286,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         data: preferences
       }
     } catch (error) {
-      console.error('Error fetching user preferences:', error)
+      logger.error('Error fetching user preferences:', error)
       return {
         success: false,
         error: 'Failed to fetch preferences'
@@ -322,7 +317,7 @@ export const userRoutes = new Elysia({ prefix: '/api/users' })
         data: preferences
       }
     } catch (error) {
-      console.error('Error updating user preferences:', error)
+      logger.error('Error updating user preferences:', error)
       return {
         success: false,
         error: 'Failed to update preferences'

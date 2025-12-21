@@ -191,6 +191,7 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 const { locale } = useI18n()
 const router = useRouter()
@@ -208,7 +209,7 @@ const contactInfo = ref({
 async function loadContactInfo() {
   loading.value = true
   try {
-    const response = await apiClient.get('/api/settings', { skipAuth: true })
+    const response = await apiClient.get('/settings', { skipAuth: true })
     if (response.success && response.data) {
       contactInfo.value = {
         phone: response.data.contact_phone || '',
@@ -220,7 +221,7 @@ async function loadContactInfo() {
       }
     }
   } catch (error) {
-    console.error('Error loading contact info:', error)
+    logger.error('Error loading contact info:', error)
   } finally {
     loading.value = false
   }

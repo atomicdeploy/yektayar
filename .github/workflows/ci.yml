@@ -1,0 +1,99 @@
+name: CI - Lint and Test
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: false
+
+      - name: Run tests
+        run: npm run test
+        continue-on-error: false
+
+      - name: Generate test coverage
+        run: npm run test:coverage
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  type-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Type check backend
+        run: npm run build -w @yektayar/backend
+        continue-on-error: false
+
+      - name: Type check shared
+        run: npm run build -w @yektayar/shared
+        continue-on-error: false
+
+      - name: Type check admin panel
+        run: npm run type-check -w @yektayar/admin-panel
+        continue-on-error: false
+
+      - name: Type check mobile app
+        run: npm run type-check -w @yektayar/mobile-app
+        continue-on-error: false
+
+  status-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: [lint-and-test, type-check]
+    if: always()
+    
+    steps:
+      - name: Check all jobs status
+        run: |
+          if [ "${{ needs.lint-and-test.result }}" != "success" ] || [ "${{ needs.type-check.result }}" != "success" ]; then
+            echo "❌ CI checks failed"
+            exit 1
+          fi
+          echo "✅ All CI checks passed"

@@ -108,6 +108,7 @@ import { heart, alertCircle, refresh, call } from 'ionicons/icons'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 const { locale } = useI18n()
 const router = useRouter()
@@ -150,7 +151,7 @@ async function loadPage() {
   error.value = ''
   
   try {
-    const response = await apiClient.get('/api/pages/about-us', { skipAuth: true })
+    const response = await apiClient.get('/pages/about-us', { skipAuth: true })
     
     if (response.success && response.data) {
       pageData.value = response.data
@@ -160,7 +161,7 @@ async function loadPage() {
         : 'Content not found'
     }
   } catch (err: any) {
-    console.error('Error loading about-us page:', err)
+    logger.error('Error loading about-us page:', err)
     error.value = locale.value === 'fa'
       ? 'خطا در بارگذاری محتوا'
       : 'Error loading content'

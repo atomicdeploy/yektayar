@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
-import { getDatabase } from '../services/database'
+import { query, getDatabase } from '../services/database'
+import { logger } from '@yektayar/shared'
 
 export const pageRoutes = new Elysia({ prefix: '/api/pages' })
   .get('/:slug', async ({ params: { slug }, set }) => {
@@ -25,7 +26,7 @@ export const pageRoutes = new Elysia({ prefix: '/api/pages' })
         data: pages[0]
       }
     } catch (error) {
-      console.error('Error fetching page:', error)
+      logger.error('Error fetching page:', error)
       set.status = 500
       return {
         success: false,
@@ -48,7 +49,7 @@ export const pageRoutes = new Elysia({ prefix: '/api/pages' })
         data: pages
       }
     } catch (error) {
-      console.error('Error fetching pages:', error)
+      logger.error('Error fetching pages:', error)
       set.status = 500
       return {
         success: false,
@@ -83,7 +84,7 @@ export const pageRoutes = new Elysia({ prefix: '/api/pages' })
         message: 'Page created successfully'
       }
     } catch (error: any) {
-      console.error('Error creating page:', error)
+      logger.error('Error creating page:', error)
       
       if (error.code === '23505') { // Unique constraint violation
         set.status = 409
@@ -133,7 +134,7 @@ export const pageRoutes = new Elysia({ prefix: '/api/pages' })
         message: 'Page updated successfully'
       }
     } catch (error) {
-      console.error('Error updating page:', error)
+      logger.error('Error updating page:', error)
       set.status = 500
       return {
         success: false,
@@ -165,7 +166,7 @@ export const pageRoutes = new Elysia({ prefix: '/api/pages' })
         message: 'Page deleted successfully'
       }
     } catch (error) {
-      console.error('Error deleting page:', error)
+      logger.error('Error deleting page:', error)
       set.status = 500
       return {
         success: false,

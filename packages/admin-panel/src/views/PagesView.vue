@@ -176,6 +176,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import apiClient from '@/api'
+import { logger } from '@yektayar/shared'
 
 interface Page {
   id?: number
@@ -200,12 +201,12 @@ const editingPage = ref<Partial<Page>>({
 async function loadPages() {
   loading.value = true
   try {
-    const response = await apiClient.get('/api/pages', { skipAuth: true })
+    const response = await apiClient.get('/pages', { skipAuth: true })
     if (response.success) {
       pages.value = response.data || []
     }
   } catch (error) {
-    console.error('Error loading pages:', error)
+    logger.error('Error loading pages:', error)
   } finally {
     loading.value = false
   }
@@ -235,19 +236,19 @@ async function savePage() {
   try {
     if (editingPage.value.id) {
       // Update existing page
-      await apiClient.put(`/api/pages/${editingPage.value.slug}`, {
+      await apiClient.put(`/pages/${editingPage.value.slug}`, {
         title: editingPage.value.title,
         content: editingPage.value.content
       }, { skipAuth: true })
     } else {
       // Create new page
-      await apiClient.post('/api/pages', editingPage.value, { skipAuth: true })
+      await apiClient.post('/pages', editingPage.value, { skipAuth: true })
     }
     
     showModal.value = false
     await loadPages()
   } catch (error: any) {
-    console.error('Error saving page:', error)
+    logger.error('Error saving page:', error)
     alert('خطا در ذخیره صفحه: ' + (error.message || 'خطای نامشخص'))
   } finally {
     saving.value = false
@@ -263,7 +264,7 @@ async function deletePage(page: Page) {
     await apiClient.delete(`/api/pages/${page.slug}`, { skipAuth: true })
     await loadPages()
   } catch (error) {
-    console.error('Error deleting page:', error)
+    logger.error('Error deleting page:', error)
     alert('خطا در حذف صفحه')
   }
 }
