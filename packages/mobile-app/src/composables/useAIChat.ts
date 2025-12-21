@@ -5,6 +5,7 @@
 
 import { ref, computed } from 'vue'
 import { io, Socket } from 'socket.io-client'
+import { useI18n } from 'vue-i18n'
 import config from '@/config'
 import apiClient from '@/api'
 import { getWebSocketPathFromEnv, logger } from '@yektayar/shared'
@@ -27,6 +28,8 @@ const isConnected = ref(false)
 const currentStreamingMessage = ref<ChatMessage | null>(null)
 
 export function useAIChat() {
+  const { t } = useI18n()
+  
   /**
    * Connect to WebSocket server
    */
@@ -59,23 +62,23 @@ export function useAIChat() {
 
       // Connection handlers
       socket.value.on('connect', () => {
-        logger.debug('Socket connected:', socket.value?.id)
+        logger.success('[AI Chat] WebSocket connected:', socket.value?.id)
         isConnected.value = true
       })
 
       socket.value.on('disconnect', (reason) => {
-        logger.debug('Socket disconnected:', reason)
+        logger.warn('[AI Chat] WebSocket disconnected:', reason)
         isConnected.value = false
       })
 
       socket.value.on('connect_error', (error) => {
-        logger.error('Socket connection error:', error)
+        logger.error('[AI Chat] WebSocket connection error:', error)
         isConnected.value = false
       })
 
       // AI Chat event handlers
       socket.value.on('ai:response:start', (data: { messageId: string }) => {
-        logger.debug('AI response started:', data.messageId)
+        logger.info('[AI Chat] AI response started:', data.messageId)
         isTyping.value = true
         
         // Create a new streaming message
@@ -90,7 +93,7 @@ export function useAIChat() {
       })
 
       socket.value.on('ai:response:chunk', (data: { messageId: string, chunk: string }) => {
-        logger.debug('AI response chunk:', data.chunk)
+        logger.debug('[AI Chat] AI response chunk received')
         
         // Append chunk to current streaming message
         if (currentStreamingMessage.value && currentStreamingMessage.value.id === data.messageId) {
@@ -99,7 +102,7 @@ export function useAIChat() {
       })
 
       socket.value.on('ai:response:complete', (data: { messageId: string, fullResponse: string }) => {
-        logger.debug('AI response complete:', data.messageId)
+        logger.success('[AI Chat] AI response complete:', data.messageId)
         isTyping.value = false
         
         // Finalize the streaming message
@@ -111,24 +114,24 @@ export function useAIChat() {
       })
 
       socket.value.on('ai:response:error', (data: { error: string }) => {
-        logger.error('AI response error:', data.error)
+        logger.error('[AI Chat] AI response error:', data.error)
         isTyping.value = false
         isSending.value = false
         
-        // Add error message
+        // Add internationalized error message
         messages.value.push({
           id: `error-${Date.now()}`,
           role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again.',
+          content: t('messages.ai_error'),
           timestamp: new Date()
         })
         
         currentStreamingMessage.value = null
       })
 
-      logger.debug('Socket.IO client initialized')
+      logger.info('[AI Chat] WebSocket client initialized')
     } catch (error) {
-      logger.error('Error connecting to socket:', error)
+      logger.error('[AI Chat] Error connecting to WebSocket:', error)
       isConnected.value = false
     }
   }
@@ -147,7 +150,7 @@ export function useAIChat() {
   /**
    * Send a message to the AI
    */
-  const sendMessage = async (content: string) => {
+  const sendMessage = async (content: string, locale: string = 'fa') => {
     if (!content.trim() || isSending.value) {
       return
     }
@@ -167,6 +170,7 @@ export function useAIChat() {
     try {
       // Send message via Socket.IO if connected
       if (socket.value?.connected) {
+        logger.info('[AI Chat] Sending message via WebSocket')
         socket.value.emit('ai:chat', {
           message: content.trim(),
           conversationHistory: messages.value
@@ -175,25 +179,26 @@ export function useAIChat() {
             .map(m => ({
               role: m.role,
               content: m.content
-            }))
+            })),
+          locale: locale
         })
         
         userMessage.sent = true
       } else {
         // Fallback to REST API if socket not connected
-        logger.warn('Socket not connected, using REST API fallback')
-        await sendMessageViaREST(content)
+        logger.warn('[AI Chat] WebSocket not connected, using REST API fallback')
+        await sendMessageViaREST(content, locale)
         userMessage.sent = true
       }
     } catch (error) {
-      logger.error('Error sending message:', error)
+      logger.error('[AI Chat] Error sending message:', error)
       userMessage.sent = false
       
-      // Add error message
+      // Add internationalized error message
       messages.value.push({
         id: `error-${Date.now()}`,
         role: 'assistant',
-        content: 'Sorry, I could not send your message. Please try again.',
+        content: t('messages.ai_error'),
         timestamp: new Date()
       })
     } finally {
@@ -204,11 +209,25 @@ export function useAIChat() {
   /**
    * Fallback method to send message via REST API
    */
-  const sendMessageViaREST = async (content: string) => {
+  const sendMessageViaREST = async (content: string, locale: string = 'fa') => {
     isTyping.value = true
 
+    // Define the response type from backend
+    interface AIChatResponse {
+      success: boolean
+      response?: string
+      message?: string
+      error?: string
+      timestamp?: string
+    }
+
     try {
-      const response = await apiClient.post<{ response?: string; message?: string }>(
+      logger.info('[AI Chat] Sending message via REST API:', { 
+        messageLength: content.length,
+        locale 
+      })
+
+      const response = await apiClient.post<AIChatResponse>(
         '/ai/chat',
         {
           message: content,
@@ -218,25 +237,43 @@ export function useAIChat() {
             .map(m => ({
               role: m.role,
               content: m.content
-            }))
+            })),
+          locale: locale
         }
       )
 
-      if (!response.success || !response.data) {
-        throw new Error(response.error || 'Failed to get AI response')
+      // Note: Backend returns response directly (not wrapped in ApiResponse.data)
+      // This is by design - the backend returns { success, response, ... } directly
+      // Type assertion is necessary due to ApiClient wrapper type definition
+      const apiResponse = response as unknown as AIChatResponse
+
+      logger.debug('[AI Chat] REST API response:', { success: apiResponse.success })
+
+      // Runtime validation: Check if the API call was successful
+      if (!apiResponse.success) {
+        logger.error('[AI Chat] API returned error:', apiResponse.error)
+        throw new Error(apiResponse.error || 'API request failed')
       }
 
-      const data = response.data
+      // Runtime validation: Validate response structure
+      if (!apiResponse.response || typeof apiResponse.response !== 'string') {
+        throw new Error('Invalid API response: missing or invalid response field')
+      }
+
+      // The response is in the 'response' field of the backend response
+      const aiResponse = apiResponse.response
       
+      logger.success('[AI Chat] Received AI response via REST API')
+
       // Add AI response
       messages.value.push({
         id: `ai-${Date.now()}`,
         role: 'assistant',
-        content: data.response || data.message || 'Sorry, I could not generate a response.',
+        content: aiResponse,
         timestamp: new Date()
       })
     } catch (error) {
-      logger.error('Error in REST API fallback:', error)
+      logger.error('[AI Chat] Error in REST API fallback:', error)
       throw error
     } finally {
       isTyping.value = false

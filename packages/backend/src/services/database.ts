@@ -280,12 +280,27 @@ export async function initializeDatabase() {
       )
     `)
 
+    // Create ai_quick_suggestions table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ai_quick_suggestions (
+        id SERIAL PRIMARY KEY,
+        title JSONB NOT NULL,
+        text JSONB NOT NULL,
+        icon VARCHAR(100),
+        order_index INTEGER DEFAULT 0,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+
     logger.success('Database tables initialized successfully')
 
     // Insert default data
     await insertDefaultAboutUsPage()
     await insertDefaultContactSettings()
     await insertDefaultUsers()
+    await insertDefaultQuickSuggestions()
 
   } catch (error) {
     logger.error('Failed to initialize database:', error)
@@ -429,6 +444,62 @@ async function insertDefaultUsers() {
     }
   } catch (error) {
     logger.error('Failed to create default users:', error)
+  }
+}
+
+/**
+ * Insert default quick suggestions
+ */
+async function insertDefaultQuickSuggestions() {
+  try {
+    // Check if quick suggestions already exist
+    const existing = await query(
+      `SELECT COUNT(*) as count FROM ai_quick_suggestions`
+    )
+    
+    if (existing[0]?.count > 0) {
+      logger.info('Quick suggestions already exist, skipping...')
+      return
+    }
+
+    const quickSuggestions = [
+      {
+        title: { fa: 'مدیریت استرس', en: 'Manage Stress' },
+        text: { fa: 'چگونه می‌توانم استرس را مدیریت کنم؟', en: 'How can I manage stress?' },
+        icon: 'help',
+        order_index: 1
+      },
+      {
+        title: { fa: 'بهبود خلق و خو', en: 'Improve Mood' },
+        text: { fa: 'نکاتی برای بهبود خلق و خو', en: 'Tips for improving mood' },
+        icon: 'happy',
+        order_index: 2
+      },
+      {
+        title: { fa: 'احساس اضطراب', en: 'Feeling Anxious' },
+        text: { fa: 'احساس اضطراب می‌کنم', en: 'I feel anxious' },
+        icon: 'sad',
+        order_index: 3
+      },
+      {
+        title: { fa: 'تکنیک‌های آرامش', en: 'Relaxation Techniques' },
+        text: { fa: 'تکنیک‌های آرامش', en: 'Relaxation techniques' },
+        icon: 'heart',
+        order_index: 4
+      }
+    ]
+
+    for (const suggestion of quickSuggestions) {
+      await query(
+        `INSERT INTO ai_quick_suggestions (title, text, icon, order_index, is_active)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [suggestion.title, suggestion.text, suggestion.icon, suggestion.order_index, true]
+      )
+    }
+
+    logger.success('Default quick suggestions created')
+  } catch (error) {
+    logger.error('Failed to create default quick suggestions:', error)
   }
 }
 
