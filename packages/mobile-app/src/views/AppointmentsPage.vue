@@ -255,6 +255,16 @@ const currentDate = ref(new Date())
 const selectedDate = ref(new Date())
 const calendarDays = ref<Array<{ date: Date; dayLabel: string; dayNumber: number; hasAppointment: boolean }>>([])
 
+// Pre-compute appointment dates for efficient lookups
+const appointmentDatesSet = computed(() => {
+  const dateSet = new Set<string>()
+  upcomingAppointments.value.forEach(apt => {
+    const aptDate = new Date(apt.scheduledAt)
+    dateSet.add(aptDate.toDateString())
+  })
+  return dateSet
+})
+
 // Initialize calendar
 const initializeCalendar = () => {
   const days: typeof calendarDays.value = []
@@ -280,19 +290,11 @@ const initializeCalendar = () => {
       date,
       dayLabel: dayLabels[i],
       dayNumber: date.getDate(),
-      hasAppointment: hasAppointmentOnDate(date),
+      hasAppointment: appointmentDatesSet.value.has(date.toDateString()),
     })
   }
   
   calendarDays.value = days
-}
-
-// Check if there's an appointment on a specific date
-const hasAppointmentOnDate = (date: Date) => {
-  return upcomingAppointments.value.some(apt => {
-    const aptDate = new Date(apt.scheduledAt)
-    return aptDate.toDateString() === date.toDateString()
-  })
 }
 
 // Month navigation
@@ -315,6 +317,9 @@ const selectDay = (date: Date) => {
 // Format month display
 const monthDisplay = computed(() => {
   if (locale.value === 'fa') {
+    // TODO: This currently uses Gregorian months with Persian names as a placeholder
+    // A proper implementation would use a Jalali calendar library (e.g., moment-jalaali)
+    // to convert Gregorian dates to Jalali calendar
     const months = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند']
     return `${months[currentDate.value.getMonth()]} ${currentDate.value.getFullYear()}`
   } else {
@@ -406,12 +411,17 @@ const getStatusLabel = (status: string) => {
 }
 
 // Determine appointment type from data
-const getAppointmentType = (appointment: AppointmentWithDetails) => {
-  // Try to determine type from notes or other fields
+const getAppointmentType = (appointment: AppointmentWithDetails): 'video' | 'in-person' | 'group' => {
+  // First priority: check if appointment_type field exists (from backend)
+  if (appointment.appointment_type) {
+    return appointment.appointment_type
+  }
+  
+  // Fallback: Try to determine type from notes
   const notes = appointment.notes?.toLowerCase() || ''
-  if (notes.includes('video') || notes.includes('online')) {
+  if (notes.includes('video') || notes.includes('online') || notes.includes('ویدیو') || notes.includes('آنلاین')) {
     return 'video'
-  } else if (notes.includes('group')) {
+  } else if (notes.includes('group') || notes.includes('گروه')) {
     return 'group'
   }
   return 'in-person'

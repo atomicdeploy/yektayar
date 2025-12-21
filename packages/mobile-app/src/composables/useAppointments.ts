@@ -142,8 +142,12 @@ export function useAppointments() {
 
   // Group appointments by status
   const upcomingAppointments = computed(() => {
+    const now = new Date()
     return appointments.value.filter(
-      (apt) => apt.status === 'confirmed' || apt.status === 'pending'
+      (apt) => {
+        const scheduledDate = new Date(apt.scheduledAt)
+        return (apt.status === 'confirmed' || apt.status === 'pending') && scheduledDate >= now
+      }
     ).sort((a, b) => {
       const dateA = new Date(a.scheduledAt).getTime()
       const dateB = new Date(b.scheduledAt).getTime()
@@ -152,8 +156,12 @@ export function useAppointments() {
   })
 
   const pastAppointments = computed(() => {
+    const now = new Date()
     return appointments.value.filter(
-      (apt) => apt.status === 'completed'
+      (apt) => {
+        const scheduledDate = new Date(apt.scheduledAt)
+        return apt.status === 'completed' || scheduledDate < now
+      }
     ).sort((a, b) => {
       const dateA = new Date(a.scheduledAt).getTime()
       const dateB = new Date(b.scheduledAt).getTime()
