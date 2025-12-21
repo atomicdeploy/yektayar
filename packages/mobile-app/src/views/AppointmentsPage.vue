@@ -220,7 +220,6 @@ import {
   IonFabButton,
   IonSpinner,
   actionSheetController,
-  alertController,
 } from '@ionic/vue'
 import { 
   filter,
@@ -239,7 +238,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAppointments } from '@/composables/useAppointments'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
-import { logger } from '@yektayar/shared'
+import { logger, AppointmentStatus } from '@yektayar/shared'
 import type { AppointmentWithDetails } from '@/composables/useAppointments'
 
 const { locale } = useI18n()
@@ -249,7 +248,6 @@ const {
   upcomingAppointments, 
   pastAppointments,
   fetchAppointments,
-  cancelAppointment,
 } = useAppointments()
 
 // Calendar state
@@ -449,13 +447,13 @@ const handleFilterClick = async () => {
       {
         text: locale.value === 'fa' ? 'تایید شده' : 'Confirmed',
         handler: () => {
-          fetchAppointments({ userId: 1, status: 'confirmed' })
+          fetchAppointments({ userId: 1, status: AppointmentStatus.CONFIRMED })
         }
       },
       {
         text: locale.value === 'fa' ? 'در انتظار' : 'Pending',
         handler: () => {
-          fetchAppointments({ userId: 1, status: 'pending' })
+          fetchAppointments({ userId: 1, status: AppointmentStatus.PENDING })
         }
       },
       {
@@ -503,7 +501,9 @@ const handleNewAppointment = () => {
 }
 
 // Handle appointment cancellation (for future use)
-const _handleCancelAppointment = async (appointment: AppointmentWithDetails) => {
+// Uncomment when adding cancel functionality to the UI
+/*
+const handleCancelAppointment = async (appointment: AppointmentWithDetails) => {
   const alert = await alertController.create({
     header: locale.value === 'fa' ? 'لغو نوبت' : 'Cancel Appointment',
     message: locale.value === 'fa' 
@@ -529,6 +529,7 @@ const _handleCancelAppointment = async (appointment: AppointmentWithDetails) => 
   })
   await alert.present()
 }
+*/
 
 // Load appointments on mount
 onMounted(async () => {
