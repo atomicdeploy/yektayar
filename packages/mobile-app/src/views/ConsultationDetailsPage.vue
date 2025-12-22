@@ -173,6 +173,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { logger } from '@yektayar/shared'
 import { useSpeechRecognition } from '@/composables/useSpeechRecognition'
+import { useFocusElement } from '@/composables/useFocusElement'
 
 const router = useRouter()
 const route = useRoute()
@@ -222,6 +223,9 @@ const {
   reset: resetRecognition,
   setFinalTranscript,
 } = speechRecognition
+
+// Initialize focus element composable
+const { focusElement } = useFocusElement()
 
 // Local transcript ref that user can edit
 const transcriptText = ref('')
@@ -300,16 +304,20 @@ function clearTranscript() {
   errorMessage.value = ''
 }
 
-function typeInstead() {
+async function typeInstead() {
   errorMessage.value = ''
   showTextarea.value = true
-  // Wait for DOM update before focusing - ensures textarea is rendered
-  setTimeout(() => {
-    const textarea = document.querySelector('.transcript-textarea')
-    if (textarea) {
-      (textarea as HTMLElement).focus()
-    }
-  }, TEXTAREA_FOCUS_DELAY)
+  
+  // Use the global focus utility with retry logic
+  // TODO: Consider refactoring to template ref approach for better type safety
+  await focusElement({
+    selector: '.transcript-textarea',
+    maxRetries: 3,
+    retryDelay: TEXTAREA_FOCUS_DELAY,
+    onError: (error) => {
+      logger.warn('Failed to auto-focus textarea', { error })
+    },
+  })
 }
 
 const canContinue = computed(() => {
@@ -429,10 +437,22 @@ async function showAlert(header: string, message: string) {
   right: 0;
   bottom: 0;
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-  animation: shimmer 2s infinite;
+  animation: shimmer-rtl 2s infinite; /* Default to RTL for Persian */
 }
 
-@keyframes shimmer {
+/* LTR language shimmer */
+:root[dir="ltr"] .progress-fill::after {
+  animation: shimmer-ltr 2s infinite;
+}
+
+/* Shimmer animation for LTR contexts (e.g., English) */
+@keyframes shimmer-ltr {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Shimmer animation for RTL contexts (e.g., Persian) */
+@keyframes shimmer-rtl {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
