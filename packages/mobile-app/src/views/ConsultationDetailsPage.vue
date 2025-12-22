@@ -9,7 +9,14 @@
             <span class="header-title">يكتایار</span>
           </div>
           <div class="progress-container">
-            <div class="progress-bar">
+            <div 
+              class="progress-bar" 
+              role="progressbar" 
+              :aria-valuenow="progressPercent" 
+              aria-valuemin="0" 
+              aria-valuemax="100"
+              :aria-label="`${progressPercent}٪ تکمیل شده`"
+            >
               <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
             </div>
             <span class="progress-text">{{ progressPercent }}٪ تکمیل شده</span>
@@ -38,6 +45,7 @@
             }"
             @click="toggleRecording"
             :disabled="isProcessing"
+            :aria-label="isRecording ? 'توقف ضبط صدا' : 'شروع ضبط صدا'"
           >
             <div class="mic-icon-wrapper">
               <ion-icon 
@@ -67,10 +75,14 @@
               <ion-icon :icon="alertCircle"></ion-icon>
               <span>{{ errorMessage }}</span>
             </div>
-            <a class="type-instead-link" @click="typeInstead">
+            <button 
+              type="button"
+              class="type-instead-link" 
+              @click="typeInstead"
+            >
               <ion-icon :icon="create"></ion-icon>
               بجای آن تایپ کنید
-            </a>
+            </button>
           </div>
         </div>
 
@@ -83,12 +95,14 @@
               :auto-grow="true"
               :rows="6"
               class="transcript-textarea"
+              aria-label="متن توضیحات مشاوره"
             ></ion-textarea>
             <div class="transcript-actions">
               <button 
                 class="action-button secondary" 
                 @click="clearTranscript"
                 :disabled="isProcessing"
+                aria-label="پاک کردن متن"
               >
                 <ion-icon :icon="trash"></ion-icon>
                 پاک کردن
@@ -98,6 +112,7 @@
                 class="action-button primary" 
                 @click="toggleRecording"
                 :disabled="isProcessing"
+                :aria-label="isRecording ? 'توقف ضبط مجدد' : 'ضبط مجدد'"
               >
                 <ion-icon :icon="mic"></ion-icon>
                 ضبط مجدد
@@ -156,14 +171,17 @@ import {
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { logger } from '@yektayar/shared'
 
 const router = useRouter()
 const route = useRoute()
 const { locale } = useI18n()
 
-// Consultation flow configuration
+// Constants
 const TOTAL_STEPS = 10 // Total steps in consultation flow
 const DEFAULT_STEP = 4 // Default to step 4 if not specified
+const MIN_CONSULTATION_TEXT_LENGTH = 10 // Minimum characters required for consultation text
+const TEXTAREA_FOCUS_DELAY = 100 // Delay in ms to ensure textarea is rendered before focusing
 
 // Get current step from route query param or use default
 const currentStep = computed(() => {
@@ -293,6 +311,8 @@ function initializeSpeechRecognition() {
     isRecording.value = false
     isProcessing.value = false
     
+    logger.error('Speech recognition error', { error: event.error, message: event.message })
+    
     switch (event.error) {
       case 'no-speech':
         errorMessage.value = 'صدایی دریافت نشد. لطفا دوباره تلاش کنید'
@@ -316,8 +336,11 @@ function initializeSpeechRecognition() {
       // Restart if still recording (for continuous recording)
       try {
         recognition.start()
-      } catch (e) {
+      } catch (error) {
         isRecording.value = false
+        isProcessing.value = false
+        errorMessage.value = 'شروع مجدد ضبط صدا با مشکل مواجه شد. لطفا دوباره تلاش کنید'
+        logger.error('Error restarting speech recognition', { error })
       }
     }
   }
@@ -345,6 +368,7 @@ function startRecording() {
     recognition.start()
   } catch (error) {
     errorMessage.value = 'خطا در شروع ضبط. لطفا دوباره تلاش کنید'
+    logger.error('Error starting speech recognition recording', { error })
   }
 }
 
@@ -366,17 +390,17 @@ function clearTranscript() {
 function typeInstead() {
   errorMessage.value = ''
   showTextarea.value = true
-  // Focus on the textarea after a short delay to ensure it's rendered
+  // Wait for DOM update before focusing - ensures textarea is rendered
   setTimeout(() => {
     const textarea = document.querySelector('.transcript-textarea')
     if (textarea) {
       (textarea as HTMLElement).focus()
     }
-  }, 100)
+  }, TEXTAREA_FOCUS_DELAY)
 }
 
 const canContinue = computed(() => {
-  return transcriptText.value.trim().length > 10
+  return transcriptText.value.trim().length > MIN_CONSULTATION_TEXT_LENGTH
 })
 
 async function handleContinue() {
