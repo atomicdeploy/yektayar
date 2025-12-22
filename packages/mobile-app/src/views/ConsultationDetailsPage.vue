@@ -805,7 +805,7 @@ async function showAlert(header: string, message: string) {
   gap: 0.75rem;
   justify-content: center;
   padding: 1rem;
-  background: rgba(212, 164, 62, 0.08);
+  background: var(--accent-soft);
   border-radius: 12px;
   direction: rtl;
   animation: fadeIn 1.2s ease-out 0.6s both;
