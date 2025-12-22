@@ -75,6 +75,8 @@ export interface SpeechRecognitionOptions {
   interimResults?: boolean
   maxAlternatives?: number
   autoRestart?: boolean
+  initialText?: string
+  accumulateResults?: boolean
 }
 
 export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
@@ -152,18 +154,32 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
         const transcript = alternative.transcript
         const confidence = alternative.confidence
 
-        // Mobile fix: treat confidence=0 as interim
+        // Mobile fix: treat confidence=0 as interim (not truly final)
+        // On mobile, results can have isFinal=true but confidence=0, which means they're still uncertain
         const isTrulyFinal = result.isFinal && confidence !== 0
 
         if (isTrulyFinal) {
-          // On mobile: replace instead of append
-          if (isMobileOrTablet.value) {
-            finalTranscript.value = transcript
-          } else {
+          // Final results handling:
+          // - If accumulateResults is true (default): ALWAYS append to build up full text
+          //   This is best for continuous dictation where users speak multiple words/sentences
+          // - If accumulateResults is false: REPLACE (legacy mobile behavior)
+          //   This assumes mobile sends complete phrases
+          const shouldAccumulate = options.accumulateResults !== false
+          
+          if (shouldAccumulate) {
+            // APPEND pattern: accumulate all spoken words (works great for dictation)
             finalTranscript.value += (finalTranscript.value ? ' ' : '') + transcript
+          } else {
+            // REPLACE pattern: replace with latest (legacy mobile behavior)
+            if (isMobileOrTablet.value) {
+              finalTranscript.value = transcript
+            } else {
+              finalTranscript.value += (finalTranscript.value ? ' ' : '') + transcript
+            }
           }
         } else {
-          // Interim result
+          // Interim result: Show the current word being spoken
+          // On mobile, we only keep the latest interim (no accumulation)
           if (isMobileOrTablet.value) {
             interim = transcript
           } else {
@@ -211,6 +227,11 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
     }
 
     userWantsListening = true
+    
+    // Initialize with provided initial text if any
+    if (options.initialText) {
+      finalTranscript.value = options.initialText
+    }
     
     try {
       rec.start()
@@ -283,6 +304,22 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
     return final || interim
   })
 
+  /**
+   * Set the initial text for the transcript
+   * Useful when resuming or continuing from existing text
+   */
+  const setInitialText = (text: string) => {
+    finalTranscript.value = text
+  }
+
+  /**
+   * Update the final transcript manually
+   * Useful for manual text edits by the user
+   */
+  const setFinalTranscript = (text: string) => {
+    finalTranscript.value = text
+  }
+
   // Cleanup on unmount
   onUnmounted(() => {
     stop()
@@ -306,5 +343,7 @@ export function useSpeechRecognition(options: SpeechRecognitionOptions = {}) {
     stop,
     abort,
     reset,
+    setInitialText,
+    setFinalTranscript,
   }
 }

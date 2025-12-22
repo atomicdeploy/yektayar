@@ -168,10 +168,11 @@ import {
   alertCircle,
   create,
 } from 'ionicons/icons'
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { logger } from '@yektayar/shared'
+import { useSpeechRecognition } from '@/composables/useSpeechRecognition'
 
 const router = useRouter()
 const route = useRoute()
@@ -194,126 +195,46 @@ const currentStep = computed(() => {
 })
 
 // State
-const isRecording = ref(false)
-const isProcessing = ref(false)
 const isSaving = ref(false)
-const transcriptText = ref('')
-const errorMessage = ref('')
-const speechRecognitionSupported = ref(true)
 const showTextarea = ref(false)
+const errorMessage = ref('')
 
-// Computed progress based on current step
-const progressPercent = computed(() => {
-  return Math.round((currentStep.value / TOTAL_STEPS) * 100)
+// Initialize Speech Recognition composable
+const langCode = computed(() => locale.value === 'fa' ? 'fa-IR' : 'en-US')
+const speechRecognition = useSpeechRecognition({
+  lang: langCode.value,
+  continuous: true,
+  interimResults: true,
+  autoRestart: true,
+  accumulateResults: true, // Use APPEND pattern for continuous dictation
 })
 
-// Watch for changes that should show the textarea
-const shouldShowTextarea = computed(() => {
-  return transcriptText.value || isRecording.value || !speechRecognitionSupported.value || showTextarea.value
+// Destructure composable
+const {
+  isSupported: speechRecognitionSupported,
+  isListening: isRecording,
+  fullTranscript,
+  finalTranscript,
+  interimTranscript,
+  error: speechError,
+  start: startRecognition,
+  stop: stopRecognition,
+  reset: resetRecognition,
+  setFinalTranscript,
+} = speechRecognition
+
+// Local transcript ref that user can edit
+const transcriptText = ref('')
+
+// Sync fullTranscript from composable to local editable ref
+watch(fullTranscript, (newValue) => {
+  transcriptText.value = newValue
 })
 
-// Web Speech API
-let recognition: any = null
-// Store finalized transcript separately - this is the committed text
-let finalizedTranscript = ''
-// Track if we're on mobile for special handling
-const isMobileOrTablet = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-  (navigator.maxTouchPoints && navigator.maxTouchPoints > 2)
-
-// Computed property for arrow icon based on locale
-const continueArrowIcon = computed(() => {
-  return locale.value === 'fa' ? arrowBack : arrowForward
-})
-
-// Computed property for icon slot position based on locale
-const iconSlot = computed(() => {
-  return locale.value === 'fa' ? 'end' : 'start'
-})
-
-// Initialize Speech Recognition
-onMounted(() => {
-  initializeSpeechRecognition()
-})
-
-onBeforeUnmount(() => {
-  if (recognition) {
-    recognition.stop()
-  }
-})
-
-function initializeSpeechRecognition() {
-  // Check for Web Speech API support
-  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-  
-  if (!SpeechRecognition) {
-    speechRecognitionSupported.value = false
-    errorMessage.value = 'مرورگر شما از قابلیت تشخیص گفتار پشتیبانی نمی‌کند'
-    return
-  }
-
-  speechRecognitionSupported.value = true
-  recognition = new SpeechRecognition()
-  recognition.continuous = true
-  recognition.interimResults = true
-  
-  // Set language based on current locale
-  const langCode = locale.value === 'fa' ? 'fa-IR' : 'en-US'
-  recognition.lang = langCode
-
-  recognition.onstart = () => {
-    isRecording.value = true
-    isProcessing.value = false
-    errorMessage.value = ''
-    // Store the current text as the starting point for this recording session
-    finalizedTranscript = transcriptText.value
-  }
-
-  recognition.onresult = (event: any) => {
-    let interimTranscript = ''
-
-    // Mobile-optimized result handling (inspired by debugger)
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const result = event.results[i]
-      const transcript = result[0].transcript
-      const confidence = result[0].confidence
-      
-      // Mobile fix: treat confidence=0 as interim (not truly final)
-      // On mobile, results can have isFinal=true but confidence=0, which means they're still uncertain
-      const isTrulyFinal = result.isFinal && confidence !== 0
-      
-      if (isTrulyFinal) {
-        // For final results: ALWAYS append (don't replace)
-        // This ensures we accumulate all spoken words
-        finalizedTranscript += (finalizedTranscript ? ' ' : '') + transcript
-      } else {
-        // Interim results: Show the current word being spoken
-        // On mobile, we only keep the latest interim (no accumulation)
-        if (isMobileOrTablet) {
-          interimTranscript = transcript
-        } else {
-          interimTranscript += transcript
-        }
-      }
-    }
-
-    // Always SET the display value (never append to transcriptText directly!)
-    // This shows: all finalized text + current interim word for live feedback
-    if (interimTranscript) {
-      // Show interim text with a space separator (the word being spoken right now)
-      transcriptText.value = finalizedTranscript + (finalizedTranscript ? ' ' : '') + interimTranscript
-    } else {
-      // No interim, just show all finalized text
-      transcriptText.value = finalizedTranscript
-    }
-  }
-
-  recognition.onerror = (event: any) => {
-    isRecording.value = false
-    isProcessing.value = false
-    
-    logger.error('Speech recognition error', { error: event.error, message: event.message })
-    
-    switch (event.error) {
+// Watch for speech recognition errors
+watch(speechError, (error) => {
+  if (error) {
+    switch (error) {
       case 'no-speech':
         errorMessage.value = 'صدایی دریافت نشد. لطفا دوباره تلاش کنید'
         break
@@ -327,27 +248,33 @@ function initializeSpeechRecognition() {
         errorMessage.value = 'خطا در ضبط صدا. لطفا دوباره تلاش کنید'
     }
   }
+})
 
-  recognition.onend = () => {
-    // When recording ends, ensure we only keep finalized text
-    transcriptText.value = finalizedTranscript
-    
-    if (isRecording.value) {
-      // Restart if still recording (for continuous recording)
-      try {
-        recognition.start()
-      } catch (error) {
-        isRecording.value = false
-        isProcessing.value = false
-        errorMessage.value = 'شروع مجدد ضبط صدا با مشکل مواجه شد. لطفا دوباره تلاش کنید'
-        logger.error('Error restarting speech recognition', { error })
-      }
-    }
-  }
-}
+// Computed progress based on current step
+const progressPercent = computed(() => {
+  return Math.round((currentStep.value / TOTAL_STEPS) * 100)
+})
 
+// Watch for changes that should show the textarea
+const shouldShowTextarea = computed(() => {
+  return transcriptText.value || isRecording.value || !speechRecognitionSupported.value || showTextarea.value
+})
+
+// Processing state (for compatibility)
+const isProcessing = computed(() => false)
+
+// Computed property for arrow icon based on locale
+const continueArrowIcon = computed(() => {
+  return locale.value === 'fa' ? arrowBack : arrowForward
+})
+
+// Computed property for icon slot position based on locale
+const iconSlot = computed(() => {
+  return locale.value === 'fa' ? 'end' : 'start'
+})
+// Functions
 async function toggleRecording() {
-  if (!recognition) {
+  if (!speechRecognitionSupported.value) {
     await showAlert(
       'خطا',
       'قابلیت تشخیص گفتار در دسترس نیست. لطفا از مرورگر Chrome استفاده کنید.'
@@ -356,34 +283,20 @@ async function toggleRecording() {
   }
 
   if (isRecording.value) {
-    stopRecording()
+    stopRecognition()
   } else {
-    startRecording()
-  }
-}
-
-function startRecording() {
-  try {
     errorMessage.value = ''
-    recognition.start()
-  } catch (error) {
-    errorMessage.value = 'خطا در شروع ضبط. لطفا دوباره تلاش کنید'
-    logger.error('Error starting speech recognition recording', { error })
-  }
-}
-
-function stopRecording() {
-  if (recognition) {
-    isRecording.value = false
-    recognition.stop()
-    // Ensure we only show finalized text when stopped
-    transcriptText.value = finalizedTranscript
+    // Set initial text if user has typed something before recording
+    if (transcriptText.value && transcriptText.value !== fullTranscript.value) {
+      setFinalTranscript(transcriptText.value)
+    }
+    startRecognition()
   }
 }
 
 function clearTranscript() {
   transcriptText.value = ''
-  finalizedTranscript = ''
+  resetRecognition()
   errorMessage.value = ''
 }
 
