@@ -470,8 +470,7 @@ ion-chip {
       bottom: 0;
       left: 0;
       right: 0;
-      background: var(--ion-background-color);
-      opacity: 0.95;
+      background: rgba(var(--ion-background-color-rgb), 0.95);
       border-top: 1px solid var(--ion-border-color);
       padding: 8px 12px;
       backdrop-filter: blur(8px);
