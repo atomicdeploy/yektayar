@@ -44,9 +44,9 @@ export function useTheme(router?: Router) {
   const updateMetaThemeColor = (dark: boolean) => {
     let themeColor: string
     
-    // Always use splash screen background color on /splash route
-    if (currentRoute.value === '/splash') {
-      themeColor = '#01183a'
+    // Always use welcome screen background color on /welcome route
+    if (currentRoute.value === '/welcome') {
+      themeColor = '#f8f9fa'
     } else {
       themeColor = dark ? '#0a0f1a' : '#fafbfc'
     }
@@ -99,13 +99,13 @@ export function useTheme(router?: Router) {
     // Watch for route changes if router is provided
     if (router) {
       watch(() => router.currentRoute.value.path, (newPath, oldPath) => {
-        const wasSplash = oldPath === '/splash'
-        const isSplash = newPath === '/splash'
+        const wasWelcome = oldPath === '/welcome'
+        const isWelcome = newPath === '/welcome'
         
-        // Only update if transitioning to/from splash to avoid unnecessary re-renders
-        if (wasSplash !== isSplash) {
+        // Only update if transitioning to/from welcome to avoid unnecessary re-renders
+        if (wasWelcome !== isWelcome) {
           currentRoute.value = newPath
-          // Re-apply theme when transitioning to/from splash to update meta theme color
+          // Re-apply theme when transitioning to/from welcome to update meta theme color
           applyTheme(currentTheme.value)
         } else {
           currentRoute.value = newPath
