@@ -458,6 +458,11 @@ const getRatingLabel = (value: number) => {
 
 const selectAnswer = (value: number) => {
   answers.value[currentQuestionIndex.value] = value
+  
+  // Auto-advance to next question after a short delay for better UX
+  setTimeout(() => {
+    nextQuestion()
+  }, 400)
 }
 
 const nextStep = () => {
