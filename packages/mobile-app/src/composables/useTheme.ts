@@ -5,7 +5,7 @@ export type Theme = 'light' | 'dark' | 'auto'
 
 const currentTheme = ref<Theme>('auto')
 const isDark = ref(false)
-const currentRoute = ref<string>('/')
+const currentRoute = ref<string>('')
 
 /**
  * Theme management composable
@@ -98,10 +98,18 @@ export function useTheme(router?: Router) {
 
     // Watch for route changes if router is provided
     if (router) {
-      watch(() => router.currentRoute.value.path, (newPath) => {
-        currentRoute.value = newPath
-        // Re-apply theme when route changes to update meta theme color
-        applyTheme(currentTheme.value)
+      watch(() => router.currentRoute.value.path, (newPath, oldPath) => {
+        const wasSplash = oldPath === '/splash'
+        const isSplash = newPath === '/splash'
+        
+        // Only update if transitioning to/from splash to avoid unnecessary re-renders
+        if (wasSplash !== isSplash) {
+          currentRoute.value = newPath
+          // Re-apply theme when transitioning to/from splash to update meta theme color
+          applyTheme(currentTheme.value)
+        } else {
+          currentRoute.value = newPath
+        }
       })
     }
 
