@@ -374,7 +374,7 @@ const answers = ref<{ [key: number]: number }>({})
 const submitting = ref(false)
 const stepIndicatorsRef = ref<HTMLElement | null>(null)
 const activeStepRef = ref<HTMLElement | null>(null)
-const autoAdvanceTimeoutId = ref<number | null>(null)
+const autoAdvanceTimeoutId = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const totalSteps = computed(() => {
   if (!assessment.value?.questions) return 2
@@ -470,9 +470,8 @@ const selectAnswer = (value: number) => {
   const isLastQuestion = currentQuestionIndex.value >= (assessment.value?.questions?.length || 0) - 1
   if (!isLastQuestion) {
     // Auto-advance to next question after a short delay for better UX
-    autoAdvanceTimeoutId.value = window.setTimeout(() => {
+    autoAdvanceTimeoutId.value = setTimeout(() => {
       nextQuestion()
-      autoAdvanceTimeoutId.value = null
     }, 400)
   }
 }
