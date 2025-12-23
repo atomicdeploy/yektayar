@@ -17,6 +17,7 @@ const ROOT_DIR = join(__dirname, '..');
 const ASSETS_DIR = join(ROOT_DIR, 'assets', 'logo');
 const ADMIN_PUBLIC_DIR = join(ROOT_DIR, 'packages', 'admin-panel', 'public');
 const MOBILE_PUBLIC_DIR = join(ROOT_DIR, 'packages', 'mobile-app', 'public');
+const DESKTOP_BUILD_DIR = join(ROOT_DIR, 'packages', 'admin-panel', 'desktop-app', 'build');
 
 // Icon sizes for various purposes
 const ICON_SIZES = [
@@ -45,6 +46,9 @@ async function generateIcons() {
   }
   if (!existsSync(MOBILE_PUBLIC_DIR)) {
     mkdirSync(MOBILE_PUBLIC_DIR, { recursive: true });
+  }
+  if (!existsSync(DESKTOP_BUILD_DIR)) {
+    mkdirSync(DESKTOP_BUILD_DIR, { recursive: true });
   }
 
   // Generate PNG icons for each variant
@@ -126,14 +130,28 @@ async function generateIcons() {
     console.log(`  ✓ Copied ${iconFileName} to mobile app`);
   }
 
+  // Generate desktop app icons (256x256 PNG for Electron)
+  // Use the light variant for desktop
+  console.log('\n📦 Generating desktop app icon...');
+  const lightIconSvgPath = join(ASSETS_DIR, 'icon.svg');
+  const lightIconSvg = readFileSync(lightIconSvgPath);
+  const desktopIconPath = join(DESKTOP_BUILD_DIR, 'icon.png');
+  await sharp(lightIconSvg)
+    .resize(256, 256)
+    .png()
+    .toFile(desktopIconPath);
+  console.log('  ✓ Generated icon.png for desktop app (256x256)');
+
   console.log('\n✅ Icon generation complete!\n');
-  console.log('Generated files for both admin panel and mobile app:');
+  console.log('Generated files for admin panel, mobile app, and desktop app:');
   console.log(`  - ${ICON_SIZES.length} PNG icons in various sizes per variant (light & dark)`);
   console.log(`  - favicon.png for modern browsers (dark variant as default)`);
+  console.log(`  - 256x256 PNG icon for desktop app`);
   console.log(`  - logo.svg, icon.svg, and icon-dark.svg for reference`);
   console.log(`\nOutput directories:`);
   console.log(`  - Admin Panel: ${ADMIN_PUBLIC_DIR}`);
   console.log(`  - Mobile App: ${MOBILE_PUBLIC_DIR}`);
+  console.log(`  - Desktop App: ${DESKTOP_BUILD_DIR}`);
   console.log(`\nNote: Update manifest.json files to reference icon variants with prefers-color-scheme media queries.`);
 }
 
