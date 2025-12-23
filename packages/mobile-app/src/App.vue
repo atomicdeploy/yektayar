@@ -1,6 +1,7 @@
 <template>
   <ion-app :dir="locale === 'fa' ? 'rtl' : 'ltr'">
     <ion-router-outlet />
+    <ErrorNotification />
   </ion-app>
 </template>
 
@@ -10,6 +11,8 @@ import { useI18n } from 'vue-i18n'
 import { useTheme } from './composables/useTheme'
 
 const { locale } = useI18n()
+
+import ErrorNotification from './components/ErrorNotification.vue'
 
 // Initialize theme system
 useTheme()

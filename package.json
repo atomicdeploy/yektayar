@@ -8,9 +8,10 @@
     "packages/*"
   ],
   "scripts": {
-    "postinstall": "npm run build -w @yektayar/shared && node scripts/check-requirements.js",
+    "postinstall": "npm run build -w @yektayar/shared && node scripts/check-requirements.js && node scripts/copy-error-handler.mjs",
     "check:requirements": "node scripts/check-requirements.js",
     "install:deps": "node scripts/install-dependencies.js",
+    "prebuild": "node scripts/copy-error-handler.mjs",
     "dev": "npm run dev --workspaces --if-present",
     "dev:backend": "npm run dev -w @yektayar/backend",
     "dev:admin": "npm run dev -w @yektayar/admin-panel",

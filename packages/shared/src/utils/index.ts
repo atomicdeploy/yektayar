@@ -63,3 +63,13 @@ export function generateToken(length: number = 32): string {
 export function isAuthenticated(session: any): boolean {
   return session && session.isLoggedIn && new Date(session.expiresAt) > new Date()
 }
+
+/**
+ * Detect if running in mobile (Ionic) context
+ */
+export function isMobile(): boolean {
+  // Check if Ionic components are available globally
+  return typeof window !== 'undefined' && 
+         'customElements' in window && 
+         customElements.get('ion-app') !== undefined
+}

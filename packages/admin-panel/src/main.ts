@@ -60,8 +60,9 @@ async function initializeApp() {
       title: 'API Configuration Error',
       message: 'Cannot start the admin panel due to API configuration issues.',
       details: validationResult.error,
-      solution: solution,
-      errorType: validationResult.errorType
+      solution: import.meta.env.DEV ? solution : null, // Don't send solution in production
+      errorType: validationResult.errorType,
+      isBuiltInError: true
     })
     
     errorApp.use(i18n)
@@ -132,4 +133,14 @@ async function initializeApp() {
 // Start initialization
 initializeApp().catch((error) => {
   logger.error('Failed to initialize app:', error)
+  
+  // Show error screen if app failed to initialize
+  const errorApp = createApp(ErrorScreen, {
+    title: 'Initialization Error',
+    message: 'Failed to start the admin panel.',
+    details: error?.message || String(error)
+  })
+  
+  errorApp.use(i18n)
+  errorApp.mount('#app')
 })
