@@ -10,6 +10,10 @@
     </ion-header>
     
     <ion-content :fullscreen="true">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ t('courses.my_courses') }}</ion-title>
@@ -91,7 +95,9 @@ import {
   IonBackButton,
   IonButton,
   IonIcon,
-  IonProgressBar
+  IonProgressBar,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/vue'
 import LazyImage from '@/components/LazyImage.vue'
 import {
@@ -138,6 +144,13 @@ const enrolledCourses = ref([
 
 const browseCourses = () => {
   router.push('/tabs/courses')
+}
+
+const handleRefresh = async (event: CustomEvent) => {
+  // Simulate refreshing enrolled courses - in real app, this would call API
+  setTimeout(() => {
+    (event.target as HTMLIonRefresherElement)?.complete()
+  }, 1000)
 }
 
 onMounted(() => {

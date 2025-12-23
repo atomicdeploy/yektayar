@@ -12,6 +12,10 @@
     </ion-header>
     
     <ion-content :fullscreen="true" :scroll-y="false">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ t('app_title') }}</ion-title>
@@ -201,6 +205,8 @@ import {
   IonIcon,
   IonButton,
   IonButtons,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/vue'
 import { 
   chatbubbles, 
@@ -224,6 +230,13 @@ import { useTheme } from '../composables/useTheme'
 const { t, locale } = useI18n()
 const router = useRouter()
 const { isDark, toggleTheme } = useTheme()
+
+const handleRefresh = (event: CustomEvent) => {
+  // Simulate a data refresh - in real app, this would reload data from API
+  setTimeout(() => {
+    (event.target as HTMLIonRefresherElement)?.complete()
+  }, 1000)
+}
 
 const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')

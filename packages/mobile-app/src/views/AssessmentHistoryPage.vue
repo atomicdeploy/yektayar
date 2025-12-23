@@ -10,6 +10,10 @@
     </ion-header>
     
     <ion-content :fullscreen="true" :scroll-y="false">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <OverlayScrollbarsComponent
         class="scrollable-content"
         :options="{
@@ -92,6 +96,8 @@ import {
   IonIcon,
   IonButton,
   IonSpinner,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/vue'
 import { 
   documentText,
@@ -167,6 +173,16 @@ const viewResult = (resultId: number) => {
 
 const goBack = () => {
   router.back()
+}
+
+const handleRefresh = async (event: CustomEvent) => {
+  try {
+    await fetchAssessmentHistory()
+  } catch (error) {
+    logger.error('Failed to refresh assessment history:', error)
+  } finally {
+    (event.target as HTMLIonRefresherElement)?.complete()
+  }
 }
 
 onMounted(() => {
