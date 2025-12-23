@@ -3,6 +3,7 @@ import { validateSessionToken } from './sessionService'
 export interface UserPreferences {
   welcomeScreenShown?: boolean
   language?: string
+  timezone?: string
   theme?: string
   notifications?: boolean
   [key: string]: any
@@ -19,6 +20,7 @@ const preferencesStore = new Map<string, UserPreferences>()
  *   user_id VARCHAR(255) PRIMARY KEY,
  *   welcome_screen_shown BOOLEAN DEFAULT FALSE,
  *   language VARCHAR(10) DEFAULT 'fa',
+ *   timezone VARCHAR(100) DEFAULT 'UTC',
  *   theme VARCHAR(20) DEFAULT 'auto',
  *   notifications BOOLEAN DEFAULT TRUE,
  *   preferences JSONB,
@@ -37,10 +39,11 @@ export async function getUserPreferences(token: string): Promise<UserPreferences
   // Use token as key for now (in production, use user_id)
   const key = session.userId || token
   
-  // Return stored preferences or defaults
+  // Return stored preferences or defaults (with session metadata as fallback)
   const preferences = preferencesStore.get(key) || {
     welcomeScreenShown: false,
-    language: 'fa',
+    language: session.metadata?.language || 'fa',
+    timezone: session.metadata?.timezone || 'UTC',
     theme: 'auto',
     notifications: true
   }
