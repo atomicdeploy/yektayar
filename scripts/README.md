@@ -427,40 +427,78 @@ sudo ./scripts/manage-services.sh logs backend
 
 #### `dev-runner.sh`
 
-Runs services in development mode (foreground or detached background processes).
+Modern CLI tool for managing YektaYar development services with clear action-service separation.
 
 **Usage:**
 ```bash
-./scripts/dev-runner.sh {backend|admin|mobile|all|stop} [--detached]
+./scripts/dev-runner.sh <action> <service> [options]
 ```
 
-**Services:**
-- `backend` - Backend API server with hot-reload
-- `admin` - Admin Panel dev server with HMR
-- `mobile` - Mobile App dev server with HMR
-- `all` - All services (requires `--detached`)
-- `stop` - Stop all detached services
+**Actions:**
+- `start` - Start a service or all services
+- `stop` - Stop a service or all services
+- `restart` - Restart a service or all services
+- `status` - Show status of services
+- `logs` - Display service logs
+- `interact` - Interactive mode for a service
+- `help` - Show detailed help message
 
-**Modes:**
-- Foreground (default) - Run in current terminal
-- Detached (`--detached`) - Run in background
+**Services:**
+- `backend` - Backend API server with hot-reload (port 3000)
+- `admin` - Admin Panel dev server with HMR (port 5173)
+- `mobile` - Mobile App dev server with HMR (port 8100)
+- `all` - All services
+
+**Options:**
+- `--detached, -d` - Run in background (auto-enabled in screen/tmux)
+- `--pm2` - Use PM2 for process management
+- `--force, -f` - Force kill processes (with stop)
+- `--pager, -p` - Use less pager for logs (with logs)
+- `--lines, -n <num>` - Number of lines to show (with logs)
+
+**Key Features:**
+- ✅ **Service-specific actions** - Perform operations on individual services
+- ✅ **Clear CLI interface** - Modern `<action> <service>` syntax
+- ✅ **Enhanced status** - Detailed service status with port information
+- ✅ **Better logs** - Follow logs with customizable output
+- ✅ **Interactive mode** - Menu-based service interaction
+- ✅ **Auto-detection** - Detached mode in screen/tmux sessions
+- ✅ **PM2 support** - Optional PM2 process management
 
 **Examples:**
 ```bash
-# Run backend in foreground with hot-reload
-./scripts/dev-runner.sh backend
+# Start services
+./scripts/dev-runner.sh start backend              # Run backend in foreground
+./scripts/dev-runner.sh start backend --detached   # Run backend in background
+./scripts/dev-runner.sh start all --detached       # Run all services in background
+./scripts/dev-runner.sh start admin --pm2          # Run admin with PM2
 
-# Run all services in background
-./scripts/dev-runner.sh all --detached
+# Stop services
+./scripts/dev-runner.sh stop backend               # Stop backend service
+./scripts/dev-runner.sh stop all                   # Stop all services
+./scripts/dev-runner.sh stop admin --force         # Force kill admin service
 
-# Stop all detached services
-./scripts/dev-runner.sh stop
+# Restart services
+./scripts/dev-runner.sh restart backend            # Restart backend service
+./scripts/dev-runner.sh restart all                # Restart all services
 
-# View logs of detached services
-tail -f /tmp/yektayar-backend.log
-tail -f /tmp/yektayar-admin.log
-tail -f /tmp/yektayar-mobile.log
+# Monitor services
+./scripts/dev-runner.sh status                     # Show status of all services
+./scripts/dev-runner.sh status backend             # Show status of backend
+./scripts/dev-runner.sh logs backend               # Follow backend logs
+./scripts/dev-runner.sh logs all                   # Follow all service logs
+./scripts/dev-runner.sh logs admin --pager         # View admin logs with less
+./scripts/dev-runner.sh logs mobile -n 100         # Show last 100 lines
+
+# Interactive mode
+./scripts/dev-runner.sh interact backend           # Interactive menu for backend
 ```
+
+**Notes:**
+- Services auto-run in detached mode in screen/tmux sessions
+- Log files: `/tmp/yektayar-{service}.log`
+- PID files: `/tmp/yektayar-{service}.pid`
+- Press Ctrl+C to exit foreground mode or log following
 
 ## Deployment Guide
 
@@ -559,24 +597,40 @@ Before deploying the application, set up PostgreSQL database:
 
 1. **Run backend in development mode:**
    ```bash
-   ./scripts/dev-runner.sh backend
+   ./scripts/dev-runner.sh start backend
    ```
 
 2. **Run all services in background:**
    ```bash
-   ./scripts/dev-runner.sh all --detached
+   ./scripts/dev-runner.sh start all --detached
    ```
 
 3. **Make changes to code** - Services will auto-reload
 
-4. **View logs:**
+4. **Check service status:**
    ```bash
-   tail -f /tmp/yektayar-backend.log
+   ./scripts/dev-runner.sh status
    ```
 
-5. **Stop services:**
+5. **View logs:**
    ```bash
-   ./scripts/dev-runner.sh stop
+   ./scripts/dev-runner.sh logs backend
+   # or follow all logs
+   ./scripts/dev-runner.sh logs all
+   ```
+
+6. **Restart a specific service:**
+   ```bash
+   ./scripts/dev-runner.sh restart backend
+   ```
+
+7. **Stop services:**
+   ```bash
+   # Stop a specific service
+   ./scripts/dev-runner.sh stop backend
+   
+   # Stop all services
+   ./scripts/dev-runner.sh stop all
    ```
 
 ## Service Configuration
