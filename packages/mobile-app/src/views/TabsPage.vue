@@ -71,18 +71,19 @@ ion-tab-button {
   --color-selected: var(--ion-color-primary);
   --ripple-color: var(--ion-color-primary-tint);
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   ion-icon {
     font-size: 24px;
     margin-bottom: 2px;
-    transition: all 0.3s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   ion-label {
     font-size: 11px;
     font-weight: 500;
     margin-top: 2px;
+    letter-spacing: 0.01em;
   }
 
   &.tab-selected {
@@ -91,6 +92,11 @@ ion-tab-button {
 
     ion-icon {
       transform: translateY(-2px) scale(1.1);
+      filter: drop-shadow(0 2px 4px rgba(212, 164, 62, 0.3));
+    }
+
+    ion-label {
+      font-weight: 600;
     }
 
     &::before {
@@ -105,6 +111,17 @@ ion-tab-button {
       border-radius: var(--tab-indicator-height) var(--tab-indicator-height) 0 0;
       box-shadow: var(--secondary-glow);
       --tab-indicator-height: 3px;
+    }
+  }
+
+  /* Hover effect for desktop/web */
+  @media (hover: hover) {
+    &:hover:not(.tab-selected) {
+      --color: var(--text-primary);
+      
+      ion-icon {
+        transform: translateY(-1px);
+      }
     }
   }
 }
