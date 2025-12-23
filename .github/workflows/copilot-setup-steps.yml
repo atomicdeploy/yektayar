@@ -1,3 +1,11 @@
+name: Copilot Setup Steps
+
+on:
+  workflow_dispatch:
+
 jobs:
   copilot-setup-steps:
     runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder step
+        run: echo "This workflow is a placeholder for copilot setup steps"
