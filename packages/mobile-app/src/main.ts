@@ -50,6 +50,7 @@ logger.startup('YektaYar Mobile App', {
 })
 
 // Register service worker with auto-update
+// Check for updates on visibility change instead of periodic interval to avoid memory leaks
 registerSW({
   immediate: true,
   onNeedRefresh() {
@@ -61,10 +62,13 @@ registerSW({
   onRegistered(registration) {
     if (registration) {
       logger.success('Service Worker registered successfully')
-      // Check for updates every hour
-      setInterval(() => {
-        registration.update()
-      }, 60 * 60 * 1000)
+      
+      // Check for updates when the app becomes visible
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          registration.update()
+        }
+      })
     }
   },
   onRegisterError(error) {

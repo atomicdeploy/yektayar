@@ -6,6 +6,23 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import packageJson from './package.json'
 
+// Cache duration constants (in seconds)
+const CACHE_DURATIONS = {
+  API: 60 * 60,              // 1 hour
+  IMAGES: 60 * 60 * 24 * 30, // 30 days
+  FONTS: 60 * 60 * 24 * 365  // 1 year
+}
+
+const CACHE_LIMITS = {
+  API_MAX_ENTRIES: 100,
+  IMAGES_MAX_ENTRIES: 200,
+  FONTS_MAX_ENTRIES: 30
+}
+
+const CACHE_TIMEOUT = {
+  NETWORK: 10 // seconds
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isDevelopment = mode === 'development'
@@ -40,10 +57,10 @@ export default defineConfig(({ mode }) => {
               options: {
                 cacheName: 'api-cache',
                 expiration: {
-                  maxEntries: 100,
-                  maxAgeSeconds: 60 * 60 // 1 hour
+                  maxEntries: CACHE_LIMITS.API_MAX_ENTRIES,
+                  maxAgeSeconds: CACHE_DURATIONS.API
                 },
-                networkTimeoutSeconds: 10,
+                networkTimeoutSeconds: CACHE_TIMEOUT.NETWORK,
                 cacheableResponse: {
                   statuses: [0, 200]
                 }
@@ -56,8 +73,8 @@ export default defineConfig(({ mode }) => {
               options: {
                 cacheName: 'image-cache',
                 expiration: {
-                  maxEntries: 200,
-                  maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  maxEntries: CACHE_LIMITS.IMAGES_MAX_ENTRIES,
+                  maxAgeSeconds: CACHE_DURATIONS.IMAGES
                 }
               }
             },
@@ -68,8 +85,8 @@ export default defineConfig(({ mode }) => {
               options: {
                 cacheName: 'font-cache',
                 expiration: {
-                  maxEntries: 30,
-                  maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+                  maxEntries: CACHE_LIMITS.FONTS_MAX_ENTRIES,
+                  maxAgeSeconds: CACHE_DURATIONS.FONTS
                 }
               }
             }

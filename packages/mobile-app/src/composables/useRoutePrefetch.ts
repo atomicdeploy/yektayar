@@ -35,7 +35,10 @@ export function useRoutePrefetch(router: Router) {
           })
         )
         prefetchedRoutes.add(path)
-        logger.debug(`Prefetched route: ${path}`)
+        // Only log in development mode to avoid production overhead
+        if (import.meta.env.DEV) {
+          logger.debug(`Prefetched route: ${path}`)
+        }
       }
     } catch (error) {
       logger.error(`Failed to prefetch route ${path}:`, error)
