@@ -35,6 +35,9 @@ import './theme/fonts.scss'
 /* Theme variables */
 import './theme/variables.scss'
 
+// Register service worker for PWA capabilities
+import { registerSW } from 'virtual:pwa-register'
+
 // Get version from environment variable
 const APP_VERSION = getPackageVersion()
 
@@ -44,6 +47,33 @@ logger.startup('YektaYar Mobile App', {
   'Environment': import.meta.env.MODE || 'development',
   'Version': APP_VERSION,
   'Platform': 'Ionic/Capacitor'
+})
+
+// Register service worker with auto-update
+// Check for updates on visibility change instead of periodic interval to avoid memory leaks
+registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    logger.info('New content available, updating...')
+  },
+  onOfflineReady() {
+    logger.success('App ready to work offline')
+  },
+  onRegistered(registration) {
+    if (registration) {
+      logger.success('Service Worker registered successfully')
+      
+      // Check for updates when the app becomes visible
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          registration.update()
+        }
+      })
+    }
+  },
+  onRegisterError(error) {
+    logger.error('Service Worker registration failed:', error)
+  }
 })
 
 // i18n configuration with missing key handler

@@ -115,4 +115,34 @@ const router = createRouter({
   routes
 })
 
+// Critical routes to prefetch immediately
+const criticalRoutes = [
+  '/tabs/home',
+  '/tabs/chat',
+  '/tabs/courses',
+  '/tabs/appointments',
+  '/tabs/profile'
+]
+
+// Prefetch critical routes after initial load
+router.isReady().then(() => {
+  // Prefetch critical tab routes for instant navigation
+  criticalRoutes.forEach(path => {
+    const route = router.resolve(path)
+    if (route.matched.length > 0) {
+      route.matched.forEach(match => {
+        if (match.components) {
+          Object.values(match.components).forEach((component: any) => {
+            // Check if it's a lazy-loaded component (function that returns a promise)
+            if (typeof component === 'function' && !component.name) {
+              // Trigger the lazy import to cache the component
+              component()
+            }
+          })
+        }
+      })
+    }
+  })
+})
+
 export default router
