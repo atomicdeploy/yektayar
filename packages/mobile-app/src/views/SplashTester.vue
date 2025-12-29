@@ -139,7 +139,7 @@ const handleKeyPress = (event: KeyboardEvent) => {
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeyPress)
+  window.addEventListener('keydown', handleKeyPress, { passive: true })
 })
 
 onUnmounted(() => {

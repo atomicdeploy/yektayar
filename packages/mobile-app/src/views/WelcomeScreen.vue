@@ -506,10 +506,10 @@ onMounted(async () => {
       }
       
       if (hasTransition) {
-        welcomeContainer.addEventListener('transitionend', handleTransitionEnd)
+        welcomeContainer.addEventListener('transitionend', handleTransitionEnd, { passive: true })
       }
       if (hasAnimation) {
-        welcomeContainer.addEventListener('animationend', handleAnimationEnd)
+        welcomeContainer.addEventListener('animationend', handleAnimationEnd, { passive: true })
       }
       
       // Fallback timeout in case events don't fire
