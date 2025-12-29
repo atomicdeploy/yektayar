@@ -395,8 +395,8 @@ onMounted(() => {
   // TODO: Fetch lesson details from API
   // TODO: Load user progress
   if (typeof window !== 'undefined') {
-    window.document.addEventListener('mousemove', showControlsTemporarily)
-    window.document.addEventListener('touchstart', showControlsTemporarily)
+    window.document.addEventListener('mousemove', showControlsTemporarily, { passive: true })
+    window.document.addEventListener('touchstart', showControlsTemporarily, { passive: true })
   }
 })
 

@@ -536,7 +536,7 @@ onMounted(async () => {
   const content = document.querySelector('ion-content')
   if (content) {
     // Listen for Ionic scroll events (touch/swipe on mobile)
-    content.addEventListener('ionScroll', handleScroll)
+    content.addEventListener('ionScroll', handleScroll, { passive: true })
     logger.debug('[WelcomeScreen] ionScroll event listener added to ion-content')
     
     // Get the actual scrollable element inside ion-content for wheel/keyboard events
@@ -562,10 +562,10 @@ onMounted(async () => {
       handleUserActivity(e)
     }
   }
-  window.addEventListener('keydown', keydownHandler)
+  window.addEventListener('keydown', keydownHandler, { passive: true })
   
-  window.addEventListener('click', handleUserActivity)
-  window.addEventListener('touchstart', handleUserActivity)
+  window.addEventListener('click', handleUserActivity, { passive: true })
+  window.addEventListener('touchstart', handleUserActivity, { passive: true })
   logger.debug('[WelcomeScreen] Activity listeners (click, touchstart, keydown) added to window')
   
   // Set up ResizeObserver to watch inner container height (only if feature enabled)
