@@ -133,7 +133,7 @@ onMounted(() => {
   // Listen for changes to dark mode preference
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
     isDarkMode.value = e.matches
-  })
+  }, { passive: true })
 })
 </script>
 
