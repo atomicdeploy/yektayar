@@ -73,7 +73,7 @@ const initializeTheme = () => {
 
   // Modern browsers
   if (mediaQuery.addEventListener) {
-    mediaQuery.addEventListener('change', handleChange)
+    mediaQuery.addEventListener('change', handleChange, { passive: true })
   } else {
     // Fallback for older browsers
     mediaQuery.addListener(handleChange)
