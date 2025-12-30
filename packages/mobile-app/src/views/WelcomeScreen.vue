@@ -903,6 +903,29 @@ const onImageError = () => {
   );
   position: relative;
   overflow: hidden;
+  
+  /* Golden gradient CSS variables for CTA button */
+  --cta-golden-gradient: linear-gradient(
+    135deg, 
+    #d4a43e 0%, 
+    #f0c05a 25%,
+    #ffd77a 50%,
+    #f0c05a 75%,
+    #d4a43e 100%
+  );
+  
+  --cta-loading-gradient: linear-gradient(
+    135deg,
+    #c99433 0%,
+    #d4a43e 15%,
+    #f0c05a 30%,
+    #ffd77a 45%,
+    #fff4cc 50%,
+    #ffd77a 55%,
+    #f0c05a 70%,
+    #d4a43e 85%,
+    #c99433 100%
+  );
 }
 
 .welcome-container {
@@ -1241,9 +1264,8 @@ const onImageError = () => {
   font-weight: 700;
   position: relative;
   overflow: hidden;
-  /* light mode CTA background */
-  /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
-  background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
+  /* light mode CTA background - Vibrant golden gradient */
+  background-image: var(--cta-golden-gradient);
   background-size: 200% 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: var(--border-radius);
@@ -1254,24 +1276,18 @@ const onImageError = () => {
   animation: gradientShift 3s ease-in-out infinite;
 }
 
-/* Elegant Loading State - Overrides disabled styles */
+/* Elegant Loading State - Vibrant golden shimmer effect */
 .cta-button-loading {
   cursor: wait !important;
   opacity: 1 !important;
-  background-image: linear-gradient(
-    135deg,
-    #667eea 0%,
-    #764ba2 25%,
-    #f093fb 50%,
-    #4facfe 75%,
-    #667eea 100%
-  ) !important;
+  background-image: var(--cta-loading-gradient) !important;
   background-size: 300% 100% !important;
   animation: loadingGradient 2s ease-in-out infinite !important;
   --box-shadow: 
-    0 12px 40px rgba(102, 126, 234, 0.4),
-    0 6px 20px rgba(118, 75, 162, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    0 12px 40px rgba(212, 164, 62, 0.5),
+    0 6px 20px rgba(212, 164, 62, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
   transform: scale(1.02);
 }
 
@@ -1373,13 +1389,13 @@ const onImageError = () => {
   z-index: 1;
   pointer-events: none;
   color: #01183a;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
-  transition: color 0.3s ease;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5), 0 0 8px rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .cta-button-loading .button-content {
-  color: #ffffff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  color: #01183a;
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.6), 0 0 12px rgba(255, 255, 255, 0.4);
 }
 
 .button-icon {
@@ -1392,7 +1408,7 @@ const onImageError = () => {
   /* letter-spacing: -0.3px; */
 }
 
-/* Loading Spinner - Enhanced for elegant loading state */
+/* Loading Spinner - Enhanced with golden theme for elegant loading state */
 .button-spinner {
   display: flex;
   align-items: center;
@@ -1402,14 +1418,14 @@ const onImageError = () => {
 .spinner-icon {
   width: 28px;
   height: 28px;
-  border: 3px solid rgba(255, 255, 255, 0.25);
-  border-top-color: #ffffff;
-  border-right-color: rgba(255, 255, 255, 0.8);
+  border: 3px solid rgba(1, 24, 58, 0.15);
+  border-top-color: #01183a;
+  border-right-color: rgba(1, 24, 58, 0.7);
   border-radius: 50%;
   animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
   box-shadow: 
-    0 0 15px rgba(255, 255, 255, 0.5),
-    inset 0 0 10px rgba(255, 255, 255, 0.2);
+    0 0 15px rgba(1, 24, 58, 0.3),
+    inset 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 @keyframes spin {
@@ -1790,9 +1806,8 @@ const onImageError = () => {
   }
 
   .cta-button:not(.cta-button-disabled) {
-    /* dark mode CTA background */
-    /* background-image: linear-gradient(135deg, #d4a43e 0%, #e8c170 50%, #d4a43e 100%); */
-    background-image: radial-gradient(circle farthest-corner at center, #10B981 0%, #07a674 100%);
+    /* dark mode CTA background - Vibrant golden gradient */
+    background-image: var(--cta-golden-gradient);
   }
 
   .error-message {
