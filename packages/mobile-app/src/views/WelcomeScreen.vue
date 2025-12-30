@@ -903,6 +903,29 @@ const onImageError = () => {
   );
   position: relative;
   overflow: hidden;
+  
+  /* Golden gradient CSS variables for CTA button */
+  --cta-golden-gradient: linear-gradient(
+    135deg, 
+    #d4a43e 0%, 
+    #f0c05a 25%,
+    #ffd77a 50%,
+    #f0c05a 75%,
+    #d4a43e 100%
+  );
+  
+  --cta-loading-gradient: linear-gradient(
+    135deg,
+    #c99433 0%,
+    #d4a43e 15%,
+    #f0c05a 30%,
+    #ffd77a 45%,
+    #fff4cc 50%,
+    #ffd77a 55%,
+    #f0c05a 70%,
+    #d4a43e 85%,
+    #c99433 100%
+  );
 }
 
 .welcome-container {
@@ -1242,14 +1265,7 @@ const onImageError = () => {
   position: relative;
   overflow: hidden;
   /* light mode CTA background - Vibrant golden gradient */
-  background-image: linear-gradient(
-    135deg, 
-    #d4a43e 0%, 
-    #f0c05a 25%,
-    #ffd77a 50%,
-    #f0c05a 75%,
-    #d4a43e 100%
-  );
+  background-image: var(--cta-golden-gradient);
   background-size: 200% 100%;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: var(--border-radius);
@@ -1264,18 +1280,7 @@ const onImageError = () => {
 .cta-button-loading {
   cursor: wait !important;
   opacity: 1 !important;
-  background-image: linear-gradient(
-    135deg,
-    #c99433 0%,
-    #d4a43e 15%,
-    #f0c05a 30%,
-    #ffd77a 45%,
-    #fff4cc 50%,
-    #ffd77a 55%,
-    #f0c05a 70%,
-    #d4a43e 85%,
-    #c99433 100%
-  ) !important;
+  background-image: var(--cta-loading-gradient) !important;
   background-size: 300% 100% !important;
   animation: loadingGradient 2s ease-in-out infinite !important;
   --box-shadow: 
@@ -1802,14 +1807,7 @@ const onImageError = () => {
 
   .cta-button:not(.cta-button-disabled) {
     /* dark mode CTA background - Vibrant golden gradient */
-    background-image: linear-gradient(
-      135deg, 
-      #d4a43e 0%, 
-      #f0c05a 25%,
-      #ffd77a 50%,
-      #f0c05a 75%,
-      #d4a43e 100%
-    );
+    background-image: var(--cta-golden-gradient);
   }
 
   .error-message {
