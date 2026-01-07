@@ -18,6 +18,7 @@ import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
 import { assessmentRoutes } from './routes/assessments'
 import { healthRoutes } from './routes/health'
+import { versionRoutes } from './routes/version'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
@@ -144,6 +145,7 @@ app
     }
   })
   .use(healthRoutes)
+  .use(versionRoutes)
   .use(authRoutes)
   .use(userRoutes)
   .use(messageRoutes)

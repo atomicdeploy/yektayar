@@ -232,6 +232,14 @@ async function initializeApp() {
       logger.error('Failed to acquire session on startup:', error)
       // Continue anyway - session will be acquired on next attempt
     })
+    
+    // Check for app updates after successful initialization
+    // This runs in the background and only logs results
+    import('./services/appUpdate').then(({ autoCheckAndDownload }) => {
+      autoCheckAndDownload().catch((error) => {
+        logger.error('Error checking for updates:', error)
+      })
+    })
   })
 }
 

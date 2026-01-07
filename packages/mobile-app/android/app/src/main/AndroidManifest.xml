@@ -32,4 +32,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Required for downloading APK files -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+    <!-- Required for installing APK files on Android 8.0 and above -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 </manifest>
