@@ -323,7 +323,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import {
   IonContent,
   IonHeader,
@@ -374,6 +374,7 @@ const answers = ref<{ [key: number]: number }>({})
 const submitting = ref(false)
 const stepIndicatorsRef = ref<HTMLElement | null>(null)
 const activeStepRef = ref<HTMLElement | null>(null)
+const autoAdvanceTimeoutId = ref<ReturnType<typeof setTimeout> | null>(null)
 
 const totalSteps = computed(() => {
   if (!assessment.value?.questions) return 2
@@ -458,6 +459,21 @@ const getRatingLabel = (value: number) => {
 
 const selectAnswer = (value: number) => {
   answers.value[currentQuestionIndex.value] = value
+  
+  // Clear any existing auto-advance timeout
+  if (autoAdvanceTimeoutId.value !== null) {
+    clearTimeout(autoAdvanceTimeoutId.value)
+  }
+  
+  // Only auto-advance if not on the last question
+  // On the last question, user should manually proceed to review page
+  const isLastQuestion = currentQuestionIndex.value >= (assessment.value?.questions?.length || 0) - 1
+  if (!isLastQuestion) {
+    // Auto-advance to next question after a short delay for better UX
+    autoAdvanceTimeoutId.value = window.setTimeout(() => {
+      nextQuestion()
+    }, 400)
+  }
 }
 
 const nextStep = () => {
@@ -578,6 +594,14 @@ const submitAssessment = async () => {
 
 onMounted(() => {
   fetchAssessment()
+})
+
+onBeforeUnmount(() => {
+  // Clear auto-advance timeout on unmount to prevent memory leaks
+  if (autoAdvanceTimeoutId.value !== null) {
+    clearTimeout(autoAdvanceTimeoutId.value)
+    autoAdvanceTimeoutId.value = null
+  }
 })
 </script>
 
