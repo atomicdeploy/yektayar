@@ -2,6 +2,8 @@ export * from './logger'
 export * from './solutions'
 export * from './validation'
 export * from './version'
+export * from './locale'
+export * from './deviceInfo'
 
 // i18n utilities
 export * from '../i18n/missingHandler'

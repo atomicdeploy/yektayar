@@ -28,6 +28,15 @@ public class DeviceInfoPlugin extends Plugin {
         ret.put("androidVersion", deviceInfo.getAndroidVersion());
         ret.put("androidSDK", deviceInfo.getAndroidSDKVersion());
         ret.put("deviceInfoString", deviceInfo.getDeviceInfoString());
+        ret.put("screenWidth", deviceInfo.getScreenWidth());
+        ret.put("screenHeight", deviceInfo.getScreenHeight());
+        ret.put("screenDensityDpi", deviceInfo.getScreenDensityDpi());
+        ret.put("screenDensity", deviceInfo.getScreenDensity());
+        ret.put("deviceId", deviceInfo.getDeviceId());
+        ret.put("hardwareName", deviceInfo.getHardwareName());
+        ret.put("boardName", deviceInfo.getBoardName());
+        ret.put("brand", deviceInfo.getBrand());
+        ret.put("product", deviceInfo.getProduct());
         call.resolve(ret);
     }
 }

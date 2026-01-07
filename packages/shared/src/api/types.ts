@@ -60,6 +60,13 @@ export interface ApiClientConfig {
    * Default: 'header'
    */
   tokenDeliveryMethod?: TokenDeliveryMethod
+
+  /**
+   * Device info provider function
+   * When provided, this function will be called to get device information
+   * that will be added as headers to every request
+   */
+  deviceInfoProvider?: () => Record<string, string> | Promise<Record<string, string>>
 }
 
 /**

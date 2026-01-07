@@ -1,21 +1,105 @@
 import { Elysia } from 'elysia'
-import { query, getDatabase } from '../services/database'
+import { getDatabase } from '../services/database'
 import bcrypt from 'bcrypt'
 import { createAnonymousSession, validateSessionToken, invalidateSession, linkUserToSession } from '../services/sessionService'
 import { extractToken } from '../middleware/tokenExtractor'
-import { logger } from '@yektayar/shared'
+import { logger, getBestLanguageMatch, normalizeTimezone, DeviceInfo } from '@yektayar/shared'
+import { getClientIpAddress } from '../utils/ipAddress'
+import { validateDeviceInfo, isValidObjectSize } from '../utils/deviceInfoValidation'
+
+// Define request body types
+interface AcquireSessionBody {
+  deviceInfo?: Partial<DeviceInfo>
+}
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
-  .post('/acquire-session', async ({ headers, request: _request }) => {
+  .post('/acquire-session', async ({ headers, request: _request, body }) => {
     try {
       // Extract metadata from request
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
+      
+      // Get device info from body if provided
+      const requestBody = body as AcquireSessionBody
+      let deviceInfo = requestBody?.deviceInfo || {}
+      
+      // Validate device info size to prevent DoS attacks
+      if (!isValidObjectSize(deviceInfo, 100)) {
+        logger.warn('Device info object too large, rejecting', {
+          size: JSON.stringify(deviceInfo).length
+        })
+        deviceInfo = {}
+      }
+      
+      // Validate and sanitize device info
+      try {
+        deviceInfo = validateDeviceInfo(deviceInfo)
+      } catch (error) {
+        logger.warn('Invalid device info structure:', error)
+        deviceInfo = {}
+      }
+      
+      // Extract device info from custom headers
+      const deviceHeaders = {
+        platform: headers['x-device-platform'],
+        deviceModel: headers['x-device-model'],
+        deviceManufacturer: headers['x-device-manufacturer'],
+        osName: headers['x-os-name'],
+        osVersion: headers['x-os-version'],
+        appVersion: headers['x-app-version'],
+        screenSize: headers['x-screen-size'],
+        screenDensity: headers['x-screen-density'],
+        viewportSize: headers['x-viewport-size'],
+        language: headers['x-device-language'],
+        languages: headers['x-device-languages'],
+        timezone: headers['x-device-timezone'],
+        timezoneOffset: headers['x-device-timezone-offset'],
+        deviceId: headers['x-device-id'],
+        connectionType: headers['x-connection-type'],
+        capabilities: headers['x-device-capabilities'],
+      }
+      
+      // Merge device info from body and headers
+      const mergedDeviceInfo = {
+        ...deviceInfo,
+        ...Object.fromEntries(
+          Object.entries(deviceHeaders).filter(([_, v]) => v !== undefined)
+        ),
+      }
+      
+      // Parse capabilities if it's a JSON string
+      if (typeof mergedDeviceInfo.capabilities === 'string') {
+        try {
+          mergedDeviceInfo.capabilities = JSON.parse(mergedDeviceInfo.capabilities)
+        } catch (e) {
+          logger.warn('Failed to parse device capabilities JSON:', {
+            error: e,
+            original: mergedDeviceInfo.capabilities
+          })
+          // Keep as string if parsing fails
+        }
+      }
+      
+      // Parse languages array if it's a comma-separated string
+      if (typeof mergedDeviceInfo.languages === 'string') {
+        mergedDeviceInfo.languages = mergedDeviceInfo.languages.split(',').map((l: string) => l.trim())
+      }
+      
+      // Detect language from Accept-Language header
+      const acceptLanguage = headers['accept-language'] || ''
+      const detectedLanguage = acceptLanguage ? getBestLanguageMatch(acceptLanguage) : 'fa'
+      
+      // Client can send timezone in a custom header - validate it
+      const clientTimezone = headers['x-timezone'] || 'UTC'
+      const validatedTimezone = normalizeTimezone(clientTimezone)
       
       const metadata = {
         userAgent,
         ip,
-        deviceInfo: {
+        language: detectedLanguage,
+        timezone: validatedTimezone,
+        deviceInfo: mergedDeviceInfo,
+        requestHeaders: {
           platform: headers['sec-ch-ua-platform'] || 'unknown',
           mobile: headers['sec-ch-ua-mobile'] === '?1'
         }
@@ -27,7 +111,9 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         success: true,
         data: {
           token: session.token,
-          expiresAt: session.expiresAt.toISOString()
+          expiresAt: session.expiresAt.toISOString(),
+          language: detectedLanguage,
+          timezone: validatedTimezone
         }
       }
     } catch (error) {
@@ -74,7 +160,9 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
           token: session.token,
           userId: session.userId,
           isLoggedIn: session.isLoggedIn,
-          expiresAt: session.expiresAt.toISOString()
+          expiresAt: session.expiresAt.toISOString(),
+          language: session.metadata?.language || 'fa',
+          timezone: session.metadata?.timezone || 'UTC'
         }
       }
     } catch (error) {
@@ -214,7 +302,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
 
       // Create session for logged-in user
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
       
       const metadata = {
         userAgent,
@@ -362,7 +450,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
 
       // Create session for logged-in user
       const userAgent = headers['user-agent'] || 'unknown'
-      const ip = headers['x-forwarded-for'] || headers['x-real-ip'] || 'unknown'
+      const ip = getClientIpAddress(headers as Record<string, string | undefined>)
       
       const metadata = {
         userAgent,
