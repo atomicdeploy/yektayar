@@ -36,6 +36,13 @@ public class DeviceInfo {
     }
     
     /**
+     * Get the app package name/identifier
+     */
+    public String getPackageName() {
+        return context.getPackageName();
+    }
+    
+    /**
      * Get the device model
      */
     public String getDeviceModel() {

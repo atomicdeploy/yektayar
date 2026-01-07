@@ -15,6 +15,7 @@ import { logger } from '@yektayar/shared'
 // Import our custom native plugin
 interface DeviceInfoPluginResponse {
   appVersion: string
+  packageName: string
   deviceModel: string
   deviceManufacturer: string
   androidVersion: string
@@ -77,6 +78,7 @@ export async function getCapacitorDeviceInfo(): Promise<DeviceInfo> {
       
       appVersion: appInfo.version,
       appBuild: appInfo.build,
+      appId: appInfo.id, // Package name/identifier (e.g., com.yektayar.app)
       
       language: languageCode.value,
       
@@ -102,6 +104,7 @@ export async function getCapacitorDeviceInfo(): Promise<DeviceInfo> {
         if (nativeInfo.deviceModel) info.deviceModel = nativeInfo.deviceModel
         if (nativeInfo.deviceManufacturer) info.deviceManufacturer = nativeInfo.deviceManufacturer
         if (nativeInfo.androidVersion) info.osVersion = nativeInfo.androidVersion
+        if (nativeInfo.packageName) info.appId = nativeInfo.packageName
         if (nativeInfo.screenWidth) info.screenWidth = nativeInfo.screenWidth
         if (nativeInfo.screenHeight) info.screenHeight = nativeInfo.screenHeight
         if (nativeInfo.screenDensity) info.screenDensity = nativeInfo.screenDensity

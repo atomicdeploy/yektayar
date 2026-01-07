@@ -23,6 +23,7 @@ public class DeviceInfoPlugin extends Plugin {
     public void getDeviceInfo(PluginCall call) {
         JSObject ret = new JSObject();
         ret.put("appVersion", deviceInfo.getAppVersion());
+        ret.put("packageName", deviceInfo.getPackageName());
         ret.put("deviceModel", deviceInfo.getDeviceModel());
         ret.put("deviceManufacturer", deviceInfo.getDeviceManufacturer());
         ret.put("androidVersion", deviceInfo.getAndroidVersion());

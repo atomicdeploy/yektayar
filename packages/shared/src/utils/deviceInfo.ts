@@ -30,6 +30,7 @@ export interface DeviceInfo {
   // App information
   appVersion?: string
   appBuild?: string
+  appId?: string // Package name/identifier (e.g., com.yektayar.app)
   
   // Browser/WebView information
   userAgent?: string
@@ -95,7 +96,7 @@ export function getWebDeviceInfo(): Partial<DeviceInfo> {
   info.timezoneOffset = new Date().getTimezoneOffset()
   try {
     info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  } catch (error) {
+  } catch (_error) {
     // Fallback if Intl API not available - timezone offset already set
   }
   
@@ -202,6 +203,14 @@ export function formatDeviceInfoForHeaders(deviceInfo: DeviceInfo): Record<strin
   
   if (deviceInfo.appVersion) {
     headers['X-App-Version'] = deviceInfo.appVersion
+  }
+  
+  if (deviceInfo.appBuild) {
+    headers['X-App-Build'] = deviceInfo.appBuild
+  }
+  
+  if (deviceInfo.appId) {
+    headers['X-App-Id'] = deviceInfo.appId
   }
   
   if (deviceInfo.screenWidth && deviceInfo.screenHeight) {
