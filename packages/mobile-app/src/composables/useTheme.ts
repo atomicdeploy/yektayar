@@ -1,15 +1,17 @@
 import { ref, onMounted, watch } from 'vue'
+import type { Router } from 'vue-router'
 
 export type Theme = 'light' | 'dark' | 'auto'
 
 const currentTheme = ref<Theme>('auto')
 const isDark = ref(false)
+const currentRoute = ref<string>('')
 
 /**
  * Theme management composable
  * Handles dark/light theme switching based on system preferences or manual selection
  */
-export function useTheme() {
+export function useTheme(router?: Router) {
   // Check system preference
   const checkSystemTheme = () => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -40,13 +42,22 @@ export function useTheme() {
 
   // Update meta theme color for mobile browsers
   const updateMetaThemeColor = (dark: boolean) => {
+    let themeColor: string
+    
+    // Always use welcome screen background color on /welcome route
+    if (currentRoute.value === '/welcome') {
+      themeColor = '#f8f9fa'
+    } else {
+      themeColor = dark ? '#0a0f1a' : '#fafbfc'
+    }
+    
     const metaThemeColor = document.querySelector('meta[name="theme-color"]')
     if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', dark ? '#0a0f1a' : '#fafbfc')
+      metaThemeColor.setAttribute('content', themeColor)
     } else {
       const meta = document.createElement('meta')
       meta.name = 'theme-color'
-      meta.content = dark ? '#0a0f1a' : '#fafbfc'
+      meta.content = themeColor
       document.head.appendChild(meta)
     }
   }
@@ -77,8 +88,30 @@ export function useTheme() {
       currentTheme.value = savedTheme
     }
 
+    // Set initial route if router is provided
+    if (router) {
+      currentRoute.value = router.currentRoute.value.path
+    }
+
     // Apply initial theme
     applyTheme(currentTheme.value)
+
+    // Watch for route changes if router is provided
+    if (router) {
+      watch(() => router.currentRoute.value.path, (newPath, oldPath) => {
+        const wasWelcome = oldPath === '/welcome'
+        const isWelcome = newPath === '/welcome'
+        
+        // Only update if transitioning to/from welcome to avoid unnecessary re-renders
+        if (wasWelcome !== isWelcome) {
+          currentRoute.value = newPath
+          // Re-apply theme when transitioning to/from welcome to update meta theme color
+          applyTheme(currentTheme.value)
+        } else {
+          currentRoute.value = newPath
+        }
+      })
+    }
 
     // Listen for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
