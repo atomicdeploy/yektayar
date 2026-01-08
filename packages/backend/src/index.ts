@@ -18,6 +18,7 @@ import { supportRoutes } from './routes/support'
 import { aiRoutes } from './routes/ai'
 import { assessmentRoutes } from './routes/assessments'
 import { healthRoutes } from './routes/health'
+import { gitRoutes } from './routes/git'
 import { setupSocketIO, setupBunSocketIO } from './websocket/socketServer'
 import { setupNodeWebSocket } from './websocket/nodeWebSocketServer'
 import { setupNativeWebSocket } from './websocket/nativeWebSocketServer'
@@ -96,6 +97,7 @@ app
           { name: 'Support', description: 'Support tickets and messaging endpoints' },
           { name: 'AI', description: 'AI counselor chat endpoints' },
           { name: 'Assessments', description: 'Psychological assessments and surveys endpoints' },
+          { name: 'Git', description: 'Git repository management endpoints' },
           { name: 'WebSocket', description: 'Real-time communication via Socket.IO' }
         ],
         externalDocs: {
@@ -155,6 +157,7 @@ app
   .use(supportRoutes)
   .use(aiRoutes)
   .use(assessmentRoutes)
+  .use(gitRoutes)
 
 // Server configuration
 const port = Number(process.env.PORT) || 3000
@@ -164,6 +167,12 @@ const hostname = process.env.HOST || 'localhost'
 initializeDatabase().catch(error => {
   logger.error('Failed to initialize database:', error)
   logger.warn('Server will continue running, but database features may not work')
+})
+
+// Display git information at startup
+import { displayGitInfo } from '@yektayar/shared'
+displayGitInfo().catch(error => {
+  logger.debug('Could not display git info (not in a git repository or git not available)')
 })
 
 // Detect runtime automatically
