@@ -12,6 +12,10 @@
     </ion-header>
     
     <ion-content :fullscreen="true">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ t('courses.title') }}</ion-title>
@@ -193,7 +197,9 @@ import {
   IonProgressBar,
   IonSelect,
   IonSelectOption,
-  IonSkeletonText
+  IonSkeletonText,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/vue'
 import LazyImage from '@/components/LazyImage.vue'
 import {
@@ -308,6 +314,13 @@ const getDifficultyColor = (difficulty: string) => {
 const truncate = (text: string, length: number) => {
   if (text.length <= length) return text
   return text.substring(0, length) + '...'
+}
+
+const handleRefresh = async (event: CustomEvent) => {
+  // Simulate refreshing course data - in real app, this would call API
+  setTimeout(() => {
+    (event.target as HTMLIonRefresherElement)?.complete()
+  }, 1000)
 }
 
 onMounted(() => {

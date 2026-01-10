@@ -7,6 +7,10 @@
     </ion-header>
     
     <ion-content :fullscreen="true" :scroll-y="false">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">{{ locale === 'fa' ? 'ارزیابی‌ها' : 'Assessments' }}</ion-title>
@@ -249,6 +253,8 @@ import {
   IonIcon,
   IonButton,
   IonSpinner,
+  IonRefresher,
+  IonRefresherContent,
 } from '@ionic/vue'
 import { 
   documentText,
@@ -349,6 +355,20 @@ const viewResult = (resultId: number) => {
 
 const viewHistory = () => {
   router.push('/tabs/assessments/history')
+}
+
+const handleRefresh = async (event: CustomEvent) => {
+  try {
+    // Reload assessments and history in parallel
+    await Promise.all([
+      fetchAssessments(),
+      fetchAssessmentHistory()
+    ])
+  } catch (error) {
+    logger.error('Failed to refresh assessments:', error)
+  } finally {
+    (event.target as HTMLIonRefresherElement)?.complete()
+  }
 }
 
 onMounted(() => {
