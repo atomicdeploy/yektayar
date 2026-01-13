@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سرویس موقتاً در دسترس نیست - YektaYar</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sahel', 'Vazir', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10%, 90% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-800px) translateX(200px);
+            }
+        }
+
+        .container {
+            max-width: 700px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .message {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: right;
+        }
+
+        .details h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #ffeb3b;
+        }
+
+        .details ul {
+            list-style: none;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .details li {
+            margin-bottom: 8px;
+            padding-right: 20px;
+            position: relative;
+        }
+
+        .details li:before {
+            content: "✓";
+            position: absolute;
+            right: 0;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            color: #667eea;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 100%);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .footer a:hover {
+            border-bottom-color: #fff;
+        }
+
+        .debug-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            font-size: 11px;
+            text-align: left;
+            direction: ltr;
+            font-family: 'Courier New', monospace;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .debug-info summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #ffeb3b;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+
+        .debug-info summary:hover {
+            color: #fff;
+        }
+
+        .debug-info code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #4caf50;
+        }
+
+        .debug-info .label {
+            color: rgba(255, 255, 255, 0.5);
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .spinner {
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            .error-code {
+                font-size: 80px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .message {
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+        }
+
+        /* English version support */
+        html[lang="en"] body {
+            direction: ltr;
+        }
+
+        html[lang="en"] .details {
+            text-align: left;
+        }
+
+        html[lang="en"] .details li {
+            padding-right: 0;
+            padding-left: 20px;
+        }
+
+        html[lang="en"] .details li:before {
+            right: auto;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated particles background -->
+    <div class="particles">
+        <div class="particle" style="width: 80px; height: 80px; left: 10%; animation-delay: 0s; animation-duration: 25s;"></div>
+        <div class="particle" style="width: 60px; height: 60px; left: 30%; animation-delay: 2s; animation-duration: 20s;"></div>
+        <div class="particle" style="width: 100px; height: 100px; left: 50%; animation-delay: 4s; animation-duration: 22s;"></div>
+        <div class="particle" style="width: 70px; height: 70px; left: 70%; animation-delay: 1s; animation-duration: 18s;"></div>
+        <div class="particle" style="width: 90px; height: 90px; left: 85%; animation-delay: 3s; animation-duration: 24s;"></div>
+    </div>
+
+    <div class="container">
+        <div class="logo">🔧</div>
+        <div class="error-code">503</div>
+        <h1>سرویس موقتاً در دسترس نیست</h1>
+        <p class="message">
+            متأسفیم، سرور در حال حاضر قادر به پردازش درخواست شما نیست. 
+            این مشکل معمولاً موقتی است و به زودی برطرف خواهد شد.
+        </p>
+
+        <div class="spinner"></div>
+
+        <div class="details">
+            <h2>چه اتفاقی افتاده است؟</h2>
+            <ul>
+                <li>سرور ممکن است در حال به‌روزرسانی باشد</li>
+                <li>سرویس backend موقتاً غیرفعال شده است</li>
+                <li>تیم فنی در حال برطرف کردن مشکل هستند</li>
+                <li>این وضعیت موقتی است و به زودی برطرف می‌شود</li>
+            </ul>
+        </div>
+
+        <div class="action-buttons">
+            <a href="javascript:location.reload()" class="btn btn-primary">تلاش مجدد</a>
+            <a href="/" class="btn btn-secondary">بازگشت به صفحه اصلی</a>
+        </div>
+
+        <details class="debug-info">
+            <summary>🔍 Technical Debug Information</summary>
+            <div>
+                <div><span class="label">Time:</span> <code><!--#echo var="DATE_LOCAL" --></code></div>
+                <div><span class="label">Server:</span> <code><!--#echo var="SERVER_NAME" -->:<!--#echo var="SERVER_PORT" --></code></div>
+                <div><span class="label">Request URI:</span> <code><!--#echo var="REQUEST_URI" --></code></div>
+                <div><span class="label">Request Method:</span> <code><!--#echo var="REQUEST_METHOD" --></code></div>
+                <div><span class="label">Protocol:</span> <code><!--#echo var="SERVER_PROTOCOL" --></code></div>
+                <div><span class="label">Remote Address:</span> <code><!--#echo var="REMOTE_ADDR" --></code></div>
+                <div><span class="label">User Agent:</span> <code><!--#echo var="HTTP_USER_AGENT" --></code></div>
+                <div><span class="label">Referer:</span> <code><!--#echo var="HTTP_REFERER" --></code></div>
+            </div>
+        </details>
+
+        <div class="footer">
+            <p>در صورت ادامه مشکل با <a href="mailto:support@yektayar.ir">پشتیبانی یکتایار</a> تماس بگیرید</p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh after 30 seconds
+        setTimeout(function() {
+            location.reload();
+        }, 30000);
+
+        // Create more particles dynamically
+        const particles = document.querySelector('.particles');
+        for (let i = 0; i < 10; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 80 + 40 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.animationDuration = Math.random() * 10 + 15 + 's';
+            particles.appendChild(particle);
+        }
+    </script>
+</body>
+</html>

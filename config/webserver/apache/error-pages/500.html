@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطای داخلی سرور - YektaYar</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sahel', 'Vazir', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Tahoma', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background shapes */
+        .bg-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: morph 15s infinite ease-in-out;
+        }
+
+        @keyframes morph {
+            0%, 100% {
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+            }
+            50% {
+                border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+                transform: translate(50px, -50px) rotate(180deg);
+            }
+            75% {
+                border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+            }
+        }
+
+        .container {
+            max-width: 700px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: shake 0.5s ease-in-out;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px) rotate(-5deg); }
+            75% { transform: translateX(10px) rotate(5deg); }
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #ffd4d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .details {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: right;
+        }
+
+        .details h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #ffeb3b;
+        }
+
+        .details ul {
+            list-style: none;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .details li {
+            margin-bottom: 8px;
+            padding-right: 20px;
+            position: relative;
+        }
+
+        .details li:before {
+            content: "⚠";
+            position: absolute;
+            right: 0;
+            color: #ffeb3b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            color: #f5576c;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            background: linear-gradient(135deg, #ffffff 0%, #e8e8e8 100%);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 100%);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .footer a:hover {
+            border-bottom-color: #fff;
+        }
+
+        .debug-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            font-size: 11px;
+            text-align: left;
+            direction: ltr;
+            font-family: 'Courier New', monospace;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .debug-info summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #ffeb3b;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+
+        .debug-info summary:hover {
+            color: #fff;
+        }
+
+        .debug-info code {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #4caf50;
+        }
+
+        .debug-info .label {
+            color: rgba(255, 255, 255, 0.5);
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 40px 20px; }
+            .error-code { font-size: 80px; }
+            h1 { font-size: 24px; }
+            p { font-size: 16px; }
+            .btn { padding: 12px 24px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-shapes">
+        <div class="shape" style="width: 300px; height: 300px; top: 10%; left: 5%; animation-delay: 0s;"></div>
+        <div class="shape" style="width: 200px; height: 200px; top: 60%; right: 10%; animation-delay: 3s;"></div>
+        <div class="shape" style="width: 250px; height: 250px; bottom: 5%; left: 50%; animation-delay: 1.5s;"></div>
+    </div>
+
+    <div class="container">
+        <div class="error-icon">⚠️</div>
+        <div class="error-code">500</div>
+        <h1>خطای داخلی سرور</h1>
+        <p>متأسفیم، مشکلی غیرمنتظره در سرور رخ داده است. این خطا لاگ شده و تیم فنی ما در حال بررسی آن هستند.</p>
+
+        <div class="details">
+            <h2>اطلاعات بیشتر</h2>
+            <ul>
+                <li>خطای داخلی سرور معمولاً موقتی است</li>
+                <li>تیم فنی به صورت خودکار از این خطا مطلع شده‌اند</li>
+                <li>لطفاً چند دقیقه دیگر دوباره تلاش کنید</li>
+                <li>در صورت تکرار، با پشتیبانی تماس بگیرید</li>
+            </ul>
+        </div>
+
+        <div class="action-buttons">
+            <a href="javascript:location.reload()" class="btn btn-primary">تلاش مجدد</a>
+            <a href="/" class="btn btn-secondary">صفحه اصلی</a>
+        </div>
+
+        <details class="debug-info">
+            <summary>🔍 Technical Debug Information</summary>
+            <div>
+                <div><span class="label">Time:</span> <code><!--#echo var="DATE_LOCAL" --></code></div>
+                <div><span class="label">Server:</span> <code><!--#echo var="SERVER_NAME" -->:<!--#echo var="SERVER_PORT" --></code></div>
+                <div><span class="label">Request URI:</span> <code><!--#echo var="REQUEST_URI" --></code></div>
+                <div><span class="label">Request Method:</span> <code><!--#echo var="REQUEST_METHOD" --></code></div>
+                <div><span class="label">Protocol:</span> <code><!--#echo var="SERVER_PROTOCOL" --></code></div>
+                <div><span class="label">Remote Address:</span> <code><!--#echo var="REMOTE_ADDR" --></code></div>
+            </div>
+        </details>
+
+        <div class="footer">
+            <p>یکتایار © 2025 | <a href="mailto:support@yektayar.ir">پشتیبانی</a></p>
+        </div>
+    </div>
+</body>
+</html>
