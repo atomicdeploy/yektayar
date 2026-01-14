@@ -251,18 +251,6 @@ if [[ -n "$INSTALL_BUN" ]]; then
     export PATH="$BUN_INSTALL/bin:$PATH"
 fi
 
-# Install Vue CLI globally
-if [[ -n "$INSTALL_VUE" ]] && command_exists npm; then
-    echo "📥 Installing Vue CLI globally..."
-    npm install -g @vue/cli
-fi
-
-# Install Vite globally (optional, usually used per-project)
-if [[ -n "$INSTALL_VITE" ]] && command_exists npm; then
-    echo "📥 Installing Vite globally..."
-    npm install -g vite
-fi
-
 # Install GitHub CLI
 if [[ -n "$INSTALL_GH" ]]; then
     echo "📥 Installing GitHub CLI..."
@@ -320,8 +308,22 @@ fi
 if command_exists npm; then
     echo "🔧 Setting up bash completion for npm..."
     if [ ! -d "$HOME/.npm-completion" ]; then
+        mkdir -p "$HOME/.npm-completion"
         npm completion > "$HOME/.npm-completion/npm-completion.sh" 2>/dev/null || true
     fi
+fi
+
+# Install Vue CLI and Vite globally (at the end after pipx/thefuck)
+if [[ -n "$INSTALL_VUE" ]] && command_exists npm; then
+    echo "📥 Installing Vue CLI globally..."
+    # Respect npm proxy environment variables
+    npm install -g @vue/cli
+fi
+
+if [[ -n "$INSTALL_VITE" ]] && command_exists npm; then
+    echo "📥 Installing Vite globally..."
+    # Respect npm proxy environment variables
+    npm install -g vite
 fi
 
 echo ""
@@ -345,6 +347,8 @@ check_version "gh" || true
 check_version "pipx" || true
 check_version "pgcli" || true
 check_version "thefuck" || true
+check_version "vue" || true
+check_version "vite" || true
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
