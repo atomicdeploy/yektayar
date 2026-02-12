@@ -70,6 +70,17 @@
             <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
           </div>
 
+          <div class="action-card" @click="navigateToConsultation">
+            <div class="action-icon-wrapper primary">
+              <ion-icon :icon="mic" class="action-icon"></ion-icon>
+            </div>
+            <div class="action-content">
+              <h3>{{ locale === 'fa' ? 'شروع مشاوره جدید' : 'Start New Consultation' }}</h3>
+              <p>{{ locale === 'fa' ? 'توضیح مشکل با صدا یا متن' : 'Describe your problem with voice or text' }}</p>
+            </div>
+            <ion-icon :icon="chevronForward" class="action-arrow"></ion-icon>
+          </div>
+
           <div class="action-card" @click="navigateToAppointments">
             <div class="action-icon-wrapper success">
               <ion-icon :icon="calendar" class="action-icon"></ion-icon>
@@ -214,6 +225,7 @@ import {
   sparkles,
   moon,
   sunny,
+  mic,
   school,
   documentText,
 } from 'ionicons/icons'
@@ -227,6 +239,7 @@ const { isDark, toggleTheme } = useTheme()
 
 const navigateToAIChat = () => router.push('/tabs/chat/ai')
 const navigateToChat = () => router.push('/tabs/chat')
+const navigateToConsultation = () => router.push('/consultation/details')
 const navigateToAppointments = () => router.push('/tabs/appointments')
 const navigateToCourses = () => router.push('/tabs/courses')
 const navigateToAssessments = () => router.push('/tabs/assessments')
