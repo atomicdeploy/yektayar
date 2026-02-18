@@ -18,6 +18,38 @@
   --ion-color-secondary-contrast-rgb: 255, 255, 255;
   --ion-color-secondary-shade: #011433;
   --ion-color-secondary-tint: #1a2f4e;
+  
+  /** tertiary (Beautiful Purple/Indigo) **/
+  --ion-color-tertiary: #6366f1;
+  --ion-color-tertiary-rgb: 99, 102, 241;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #575ad4;
+  --ion-color-tertiary-tint: #7375f2;
+  
+  /** info (Bright Blue) **/
+  --ion-color-info: #3b82f6;
+  --ion-color-info-rgb: 59, 130, 246;
+  --ion-color-info-contrast: #ffffff;
+  --ion-color-info-contrast-rgb: 255, 255, 255;
+  --ion-color-info-shade: #3472d8;
+  --ion-color-info-tint: #4f8ff7;
+  
+  /** celebrate (Vibrant Pink/Magenta) **/
+  --ion-color-celebrate: #ec4899;
+  --ion-color-celebrate-rgb: 236, 72, 153;
+  --ion-color-celebrate-contrast: #ffffff;
+  --ion-color-celebrate-contrast-rgb: 255, 255, 255;
+  --ion-color-celebrate-shade: #d03f87;
+  --ion-color-celebrate-tint: #ee5aa3;
+  
+  /** help (Bright Teal) **/
+  --ion-color-help: #14b8a6;
+  --ion-color-help-rgb: 20, 184, 166;
+  --ion-color-help-contrast: #ffffff;
+  --ion-color-help-contrast-rgb: 255, 255, 255;
+  --ion-color-help-shade: #12a292;
+  --ion-color-help-tint: #2cbfaf;
 
   /** success **/
   --ion-color-success: #2dd36f;
@@ -80,9 +112,9 @@
   --ion-text-color: #1a1a1a;
   --ion-text-color-rgb: 26, 26, 26;
 
-  /* Toolbar & Header */
-  --ion-toolbar-background: #ffffff;
-  --ion-toolbar-border-color: #e8eaed;
+  /* Toolbar & Header - Translucent glass effect */
+  --ion-toolbar-background: rgba(255, 255, 255, 0.85);
+  --ion-toolbar-border-color: rgba(0, 0, 0, 0.08);
   --ion-toolbar-color: #1a1a1a;
 
   /* Card & Surface */
@@ -92,9 +124,9 @@
   /* Borders & Dividers */
   --ion-border-color: #e8eaed;
 
-  /* Tab Bar */
-  --ion-tab-bar-background: #ffffff;
-  --ion-tab-bar-border-color: #e8eaed;
+  /* Tab Bar - Translucent glass effect */
+  --ion-tab-bar-background: rgba(255, 255, 255, 0.85);
+  --ion-tab-bar-border-color: rgba(0, 0, 0, 0.08);
 
   /* Custom Light Theme Variables */
   --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #e8c170 100%);
@@ -136,9 +168,9 @@
   --ion-text-color: #e8e9ed;
   --ion-text-color-rgb: 232, 233, 237;
 
-  /* Toolbar & Header - Elevated dark surface */
-  --ion-toolbar-background: #101826;
-  --ion-toolbar-border-color: #1a2436;
+  /* Toolbar & Header - Translucent glass effect */
+  --ion-toolbar-background: rgba(16, 24, 38, 0.72);
+  --ion-toolbar-border-color: rgba(26, 36, 54, 0.5);
   --ion-toolbar-color: #e8e9ed;
 
   /* Card & Surface - Layered depth */
@@ -148,16 +180,16 @@
   /* Borders & Dividers - Subtle separation */
   --ion-border-color: #1e2a3f;
 
-  /* Tab Bar - Premium feel */
-  --ion-tab-bar-background: #0d1421;
-  --ion-tab-bar-border-color: #1a2436;
+  /* Tab Bar - Translucent glass effect */
+  --ion-tab-bar-background: rgba(13, 20, 33, 0.72);
+  --ion-tab-bar-border-color: rgba(26, 36, 54, 0.5);
 
   /* Custom Dark Theme Variables */
   --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #f0ca6f 100%);
   --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --glass-background: rgba(18, 26, 43, 0.75);
-  --glass-border: rgba(212, 164, 62, 0.2);
+  --glass-background: rgba(18, 26, 43, 0.72);
+  --glass-border: rgba(26, 36, 54, 0.5);
   --overlay-background: rgba(0, 0, 0, 0.7);
 
   /* Dark theme specific colors */
@@ -205,6 +237,27 @@
   --ion-color-step-850: #5480bf;
   --ion-color-step-900: #5886c8;
   --ion-color-step-950: #5c8cd1;
+  
+  /* Semantic colors - Dark mode variants */
+  --ion-color-tertiary: #818cf8;
+  --ion-color-tertiary-rgb: 129, 140, 248;
+  --ion-color-tertiary-shade: #7379da;
+  --ion-color-tertiary-tint: #8f97f9;
+  
+  --ion-color-info: #60a5fa;
+  --ion-color-info-rgb: 96, 165, 250;
+  --ion-color-info-shade: #5591dc;
+  --ion-color-info-tint: #70aefb;
+  
+  --ion-color-celebrate: #f472b6;
+  --ion-color-celebrate-rgb: 244, 114, 182;
+  --ion-color-celebrate-shade: #d764a1;
+  --ion-color-celebrate-tint: #f581bd;
+  
+  --ion-color-help: #2dd4bf;
+  --ion-color-help-rgb: 45, 212, 191;
+  --ion-color-help-shade: #28bba8;
+  --ion-color-help-tint: #42d8c5;
 }
 
 /* Apply dark theme when system prefers dark mode AND not in forced mode */
@@ -218,9 +271,9 @@
     --ion-text-color: #e8e9ed;
     --ion-text-color-rgb: 232, 233, 237;
 
-    /* Toolbar & Header - Elevated dark surface */
-    --ion-toolbar-background: #101826;
-    --ion-toolbar-border-color: #1a2436;
+    /* Toolbar & Header - Translucent glass effect */
+    --ion-toolbar-background: rgba(16, 24, 38, 0.72);
+    --ion-toolbar-border-color: rgba(26, 36, 54, 0.5);
     --ion-toolbar-color: #e8e9ed;
 
     /* Card & Surface - Layered depth */
@@ -230,16 +283,16 @@
     /* Borders & Dividers - Subtle separation */
     --ion-border-color: #1e2a3f;
 
-    /* Tab Bar - Premium feel */
-    --ion-tab-bar-background: #0d1421;
-    --ion-tab-bar-border-color: #1a2436;
+    /* Tab Bar - Translucent glass effect */
+    --ion-tab-bar-background: rgba(13, 20, 33, 0.72);
+    --ion-tab-bar-border-color: rgba(26, 36, 54, 0.5);
 
     /* Custom Dark Theme Variables */
     --accent-gradient: linear-gradient(135deg, #d4a43e 0%, #f0ca6f 100%);
     --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     --card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --glass-background: rgba(18, 26, 43, 0.75);
-    --glass-border: rgba(212, 164, 62, 0.2);
+    --glass-background: rgba(18, 26, 43, 0.72);
+    --glass-border: rgba(26, 36, 54, 0.5);
     --overlay-background: rgba(0, 0, 0, 0.7);
 
     /* Dark theme specific colors */
@@ -287,6 +340,27 @@
     --ion-color-step-850: #5480bf;
     --ion-color-step-900: #5886c8;
     --ion-color-step-950: #5c8cd1;
+    
+    /* Semantic colors - Dark mode variants */
+    --ion-color-tertiary: #818cf8;
+    --ion-color-tertiary-rgb: 129, 140, 248;
+    --ion-color-tertiary-shade: #7379da;
+    --ion-color-tertiary-tint: #8f97f9;
+    
+    --ion-color-info: #60a5fa;
+    --ion-color-info-rgb: 96, 165, 250;
+    --ion-color-info-shade: #5591dc;
+    --ion-color-info-tint: #70aefb;
+    
+    --ion-color-celebrate: #f472b6;
+    --ion-color-celebrate-rgb: 244, 114, 182;
+    --ion-color-celebrate-shade: #d764a1;
+    --ion-color-celebrate-tint: #f581bd;
+    
+    --ion-color-help: #2dd4bf;
+    --ion-color-help-rgb: 45, 212, 191;
+    --ion-color-help-shade: #28bba8;
+    --ion-color-help-tint: #42d8c5;
   }
 }
 
@@ -389,7 +463,10 @@ ion-card {
   box-shadow: var(--card-shadow);
   border-radius: 16px;
   margin: 12px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
 }
 
 ion-card:hover {
@@ -397,7 +474,57 @@ ion-card:hover {
   box-shadow: var(--card-shadow-hover);
 }
 
-/* Enhanced toolbar styling */
+/* Enhanced button styling */
+ion-button {
+  --border-radius: 12px;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &::part(native) {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+  }
+}
+
+/* Smooth chip styling */
+ion-chip {
+  --background: var(--surface-2);
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--glass-border);
+  
+  @media (hover: hover) {
+    &:hover {
+      --background: var(--surface-3);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+/* Enhanced searchbar */
+ion-searchbar {
+  --background: var(--surface-2);
+  --border-radius: 12px;
+  --box-shadow: var(--card-shadow);
+  --cancel-button-color: var(--ion-color-primary);
+  --clear-button-color: var(--text-secondary);
+  --icon-color: var(--text-tertiary);
+  --placeholder-color: var(--text-tertiary);
+  --placeholder-opacity: 1;
+  padding: 8px 12px;
+}
+
+/* Enhanced toolbar styling - Translucent/Acrylic effect */
 ion-toolbar {
   --background: var(--ion-toolbar-background);
   --color: var(--ion-toolbar-color);
@@ -405,16 +532,27 @@ ion-toolbar {
   --border-width: 0 0 1px 0;
 }
 
-/* Enhanced tab bar styling */
-ion-tab-bar {
-  --background: var(--ion-tab-bar-background);
-  --border: 1px solid var(--ion-tab-bar-border-color);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+/* iOS-style translucent header */
+ion-header {
+  &::after {
+    display: none; /* Remove default header shadow */
+  }
 }
 
-ion-tab-button {
-  --color: var(--text-secondary);
-  --color-selected: var(--ion-color-primary);
+ion-header ion-toolbar {
+  --background: var(--glass-background);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+/* Enhanced tab bar styling - Modern iOS look with translucency */
+ion-tab-bar {
+  --background: var(--glass-background);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid var(--glass-border);
+  box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* Content area styling */
